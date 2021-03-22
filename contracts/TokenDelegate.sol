@@ -76,7 +76,7 @@ contract TokenDelegate is TokenDelegateStorageV1, TokenEvents {
     }
 
     /**
-     * @notice Pause the token transfer
+     * @notice Token name and symbol change
      */
     // TODO @KaymasJain - Looks good? And should we have two functions or single?
     function changeNameAndSymbol(string calldata name_, string calldata symbol_) external {
