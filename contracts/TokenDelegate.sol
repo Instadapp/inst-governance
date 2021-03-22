@@ -87,7 +87,6 @@ contract TokenDelegate is TokenDelegateStorageV1, TokenEvents {
         emit ChangedNameAndSymbol(name, name_, symbol, symbol_);
         name = name_;
         symbol = symbol_;
-        
     }
 
     /**
