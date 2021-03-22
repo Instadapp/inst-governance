@@ -1,20 +1,6 @@
 pragma solidity ^0.7.0;
 pragma experimental ABIEncoderV2;
 
-interface TimelockInterface {
-    function delay() external view returns (uint);
-    function GRACE_PERIOD() external view returns (uint);
-    function acceptAdmin() external;
-    function queuedTransactions(bytes32 hash) external view returns (bool);
-    function queueTransaction(address target, uint value, string calldata signature, bytes calldata data, uint eta) external returns (bytes32);
-    function cancelTransaction(address target, uint value, string calldata signature, bytes calldata data, uint eta) external;
-    function executeTransaction(address target, uint value, string calldata signature, bytes calldata data, uint eta) external payable returns (bytes memory);
-}
-
-interface TokenInterface {
-    function getPriorVotes(address account, uint blockNumber) external view returns (uint96);
-}
-
 contract TokenEvents {
     
     /// @notice An event thats emitted when an account changes its delegate
@@ -36,10 +22,13 @@ contract TokenEvents {
     event NewImplementation(address oldImplementation, address newImplementation);
 
     /// @notice An event thats emitted when the token transfered is paused
-    event TransferPaused(address minter);
+    event TransferPaused(address indexed minter);
 
     /// @notice An event thats emitted when the token transfered is unpaused
-    event TransferUnpaused(address minter);
+    event TransferUnpaused(address indexed minter);
+
+    /// @notice An event thats emitted when the token name and symbol is changed
+    event ChangedNameAndSymbol(string oldName, string newName, string oldSybmol, string newSybmol);
 }
 
 contract TokenDelegatorStorage {

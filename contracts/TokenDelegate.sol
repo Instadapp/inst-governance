@@ -1,12 +1,7 @@
 pragma solidity ^0.7.0;
 pragma experimental ABIEncoderV2;
 
-import {     
-    TokenDelegateStorageV1,
-    TokenEvents,
-    TimelockInterface,
-    TokenInterface
-} from "./TokenInterfaces.sol";
+import { TokenDelegateStorageV1, TokenEvents} from "./TokenInterfaces.sol";
 import { SafeMath } from "./SafeMath.sol";
 
 // TODO @thrilok209 @KaymasJain - Rename it
@@ -78,6 +73,21 @@ contract TokenDelegate is TokenDelegateStorageV1, TokenEvents {
         require(msg.sender == minter, "Tkn::unpauseTransfer: only the minter can unpause token transfer");
         transferPaused = false;
         emit TransferUnpaused(msg.sender);
+    }
+
+    /**
+     * @notice Pause the token transfer
+     */
+    // TODO @KaymasJain - Looks good? And should we have two functions or single?
+    function changeNameAndSymbol(string calldata name_, string calldata symbol_) external {
+        require(msg.sender == minter, "Tkn::changeNameAndSymbol: only the minter can change token name and symbol");
+        require(bytes(name_).length > 0, "Tkn::changeNameAndSymbol: name_name_ length invaild");
+        require(bytes(symbol_).length > 0, "Tkn::changeNameAndSymbol: symbol_ length invaild");
+
+        emit ChangedNameAndSymbol(name, name_, symbol, symbol_);
+        name = name_;
+        symbol = symbol_;
+        
     }
 
     /**
