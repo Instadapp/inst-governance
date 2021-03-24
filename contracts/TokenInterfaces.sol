@@ -27,8 +27,11 @@ contract TokenEvents {
     /// @notice An event thats emitted when the token transfered is unpaused
     event TransferUnpaused(address indexed minter);
 
-    /// @notice An event thats emitted when the token name and symbol is changed
-    event ChangedNameAndSymbol(string oldName, string newName, string oldSybmol, string newSybmol);
+    /// @notice An event thats emitted when the token symbol is changed
+    event ChangedSymbol(string oldSybmol, string newSybmol);
+
+    /// @notice An event thats emitted when the token name is changed
+    event ChangedName(string oldName, string newName);
 }
 
 contract TokenDelegatorStorage {

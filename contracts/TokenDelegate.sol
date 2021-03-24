@@ -25,13 +25,19 @@ contract TokenDelegate is TokenDelegateStorageV1, TokenEvents {
     bytes32 public constant PERMIT_TYPEHASH = keccak256("Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)");
 
 
-    // TODO @mubaris - add comment of each parameter.
+    /**
+      * @notice Used to initialize the contract during delegator constructor
+      * @param account The address to recieve initial suppply
+      * @param minter_ The address of the minter
+      * @param mintingAllowedAfter_ Timestamp of the next allowed minting
+      * @param transferPaused_ Flag to make the token non-transferable
+      */
     function initialize(address account, address minter_, uint mintingAllowedAfter_, bool transferPaused_) public {
         require(mintingAllowedAfter == 0, "Token::initialize: can only initialize once");
-        require(address(minter) == address(0), "Token::initialize: can only initialize once");
+        require(minter == address(0), "Token::initialize: can only initialize once");
         require(mintingAllowedAfter_ >= block.timestamp, "Token::constructor: minting can only begin after deployment");
         require(msg.sender == minter, "Token::initialize: admin only");
-        // TODO @mubaris - anything else to add in require statements?
+        require(account != address(0) && minter_ != address(0), "Token::initialize: invalid address");
 
         balances[account] = uint96(totalSupply);
         emit Transfer(address(0), account, totalSupply);
@@ -76,16 +82,28 @@ contract TokenDelegate is TokenDelegateStorageV1, TokenEvents {
     }
 
     /**
-     * @notice Token name and symbol change
+     * @notice Change token name
+     * @param name_ New token name
      */
-    // TODO @KaymasJain - Looks good? And should we have two functions or single?
-    function changeNameAndSymbol(string calldata name_, string calldata symbol_) external {
-        require(msg.sender == minter, "Tkn::changeNameAndSymbol: only the minter can change token name and symbol");
-        require(bytes(name_).length > 0, "Tkn::changeNameAndSymbol: name_name_ length invaild");
-        require(bytes(symbol_).length > 0, "Tkn::changeNameAndSymbol: symbol_ length invaild");
+    function changeName(string calldata name_) external {
+        require(msg.sender == minter, "Tkn::changeName: only the minter can change token name");
+        require(bytes(name_).length > 0, "Tkn::changeName: name_ length invaild");
 
-        emit ChangedNameAndSymbol(name, name_, symbol, symbol_);
+        emit ChangedName(name, name_);
+
         name = name_;
+    }
+
+    /**
+     * @notice Change token symbol
+     * @param symbol_ New token symbol
+     */
+    function changeSymbol(string calldata symbol_) external {
+        require(msg.sender == minter, "Tkn::changeSymbol: only the minter can change token symbol");
+        require(bytes(symbol_).length > 0, "Tkn::changeSymbol: name_name_ length invaild");
+
+        emit ChangedName(symbol, symbol_);
+
         symbol = symbol_;
     }
 
