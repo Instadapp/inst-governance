@@ -1,6 +1,8 @@
 pragma solidity ^0.7.0;
 pragma experimental ABIEncoderV2;
 
+import "hardhat/console.sol";
+
 import { TokenDelegateStorageV1, TokenEvents} from "./TokenInterfaces.sol";
 import { SafeMath } from "./SafeMath.sol";
 
@@ -34,7 +36,6 @@ contract TokenDelegate is TokenDelegateStorageV1, TokenEvents {
       */
     function initialize(address account, address minter_, uint mintingAllowedAfter_, bool transferPaused_) public {
         require(mintingAllowedAfter == 0, "Token::initialize: can only initialize once");
-        require(minter == address(0), "Token::initialize: can only initialize once");
         require(mintingAllowedAfter_ >= block.timestamp, "Token::constructor: minting can only begin after deployment");
         require(msg.sender == minter, "Token::initialize: admin only");
         require(account != address(0) && minter_ != address(0), "Token::initialize: invalid address");
@@ -45,6 +46,9 @@ contract TokenDelegate is TokenDelegateStorageV1, TokenEvents {
         emit MinterChanged(address(0), minter);
         mintingAllowedAfter = mintingAllowedAfter_;
         transferPaused = transferPaused_;
+
+        // console.log("Account: ", account);
+        // console.log("Balance: ", balances[account]);
 
         if (transferPaused) {
             emit TransferPaused(msg.sender);
@@ -334,6 +338,9 @@ contract TokenDelegate is TokenDelegateStorageV1, TokenEvents {
         require(!transferPaused, "Tkn::_transferTokens: transfer paused");
         require(src != address(0), "Tkn::_transferTokens: cannot transfer from the zero address");
         require(dst != address(0), "Tkn::_transferTokens: cannot transfer to the zero address");
+
+        // console.log("Balance: ", balances[src]);
+        // console.log("Account (Transfer): ", src);
 
         balances[src] = sub96(balances[src], amount, "Tkn::_transferTokens: transfer amount exceeds balance");
         balances[dst] = add96(balances[dst], amount, "Tkn::_transferTokens: transfer amount overflows");

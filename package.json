@@ -17,5 +17,9 @@
     "ethers": "^5.0.32",
     "hardhat": "^2.1.1",
     "solc": "^0.7.0"
+  },
+  "dependencies": {
+    "@nomiclabs/hardhat-etherscan": "^2.1.1",
+    "dotenv": "^8.2.0"
   }
 }

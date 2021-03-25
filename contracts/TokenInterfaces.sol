@@ -44,6 +44,14 @@ contract TokenDelegatorStorage {
     /// @notice The timestamp after which implementation maybe change
     uint public changeImplementationAfter;
 
+    /// @notice EIP-20 token name for this token
+    string public name = "<Token Name>"; // TODO - Replace it
+
+    /// @notice EIP-20 token symbol for this token
+    string public symbol = "<TKN>"; // TODO - Replace it
+
+    /// @notice Total number of tokens in circulation
+    uint public totalSupply = 10000000e18; // TODO - Replace it
 }
 
 /**
@@ -53,17 +61,11 @@ contract TokenDelegatorStorage {
  * TokenDelegateStorageVX.
  */
 contract TokenDelegateStorageV1 is TokenDelegatorStorage {
-    /// @notice EIP-20 token name for this token
-    string public name = "<Token Name>"; // TODO - Replace it
-
-    /// @notice EIP-20 token symbol for this token
-    string public symbol = "<TKN>"; // TODO - Replace it
-
-    /// @notice Total number of tokens in circulation
-    uint public totalSupply = 10000000e18; // TODO - Replace it
-
     /// @notice The timestamp after which minting may occur
     uint public mintingAllowedAfter;
+
+    /// @notice token transfer pause state
+    bool public transferPaused;
 
     // Allowance amounts on behalf of others
     mapping (address => mapping (address => uint96)) internal allowances;
@@ -88,7 +90,4 @@ contract TokenDelegateStorageV1 is TokenDelegatorStorage {
 
     /// @notice A record of states for signing / validating signatures
     mapping (address => uint) public nonces;
-
-    /// @notice token transfer pause state
-    bool public transferPaused;
 }

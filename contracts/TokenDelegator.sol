@@ -9,7 +9,8 @@ contract TokenDelegator is TokenDelegatorStorage, TokenEvents {
         address minter_,
         address implementation_,
         uint mintingAllowedAfter_,
-        uint changeImplementationAfter_
+        uint changeImplementationAfter_,
+        bool transferPaused_
     ) {
         // Admin set to msg.sender for initialization
         minter = msg.sender;
@@ -17,10 +18,11 @@ contract TokenDelegator is TokenDelegatorStorage, TokenEvents {
         delegateTo(
             implementation_,
             abi.encodeWithSignature(
-                "initialize(address,address,uint256)",
+                "initialize(address,address,uint256,bool)",
                 account,
                 minter_,
-                mintingAllowedAfter_
+                mintingAllowedAfter_,
+                transferPaused_
             )
         );
 
