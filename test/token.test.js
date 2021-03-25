@@ -17,11 +17,6 @@ describe("Token", function() {
 
     await tokenDelegate.deployed()
 
-    // console.log((await tokenDelegate.totalSupply()))
-    // console.log((await tokenDelegate.symbol()))
-    // console.log((await tokenDelegate.decimals()))
-    // console.log((await tokenDelegate.transferPaused()))
-
     allowedAfter = 1622505601 // June 1 2021
 
     const TokenDelegator = await ethers.getContractFactory("TokenDelegator")
@@ -30,10 +25,6 @@ describe("Token", function() {
     await tokenDelegator.deployed()
 
     token = await ethers.getContractAt("TokenDelegate", tokenDelegator.address)
-
-    // console.log((await tokenDelegate.balanceOf(minter.address)))
-
-    // console.log((await token.balanceOf(minter.address)))
 
     await token.transfer(account1.address, ethers.utils.parseEther("10000"))
     await token.transfer(account2.address, ethers.utils.parseEther("20000"))
