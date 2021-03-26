@@ -6,9 +6,6 @@ import { SafeMath } from "./SafeMath.sol";
 
 // TODO @thrilok209 @KaymasJain - Rename it
 contract TokenDelegate is TokenDelegateStorageV1, TokenEvents {
-    /// @notice EIP-20 token decimals for this token
-    uint8 public constant decimals = 18;
-
     /// @notice Minimum time between mints
     uint32 public constant minimumTimeBetweenMints = 1 days * 7; // TODO @thrilok209 @KaymasJain - Replace it
 
