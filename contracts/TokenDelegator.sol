@@ -6,21 +6,16 @@ import { TokenDelegatorStorage, TokenEvents } from "./TokenInterfaces.sol";
 contract TokenDelegator is TokenDelegatorStorage, TokenEvents {
     constructor(
         address account,
-        address minter_,
         address implementation_,
         uint mintingAllowedAfter_,
         uint changeImplementationAfter_,
         bool transferPaused_
     ) {
-        // Admin set to msg.sender for initialization
-        minter = msg.sender;
-
         delegateTo(
             implementation_,
             abi.encodeWithSignature(
-                "initialize(address,address,uint256,bool)",
+                "initialize(address,uint256,bool)",
                 account,
-                minter_,
                 mintingAllowedAfter_,
                 transferPaused_
             )
@@ -29,16 +24,13 @@ contract TokenDelegator is TokenDelegatorStorage, TokenEvents {
         changeImplementationAfter = changeImplementationAfter_;
 
         _setImplementation(implementation_);
-
-        minter = minter_;
     }
 
     /**
      * @notice Called by the admin to update the implementation of the delegator
      * @param implementation_ The address of the new implementation for delegation
      */
-    function _setImplementation(address implementation_) public {
-        require(msg.sender == minter, "TokenDelegator::_setImplementation: admin only");
+    function _setImplementation(address implementation_) public isMaster {
         require(implementation_ != address(0), "TokenDelegator::_setImplementation: invalid implementation address");
         require(changeImplementationAfter >= block.timestamp, "TokenDelegator::_setImplementation: can change implementation changeImplementationAfter time only");
 

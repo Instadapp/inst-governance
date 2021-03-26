@@ -1,6 +1,10 @@
 pragma solidity ^0.7.0;
 pragma experimental ABIEncoderV2;
 
+interface IndexInterface {
+    function master() external view returns (address);
+}
+
 contract TokenEvents {
     
     /// @notice An event thats emitted when an account changes its delegate
@@ -35,8 +39,7 @@ contract TokenEvents {
 }
 
 contract TokenDelegatorStorage {
-    /// @notice Administrator Token minter
-    address public minter;
+    IndexInterface constant public instaIndex = IndexInterface(0x2971AdFa57b20E5a416aE5a708A8655A9c74f723);
 
     /// @notice Active brains of Token
     address public implementation;
@@ -56,6 +59,10 @@ contract TokenDelegatorStorage {
     /// @notice EIP-20 token decimals for this token
     uint8 public constant decimals = 18;
 
+    modifier isMaster() {
+        require(instaIndex.master() == msg.sender, "Tkn::isMaster: msg.sender not master");
+        _;
+    }
 }
 
 /**

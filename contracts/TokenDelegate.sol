@@ -25,20 +25,16 @@ contract TokenDelegate is TokenDelegateStorageV1, TokenEvents {
     /**
       * @notice Used to initialize the contract during delegator constructor
       * @param account The address to recieve initial suppply
-      * @param minter_ The address of the minter
       * @param mintingAllowedAfter_ Timestamp of the next allowed minting
       * @param transferPaused_ Flag to make the token non-transferable
       */
-    function initialize(address account, address minter_, uint mintingAllowedAfter_, bool transferPaused_) public {
+    function initialize(address account, uint mintingAllowedAfter_, bool transferPaused_) public {
         require(mintingAllowedAfter == 0, "Token::initialize: can only initialize once");
         require(mintingAllowedAfter_ >= block.timestamp, "Token::constructor: minting can only begin after deployment");
-        require(msg.sender == minter, "Token::initialize: admin only");
-        require(account != address(0) && minter_ != address(0), "Token::initialize: invalid address");
+        require(account != address(0), "Token::initialize: invalid address");
 
         balances[account] = uint96(totalSupply);
         emit Transfer(address(0), account, totalSupply);
-        minter = minter_;
-        emit MinterChanged(address(0), minter);
         mintingAllowedAfter = mintingAllowedAfter_;
         transferPaused = transferPaused_;
 
@@ -50,20 +46,9 @@ contract TokenDelegate is TokenDelegateStorageV1, TokenEvents {
     }
 
     /**
-     * @notice Change the minter address
-     * @param minter_ The address of the new minter
-     */
-    function setMinter(address minter_) external {
-        require(msg.sender == minter, "Tkn::setMinter: only the minter can change the minter address");
-        emit MinterChanged(minter, minter_);
-        minter = minter_;
-    }
-
-    /**
      * @notice Pause the token transfer
      */
-    function pauseTransfer() external {
-        require(msg.sender == minter, "Tkn::pauseTransfer: only the minter can pause token transfer");
+    function pauseTransfer() external isMaster {
         transferPaused = true;
         emit TransferPaused(msg.sender);
     }
@@ -71,8 +56,7 @@ contract TokenDelegate is TokenDelegateStorageV1, TokenEvents {
     /**
      * @notice Unpause the token transfer
      */
-    function unpauseTransfer() external {
-        require(msg.sender == minter, "Tkn::unpauseTransfer: only the minter can unpause token transfer");
+    function unpauseTransfer() external isMaster {
         transferPaused = false;
         emit TransferUnpaused(msg.sender);
     }
@@ -81,8 +65,7 @@ contract TokenDelegate is TokenDelegateStorageV1, TokenEvents {
      * @notice Change token name
      * @param name_ New token name
      */
-    function changeName(string calldata name_) external {
-        require(msg.sender == minter, "Tkn::changeName: only the minter can change token name");
+    function changeName(string calldata name_) external isMaster {
         require(bytes(name_).length > 0, "Tkn::changeName: name_ length invaild");
 
         emit ChangedName(name, name_);
@@ -94,8 +77,7 @@ contract TokenDelegate is TokenDelegateStorageV1, TokenEvents {
      * @notice Change token symbol
      * @param symbol_ New token symbol
      */
-    function changeSymbol(string calldata symbol_) external {
-        require(msg.sender == minter, "Tkn::changeSymbol: only the minter can change token symbol");
+    function changeSymbol(string calldata symbol_) external isMaster {
         require(bytes(symbol_).length > 0, "Tkn::changeSymbol: name_name_ length invaild");
 
         emit ChangedName(symbol, symbol_);
