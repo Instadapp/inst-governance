@@ -30,6 +30,7 @@ contract TokenDelegate is TokenDelegateStorageV1, TokenEvents {
       */
     function initialize(address account, uint mintingAllowedAfter_, bool transferPaused_) public {
         require(mintingAllowedAfter == 0, "Token::initialize: can only initialize once");
+        require(totalSupply == 0, "Token::initialize: can only initialize once");
         require(mintingAllowedAfter_ >= block.timestamp, "Token::constructor: minting can only begin after deployment");
         require(account != address(0), "Token::initialize: invalid address");
 
