@@ -23,18 +23,20 @@ contract TokenDelegator is TokenDelegatorStorage, TokenEvents {
             )
         );
 
+        implementation = implementation_;
+
         changeImplementationAfter = changeImplementationAfter_;
 
-        _setImplementation(implementation_);
+        emit NewImplementation(address(0), implementation);
     }
 
     /**
      * @notice Called by the admin to update the implementation of the delegator
      * @param implementation_ The address of the new implementation for delegation
      */
-    function _setImplementation(address implementation_) public isMaster {
+    function _setImplementation(address implementation_) external isMaster {
         require(implementation_ != address(0), "TokenDelegator::_setImplementation: invalid implementation address");
-        require(changeImplementationAfter >= block.timestamp, "TokenDelegator::_setImplementation: can change implementation changeImplementationAfter time only");
+        require(block.timestamp >=changeImplementationAfter, "TokenDelegator::_setImplementation: can change implementation changeImplementationAfter time only");
 
         address oldImplementation = implementation;
         implementation = implementation_;

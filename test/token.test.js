@@ -3,11 +3,17 @@ const { expect } = require("chai");
 const { ethers, network } = hre;
 
 describe("Token", function() {
-  let tokenDelegate, tokenDelegator, token, minter, account1, account2, account3, allowedAfter, ethereum
+  let tokenDelegate, tokenDelegator, token, masterAddress, minter, account0, account1, account2, account3, initialSupply, allowedAfter, ethereum
   before(async () => {
+    masterAddress = "0xb1DC62EC38E6E3857a887210C38418E4A17Da5B2"
+    await hre.network.provider.request({
+      method: "hardhat_impersonateAccount",
+      params: [ masterAddress ]
+    })
     accounts = await ethers.getSigners()
-    minter = accounts[0]
+    minter = ethers.provider.getSigner(masterAddress)
 
+    account0 = accounts[0]
     account1 = accounts[1]
     account2 = accounts[2]
     account3 = accounts[3]
@@ -19,8 +25,11 @@ describe("Token", function() {
 
     allowedAfter = 1622505601 // June 1 2021
 
+    initialSupply = ethers.utils.parseEther("1000000000")
+
     const TokenDelegator = await ethers.getContractFactory("TokenDelegator")
-    tokenDelegator = await TokenDelegator.deploy(minter.address, minter.address, tokenDelegate.address, allowedAfter, allowedAfter, false)
+    tokenDelegator = await TokenDelegator
+      .deploy(account0.address, tokenDelegate.address, initialSupply, allowedAfter, allowedAfter, false)
 
     await tokenDelegator.deployed()
 
@@ -33,20 +42,18 @@ describe("Token", function() {
   })
 
   it("Should match the deployed", async () => {
-    const minter_ = await token.minter()
     const totalSupply_ = await token.totalSupply()
     const transferPaused_ = await token.transferPaused()
     const name_ = await token.name()
     const symbol_ = await token.symbol()
-    expect(minter_).to.be.equal(minter.address)
-    expect(totalSupply_).to.be.equal(ethers.utils.parseEther("10000000"))
+    expect(totalSupply_).to.be.equal(initialSupply)
     expect(transferPaused_).to.be.equal(false)
     expect(name_).to.be.equal("<Token Name>")
     expect(symbol_).to.be.equal("<TKN>")
   })
 
   it("Should pause transfer", async () => {
-    await token.pauseTransfer()
+    await token.connect(minter).pauseTransfer()
     const transferPaused_ = await token.transferPaused()
     expect(transferPaused_).to.be.equal(true)
     await expect(token.transfer(account1.address, ethers.utils.parseEther("10000")))
@@ -54,7 +61,7 @@ describe("Token", function() {
   })
 
   it("Should unpause transfer", async () => {
-    await token.unpauseTransfer()
+    await token.connect(minter).unpauseTransfer()
     const transferPaused_ = await token.transferPaused()
     expect(transferPaused_).to.be.equal(false)
     await token.transfer(account3.address, ethers.utils.parseEther("10"))
@@ -63,13 +70,13 @@ describe("Token", function() {
   })
 
   it("Should change name", async () => {
-    await token.changeName("Awesome Token")
+    await token.connect(minter).changeName("Awesome Token")
     const name_ = await token.name()
     expect(name_).to.be.equal("Awesome Token")
   })
 
   it("Should change symbol", async () => {
-    await token.changeSymbol("AWT")
+    await token.connect(minter).changeSymbol("AWT")
     const name_ = await token.symbol()
     expect(name_).to.be.equal("AWT")
   })
@@ -84,9 +91,13 @@ describe("Token", function() {
     await ethereum.send("evm_setNextBlockTimestamp", [allowedAfter+100])
     await ethereum.send("evm_mine", [])
 
-    await token.mint(account2.address, ethers.utils.parseEther("1000"))
+    const mintAmount = ethers.utils.parseEther("1000")
+
+    await token.connect(minter).mint(account2.address, mintAmount)
+
+    const newTotalSupply = initialSupply.add(mintAmount)
 
     const totalSupply_ = await token.totalSupply()
-    expect(totalSupply_).to.be.equal(ethers.utils.parseEther("10001000"))
+    expect(totalSupply_).to.be.equal(newTotalSupply)
   })
 })
