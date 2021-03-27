@@ -28,11 +28,14 @@ contract TokenDelegate is TokenDelegateStorageV1, TokenEvents {
       * @param mintingAllowedAfter_ Timestamp of the next allowed minting
       * @param transferPaused_ Flag to make the token non-transferable
       */
-    function initialize(address account, uint mintingAllowedAfter_, bool transferPaused_) public {
+    function initialize(address account, uint initialSupply_, uint mintingAllowedAfter_, bool transferPaused_) public {
         require(mintingAllowedAfter == 0, "Token::initialize: can only initialize once");
         require(totalSupply == 0, "Token::initialize: can only initialize once");
         require(mintingAllowedAfter_ >= block.timestamp, "Token::constructor: minting can only begin after deployment");
         require(account != address(0), "Token::initialize: invalid address");
+        require(initialSupply_ > 0, "Token::initialize: invalid initial supply");
+
+        totalSupply = initialSupply_;
 
         balances[account] = uint96(totalSupply);
         emit Transfer(address(0), account, totalSupply);
@@ -198,8 +201,7 @@ contract TokenDelegate is TokenDelegateStorageV1, TokenEvents {
      * @param dst The address of the destination account
      * @param rawAmount The number of tokens to be minted
      */
-    function mint(address dst, uint rawAmount) external {
-        require(msg.sender == minter, "Tkn::mint: only the minter can mint");
+    function mint(address dst, uint rawAmount) external isMaster {
         require(block.timestamp >= mintingAllowedAfter, "Uni::mint: minting not allowed yet");
         require(dst != address(0), "Tkn::mint: cannot transfer to the zero address");
 

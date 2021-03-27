@@ -54,7 +54,7 @@ contract TokenDelegatorStorage {
     string public symbol = "<TKN>"; // TODO - Replace it
 
     /// @notice Total number of tokens in circulation
-    uint public totalSupply = 10000000e18; // TODO - Replace it
+    uint public totalSupply;
 
     /// @notice EIP-20 token decimals for this token
     uint8 public constant decimals = 18;

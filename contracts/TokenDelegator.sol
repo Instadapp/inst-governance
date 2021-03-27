@@ -7,6 +7,7 @@ contract TokenDelegator is TokenDelegatorStorage, TokenEvents {
     constructor(
         address account,
         address implementation_,
+        uint initialSupply_,
         uint mintingAllowedAfter_,
         uint changeImplementationAfter_,
         bool transferPaused_
@@ -14,8 +15,9 @@ contract TokenDelegator is TokenDelegatorStorage, TokenEvents {
         delegateTo(
             implementation_,
             abi.encodeWithSignature(
-                "initialize(address,uint256,bool)",
+                "initialize(address,uint256,uint256,bool)",
                 account,
+                initialSupply_,
                 mintingAllowedAfter_,
                 transferPaused_
             )
