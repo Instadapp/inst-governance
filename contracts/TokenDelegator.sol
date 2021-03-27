@@ -37,7 +37,7 @@ contract TokenDelegator is TokenDelegatorStorage, TokenEvents {
      */
     function _setImplementation(address implementation_) external isMaster {
         require(implementation_ != address(0), "TokenDelegator::_setImplementation: invalid implementation address");
-        require(block.timestamp >=changeImplementationAfter, "TokenDelegator::_setImplementation: can change implementation changeImplementationAfter time only");
+        require(block.timestamp >= changeImplementationAfter, "TokenDelegator::_setImplementation: can change implementation changeImplementationAfter time only");
 
         address oldImplementation = implementation;
         implementation = implementation_;
