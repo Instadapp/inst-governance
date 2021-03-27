@@ -12,6 +12,7 @@ contract TokenDelegator is TokenDelegatorStorage, TokenEvents {
         uint changeImplementationAfter_,
         bool transferPaused_
     ) {
+        require(implementation_ != address(0), "TokenDelegator::constructor invalid address");
         delegateTo(
             implementation_,
             abi.encodeWithSignature(
