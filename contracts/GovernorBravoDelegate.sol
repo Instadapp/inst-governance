@@ -93,22 +93,6 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV1, GovernorBravoE
         uint endBlock = SafeMath.add(startBlock, votingPeriod);
 
         proposalCount++;
-        // Proposal memory newProposal = Proposal({
-        //     id: proposalCount,
-        //     proposer: msg.sender,
-        //     eta: 0,
-        //     targets: targets,
-        //     values: values,
-        //     signatures: signatures,
-        //     calldatas: calldatas,
-        //     startBlock: startBlock,
-        //     endBlock: endBlock,
-        //     forVotes: 0,
-        //     againstVotes: 0,
-        //     abstainVotes: 0,
-        //     canceled: false,
-        //     executed: false
-        // });
 
         Proposal storage newProposal = proposals[proposalCount];
 
