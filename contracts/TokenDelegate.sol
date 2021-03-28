@@ -4,8 +4,7 @@ pragma experimental ABIEncoderV2;
 import { TokenDelegateStorageV1, TokenEvents} from "./TokenInterfaces.sol";
 import { SafeMath } from "./SafeMath.sol";
 
-// TODO @thrilok209 @KaymasJain - Rename it
-contract TokenDelegate is TokenDelegateStorageV1, TokenEvents {
+contract InstaTokenDelegate is TokenDelegateStorageV1, TokenEvents {
     /// @notice Minimum time between mints
     uint32 public constant minimumTimeBetweenMints = 1 days * 7; // TODO @thrilok209 @KaymasJain - Replace it
 

@@ -9,7 +9,7 @@ import {
 } from "./GovernorBravoInterfaces.sol";
 import { SafeMath } from "./SafeMath.sol";
 
-contract GovernorBravoDelegate is GovernorBravoDelegateStorageV1, GovernorBravoEvents {
+contract InstaGovernorBravoDelegate is GovernorBravoDelegateStorageV1, GovernorBravoEvents {
     /// @notice The name of this contract
     string public constant name = "DSL Governor Bravo";
 
