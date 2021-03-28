@@ -6,10 +6,10 @@ import { SafeMath } from "./SafeMath.sol";
 
 contract InstaTokenDelegate is TokenDelegateStorageV1, TokenEvents {
     /// @notice Minimum time between mints
-    uint32 public constant minimumTimeBetweenMints = 1 days * 7; // TODO @thrilok209 @KaymasJain - Replace it
+    uint32 public constant minimumTimeBetweenMints = 1 days * 365; // 365 days
 
     /// @notice Cap on the percentage of totalSupply that can be minted at each mint
-    uint8 public constant mintCap = 2; // TODO @thrilok209 @KaymasJain - Replace it
+    uint8 public constant mintCap = 2; // 2%
 
     /// @notice The EIP-712 typehash for the contract's domain
     bytes32 public constant DOMAIN_TYPEHASH = keccak256("EIP712Domain(string name,uint256 chainId,address verifyingContract)");
