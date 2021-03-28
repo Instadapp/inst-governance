@@ -3,23 +3,23 @@ const RLP = require('rlp');
 const { ethers } = hre;
 
 async function main() {
-  const deployerAddress = '0x2b02AAd6f1694E7D9c934B7b3Ec444541286cF0f' // Replace this
+  const deployerAddress = '0xB46693c062B49689cC4F624AaB24a7eA90275890' // Replace this
   const initialSupply = ethers.utils.parseEther("10000000") // Replace with actual supply
   const initialHolder = '0x0000000000000000000000000000000000000002' // Replace
   const mintingAfter = 1622548800 // (June 1) Replace
   const changeImplementationAfter = 1622548800 // (June 1) Replace
-  const governanceAdmin = '0x2b02AAd6f1694E7D9c934B7b3Ec444541286cF0f' // Replace this
+  const governanceAdmin = '0xB46693c062B49689cC4F624AaB24a7eA90275890' // Replace this
   const votingPeriod = 6000 // Replace this
   const votingDelay = 1 // Replace this
   const proposalThreshold = ethers.utils.parseEther("60000")
   const timelockDelay = 259200 // (3 Days) Replace this
 
-  const TokenDelegate = await ethers.getContractFactory("TokenDelegate")
+  const TokenDelegate = await ethers.getContractFactory("InstaTokenDelegate")
   const tokenDelegate = await TokenDelegate.deploy()
 
   await tokenDelegate.deployed()
 
-  const TokenDelegator = await ethers.getContractFactory("TokenDelegator")
+  const TokenDelegator = await ethers.getContractFactory("InstaTokenDelegator")
   const tokenDelegator = await TokenDelegator
     .deploy(initialHolder, tokenDelegate.address, initialSupply, mintingAfter, changeImplementationAfter, false)
 
@@ -29,12 +29,12 @@ async function main() {
 
   const timelockAddress = '0x' + ethers.utils.keccak256(RLP.encode([deployerAddress, txCount])).slice(12).substring(14)
 
-  const GovernorDelegate = await ethers.getContractFactory("GovernorBravoDelegate")
+  const GovernorDelegate = await ethers.getContractFactory("InstaGovernorBravoDelegate")
   const governorDelegate = await GovernorDelegate.deploy()
 
   await governorDelegate.deployed()
 
-  const GovernorDelegator = await ethers.getContractFactory("GovernorBravoDelegator")
+  const GovernorDelegator = await ethers.getContractFactory("InstaGovernorBravoDelegator")
   const governorDelegator = await GovernorDelegator
     .deploy(
       timelockAddress,
@@ -48,14 +48,14 @@ async function main() {
   
   await governorDelegator.deployed()
 
-  const Timelock = await ethers.getContractFactory("Timelock")
+  const Timelock = await ethers.getContractFactory("InstaTimelock")
   const timelock = await Timelock.deploy(governorDelegator.address, timelockDelay)
 
-  console.log("TokenDelegate: ", tokenDelegate.address)
-  console.log("TokenDelegator: ", tokenDelegator.address)
-  console.log("Timelock: ", timelock.address)
-  console.log("GovernorBravoDelegate: ", governorDelegate.address)
-  console.log("GovernorBravoDelegator: ", governorDelegator.address)
+  console.log("InstaTokenDelegate: ", tokenDelegate.address)
+  console.log("InstaTokenDelegator: ", tokenDelegator.address)
+  console.log("InstaTimelock: ", timelock.address)
+  console.log("InstaGovernorBravoDelegate: ", governorDelegate.address)
+  console.log("InstaGovernorBravoDelegator: ", governorDelegator.address)
   console.log()
 
   await timelock.deployed()
