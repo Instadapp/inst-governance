@@ -1,54 +1,16 @@
 pragma solidity ^0.7.0;
 pragma experimental ABIEncoderV2;
 
+import { TokenDelegateStorageV1, TokenEvents} from "./TokenInterfaces.sol";
 import { SafeMath } from "./SafeMath.sol";
 
-// TODO - Rename it
-contract Token {
-    /// @notice EIP-20 token name for this token
-    string public constant name = "<Token Name>"; // TODO - Replace it
-
-    /// @notice EIP-20 token symbol for this token
-    string public constant symbol = "<TKN>"; // TODO - Replace it
-
-    /// @notice EIP-20 token decimals for this token
-    uint8 public constant decimals = 18;
-
-    /// @notice Total number of tokens in circulation
-    uint public totalSupply = 10000000e18; // TODO - Replace it
-
-    /// @notice Token minter
-    address public minter;
-
-    /// @notice The timestamp after which minting may occur
-    uint public mintingAllowedAfter;
-
+// TODO @thrilok209 @KaymasJain - Rename it
+contract TokenDelegate is TokenDelegateStorageV1, TokenEvents {
     /// @notice Minimum time between mints
-    uint32 public constant minimumTimeBetweenMints = 1 days * 7; // TODO - Replace it
+    uint32 public constant minimumTimeBetweenMints = 1 days * 7; // TODO @thrilok209 @KaymasJain - Replace it
 
     /// @notice Cap on the percentage of totalSupply that can be minted at each mint
-    uint8 public constant mintCap = 2; // TODO - Replace it
-
-    // Allowance amounts on behalf of others
-    mapping (address => mapping (address => uint96)) internal allowances;
-
-    // Official record of token balances for each account
-    mapping (address => uint96) internal balances;
-
-    /// @notice A record of each accounts delegate
-    mapping (address => address) public delegates;
-
-    /// @notice A checkpoint for marking number of votes from a given block
-    struct Checkpoint {
-        uint32 fromBlock;
-        uint96 votes;
-    }
-
-    /// @notice A record of votes checkpoints for each account, by index
-    mapping (address => mapping (uint32 => Checkpoint)) public checkpoints;
-
-    /// @notice The number of checkpoints for each account
-    mapping (address => uint32) public numCheckpoints;
+    uint8 public constant mintCap = 2; // TODO @thrilok209 @KaymasJain - Replace it
 
     /// @notice The EIP-712 typehash for the contract's domain
     bytes32 public constant DOMAIN_TYPEHASH = keccak256("EIP712Domain(string name,uint256 chainId,address verifyingContract)");
@@ -59,42 +21,72 @@ contract Token {
     /// @notice The EIP-712 typehash for the permit struct used by the contract
     bytes32 public constant PERMIT_TYPEHASH = keccak256("Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)");
 
-    /// @notice A record of states for signing / validating signatures
-    mapping (address => uint) public nonces;
 
-    /// @notice An event thats emitted when an account changes its delegate
-    event DelegateChanged(address indexed delegator, address indexed fromDelegate, address indexed toDelegate);
+    /**
+      * @notice Used to initialize the contract during delegator constructor
+      * @param account The address to recieve initial suppply
+      * @param mintingAllowedAfter_ Timestamp of the next allowed minting
+      * @param transferPaused_ Flag to make the token non-transferable
+      */
+    function initialize(address account, uint initialSupply_, uint mintingAllowedAfter_, bool transferPaused_) public {
+        require(mintingAllowedAfter == 0, "Token::initialize: can only initialize once");
+        require(totalSupply == 0, "Token::initialize: can only initialize once");
+        require(mintingAllowedAfter_ >= block.timestamp, "Token::constructor: minting can only begin after deployment");
+        require(account != address(0), "Token::initialize: invalid address");
+        require(initialSupply_ > 0, "Token::initialize: invalid initial supply");
 
-    /// @notice An event thats emitted when a delegate account's vote balance changes
-    event DelegateVotesChanged(address indexed delegate, uint previousBalance, uint newBalance);
-
-    /// @notice An event thats emitted when the minter changes
-    event MinterChanged(address indexed oldMinter, address indexed newMinter);
-
-    /// @notice The standard EIP-20 transfer event
-    event Transfer(address indexed from, address indexed to, uint256 amount);
-
-    /// @notice The standard EIP-20 approval event
-    event Approval(address indexed owner, address indexed spender, uint256 amount);
-
-    constructor(address account, address minter_, uint mintingAllowedAfter_) {
-        require(mintingAllowedAfter_ >= block.timestamp, "Tkn::constructor: minting can only begin after deployment");
+        totalSupply = initialSupply_;
 
         balances[account] = uint96(totalSupply);
         emit Transfer(address(0), account, totalSupply);
-        minter = minter_;
-        emit MinterChanged(address(0), minter);
         mintingAllowedAfter = mintingAllowedAfter_;
+        transferPaused = transferPaused_;
+
+        if (transferPaused) {
+            emit TransferPaused(msg.sender);
+        } else {
+            emit TransferUnpaused(msg.sender);
+        }
     }
 
     /**
-     * @notice Change the minter address
-     * @param minter_ The address of the new minter
+     * @notice Pause the token transfer
      */
-    function setMinter(address minter_) external {
-        require(msg.sender == minter, "Tkn::setMinter: only the minter can change the minter address");
-        emit MinterChanged(minter, minter_);
-        minter = minter_;
+    function pauseTransfer() external isMaster {
+        transferPaused = true;
+        emit TransferPaused(msg.sender);
+    }
+
+    /**
+     * @notice Unpause the token transfer
+     */
+    function unpauseTransfer() external isMaster {
+        transferPaused = false;
+        emit TransferUnpaused(msg.sender);
+    }
+
+    /**
+     * @notice Change token name
+     * @param name_ New token name
+     */
+    function changeName(string calldata name_) external isMaster {
+        require(bytes(name_).length > 0, "Tkn::changeName: name_ length invaild");
+
+        emit ChangedName(name, name_);
+
+        name = name_;
+    }
+
+    /**
+     * @notice Change token symbol
+     * @param symbol_ New token symbol
+     */
+    function changeSymbol(string calldata symbol_) external isMaster {
+        require(bytes(symbol_).length > 0, "Tkn::changeSymbol: name_name_ length invaild");
+
+        emit ChangedName(symbol, symbol_);
+
+        symbol = symbol_;
     }
 
     /**
@@ -209,8 +201,7 @@ contract Token {
      * @param dst The address of the destination account
      * @param rawAmount The number of tokens to be minted
      */
-    function mint(address dst, uint rawAmount) external {
-        require(msg.sender == minter, "Tkn::mint: only the minter can mint");
+    function mint(address dst, uint rawAmount) external isMaster {
         require(block.timestamp >= mintingAllowedAfter, "Uni::mint: minting not allowed yet");
         require(dst != address(0), "Tkn::mint: cannot transfer to the zero address");
 
@@ -321,6 +312,7 @@ contract Token {
     }
 
     function _transferTokens(address src, address dst, uint96 amount) internal {
+        require(!transferPaused, "Tkn::_transferTokens: transfer paused");
         require(src != address(0), "Tkn::_transferTokens: cannot transfer from the zero address");
         require(dst != address(0), "Tkn::_transferTokens: cannot transfer to the zero address");
 
