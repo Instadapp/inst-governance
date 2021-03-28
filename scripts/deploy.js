@@ -4,15 +4,15 @@ const { ethers } = hre;
 
 async function main() {
   const deployerAddress = '0xB46693c062B49689cC4F624AaB24a7eA90275890' // Replace this
-  const initialSupply = ethers.utils.parseEther("10000000") // Replace with actual supply
+  const initialSupply = ethers.utils.parseEther("100000000") // 100M supply
   const initialHolder = '0x0000000000000000000000000000000000000002' // Replace
-  const mintingAfter = 1622548800 // (June 1) Replace
-  const changeImplementationAfter = 1622548800 // (June 1) Replace
+  const mintingAfter = 1743465600 // Thursday, 1 May 2025 00:00:00
+  const changeImplementationAfter = 1743465600 // Thursday, 1 May 2025 00:00:00
   const governanceAdmin = '0xB46693c062B49689cC4F624AaB24a7eA90275890' // Replace this
-  const votingPeriod = 6000 // Replace this
-  const votingDelay = 1 // Replace this
-  const proposalThreshold = ethers.utils.parseEther("60000")
-  const timelockDelay = 259200 // (3 Days) Replace this
+  const votingPeriod = 17280 // ~3 days in blocks (assuming 15s blocks)
+  const votingDelay = 1 // 1 block
+  const proposalThreshold = ethers.utils.parseEther("1000000") // 1M
+  const timelockDelay = 172800 // ~2 days in blocks (assuming 15s blocks)
 
   const TokenDelegate = await ethers.getContractFactory("InstaTokenDelegate")
   const tokenDelegate = await TokenDelegate.deploy()
