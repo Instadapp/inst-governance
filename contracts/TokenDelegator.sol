@@ -9,7 +9,6 @@ contract InstaTokenDelegator is TokenDelegatorStorage, TokenEvents {
         address implementation_,
         uint initialSupply_,
         uint mintingAllowedAfter_,
-        uint changeImplementationAfter_,
         bool transferPaused_
     ) {
         require(implementation_ != address(0), "TokenDelegator::constructor invalid address");
@@ -26,8 +25,6 @@ contract InstaTokenDelegator is TokenDelegatorStorage, TokenEvents {
 
         implementation = implementation_;
 
-        changeImplementationAfter = changeImplementationAfter_;
-
         emit NewImplementation(address(0), implementation);
     }
 
@@ -37,7 +34,6 @@ contract InstaTokenDelegator is TokenDelegatorStorage, TokenEvents {
      */
     function _setImplementation(address implementation_) external isMaster {
         require(implementation_ != address(0), "TokenDelegator::_setImplementation: invalid implementation address");
-        require(block.timestamp >= changeImplementationAfter, "TokenDelegator::_setImplementation: can change implementation changeImplementationAfter time only");
 
         address oldImplementation = implementation;
         implementation = implementation_;
