@@ -51,14 +51,14 @@ async function main() {
   const Timelock = await ethers.getContractFactory("InstaTimelock")
   const timelock = await Timelock.deploy(governorDelegator.address, timelockDelay)
 
+  await timelock.deployed()
+
   console.log("InstaTokenDelegate: ", tokenDelegate.address)
   console.log("InstaTokenDelegator: ", tokenDelegator.address)
   console.log("InstaTimelock: ", timelock.address)
   console.log("InstaGovernorBravoDelegate: ", governorDelegate.address)
   console.log("InstaGovernorBravoDelegator: ", governorDelegator.address)
   console.log()
-
-  await timelock.deployed()
 
   await hre.run("verify:verify", {
     address: tokenDelegate.address,
