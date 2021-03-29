@@ -6,8 +6,7 @@ async function main() {
   const deployerAddress = '0xB46693c062B49689cC4F624AaB24a7eA90275890' // Replace this
   const initialSupply = ethers.utils.parseEther("100000000") // 100M supply
   const initialHolder = '0x0000000000000000000000000000000000000002' // Replace
-  const mintingAfter = 1743465600 // Thursday, 1 May 2025 00:00:00
-  const changeImplementationAfter = 1743465600 // Thursday, 1 May 2025 00:00:00
+  const mintingAfter = 1743465600 // Thursday, 1 May 2025 00:00:00 // TODO - replace
   const governanceAdmin = '0xB46693c062B49689cC4F624AaB24a7eA90275890' // Replace this
   const votingPeriod = 17280 // ~3 days in blocks (assuming 15s blocks)
   const votingDelay = 1 // 1 block
@@ -21,7 +20,7 @@ async function main() {
 
   const TokenDelegator = await ethers.getContractFactory("InstaTokenDelegator")
   const tokenDelegator = await TokenDelegator
-    .deploy(initialHolder, tokenDelegate.address, initialSupply, mintingAfter, changeImplementationAfter, false)
+    .deploy(initialHolder, tokenDelegate.address, initialSupply, mintingAfter, false)
 
   await tokenDelegator.deployed()
 
@@ -67,7 +66,7 @@ async function main() {
 
   await hre.run("verify:verify", {
     address: tokenDelegator.address,
-    constructorArguments: [initialHolder, tokenDelegate.address, initialSupply, mintingAfter, changeImplementationAfter, false]
+    constructorArguments: [initialHolder, tokenDelegate.address, initialSupply, mintingAfter, false]
   })
 
   await hre.run("verify:verify", {
