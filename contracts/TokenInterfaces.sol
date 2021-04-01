@@ -46,10 +46,10 @@ contract TokenDelegatorStorage {
     address public implementation;
 
     /// @notice EIP-20 token name for this token
-    string public name = "<Token Name>"; // TODO - Replace it
+    string public name = "Instadapp";
 
     /// @notice EIP-20 token symbol for this token
-    string public symbol = "<TKN>"; // TODO - Replace it
+    string public symbol = "INST";
 
     /// @notice Total number of tokens in circulation
     uint public totalSupply;
