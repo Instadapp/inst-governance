@@ -7,7 +7,6 @@ async function main() {
   const initialSupply = ethers.utils.parseEther("100000000") // 100M supply
   const initialHolder = '0xb1DC62EC38E6E3857a887210C38418E4A17Da5B2'
   const mintingAfter = 1704067200 // Monday, 1 January 2024 00:00:00
-  const governanceAdmin = '0xb1DC62EC38E6E3857a887210C38418E4A17Da5B2'
   const votingPeriod = 17280 // ~3 days in blocks (assuming 15s blocks)
   const votingDelay = 1 // 1 block
   const proposalThreshold = ethers.utils.parseEther("1000000") // 1M
@@ -37,7 +36,7 @@ async function main() {
   const governorDelegator = await GovernorDelegator
     .deploy(
       timelockAddress,
-      governanceAdmin,
+      timelockAddress,
       tokenDelegator.address,
       governorDelegate.address,
       votingPeriod,
@@ -78,7 +77,7 @@ async function main() {
     address: governorDelegator.address,
     constructorArguments: [
       timelockAddress,
-      governanceAdmin,
+      timelockAddress,
       tokenDelegator.address,
       governorDelegate.address,
       votingPeriod,
