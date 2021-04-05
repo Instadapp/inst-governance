@@ -3,11 +3,11 @@ const RLP = require('rlp');
 const { ethers } = hre;
 
 async function main() {
-  const deployerAddress = '0xB46693c062B49689cC4F624AaB24a7eA90275890' // Replace this
+  const deployerAddress = '0xf6839085F692bDe6A8062573E3DA35E7e947C21E'
   const initialSupply = ethers.utils.parseEther("100000000") // 100M supply
-  const initialHolder = '0x0000000000000000000000000000000000000002' // Replace
-  const mintingAfter = 1743465600 // Thursday, 1 May 2025 00:00:00 // TODO - replace
-  const governanceAdmin = '0xB46693c062B49689cC4F624AaB24a7eA90275890' // Replace this
+  const initialHolder = '0xb1DC62EC38E6E3857a887210C38418E4A17Da5B2'
+  const mintingAfter = 1704067200 // Monday, 1 January 2024 00:00:00
+  const governanceAdmin = '0xb1DC62EC38E6E3857a887210C38418E4A17Da5B2'
   const votingPeriod = 17280 // ~3 days in blocks (assuming 15s blocks)
   const votingDelay = 1 // 1 block
   const proposalThreshold = ethers.utils.parseEther("1000000") // 1M
