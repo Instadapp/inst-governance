@@ -18,7 +18,7 @@ async function main() {
 
   await tokenDelegate.deployed()
 
-  const TokenDelegator = await ethers.getContractFactory("InstaTokenDelegator")
+  const TokenDelegator = await ethers.getContractFactory("InstaToken")
   const tokenDelegator = await TokenDelegator
     .deploy(initialHolder, tokenDelegate.address, initialSupply, mintingAfter, false)
 
@@ -53,7 +53,7 @@ async function main() {
   await timelock.deployed()
 
   console.log("InstaTokenDelegate: ", tokenDelegate.address)
-  console.log("InstaTokenDelegator: ", tokenDelegator.address)
+  console.log("InstaToken: ", tokenDelegator.address)
   console.log("InstaTimelock: ", timelock.address)
   console.log("InstaGovernorBravoDelegate: ", governorDelegate.address)
   console.log("InstaGovernorBravoDelegator: ", governorDelegator.address)

@@ -3,7 +3,7 @@ pragma experimental ABIEncoderV2;
 
 import { TokenDelegatorStorage, TokenEvents } from "./TokenInterfaces.sol";
 
-contract InstaTokenDelegator is TokenDelegatorStorage, TokenEvents {
+contract InstaToken is TokenDelegatorStorage, TokenEvents {
     constructor(
         address account,
         address implementation_,
