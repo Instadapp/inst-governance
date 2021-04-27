@@ -3,7 +3,7 @@ pragma experimental ABIEncoderV2;
 
 import { GovernorBravoDelegatorStorage, GovernorBravoEvents } from "./GovernorBravoInterfaces.sol";
 
-contract GovernorBravoDelegator is GovernorBravoDelegatorStorage, GovernorBravoEvents {
+contract InstaGovernorBravoDelegator is GovernorBravoDelegatorStorage, GovernorBravoEvents {
     constructor(
         address timelock_,
         address admin_,

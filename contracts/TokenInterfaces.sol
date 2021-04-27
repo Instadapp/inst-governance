@@ -39,19 +39,17 @@ contract TokenEvents {
 }
 
 contract TokenDelegatorStorage {
+    /// @notice InstaIndex contract
     IndexInterface constant public instaIndex = IndexInterface(0x2971AdFa57b20E5a416aE5a708A8655A9c74f723);
 
     /// @notice Active brains of Token
     address public implementation;
 
-    /// @notice The timestamp after which implementation maybe change
-    uint public changeImplementationAfter;
-
     /// @notice EIP-20 token name for this token
-    string public name = "<Token Name>"; // TODO - Replace it
+    string public name = "Instadapp";
 
     /// @notice EIP-20 token symbol for this token
-    string public symbol = "<TKN>"; // TODO - Replace it
+    string public symbol = "INST";
 
     /// @notice Total number of tokens in circulation
     uint public totalSupply;

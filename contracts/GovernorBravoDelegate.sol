@@ -9,15 +9,15 @@ import {
 } from "./GovernorBravoInterfaces.sol";
 import { SafeMath } from "./SafeMath.sol";
 
-contract GovernorBravoDelegate is GovernorBravoDelegateStorageV1, GovernorBravoEvents {
+contract InstaGovernorBravoDelegate is GovernorBravoDelegateStorageV1, GovernorBravoEvents {
     /// @notice The name of this contract
     string public constant name = "DSL Governor Bravo";
 
     /// @notice The minimum setable proposal threshold
-    uint public constant MIN_PROPOSAL_THRESHOLD = 50000e18; // TODO - Update this
+    uint public constant MIN_PROPOSAL_THRESHOLD = 500000e18; // 500,000
 
     /// @notice The maximum setable proposal threshold
-    uint public constant MAX_PROPOSAL_THRESHOLD = 100000e18; // TODO - Update this
+    uint public constant MAX_PROPOSAL_THRESHOLD = 50000000e18; // 5,000,000
 
     /// @notice The minimum setable voting period
     uint public constant MIN_VOTING_PERIOD = 5760; // About 24 hours
@@ -32,7 +32,7 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV1, GovernorBravoE
     uint public constant MAX_VOTING_DELAY = 40320; // About 1 week
 
     /// @notice The number of votes in support of a proposal required in order for a quorum to be reached and for a vote to succeed
-    uint public constant quorumVotes = 400000e18; // TODO - Update this
+    uint public constant quorumVotes = 4000000e18; // 4,000,000
 
     /// @notice The maximum number of actions that can be included in a proposal
     uint public constant proposalMaxOperations = 10; // 10 actions
@@ -93,22 +93,6 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV1, GovernorBravoE
         uint endBlock = SafeMath.add(startBlock, votingPeriod);
 
         proposalCount++;
-        // Proposal memory newProposal = Proposal({
-        //     id: proposalCount,
-        //     proposer: msg.sender,
-        //     eta: 0,
-        //     targets: targets,
-        //     values: values,
-        //     signatures: signatures,
-        //     calldatas: calldatas,
-        //     startBlock: startBlock,
-        //     endBlock: endBlock,
-        //     forVotes: 0,
-        //     againstVotes: 0,
-        //     abstainVotes: 0,
-        //     canceled: false,
-        //     executed: false
-        // });
 
         Proposal storage newProposal = proposals[proposalCount];
 
