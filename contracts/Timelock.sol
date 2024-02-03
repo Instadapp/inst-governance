@@ -2,12 +2,13 @@ pragma solidity ^0.7.0;
 
 import "./SafeMath.sol";
 
-contract InstaTimelock {
+contract InstaTimelockV2 {
     using SafeMath for uint;
 
     event NewAdmin(address indexed newAdmin);
     event NewPendingAdmin(address indexed newPendingAdmin);
     event NewDelay(uint indexed newDelay);
+    event NewGuardian(address indexed newGuardian);
     event CancelTransaction(bytes32 indexed txHash, address indexed target, uint value, string signature,  bytes data, uint eta);
     event ExecuteTransaction(bytes32 indexed txHash, address indexed target, uint value, string signature,  bytes data, uint eta);
     event QueueTransaction(bytes32 indexed txHash, address indexed target, uint value, string signature, bytes data, uint eta);
@@ -18,17 +19,19 @@ contract InstaTimelock {
 
     address public admin;
     address public pendingAdmin;
+    address pubic guardian;
     uint public delay;
 
     mapping (bytes32 => bool) public queuedTransactions;
 
 
-    constructor(address admin_, uint delay_) {
+    constructor(address admin_, uint delay_, address guardian_) {
         require(delay_ >= MINIMUM_DELAY, "Timelock::constructor: Delay must exceed minimum delay.");
         require(delay_ <= MAXIMUM_DELAY, "Timelock::setDelay: Delay must not exceed maximum delay.");
 
         admin = admin_;
         delay = delay_;
+        guardian = guardian_;
     }
 
     fallback() external payable { }
@@ -40,6 +43,13 @@ contract InstaTimelock {
         delay = delay_;
 
         emit NewDelay(delay);
+    }
+
+    function setGuardian(address guardian_) public {
+        require(msg.sender == address(this), "Timelock::setGuardian: Call must come from Timelock.");
+        guardian = guardian_;
+
+        emit NewGuardian(guardian_);
     }
 
     function acceptAdmin() public {
@@ -69,7 +79,7 @@ contract InstaTimelock {
     }
 
     function cancelTransaction(address target, uint value, string memory signature, bytes memory data, uint eta) public {
-        require(msg.sender == admin, "Timelock::cancelTransaction: Call must come from admin.");
+        require(msg.sender == admin || msg.sender == guardian, "Timelock::cancelTransaction: Call must come from admin or guardian.");
 
         bytes32 txHash = keccak256(abi.encode(target, value, signature, data, eta));
         queuedTransactions[txHash] = false;
