@@ -114,6 +114,23 @@ contract InstaTimelockV2 {
         return returnData;
     }
 
+    function executePayload(address target, string memory signature, bytes memory data) public returns (bytes memory) {
+        require(msg.sender == address(this), "Timelock::executePayload: Call must come from Timelock.");
+        bytes memory callData;
+
+        if (bytes(signature).length == 0) {
+            callData = data;
+        } else {
+            callData = abi.encodePacked(bytes4(keccak256(bytes(signature))), data);
+        }
+
+        // solium-disable-next-line security/no-call-value
+        (bool success, bytes memory returnData) = target.delegatecall(callData);
+        require(success, "Timelock::executePayload: Transaction execution reverted.");
+
+        return returnData;
+    }
+
     function getBlockTimestamp() internal view returns (uint) {
         // solium-disable-next-line security/no-block-members
         return block.timestamp;
