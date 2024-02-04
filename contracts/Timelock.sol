@@ -19,7 +19,7 @@ contract InstaTimelockV2 {
 
     address public admin;
     address public pendingAdmin;
-    address pubic guardian;
+    address public guardian;
     uint public delay;
 
     mapping (bytes32 => bool) public queuedTransactions;
@@ -27,7 +27,7 @@ contract InstaTimelockV2 {
 
     constructor(address admin_, uint delay_, address guardian_) {
         require(delay_ >= MINIMUM_DELAY, "Timelock::constructor: Delay must exceed minimum delay.");
-        require(delay_ <= MAXIMUM_DELAY, "Timelock::setDelay: Delay must not exceed maximum delay.");
+        require(delay_ <= MAXIMUM_DELAY, "Timelock::constructor: Delay must not exceed maximum delay.");
 
         admin = admin_;
         delay = delay_;
