@@ -11,7 +11,7 @@ import { SafeMath } from "./SafeMath.sol";
 
 contract InstaGovernorBravoDelegate is GovernorBravoDelegateStorageV1, GovernorBravoEvents {
     /// @notice The name of this contract
-    string public constant name = "DSL Governor Bravo";
+    string public constant name = "INST Governor Bravo";
 
     /// @notice The minimum setable proposal threshold
     uint public constant MIN_PROPOSAL_THRESHOLD = 500000e18; // 500,000
@@ -35,7 +35,7 @@ contract InstaGovernorBravoDelegate is GovernorBravoDelegateStorageV1, GovernorB
     uint public constant quorumVotes = 4000000e18; // 4,000,000
 
     /// @notice The maximum number of actions that can be included in a proposal
-    uint public constant proposalMaxOperations = 10; // 10 actions
+    uint public constant proposalMaxOperations = 30; // 30 actions
 
     /// @notice The EIP-712 typehash for the contract's domain
     bytes32 public constant DOMAIN_TYPEHASH = keccak256("EIP712Domain(string name,uint256 chainId,address verifyingContract)");
