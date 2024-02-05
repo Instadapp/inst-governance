@@ -375,8 +375,7 @@ contract InstaGovernorBravoDelegate is GovernorBravoDelegateStorageV1, GovernorB
       * @dev Admin function for pending admin to accept role and update admin on timelock contract
       */
     function _acceptAdminOnTimelock() external {
-        // Check caller is pendingAdmin and pendingAdmin ≠ address(0)
-        require(msg.sender == admin && msg.sender != address(0), "GovernorBravo:_acceptAdmin: pending admin only");
+        require(msg.sender == admin, "GovernorBravo:_acceptAdminOnTimelock: pending admin only");
         timelock.acceptAdmin();
     }
 
