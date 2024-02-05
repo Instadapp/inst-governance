@@ -133,7 +133,7 @@ contract PayloadIGP {
 
     ///////// PROPOSAL ACTIONS - 8 Actions ///////
 
-        /// @notice Action 1: call cast() - transfer rewards to Team Multisig, add new Timelock as auth & remove old Timelock as auth on Treasury
+    /// @notice Action 1: call cast() - transfer rewards to Team Multisig, add new Timelock as auth & remove old Timelock as auth on Treasury
     function action1() public view returns(address target, uint256 value, string memory signature, bytes memory calldatas) {
         string[] memory targets = new string[](7);
         bytes[] memory encodedSpells = new bytes[](7);
