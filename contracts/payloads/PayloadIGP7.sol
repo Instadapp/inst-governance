@@ -102,29 +102,29 @@ contract PayloadIGP {
     }
 
     function execute() external {
-        // Action 1: _acceptAdmin() function on governor contract
-        GOVERNOR._acceptAdmin();
+        // Action 1: updateMaster() function on DSA instaIndex
+        INSTAINDEX.updateMaster();
 
         // Action 2: acceptAdmin() function on old time contract
         OLD_TIMELOCK.acceptAdmin();
-        
-        // Action 2: updateMaster() function on DSA instaIndex
-        INSTAINDEX.updateMaster();
 
-        // Action 4: setDelay() on new timelock contract with 1 day
-        TIMELOCK.setDelay(ONE_DAY_TIME_IN_SECONDS);
+        // Action 3: _acceptAdmin() function on governor contract
+        GOVERNOR._acceptAdmin();
 
-        // Action 5: setPendingAdmin() on new timelock contract
-        TIMELOCK.setPendingAdmin(address(GOVERNOR));
-
-        // Action 6: _acceptAdminOnTimelock() on governor contract
-        GOVERNOR._acceptAdminOnTimelock();
-
-        // Action 7: _setVotingDelay() function on governor contract with 1 days
+        // Action 4: _setVotingDelay() function on governor contract with 1 days
         GOVERNOR._setVotingDelay(ONE_DAY_TIME_IN_BLOCKS);
 
-        // Action 8: _setVotingPeriod() function on governor contract with 2 days
+        // Action 5: _setVotingPeriod() function on governor contract with 2 days
         GOVERNOR._setVotingPeriod(TWO_DAY_TIME_IN_BLOCKS);
+
+        // Action 6: setPendingAdmin() on new timelock contract
+        TIMELOCK.setPendingAdmin(address(GOVERNOR));
+
+        // Action 7: _acceptAdminOnTimelock() on governor contract
+        GOVERNOR._acceptAdminOnTimelock();
+
+        // Action 8: setDelay() on new timelock contract with 1 day
+        TIMELOCK.setDelay(ONE_DAY_TIME_IN_SECONDS);
     }
 
     function verifyProposal() external {
