@@ -360,8 +360,8 @@ contract InstaGovernorBravoDelegate is GovernorBravoDelegateStorageV1, GovernorB
         // Store admin with value pendingAdmin
         admin = pendingAdmin;
         // Store timelock with value pendingAdmin
-        emit NewTimelock(timelock, pendingAdmin);
-        timelock = pendingAdmin;
+        emit NewTimelock(address(timelock), pendingAdmin);
+        timelock = TimelockInterface(pendingAdmin);
 
         // Clear the pending value
         pendingAdmin = address(0);
