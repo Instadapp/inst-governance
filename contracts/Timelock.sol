@@ -2,7 +2,7 @@ pragma solidity ^0.7.0;
 
 import "./SafeMath.sol";
 
-contract InstaTimelockV2 {
+contract InstaTimelock {
     using SafeMath for uint;
 
     event NewAdmin(address indexed newAdmin);
