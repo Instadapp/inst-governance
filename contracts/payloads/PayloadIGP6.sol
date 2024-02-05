@@ -27,8 +27,9 @@ contract PayloadIGP {
     ITimelock public constant TIMELOCK = ITimelock(0xC7Cb1dE2721BFC0E0DA1b9D526bCdC54eF1C0eFC);
     IInstaIndex public constant INSTAINDEX = IInstaIndex(0xC7Cb1dE2721BFC0E0DA1b9D526bCdC54eF1C0eFC);
 
-    uint256 public constant ONE_DAY_TIME = 1 days;
-    uint256 public constant TWO_DAY_TIME = 2 days;
+    uint256 public constant ONE_DAY_TIME_IN_SECONDS = 1 days; // 1 day in seconds. 86400s
+    uint256 public constant ONE_DAY_TIME_IN_BLOCKS = 7_200; // 1 day in blocks. 12s per block
+    uint256 public constant TWO_DAY_TIME_IN_BLOCKS = 14_400; // 2 day in blocks. 12s per block
 
     function execute() external {
         // Action 1: _acceptAdmin() function on governor contract
@@ -41,7 +42,7 @@ contract PayloadIGP {
         INSTAINDEX.updateMaster();
 
         // Action 4: setDelay() on new timelock contract with 1 day
-        TIMELOCK.setDelay(ONE_DAY_TIME);
+        TIMELOCK.setDelay(ONE_DAY_TIME_IN_SECONDS);
 
         // Action 5: setPendingAdmin() on new timelock contract
         TIMELOCK.setPendingAdmin(address(GOVERNOR));
@@ -50,13 +51,13 @@ contract PayloadIGP {
         GOVERNOR._acceptAdminOnTimelock();
 
         // Action 7: _setVotingDelay() function on governor contract with 1 days
-        GOVERNOR._setVotingDelay(ONE_DAY_TIME);
+        GOVERNOR._setVotingDelay(ONE_DAY_TIME_IN_BLOCKS);
 
         // Action 8: _setVotingPeriod() function on governor contract with 2 days
-        GOVERNOR._setVotingPeriod(TWO_DAY_TIME);
+        GOVERNOR._setVotingPeriod(TWO_DAY_TIME_IN_BLOCKS);
     }
 
     function verifyProposal() external {
-        
+
     }
 }
