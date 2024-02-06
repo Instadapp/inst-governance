@@ -38,12 +38,12 @@ interface IDSAV2 {
     returns (bytes32);
 }
 
-contract PayloadIGP {
+contract PayloadIGP7 {
     uint256 public constant PROPOSAL_ID = 7;
 
     IGovernorBravo public constant GOVERNOR = IGovernorBravo(0x0204Cd037B2ec03605CFdFe482D8e257C765fA1B);
     ITimelock public constant OLD_TIMELOCK = ITimelock(0xC7Cb1dE2721BFC0E0DA1b9D526bCdC54eF1C0eFC);
-    ITimelock public constant TIMELOCK = ITimelock(address(0)); // TODO
+    ITimelock public immutable TIMELOCK; // TODO
 
     IInstaIndex public constant INSTAINDEX = IInstaIndex(0xC7Cb1dE2721BFC0E0DA1b9D526bCdC54eF1C0eFC);
     ILite public constant LITE = ILite(0xA0D3707c569ff8C87FA923d3823eC5D81c98Be78);
@@ -55,8 +55,13 @@ contract PayloadIGP {
 
     string public constant description = "";
 
-    address public constant GOVERNOR_IMPLEMENTATION_ADDRESS = address(0); // todo
+    address public immutable GOVERNOR_IMPLEMENTATION_ADDRESS; // todo
     address public constant TEAM_MULTISIG = 0x4F6F977aCDD1177DCD81aB83074855EcB9C2D49e;
+
+    constructor (address governor_, address timelock_) {
+        TIMELOCK = ITimelock(address(timelock_)); 
+        GOVERNOR_IMPLEMENTATION_ADDRESS = address(governor_);
+    }
 
 
     function propose() external {
@@ -140,10 +145,10 @@ contract PayloadIGP {
 
         string memory withdrawSignature = "withdraw(address,uint256,address,uint256,uint256)";
 
-        // Spell 1: Transfer ETH
+        // Spell 1: Transfer wETH
         {
-            address ETH_ADDRESS = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
-            uint256 ETH_AMOUNT = 230 * 1e18;
+            address ETH_ADDRESS = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
+            uint256 ETH_AMOUNT = 1 * 1e18;
             targets[0] = "BASIC-A";
             encodedSpells[0] = abi.encodeWithSignature(withdrawSignature, ETH_ADDRESS, ETH_AMOUNT, TEAM_MULTISIG, 0, 0);
         }
@@ -151,7 +156,7 @@ contract PayloadIGP {
         // Spell 2: Transfer USDC
         {   
             address USDC_ADDRESS = 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
-            uint256 USDC_AMOUNT = 100_000 * 1e6;
+            uint256 USDC_AMOUNT = 100 * 1e6;
             targets[1] = "BASIC-A";
             encodedSpells[1] = abi.encodeWithSignature(withdrawSignature, USDC_ADDRESS, USDC_AMOUNT, TEAM_MULTISIG, 0, 0);
         }
@@ -159,7 +164,7 @@ contract PayloadIGP {
         // Spell 3: Transfer DAI
         {   
             address DAI_ADDRESS = 0x6B175474E89094C44Da98b954EedeAC495271d0F;
-            uint256 DAI_AMOUNT = 100_000 * 1e18;
+            uint256 DAI_AMOUNT = 100 * 1e18;
             targets[2] = "BASIC-A";
             encodedSpells[2] = abi.encodeWithSignature(withdrawSignature, DAI_ADDRESS, DAI_AMOUNT, TEAM_MULTISIG, 0, 0);
         }
@@ -167,7 +172,7 @@ contract PayloadIGP {
         // Spell 4: Transfer USDT
         {   
             address USDT_ADDRESS = 0xdAC17F958D2ee523a2206206994597C13D831ec7;
-            uint256 USDT_AMOUNT = 100_000 * 1e6;
+            uint256 USDT_AMOUNT = 100 * 1e6;
             targets[3] = "BASIC-A";
             encodedSpells[3] = abi.encodeWithSignature(withdrawSignature, USDT_ADDRESS, USDT_AMOUNT, TEAM_MULTISIG, 0, 0);
         }
@@ -188,8 +193,8 @@ contract PayloadIGP {
 
         // Spell 7: Remove old Timelock as auth
         {
-            targets[5] = "AUTHORITY-A";
-            encodedSpells[5] = abi.encodeWithSignature("remove(address)", address(OLD_TIMELOCK));
+            targets[6] = "AUTHORITY-A";
+            encodedSpells[6] = abi.encodeWithSignature("remove(address)", address(OLD_TIMELOCK));
         }
 
         target = address(TREASURY);
@@ -199,7 +204,7 @@ contract PayloadIGP {
     }
 
     /// @notice Action 2: call _setImplementation() - upgrade governor contract to new implementation
-    function action2() public pure returns(address target, uint256 value, string memory signature, bytes memory calldatas) {
+    function action2() public view returns(address target, uint256 value, string memory signature, bytes memory calldatas) {
         target = address(GOVERNOR);
         value = 0;
         signature = "_setImplementation(address)";
@@ -207,7 +212,7 @@ contract PayloadIGP {
     }
 
     /// @notice Action 3: call changeMaster() - change ownership of DSA to new timelock contract
-    function action3() public pure returns(address target, uint256 value, string memory signature, bytes memory calldatas) {
+    function action3() public view returns(address target, uint256 value, string memory signature, bytes memory calldatas) {
         target = address(INSTAINDEX);
         value = 0;
         signature = "changeMaster(address)";
@@ -215,7 +220,7 @@ contract PayloadIGP {
     }
 
     /// @notice Action 4: call setAdmin() - change ownership of Lite to new timelock contract
-    function action4() public pure returns(address target, uint256 value, string memory signature, bytes memory calldatas) {
+    function action4() public view returns(address target, uint256 value, string memory signature, bytes memory calldatas) {
         target = address(LITE);
         value = 0;
         signature = "setAdmin(address)";
@@ -223,7 +228,7 @@ contract PayloadIGP {
     }
 
     /// @notice Action 5: call _setPendingAdmin() - on governor contract with new timelock address
-    function action5() public pure returns(address target, uint256 value, string memory signature, bytes memory calldatas) {
+    function action5() public view returns(address target, uint256 value, string memory signature, bytes memory calldatas) {
         target = address(GOVERNOR);
         value = 0;
         signature = "_setPendingAdmin(address)";
@@ -231,7 +236,7 @@ contract PayloadIGP {
     }
 
     /// @notice Action 6: call setPendingAdmin() - on old timelock with new timelock address
-    function action6() public pure returns(address target, uint256 value, string memory signature, bytes memory calldatas) {
+    function action6() public view returns(address target, uint256 value, string memory signature, bytes memory calldatas) {
         target = address(OLD_TIMELOCK);
         value = 0;
         signature = "setPendingAdmin()";
