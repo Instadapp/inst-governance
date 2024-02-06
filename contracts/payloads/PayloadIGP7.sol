@@ -162,31 +162,31 @@ contract PayloadIGP7 {
         // Verify 5 : Verify Governor Pending Admin
         require(GOVERNOR.pendingAdmin() == address(0), "Governor-wrong-timelock");
 
-        // Verify 5 : Verify Old Timelock Admin
+        // Verify 6 : Verify Old Timelock Admin
         require(OLD_TIMELOCK.admin() == address(GOVERNOR), "Old-timelock-wrong-admin");
 
-        // Verify 6 : Verify Old Timelock Pending Admin
+        // Verify 7 : Verify Old Timelock Pending Admin
         require(OLD_TIMELOCK.pendingAdmin() == address(TEAM_MULTISIG), "Old-timelock-wrong-pending-admin");
 
-        // Verify 7 : Verify New Timelock Admin
+        // Verify 8 : Verify New Timelock Admin
         require(TIMELOCK.admin() == address(GOVERNOR), "Timelock-wrong-admin");
 
-        // Verify 8 : Verify Timelock Pending Admin
+        // Verify 9 : Verify Timelock Pending Admin
         require(TIMELOCK.pendingAdmin() == address(0), "Old-timelock-wrong-pending-admin");
 
-        // Verify 9 : Verify Treasury remove of old timelock
+        // Verify 10 : Verify Treasury remove of old timelock
         require(TREASURY.isAuth(address(OLD_TIMELOCK)) == false, "Treasury-old-timelock-not-removed");
 
-        // Verify 10: Verify Treasury add of new timelock
+        // Verify 11: Verify Treasury add of new timelock
         require(TREASURY.isAuth(address(TIMELOCK)) == true, "Treasury-new-timelock-not-added");
 
-        // Verify 11: Verify voting delay
+        // Verify 12: Verify voting delay
         require(GOVERNOR.votingDelay() == ONE_DAY_TIME_IN_BLOCKS, "Voting-delay-not-set-to-one-day");
 
-        // Verify 12: Verify voting period
+        // Verify 13: Verify voting period
         require(GOVERNOR.votingPeriod() == TWO_DAY_TIME_IN_BLOCKS, "Voting-period-not-set-to-two-day");
 
-        // Verify 13: Verify queueing period
+        // Verify 14: Verify queueing period
         require(TIMELOCK.delay() == ONE_DAY_TIME_IN_SECONDS, "Timelock-delay-not-set-to-one-day");
     }
 
