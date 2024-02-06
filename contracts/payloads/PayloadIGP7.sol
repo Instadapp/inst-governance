@@ -8,6 +8,10 @@ interface IGovernorBravo {
     function _acceptAdminOnTimelock() external;
     function _setImplementation(address implementation_) external;
     function propose(address[] memory targets, uint[] memory values, string[] memory signatures, bytes[] memory calldatas, string memory description) external returns (uint);
+    function admin() external view returns(address);
+    function timelock() external view returns(address);
+    function votingDelay() external view returns(uint256);
+    function votingPeriod() external view returns(uint256);
 }
 
 interface ITimelock {
@@ -16,15 +20,19 @@ interface ITimelock {
     function setPendingAdmin(address pendingAdmin_) external;
     function queueTransaction(address target, uint value, string memory signature, bytes memory data, uint eta) external returns (bytes32);
     function executeTransaction(address target, uint value, string memory signature, bytes memory data, uint eta) external payable returns (bytes memory);
+    function admin() external view returns(address);
+    function delay() external view returns(uint256);
 }
 
 interface IInstaIndex {
     function changeMaster(address _newMaster) external;
     function updateMaster() external;
+    function master() external view returns(address);
 }
 
 interface ILite {
     function setAdmin(address newAdmin) external;
+    function getAdmin() external view returns(address);
 }
 
 interface IDSAV2 {
@@ -36,6 +44,8 @@ interface IDSAV2 {
     external
     payable 
     returns (bytes32);
+
+    function isAuth(address user) external view returns (bool);
 }
 
 contract PayloadIGP7 {
@@ -65,7 +75,7 @@ contract PayloadIGP7 {
 
 
     function propose() external {
-        uint256 totalActions = 8;
+        uint256 totalActions = 9;
         address[] memory targets = new address[](totalActions);
         uint256[] memory values = new uint256[](totalActions);
         string[] memory signatures = new string[](totalActions);
@@ -94,6 +104,9 @@ contract PayloadIGP7 {
 
         // Action 8: call executeTransaction - new timelock contract to execute below payload
         (targets[7], values[7], signatures[7], calldatas[7]) = action8();
+
+        // Action 9: call verifyProposal() - on this payload contract
+        (targets[8], values[8], signatures[8], calldatas[8]) = action9();
 
         uint256 proposedId = GOVERNOR.propose(
             targets,
@@ -132,17 +145,39 @@ contract PayloadIGP7 {
         TIMELOCK.setDelay(ONE_DAY_TIME_IN_SECONDS);
     }
 
-    function verifyProposal() external {
+    function verifyProposal() external view {
         // Verify 1 : Verify DSA Master
+        require(INSTAINDEX.master() == address(TIMELOCK), "InstaIndex-wrong-master");
+
         // Verify 2 : Verify Lite Admin
+        require(LITE.getAdmin() == address(TIMELOCK), "Lite-wrong-admin");
+
         // Verify 3 : Verify Governor Admin
-        // Verify 4 : Verify Old Timelock Admin
-        // Verify 5 : Verify New Timelock Admin
-        // Verify 6 : Verify Treasury remove of old timelock
-        // Verify 7 : Verify Treasury add of new timelock
-        // Verify 8 : Verify voting delay
-        // Verify 9 : Verify voting period
-        // Verify 10: Verify queueing period
+        require(GOVERNOR.admin() == address(TIMELOCK), "Governor-wrong-admin");
+
+        // Verify 4 : Verify Governor Admin
+        require(GOVERNOR.timelock() == address(TIMELOCK), "Governor-wrong-timelock");
+
+        // Verify 5 : Verify Old Timelock Admin
+        require(OLD_TIMELOCK.admin() == address(TIMELOCK), "Old-timelock-wrong-admin");
+
+        // Verify 6 : Verify New Timelock Admin
+        require(TIMELOCK.admin() == address(GOVERNOR), "Timelock-wrong-admin");
+
+        // Verify 7 : Verify Treasury remove of old timelock
+        require(TREASURY.isAuth(address(OLD_TIMELOCK)) == false, "Treasury-old-timelock-not-removed");
+
+        // Verify 8 : Verify Treasury add of new timelock
+        require(TREASURY.isAuth(address(TIMELOCK)) == true, "Treasury-new-timelock-not-added");
+
+        // Verify 9 : Verify voting delay
+        require(GOVERNOR.votingDelay() == ONE_DAY_TIME_IN_BLOCKS, "Voting-delay-not-set-to-one-day");
+
+        // Verify 10 : Verify voting period
+        require(GOVERNOR.votingPeriod() == TWO_DAY_TIME_IN_BLOCKS, "Voting-period-not-set-to-two-day");
+
+        // Verify 11: Verify queueing period
+        require(TIMELOCK.delay() == ONE_DAY_TIME_IN_SECONDS, "Timelock-delay-not-set-to-one-day");
     }
 
     ///////// PROPOSAL ACTIONS - 8 Actions ///////
@@ -286,5 +321,13 @@ contract PayloadIGP7 {
             ),
             block.timestamp
         );
+    }
+
+    /// @notice Action 5: call verifyProposal() - on this payload contract to verify end of execution
+    function action9() public view returns(address target, uint256 value, string memory signature, bytes memory calldatas) {
+        target = address(this);
+        value = 0;
+        signature = "verifyProposal()";
+        calldatas = abi.encode();
     }
 }
