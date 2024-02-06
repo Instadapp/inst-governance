@@ -133,7 +133,16 @@ contract PayloadIGP7 {
     }
 
     function verifyProposal() external {
-
+        // Verify 1 : Verify DSA Master
+        // Verify 2 : Verify Lite Admin
+        // Verify 3 : Verify Governor Admin
+        // Verify 4 : Verify Old Timelock Admin
+        // Verify 5 : Verify New Timelock Admin
+        // Verify 6 : Verify Treasury remove of old timelock
+        // Verify 7 : Verify Treasury add of new timelock
+        // Verify 8 : Verify voting delay
+        // Verify 9 : Verify voting period
+        // Verify 10: Verify queueing period
     }
 
     ///////// PROPOSAL ACTIONS - 8 Actions ///////
