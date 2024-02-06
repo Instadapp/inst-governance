@@ -53,9 +53,10 @@ contract PayloadIGP7 {
 
     IGovernorBravo public constant GOVERNOR = IGovernorBravo(0x0204Cd037B2ec03605CFdFe482D8e257C765fA1B);
     ITimelock public constant OLD_TIMELOCK = ITimelock(0xC7Cb1dE2721BFC0E0DA1b9D526bCdC54eF1C0eFC);
-    ITimelock public immutable TIMELOCK; // TODO
+    ITimelock public immutable TIMELOCK;
+    address public immutable ADDRESS_THIS;
 
-    IInstaIndex public constant INSTAINDEX = IInstaIndex(0xC7Cb1dE2721BFC0E0DA1b9D526bCdC54eF1C0eFC);
+    IInstaIndex public constant INSTAINDEX = IInstaIndex(0x2971AdFa57b20E5a416aE5a708A8655A9c74f723);
     ILite public constant LITE = ILite(0xA0D3707c569ff8C87FA923d3823eC5D81c98Be78);
     IDSAV2 public constant TREASURY = IDSAV2(0x28849D2b63fA8D361e5fc15cB8aBB13019884d09);
 
@@ -65,17 +66,18 @@ contract PayloadIGP7 {
 
     string public constant description = "";
 
-    address public immutable GOVERNOR_IMPLEMENTATION_ADDRESS; // todo
+    address public immutable GOVERNOR_IMPLEMENTATION_ADDRESS;
     address public constant TEAM_MULTISIG = 0x4F6F977aCDD1177DCD81aB83074855EcB9C2D49e;
 
     constructor (address governor_, address timelock_) {
         TIMELOCK = ITimelock(address(timelock_)); 
         GOVERNOR_IMPLEMENTATION_ADDRESS = address(governor_);
+        ADDRESS_THIS = address(this);
     }
 
 
     function propose() external {
-        uint256 totalActions = 9;
+        uint256 totalActions = 8;
         address[] memory targets = new address[](totalActions);
         uint256[] memory values = new uint256[](totalActions);
         string[] memory signatures = new string[](totalActions);
@@ -104,9 +106,6 @@ contract PayloadIGP7 {
 
         // Action 8: call executeTransaction - new timelock contract to execute below payload
         (targets[7], values[7], signatures[7], calldatas[7]) = action8();
-
-        // Action 9: call verifyProposal() - on this payload contract
-        (targets[8], values[8], signatures[8], calldatas[8]) = action9();
 
         uint256 proposedId = GOVERNOR.propose(
             targets,
@@ -143,6 +142,9 @@ contract PayloadIGP7 {
 
         // Action 8: setDelay() on new timelock contract with 1 day
         TIMELOCK.setDelay(ONE_DAY_TIME_IN_SECONDS);
+
+        // Action 9: call verifyProposal() - on this payload contract to verify proposal execution
+        PayloadIGP7(ADDRESS_THIS).verifyProposal();
     }
 
     function verifyProposal() external view {
@@ -321,13 +323,5 @@ contract PayloadIGP7 {
             ),
             block.timestamp
         );
-    }
-
-    /// @notice Action 5: call verifyProposal() - on this payload contract to verify end of execution
-    function action9() public view returns(address target, uint256 value, string memory signature, bytes memory calldatas) {
-        target = address(this);
-        value = 0;
-        signature = "verifyProposal()";
-        calldatas = abi.encode();
     }
 }
