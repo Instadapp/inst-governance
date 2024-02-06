@@ -239,7 +239,7 @@ contract PayloadIGP7 {
     function action6() public view returns(address target, uint256 value, string memory signature, bytes memory calldatas) {
         target = address(OLD_TIMELOCK);
         value = 0;
-        signature = "setPendingAdmin()";
+        signature = "setPendingAdmin(address)";
         calldatas = abi.encode(TIMELOCK);
     }
 
