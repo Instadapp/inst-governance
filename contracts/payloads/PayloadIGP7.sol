@@ -9,6 +9,7 @@ interface IGovernorBravo {
     function _setImplementation(address implementation_) external;
     function propose(address[] memory targets, uint[] memory values, string[] memory signatures, bytes[] memory calldatas, string memory description) external returns (uint);
     function admin() external view returns(address);
+    function pendingAdmin() external view returns(address);
     function timelock() external view returns(address);
     function votingDelay() external view returns(uint256);
     function votingPeriod() external view returns(uint256);
@@ -20,6 +21,7 @@ interface ITimelock {
     function setPendingAdmin(address pendingAdmin_) external;
     function queueTransaction(address target, uint value, string memory signature, bytes memory data, uint eta) external returns (bytes32);
     function executeTransaction(address target, uint value, string memory signature, bytes memory data, uint eta) external payable returns (bytes memory);
+    function pendingAdmin() external view returns(address);
     function admin() external view returns(address);
     function delay() external view returns(uint256);
 }
@@ -98,7 +100,7 @@ contract PayloadIGP7 {
         // Action 5: call _setPendingAdmin() - on governor contract with new timelock address
         (targets[4], values[4], signatures[4], calldatas[4]) = action5();
 
-        // Action 6: call setPendingAdmin() - on old timelock with new timelock address
+        // Action 6: call setPendingAdmin() - on old timelock to change team multisig
         (targets[5], values[5], signatures[5], calldatas[5]) = action6();
 
         // Action 7: call queueTransaction - new timelock contract to queue below payload
@@ -122,28 +124,25 @@ contract PayloadIGP7 {
         // Action 1: updateMaster() function on DSA instaIndex
         INSTAINDEX.updateMaster();
 
-        // Action 2: acceptAdmin() function on old time contract
-        OLD_TIMELOCK.acceptAdmin();
-
-        // Action 3: _acceptAdmin() function on governor contract
+        // Action 2: _acceptAdmin() function on governor contract
         GOVERNOR._acceptAdmin();
 
-        // Action 4: _setVotingDelay() function on governor contract with 1 days
+        // Action 3: _setVotingDelay() function on governor contract with 1 days
         GOVERNOR._setVotingDelay(ONE_DAY_TIME_IN_BLOCKS);
 
-        // Action 5: _setVotingPeriod() function on governor contract with 2 days
+        // Action 4: _setVotingPeriod() function on governor contract with 2 days
         GOVERNOR._setVotingPeriod(TWO_DAY_TIME_IN_BLOCKS);
 
-        // Action 6: setPendingAdmin() on new timelock contract
+        // Action 5: setPendingAdmin() on new timelock contract
         TIMELOCK.setPendingAdmin(address(GOVERNOR));
 
-        // Action 7: _acceptAdminOnTimelock() on governor contract
+        // Action 6: _acceptAdminOnTimelock() on governor contract
         GOVERNOR._acceptAdminOnTimelock();
 
-        // Action 8: setDelay() on new timelock contract with 1 day
+        // Action 7: setDelay() on new timelock contract with 1 day
         TIMELOCK.setDelay(ONE_DAY_TIME_IN_SECONDS);
 
-        // Action 9: call verifyProposal() - on this payload contract to verify proposal execution
+        // Action 8: call verifyProposal() - on this payload contract to verify proposal execution
         PayloadIGP7(ADDRESS_THIS).verifyProposal();
     }
 
@@ -157,28 +156,37 @@ contract PayloadIGP7 {
         // Verify 3 : Verify Governor Admin
         require(GOVERNOR.admin() == address(TIMELOCK), "Governor-wrong-admin");
 
-        // Verify 4 : Verify Governor Admin
+        // Verify 4 : Verify Governor Timelock
         require(GOVERNOR.timelock() == address(TIMELOCK), "Governor-wrong-timelock");
 
-        // Verify 5 : Verify Old Timelock Admin
-        require(OLD_TIMELOCK.admin() == address(TIMELOCK), "Old-timelock-wrong-admin");
+        // Verify 5 : Verify Governor Pending Admin
+        require(GOVERNOR.pendingAdmin() == address(0), "Governor-wrong-timelock");
 
-        // Verify 6 : Verify New Timelock Admin
+        // Verify 5 : Verify Old Timelock Admin
+        require(OLD_TIMELOCK.admin() == address(GOVERNOR), "Old-timelock-wrong-admin");
+
+        // Verify 6 : Verify Old Timelock Pending Admin
+        require(OLD_TIMELOCK.pendingAdmin() == address(TEAM_MULTISIG), "Old-timelock-wrong-pending-admin");
+
+        // Verify 7 : Verify New Timelock Admin
         require(TIMELOCK.admin() == address(GOVERNOR), "Timelock-wrong-admin");
 
-        // Verify 7 : Verify Treasury remove of old timelock
+        // Verify 8 : Verify Timelock Pending Admin
+        require(TIMELOCK.pendingAdmin() == address(0), "Old-timelock-wrong-pending-admin");
+
+        // Verify 9 : Verify Treasury remove of old timelock
         require(TREASURY.isAuth(address(OLD_TIMELOCK)) == false, "Treasury-old-timelock-not-removed");
 
-        // Verify 8 : Verify Treasury add of new timelock
+        // Verify 10: Verify Treasury add of new timelock
         require(TREASURY.isAuth(address(TIMELOCK)) == true, "Treasury-new-timelock-not-added");
 
-        // Verify 9 : Verify voting delay
+        // Verify 11: Verify voting delay
         require(GOVERNOR.votingDelay() == ONE_DAY_TIME_IN_BLOCKS, "Voting-delay-not-set-to-one-day");
 
-        // Verify 10 : Verify voting period
+        // Verify 12: Verify voting period
         require(GOVERNOR.votingPeriod() == TWO_DAY_TIME_IN_BLOCKS, "Voting-period-not-set-to-two-day");
 
-        // Verify 11: Verify queueing period
+        // Verify 13: Verify queueing period
         require(TIMELOCK.delay() == ONE_DAY_TIME_IN_SECONDS, "Timelock-delay-not-set-to-one-day");
     }
 
@@ -281,12 +289,12 @@ contract PayloadIGP7 {
         calldatas = abi.encode(TIMELOCK);
     }
 
-    /// @notice Action 6: call setPendingAdmin() - on old timelock with new timelock address
-    function action6() public view returns(address target, uint256 value, string memory signature, bytes memory calldatas) {
+    /// @notice Action 6: call setPendingAdmin() - on old timelock to change team multisig
+    function action6() public pure returns(address target, uint256 value, string memory signature, bytes memory calldatas) {
         target = address(OLD_TIMELOCK);
         value = 0;
         signature = "setPendingAdmin(address)";
-        calldatas = abi.encode(TIMELOCK);
+        calldatas = abi.encode(TEAM_MULTISIG);
     }
 
     /// @notice Action 7: call queueTransaction - new timelock contract to queue below payload
