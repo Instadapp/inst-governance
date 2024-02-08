@@ -202,7 +202,7 @@ contract PayloadIGP7 {
         // Spell 1: Transfer wETH
         {
             address ETH_ADDRESS = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
-            uint256 ETH_AMOUNT = 1 * 1e18;
+            uint256 ETH_AMOUNT = 230 * 1e18; // 230 ETH
             targets[0] = "BASIC-A";
             encodedSpells[0] = abi.encodeWithSignature(withdrawSignature, ETH_ADDRESS, ETH_AMOUNT, TEAM_MULTISIG, 0, 0);
         }
@@ -210,7 +210,7 @@ contract PayloadIGP7 {
         // Spell 2: Transfer USDC
         {   
             address USDC_ADDRESS = 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
-            uint256 USDC_AMOUNT = 100 * 1e6;
+            uint256 USDC_AMOUNT = 247_900 * 1e6; // 247.9k USDC
             targets[1] = "BASIC-A";
             encodedSpells[1] = abi.encodeWithSignature(withdrawSignature, USDC_ADDRESS, USDC_AMOUNT, TEAM_MULTISIG, 0, 0);
         }
@@ -218,7 +218,7 @@ contract PayloadIGP7 {
         // Spell 3: Transfer DAI
         {   
             address DAI_ADDRESS = 0x6B175474E89094C44Da98b954EedeAC495271d0F;
-            uint256 DAI_AMOUNT = 100 * 1e18;
+            uint256 DAI_AMOUNT = 59_000 * 1e18; // 59k DAI
             targets[2] = "BASIC-A";
             encodedSpells[2] = abi.encodeWithSignature(withdrawSignature, DAI_ADDRESS, DAI_AMOUNT, TEAM_MULTISIG, 0, 0);
         }
@@ -226,7 +226,7 @@ contract PayloadIGP7 {
         // Spell 4: Transfer USDT
         {   
             address USDT_ADDRESS = 0xdAC17F958D2ee523a2206206994597C13D831ec7;
-            uint256 USDT_AMOUNT = 100 * 1e6;
+            uint256 USDT_AMOUNT = 28_700 * 1e6; // 28.8k USDT
             targets[3] = "BASIC-A";
             encodedSpells[3] = abi.encodeWithSignature(withdrawSignature, USDT_ADDRESS, USDT_AMOUNT, TEAM_MULTISIG, 0, 0);
         }
@@ -234,7 +234,7 @@ contract PayloadIGP7 {
         // Spell 5: Transfer stETH
         {   
             address STETH_ADDRESS = 0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84;
-            uint256 STETH_AMOUNT = 70 * 1e18;
+            uint256 STETH_AMOUNT = 320 * 1e18; // 320 stETH
             targets[4] = "BASIC-A";
             encodedSpells[4] = abi.encodeWithSignature(withdrawSignature, STETH_ADDRESS, STETH_AMOUNT, TEAM_MULTISIG, 0, 0);
         }
