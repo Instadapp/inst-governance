@@ -174,7 +174,7 @@ contract PayloadIGP7 {
         require(TIMELOCK.admin() == address(GOVERNOR), "Timelock-wrong-admin");
 
         // Verify 9 : Verify Timelock Pending Admin
-        require(TIMELOCK.pendingAdmin() == address(0), "Old-timelock-wrong-pending-admin");
+        require(TIMELOCK.pendingAdmin() == address(0), "Timelock-wrong-pending-admin");
 
         // Verify 10 : Verify Treasury remove of old timelock
         require(TREASURY.isAuth(address(OLD_TIMELOCK)) == false, "Treasury-old-timelock-not-removed");
