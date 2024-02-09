@@ -162,7 +162,7 @@ contract PayloadIGP7 {
         require(GOVERNOR.timelock() == address(TIMELOCK), "Governor-wrong-timelock");
 
         // Verify 5 : Verify Governor Pending Admin
-        require(GOVERNOR.pendingAdmin() == address(0), "Governor-wrong-timelock");
+        require(GOVERNOR.pendingAdmin() == address(0), "Governor-wrong-pending-admin");
 
         // Verify 6 : Verify Old Timelock Admin
         require(OLD_TIMELOCK.admin() == address(GOVERNOR), "Old-timelock-wrong-admin");
