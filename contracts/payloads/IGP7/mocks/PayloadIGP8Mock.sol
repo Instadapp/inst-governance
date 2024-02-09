@@ -67,8 +67,6 @@ contract PayloadIGP8Mock {
     uint256 public constant ONE_DAY_TIME_IN_BLOCKS = 7_200; // 1 day in blocks. 12s per block
     uint256 public constant TWO_DAY_TIME_IN_BLOCKS = 14_400; // 2 day in blocks. 12s per block
 
-    string public constant description = "";
-
     address public immutable GOVERNOR_IMPLEMENTATION_ADDRESS;
     address public constant TEAM_MULTISIG = 0x4F6F977aCDD1177DCD81aB83074855EcB9C2D49e;
 
@@ -79,7 +77,7 @@ contract PayloadIGP8Mock {
     }
 
 
-    function propose() external {
+    function propose(string memory description) external {
         uint256 totalActions = 3;
         address[] memory targets = new address[](totalActions);
         uint256[] memory values = new uint256[](totalActions);
