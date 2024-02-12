@@ -55,20 +55,22 @@ contract PayloadIGP8Mock {
     uint256 public constant PROPOSAL_ID = 8;
 
     IGovernorBravo public constant GOVERNOR = IGovernorBravo(0x0204Cd037B2ec03605CFdFe482D8e257C765fA1B);
-    ITimelock public constant OLD_TIMELOCK = ITimelock(0xC7Cb1dE2721BFC0E0DA1b9D526bCdC54eF1C0eFC);
-    ITimelock public immutable TIMELOCK;
-    address public immutable ADDRESS_THIS;
+    IDSAV2 public constant TREASURY = IDSAV2(0x28849D2b63fA8D361e5fc15cB8aBB13019884d09);
 
     IInstaIndex public constant INSTAINDEX = IInstaIndex(0x2971AdFa57b20E5a416aE5a708A8655A9c74f723);
     ILite public constant LITE = ILite(0xA0D3707c569ff8C87FA923d3823eC5D81c98Be78);
-    IDSAV2 public constant TREASURY = IDSAV2(0x28849D2b63fA8D361e5fc15cB8aBB13019884d09);
+
+    ITimelock public constant OLD_TIMELOCK = ITimelock(0xC7Cb1dE2721BFC0E0DA1b9D526bCdC54eF1C0eFC);
+
+    address public immutable ADDRESS_THIS;
+    ITimelock public immutable TIMELOCK;
+    address public immutable GOVERNOR_IMPLEMENTATION_ADDRESS;
+
+    address public constant TEAM_MULTISIG = 0x4F6F977aCDD1177DCD81aB83074855EcB9C2D49e;
 
     uint256 public constant ONE_DAY_TIME_IN_SECONDS = 1 days; // 1 day in seconds. 86400s
     uint256 public constant ONE_DAY_TIME_IN_BLOCKS = 7_200; // 1 day in blocks. 12s per block
     uint256 public constant TWO_DAY_TIME_IN_BLOCKS = 14_400; // 2 day in blocks. 12s per block
-
-    address public immutable GOVERNOR_IMPLEMENTATION_ADDRESS;
-    address public constant TEAM_MULTISIG = 0x4F6F977aCDD1177DCD81aB83074855EcB9C2D49e;
 
     constructor (address governor_, address timelock_) {
         TIMELOCK = ITimelock(address(timelock_)); 
