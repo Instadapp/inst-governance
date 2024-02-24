@@ -63,6 +63,9 @@ contract GovernorBravoEvents {
 
     /// @notice Emitted when pendingAdmin is accepted, which means admin is updated
     event NewAdmin(address oldAdmin, address newAdmin);
+
+    /// @notice Emitted when pendingAdmin is accepted, which means timelock is updated
+    event NewTimelock(address oldTimelock, address newTimelock);
 }
 
 contract GovernorBravoDelegatorStorage {

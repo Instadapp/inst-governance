@@ -8,27 +8,27 @@ contract InstaTimelock {
     event NewAdmin(address indexed newAdmin);
     event NewPendingAdmin(address indexed newPendingAdmin);
     event NewDelay(uint indexed newDelay);
+    event NewGuardian(address indexed newGuardian);
     event CancelTransaction(bytes32 indexed txHash, address indexed target, uint value, string signature,  bytes data, uint eta);
     event ExecuteTransaction(bytes32 indexed txHash, address indexed target, uint value, string signature,  bytes data, uint eta);
     event QueueTransaction(bytes32 indexed txHash, address indexed target, uint value, string signature, bytes data, uint eta);
 
     uint public constant GRACE_PERIOD = 14 days;
-    uint public constant MINIMUM_DELAY = 2 days;
+    uint public constant MINIMUM_DELAY = 1 hours;
     uint public constant MAXIMUM_DELAY = 30 days;
 
     address public admin;
     address public pendingAdmin;
+    address public guardian;
     uint public delay;
 
     mapping (bytes32 => bool) public queuedTransactions;
 
 
-    constructor(address admin_, uint delay_) {
-        require(delay_ >= MINIMUM_DELAY, "Timelock::constructor: Delay must exceed minimum delay.");
-        require(delay_ <= MAXIMUM_DELAY, "Timelock::setDelay: Delay must not exceed maximum delay.");
-
+    constructor(address admin_, address guardian_) {
         admin = admin_;
-        delay = delay_;
+        delay = 0; // delay set to "0"
+        guardian = guardian_;
     }
 
     fallback() external payable { }
@@ -40,6 +40,13 @@ contract InstaTimelock {
         delay = delay_;
 
         emit NewDelay(delay);
+    }
+
+    function setGuardian(address guardian_) public {
+        require(msg.sender == address(this), "Timelock::setGuardian: Call must come from Timelock.");
+        guardian = guardian_;
+
+        emit NewGuardian(guardian_);
     }
 
     function acceptAdmin() public {
@@ -59,7 +66,7 @@ contract InstaTimelock {
 
     function queueTransaction(address target, uint value, string memory signature, bytes memory data, uint eta) public returns (bytes32) {
         require(msg.sender == admin, "Timelock::queueTransaction: Call must come from admin.");
-        require(eta >= getBlockTimestamp().add(delay), "Timelock::queueTransaction: Estimated execution block must satisfy delay.");
+        require(delay == 0 || eta >= getBlockTimestamp().add(delay), "Timelock::queueTransaction: Estimated execution block must satisfy delay.");
 
         bytes32 txHash = keccak256(abi.encode(target, value, signature, data, eta));
         queuedTransactions[txHash] = true;
@@ -69,7 +76,7 @@ contract InstaTimelock {
     }
 
     function cancelTransaction(address target, uint value, string memory signature, bytes memory data, uint eta) public {
-        require(msg.sender == admin, "Timelock::cancelTransaction: Call must come from admin.");
+        require(msg.sender == admin || msg.sender == guardian, "Timelock::cancelTransaction: Call must come from admin or guardian.");
 
         bytes32 txHash = keccak256(abi.encode(target, value, signature, data, eta));
         queuedTransactions[txHash] = false;
@@ -100,6 +107,23 @@ contract InstaTimelock {
         require(success, "Timelock::executeTransaction: Transaction execution reverted.");
 
         emit ExecuteTransaction(txHash, target, value, signature, data, eta);
+
+        return returnData;
+    }
+
+    function executePayload(address target, string memory signature, bytes memory data) public returns (bytes memory) {
+        require(msg.sender == address(this), "Timelock::executePayload: Call must come from Timelock.");
+        bytes memory callData;
+
+        if (bytes(signature).length == 0) {
+            callData = data;
+        } else {
+            callData = abi.encodePacked(bytes4(keccak256(bytes(signature))), data);
+        }
+
+        // solium-disable-next-line security/no-call-value
+        (bool success, bytes memory returnData) = target.delegatecall(callData);
+        require(success, "Timelock::executePayload: Transaction execution reverted.");
 
         return returnData;
     }

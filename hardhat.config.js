@@ -26,15 +26,14 @@ module.exports = {
   networks: {
     hardhat: {
       forking: {
-        url: `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_ID}`,
+        url: `https://1rpc.io/eth`,
         blockNumber: 12308027,
       },
       blockGasLimit: 12000000,
     },
-    kovan: {
-      url: `https://eth-kovan.alchemyapi.io/v2/${ALCHEMY_ID}`,
-      accounts: [`0x${PRIVATE_KEY}`],
-      gas: 12500000,
+    mainnet: {
+      url: `https://1rpc.io/eth`,
+      accounts: !PRIVATE_KEY ? [] : [ `0x${PRIVATE_KEY}`],
     },
   },
   etherscan: {

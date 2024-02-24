@@ -11,7 +11,7 @@ import { SafeMath } from "./SafeMath.sol";
 
 contract InstaGovernorBravoDelegate is GovernorBravoDelegateStorageV1, GovernorBravoEvents {
     /// @notice The name of this contract
-    string public constant name = "DSL Governor Bravo";
+    string public constant name = "INST Governor Bravo";
 
     /// @notice The minimum setable proposal threshold
     uint public constant MIN_PROPOSAL_THRESHOLD = 500000e18; // 500,000
@@ -20,22 +20,22 @@ contract InstaGovernorBravoDelegate is GovernorBravoDelegateStorageV1, GovernorB
     uint public constant MAX_PROPOSAL_THRESHOLD = 50000000e18; // 5,000,000
 
     /// @notice The minimum setable voting period
-    uint public constant MIN_VOTING_PERIOD = 5760; // About 24 hours
+    uint public constant MIN_VOTING_PERIOD = 7200; // About 24 hours, 12s per block
 
     /// @notice The max setable voting period
-    uint public constant MAX_VOTING_PERIOD = 80640; // About 2 weeks
+    uint public constant MAX_VOTING_PERIOD = 100800; // About 2 weeks, 12s per block
 
     /// @notice The min setable voting delay
     uint public constant MIN_VOTING_DELAY = 1;
 
     /// @notice The max setable voting delay
-    uint public constant MAX_VOTING_DELAY = 40320; // About 1 week
+    uint public constant MAX_VOTING_DELAY = 50400; // About 1 week, 12s per block
 
     /// @notice The number of votes in support of a proposal required in order for a quorum to be reached and for a vote to succeed
     uint public constant quorumVotes = 4000000e18; // 4,000,000
 
     /// @notice The maximum number of actions that can be included in a proposal
-    uint public constant proposalMaxOperations = 10; // 10 actions
+    uint public constant proposalMaxOperations = 30; // 30 actions
 
     /// @notice The EIP-712 typehash for the contract's domain
     bytes32 public constant DOMAIN_TYPEHASH = keccak256("EIP712Domain(string name,uint256 chainId,address verifyingContract)");
@@ -359,12 +359,24 @@ contract InstaGovernorBravoDelegate is GovernorBravoDelegateStorageV1, GovernorB
 
         // Store admin with value pendingAdmin
         admin = pendingAdmin;
+        // Store timelock with value pendingAdmin
+        emit NewTimelock(address(timelock), pendingAdmin);
+        timelock = TimelockInterface(pendingAdmin);
 
         // Clear the pending value
         pendingAdmin = address(0);
 
         emit NewAdmin(oldAdmin, admin);
         emit NewPendingAdmin(oldPendingAdmin, pendingAdmin);
+    }
+
+    /**
+      * @notice Accepts transfer of admin rights on timelock contract. msg.sender must be admin of this contract
+      * @dev Admin function for pending admin to accept role and update admin on timelock contract
+      */
+    function _acceptAdminOnTimelock() external {
+        require(msg.sender == admin, "GovernorBravo:_acceptAdminOnTimelock: pending admin only");
+        timelock.acceptAdmin();
     }
 
 
