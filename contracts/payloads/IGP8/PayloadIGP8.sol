@@ -79,7 +79,10 @@ contract PayloadIGP8 {
     address internal constant OLD_REFINANCE_MODULE =
         0x390936658cB9B73ca75c6c02D5EF88b958D38241;
     address internal constant OLD_DSA_MODULE =
+        0xE38d5938d6D75ceF2c3Fc63Dc4AB32cD103E10df;
+    address internal constant OLD_WITHDRAWALS_MODULE = 
         0xbd45DfF3320b0d832C61fb41489fdd3a1b960067;
+
 
     address internal constant NEW_USER_MODULE =
         0xFF93C10FB34f7069071D0679c45ed77A98f37f21;
@@ -162,6 +165,7 @@ contract PayloadIGP8 {
         LITE.removeImplementation(OLD_REBALANCER_MODULE);
         LITE.removeImplementation(OLD_REFINANCE_MODULE);
         LITE.removeImplementation(OLD_DSA_MODULE);
+        LITE.removeImplementation(OLD_WITHDRAWALS_MODULE);
     }
 
     /// @notice Action 2: Add new implementations
