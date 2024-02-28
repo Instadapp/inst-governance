@@ -84,6 +84,8 @@ contract PayloadIGP8 {
         0xbd45DfF3320b0d832C61fb41489fdd3a1b960067;
 
 
+    address internal constant NEW_VIEW_MODULE =
+        0xbd45DfF3320b0d832C61fb41489fdd3a1b960067; // TODO
     address internal constant NEW_USER_MODULE =
         0xFF93C10FB34f7069071D0679c45ed77A98f37f21;
     address internal constant NEW_ADMIN_MODULE =
@@ -171,6 +173,7 @@ contract PayloadIGP8 {
     /// @notice Action 2: Add new implementations
     function action2() internal {
         LITE.addImplementation(NEW_USER_MODULE, userSigs());
+        LITE.addImplementation(NEW_VIEW_MODULE, viewSigs());
         LITE.addImplementation(NEW_ADMIN_MODULE, adminSigs());
         LITE.addImplementation(NEW_LEVERAGE_MODULE, leverageSigs());
         LITE.addImplementation(NEW_REBALANCER_MODULE, rebalancerSigs());
@@ -179,7 +182,7 @@ contract PayloadIGP8 {
         LITE.addImplementation(NEW_WITHDRAWALS_MODULE, withdrawalsSigs());
     }
 
-    /// @notice Action 3: call changeMaster() - change ownership of DSA to new timelock contract
+    /// @notice Action 3: Change dummy implementation.
     function action3() internal {
         LITE.setDummyImplementation(NEW_DUMMY_IMPLEMENTATION);
     }
@@ -188,7 +191,7 @@ contract PayloadIGP8 {
     |          Function Signatures      |
     |__________________________________*/
     function userSigs() public pure returns (bytes4[] memory sigs_) {
-        sigs_ = new bytes4[](54);
+        sigs_ = new bytes4[](28);
         sigs_[0] = bytes4(keccak256("allowance(address,address)"));
         sigs_[1] = bytes4(keccak256("approve(address,uint256)"));
         sigs_[2] = bytes4(keccak256("balanceOf(address)"));
@@ -211,42 +214,46 @@ contract PayloadIGP8 {
         sigs_[19] = bytes4(keccak256("previewMint(uint256)"));
         sigs_[20] = bytes4(keccak256("previewRedeem(uint256)"));
         sigs_[21] = bytes4(keccak256("previewWithdraw(uint256)"));
-        sigs_[22] = bytes4(keccak256("getNetAssets()"));
-        sigs_[23] = bytes4(keccak256("getProtocolRatio(uint8)"));
-        sigs_[24] = bytes4(keccak256("getRatioAaveV2()"));
-        sigs_[25] = bytes4(keccak256("getRatioAaveV3(uint256)"));
-        sigs_[26] = bytes4(keccak256("getRatioCompoundV3(uint256)"));
-        sigs_[27] = bytes4(keccak256("getRatioEuler(uint256)"));
-        sigs_[28] = bytes4(keccak256("getRatioMorphoAaveV2()"));
-        sigs_[29] = bytes4(keccak256("getWithdrawFee(uint256)"));
-        sigs_[30] = bytes4(keccak256("aggrMaxVaultRatio()"));
-        sigs_[31] = bytes4(keccak256("exchangePrice()"));
-        sigs_[32] = bytes4(keccak256("isRebalancer(address)"));
-        sigs_[33] = bytes4(keccak256("leverageMaxUnitAmountLimit()"));
-        sigs_[34] = bytes4(keccak256("maxRiskRatio(uint8)"));
-        sigs_[35] = bytes4(keccak256("revenue()"));
-        sigs_[36] = bytes4(keccak256("revenueExchangePrice()"));
-        sigs_[37] = bytes4(keccak256("revenueFeePercentage()"));
-        sigs_[38] = bytes4(keccak256("secondaryAuth()"));
-        sigs_[39] = bytes4(keccak256("treasury()"));
-        sigs_[40] = bytes4(keccak256("vaultDSA()"));
-        sigs_[41] = bytes4(keccak256("withdrawFeeAbsoluteMin()"));
-        sigs_[42] = bytes4(keccak256("withdrawalFeePercentage()"));
-        sigs_[43] = bytes4(keccak256("deposit(uint256,address)"));
-        sigs_[44] = bytes4(
+        sigs_[22] = bytes4(keccak256("deposit(uint256,address)"));
+        sigs_[23] = bytes4(
             keccak256("importPosition(uint256,uint256,uint256,address)")
         );
-        sigs_[45] = bytes4(keccak256("mint(uint256,address)"));
-        sigs_[46] = bytes4(keccak256("redeem(uint256,address,address)"));
-        sigs_[47] = bytes4(keccak256("totalAssets()"));
-        sigs_[48] = bytes4(keccak256("withdraw(uint256,address,address)"));
-        // new functions
-        sigs_[49] = bytes4(keccak256("borrowBalanceMorphoAaveV3(address)"));
-        sigs_[50] = bytes4(keccak256("collateralBalanceMorphoAaveV3(address)"));
-        sigs_[51] = bytes4(keccak256("getRatioMorphoAaveV3(uint256)"));
-        sigs_[52] = bytes4(keccak256("getRatioSpark(uint256)"));
-        sigs_[53] = bytes4(keccak256("queuedWithdrawStEth()"));
-        // TODO: add new function
+        sigs_[24] = bytes4(keccak256("mint(uint256,address)"));
+        sigs_[25] = bytes4(keccak256("redeem(uint256,address,address)"));
+        sigs_[26] = bytes4(keccak256("totalAssets()"));
+        sigs_[27] = bytes4(keccak256("withdraw(uint256,address,address)"));
+    }
+
+    function viewSigs() public pure returns (bytes4[] memory sigs_) {
+        sigs_ = new bytes4[](27);
+
+        sigs_[0] = bytes4(keccak256("getRatioAaveV2()"));
+        sigs_[1] = bytes4(keccak256("getRatioAaveV3(uint256)"));
+        sigs_[2] = bytes4(keccak256("getRatioCompoundV3(uint256)"));
+        sigs_[3] = bytes4(keccak256("getRatioEuler(uint256)"));
+        sigs_[4] = bytes4(keccak256("getRatioMorphoAaveV2()"));
+        sigs_[5] = bytes4(keccak256("getRatioMorphoAaveV3(uint256)"));
+        sigs_[6] = bytes4(keccak256("getRatioSpark(uint256)"));
+        sigs_[7] = bytes4(keccak256("getRatioFluid(uint256)"));
+        sigs_[8] = bytes4(keccak256("getProtocolRatio(uint8)"));
+        sigs_[9] = bytes4(keccak256("getNetAssets()"));
+        sigs_[10] = bytes4(keccak256("getWithdrawFee(uint256)"));
+        sigs_[11] = bytes4(keccak256("vaultDSA()"));
+        sigs_[12] = bytes4(keccak256("leverageMaxUnitAmountLimit()"));
+        sigs_[13] = bytes4(keccak256("secondaryAuth()"));
+        sigs_[14] = bytes4(keccak256("exchangePrice()"));
+        sigs_[15] = bytes4(keccak256("revenueExchangePrice()"));
+        sigs_[16] = bytes4(keccak256("isRebalancer(address)"));
+        sigs_[17] = bytes4(keccak256("maxRiskRatio(uint8)"));
+        sigs_[18] = bytes4(keccak256("aggrMaxVaultRatio()"));
+        sigs_[19] = bytes4(keccak256("withdrawFeeAbsoluteMin()"));
+        sigs_[20] = bytes4(keccak256("withdrawalFeePercentage()"));
+        sigs_[21] = bytes4(keccak256("revenueFeePercentage()"));
+        sigs_[22] = bytes4(keccak256("revenue()"));
+        sigs_[23] = bytes4(keccak256("treasury()"));
+        sigs_[24] = bytes4(keccak256("borrowBalanceMorphoAaveV3(address)"));
+        sigs_[25] = bytes4(keccak256("collateralBalanceMorphoAaveV3(address)"));
+        sigs_[26] = bytes4(keccak256("queuedWithdrawStEth()"));
     }
 
     function adminSigs() public pure returns (bytes4[] memory sigs_) {
