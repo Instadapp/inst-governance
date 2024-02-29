@@ -267,7 +267,7 @@ contract PayloadIGP8 {
     }
 
     function viewSigs() public pure returns (bytes4[] memory sigs_) {
-        sigs_ = new bytes4[](27);
+        sigs_ = new bytes4[](28);
 
         sigs_[0] = bytes4(keccak256("getRatioAaveV2()"));
         sigs_[1] = bytes4(keccak256("getRatioAaveV3(uint256)"));
@@ -296,6 +296,7 @@ contract PayloadIGP8 {
         sigs_[24] = bytes4(keccak256("borrowBalanceMorphoAaveV3(address)"));
         sigs_[25] = bytes4(keccak256("collateralBalanceMorphoAaveV3(address)"));
         sigs_[26] = bytes4(keccak256("queuedWithdrawStEth()"));
+        sigs_[27] = bytes4(keccak256("readFromStorage(bytes32)"));
     }
 
     function adminSigs() public pure returns (bytes4[] memory sigs_) {
