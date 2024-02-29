@@ -3,43 +3,84 @@ pragma experimental ABIEncoderV2;
 
 interface IGovernorBravo {
     function _acceptAdmin() external;
+
     function _setVotingDelay(uint newVotingDelay) external;
+
     function _setVotingPeriod(uint newVotingPeriod) external;
+
     function _acceptAdminOnTimelock() external;
+
     function _setImplementation(address implementation_) external;
-    function propose(address[] memory targets, uint[] memory values, string[] memory signatures, bytes[] memory calldatas, string memory description) external returns (uint);
-    function admin() external view returns(address);
-    function pendingAdmin() external view returns(address);
-    function timelock() external view returns(address);
-    function votingDelay() external view returns(uint256);
-    function votingPeriod() external view returns(uint256);
+
+    function propose(
+        address[] memory targets,
+        uint[] memory values,
+        string[] memory signatures,
+        bytes[] memory calldatas,
+        string memory description
+    ) external returns (uint);
+
+    function admin() external view returns (address);
+
+    function pendingAdmin() external view returns (address);
+
+    function timelock() external view returns (address);
+
+    function votingDelay() external view returns (uint256);
+
+    function votingPeriod() external view returns (uint256);
 }
 
 interface ITimelock {
     function acceptAdmin() external;
+
     function setDelay(uint delay_) external;
+
     function setPendingAdmin(address pendingAdmin_) external;
-    function queueTransaction(address target, uint value, string memory signature, bytes memory data, uint eta) external returns (bytes32);
-    function executeTransaction(address target, uint value, string memory signature, bytes memory data, uint eta) external payable returns (bytes memory);
-    function pendingAdmin() external view returns(address);
-    function admin() external view returns(address);
-    function delay() external view returns(uint256);
+
+    function queueTransaction(
+        address target,
+        uint value,
+        string memory signature,
+        bytes memory data,
+        uint eta
+    ) external returns (bytes32);
+
+    function executeTransaction(
+        address target,
+        uint value,
+        string memory signature,
+        bytes memory data,
+        uint eta
+    ) external payable returns (bytes memory);
+
+    function pendingAdmin() external view returns (address);
+
+    function admin() external view returns (address);
+
+    function delay() external view returns (uint256);
 }
 
 interface IInstaIndex {
     function changeMaster(address _newMaster) external;
+
     function updateMaster() external;
-    function master() external view returns(address);
+
+    function master() external view returns (address);
 }
 
 interface ILite {
     function setAdmin(address newAdmin) external;
-    function getAdmin() external view returns(address);
+
+    function getAdmin() external view returns (address);
+
     function removeImplementation(address implementation_) external;
+
     function addImplementation(
         address implementation_,
         bytes4[] calldata sigs_
     ) external;
+
     function setDummyImplementation(address newDummyImplementation_) external;
 
     function updateMaxRiskRatio(
@@ -47,9 +88,7 @@ interface ILite {
         uint256[] memory newRiskRatio_
     ) external;
 
-    function updateAggrMaxVaultRatio(
-        uint256 newAggrMaxVaultRatio_
-    ) external;
+    function updateAggrMaxVaultRatio(uint256 newAggrMaxVaultRatio_) external;
 }
 
 interface IDSAV2 {
@@ -57,10 +96,7 @@ interface IDSAV2 {
         string[] memory _targetNames,
         bytes[] memory _datas,
         address _origin
-    )
-    external
-    payable 
-    returns (bytes32);
+    ) external payable returns (bytes32);
 
     function isAuth(address user) external view returns (bool);
 }
@@ -68,14 +104,18 @@ interface IDSAV2 {
 contract PayloadIGP8 {
     uint256 public constant PROPOSAL_ID = 8;
 
-    address public constant PROPOSER = 0xA45f7bD6A5Ff45D31aaCE6bCD3d426D9328cea01;
+    address public constant PROPOSER =
+        0xA45f7bD6A5Ff45D31aaCE6bCD3d426D9328cea01;
 
-    IGovernorBravo public constant GOVERNOR = IGovernorBravo(0x0204Cd037B2ec03605CFdFe482D8e257C765fA1B);
-    ITimelock public immutable TIMELOCK = ITimelock(0x2386DC45AdDed673317eF068992F19421B481F4c);
+    IGovernorBravo public constant GOVERNOR =
+        IGovernorBravo(0x0204Cd037B2ec03605CFdFe482D8e257C765fA1B);
+    ITimelock public immutable TIMELOCK =
+        ITimelock(0x2386DC45AdDed673317eF068992F19421B481F4c);
 
     address public immutable ADDRESS_THIS;
 
-    ILite public constant LITE = ILite(0xA0D3707c569ff8C87FA923d3823eC5D81c98Be78);
+    ILite public constant LITE =
+        ILite(0xA0D3707c569ff8C87FA923d3823eC5D81c98Be78);
 
     address internal constant OLD_USER_MODULE =
         0xFF93C10FB34f7069071D0679c45ed77A98f37f21;
@@ -89,9 +129,8 @@ contract PayloadIGP8 {
         0x390936658cB9B73ca75c6c02D5EF88b958D38241;
     address internal constant OLD_DSA_MODULE =
         0xE38d5938d6D75ceF2c3Fc63Dc4AB32cD103E10df;
-    address internal constant OLD_WITHDRAWALS_MODULE = 
+    address internal constant OLD_WITHDRAWALS_MODULE =
         0xbd45DfF3320b0d832C61fb41489fdd3a1b960067;
-
 
     address internal constant NEW_VIEW_MODULE =
         0xbd45DfF3320b0d832C61fb41489fdd3a1b960067; // TODO
@@ -113,10 +152,9 @@ contract PayloadIGP8 {
     address internal constant NEW_DUMMY_IMPLEMENTATION =
         0x5C122207f668D3fE345465Ac447b3FEF627f4963;
 
-    constructor () {
+    constructor() {
         ADDRESS_THIS = address(this);
     }
-
 
     function propose(string memory description) external {
         require(msg.sender == PROPOSER, "msg.sender-not-proposer");
@@ -131,11 +169,7 @@ contract PayloadIGP8 {
         targets[0] = address(TIMELOCK);
         values[0] = 0;
         signatures[0] = "executePayload(address,string,bytes)";
-        calldatas[0] = abi.encode(
-            ADDRESS_THIS,
-            "execute()",
-            abi.encode()
-        );
+        calldatas[0] = abi.encode(ADDRESS_THIS, "execute()", abi.encode());
 
         uint256 proposedId = GOVERNOR.propose(
             targets,
@@ -150,10 +184,10 @@ contract PayloadIGP8 {
 
     function execute() external {
         // Action 1: remove Implementations
-       action1();
+        action1();
 
         // Action 2: add implementations
-       action2();
+        action2();
 
         // Action 3: set dummy implementations
         action3();
@@ -162,8 +196,7 @@ contract PayloadIGP8 {
         action4();
     }
 
-    function verifyProposal() external view {
-    }
+    function verifyProposal() external view {}
 
     /***********************************|
     |     Proposal Payload Actions      |
@@ -202,7 +235,6 @@ contract PayloadIGP8 {
         // Update max aggr ratio from 78.5 to 83.5
         LITE.updateAggrMaxVaultRatio(83.5 * 1e4); // 83.5% or 83.5 * 1e4
 
-
         // Update max risk ratio of different protocols
         {
             uint8[] memory protocolIds_ = new uint8[](4);
@@ -226,7 +258,6 @@ contract PayloadIGP8 {
 
             LITE.updateMaxRiskRatio(protocolIds_, newRiskRatios_);
         }
-        
     }
 
     /***********************************|
