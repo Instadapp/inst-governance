@@ -41,6 +41,15 @@ interface ILite {
         bytes4[] calldata sigs_
     ) external;
     function setDummyImplementation(address newDummyImplementation_) external;
+
+    function updateMaxRiskRatio(
+        uint8[] memory protocolId_,
+        uint256[] memory newRiskRatio_
+    ) external;
+
+    function updateAggrMaxVaultRatio(
+        uint256 newAggrMaxVaultRatio_
+    ) external;
 }
 
 interface IDSAV2 {
@@ -149,7 +158,8 @@ contract PayloadIGP8 {
         // Action 3: set dummy implementations
         action3();
 
-        // Action 4: verify proposal
+        // Action 4: Change ratios
+        action4();
     }
 
     function verifyProposal() external view {
@@ -185,6 +195,38 @@ contract PayloadIGP8 {
     /// @notice Action 3: Change dummy implementation.
     function action3() internal {
         LITE.setDummyImplementation(NEW_DUMMY_IMPLEMENTATION);
+    }
+
+    /// @notice Action 4: Change ratios
+    function action4() internal {
+        // Update max aggr ratio from 78.5 to 83.5
+        LITE.updateAggrMaxVaultRatio(83.5 * 1e4); // 83.5% or 83.5 * 1e4
+
+
+        // Update max risk ratio of different protocols
+        {
+            uint8[] memory protocolIds_ = new uint8[](4);
+            uint256[] memory newRiskRatios_ = new uint256[](4);
+
+            // Spark Risk Ratio from 88% to 89%. Protocol Id: 7
+            protocolIds_[0] = 7;
+            newRiskRatios_[0] = 89 * 1e4;
+
+            // Aave V3 Risk Ratio from 88% to 91%. Protocol Id: 2
+            protocolIds_[1] = 2;
+            newRiskRatios_[1] = 91 * 1e4;
+
+            // Morpho Aave v3 Risk Ratio from 88% to 89%. Protocol Id: 6
+            protocolIds_[2] = 6;
+            newRiskRatios_[2] = 89 * 1e4;
+
+            // Fluid Risk Ratio from 88% to 91%. Protocol Id: 8
+            protocolIds_[3] = 8;
+            newRiskRatios_[3] = 91 * 1e4;
+
+            LITE.updateMaxRiskRatio(protocolIds_, newRiskRatios_);
+        }
+        
     }
 
     /***********************************|
