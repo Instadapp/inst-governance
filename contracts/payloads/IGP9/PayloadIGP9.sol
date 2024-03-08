@@ -239,7 +239,7 @@ contract PayloadIGP9 {
     address public immutable ADDRESS_THIS;
     
     IstETHProtocol public constant STETH_PROTOCOL = IstETHProtocol(0x1F6B2bFDd5D1e6AdE7B17027ff5300419a56Ad6b);
-    IFluidLiquidityAdmin public constant LIQUIDITY = IFluidLiquidityAdmin(address(0)); // TODO
+    IFluidLiquidityAdmin public constant LIQUIDITY = IFluidLiquidityAdmin(0x52Aa899454998Be5b000Ad077a46Bbe360F4e497);
 
     address public constant ETH_ADDRESS = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
 
