@@ -5,15 +5,13 @@ async function main() {
   const oldTimelockAddress = "0xC7Cb1dE2721BFC0E0DA1b9D526bCdC54eF1C0eFC"
   const guardain = "0x4F6F977aCDD1177DCD81aB83074855EcB9C2D49e"
 
-//   const Timelock = await ethers.getContractFactory("InstaTimelock")
-  const timelock = await ethers.getContractAt("InstaTimelock", "0x2386dc45added673317ef068992f19421b481f4c")
-//   const timelock = await Timelock.deploy(oldTimelockAddress, guardain)
-//   await timelock.deployed()
+  const Timelock = await ethers.getContractFactory("InstaTimelock")
+  const timelock = await Timelock.deploy(oldTimelockAddress, guardain)
+  await timelock.deployed()
 
-//   const GovernorDelegate = await ethers.getContractFactory("InstaGovernorBravoDelegate")
-  const governorDelegate = await ethers.getContractAt("InstaGovernorBravoDelegate", "0x00613f7e762124711c7647f9eab5c8a88632ee47")
-//   const governorDelegate = await GovernorDelegate.deploy()
-//   await governorDelegate.deployed()
+  const GovernorDelegate = await ethers.getContractFactory("InstaGovernorBravoDelegate")
+  const governorDelegate = await GovernorDelegate.deploy()
+  await governorDelegate.deployed()
 
   const PayloadIGP7 = await ethers.getContractFactory("PayloadIGP7")
   const payloadIGP7 = await PayloadIGP7.deploy(governorDelegate.address, timelock.address)
