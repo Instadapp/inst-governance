@@ -274,6 +274,8 @@ contract PayloadIGP9 {
     }
 
     function execute() external {
+        require(address(this) == address(TIMELOCK), "not-valid-caller");
+
         // Action 1: list stETH Protocol in Liquidity Layer with max debt ceiling of 5k ETH and base debt ceiling of 5k ETH
         action1();
 
