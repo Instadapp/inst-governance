@@ -210,6 +210,11 @@ interface IstETHProtocol {
 
     /// @notice                   Sets `maxLTV` to `maxLTV_` (in 1e2: 1% = 100, 100% = 10000). Must be > 0 and < 100%.
     function setMaxLTV(uint16 maxLTV_) external;
+
+    /// @notice                   Sets an address as allowed guardian or not. Only callable by owner.
+    /// @param guardian_          address to set guardian value for
+    /// @param allowed_           bool flag for whether address is allowed as guardian or not
+    function setGuardian(address guardian_, bool allowed_) external;
 }
 
 contract PayloadIGP9 {
@@ -220,17 +225,19 @@ contract PayloadIGP9 {
 
     IGovernorBravo public constant GOVERNOR =
         IGovernorBravo(0x0204Cd037B2ec03605CFdFe482D8e257C765fA1B);
-    ITimelock public immutable TIMELOCK =
+    ITimelock public constant TIMELOCK =
         ITimelock(0x2386DC45AdDed673317eF068992F19421B481F4c);
 
-    address public immutable ADDRESS_THIS;
+    address public constant TEAM_MULTISIG = 
+        0x4F6F977aCDD1177DCD81aB83074855EcB9C2D49e;
 
     address public constant LITE =
         0xA0D3707c569ff8C87FA923d3823eC5D81c98Be78;
     address public constant LITE_DSA = 
         0x9600A48ed0f931d0c422D574e3275a90D8b22745;
 
-
+    address public immutable ADDRESS_THIS;
+    
     IstETHProtocol public constant STETH_PROTOCOL = IstETHProtocol(0x1F6B2bFDd5D1e6AdE7B17027ff5300419a56Ad6b);
     IFluidLiquidityAdmin public constant LIQUIDITY = IFluidLiquidityAdmin(address(0)); // TODO
 
@@ -267,17 +274,20 @@ contract PayloadIGP9 {
     }
 
     function execute() external {
-        // Action 1: remove Implementations
+        // Action 1: list stETH Protocol in Liquidity Layer with max debt ceiling of 5k ETH and base debt ceiling of 5k ETH
         action1();
 
-        // Action 2: add implementations
+        // Action 2: initialize owner on stETH protocol as governance address
         action2();
 
-        // Action 3: set dummy implementations
+        // Action 3: Set Max LTV as 93%.
         action3();
 
-        // Action 4: Change ratios
+        // Action 4: Allow Lite DSA as user on stETH Protocol
         action4();
+
+        // Action 5: Set Team Avocado Multisig as guardian
+        action5();
     }
 
     function verifyProposal() external view {}
@@ -316,5 +326,10 @@ contract PayloadIGP9 {
     /// @notice Action 4: Allow Lite DSA as user on stETH Protocol
     function action4() internal {
         STETH_PROTOCOL.setUserAllowed(LITE_DSA, true);
+    }
+
+    /// @notice Action 5: Set Team Avocado Multisig as guardian
+    function action5() internal {
+        STETH_PROTOCOL.setGuardian(TEAM_MULTISIG, true);
     }
 }
