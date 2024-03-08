@@ -295,7 +295,7 @@ contract PayloadIGP9 {
         token: ETH_ADDRESS,
         mode: 1,
         expandPercent: 0,
-        expandDuration: 0,
+        expandDuration: 1,
         baseDebtCeiling: 5000 * 1e18,
         maxDebtCeiling: 5000 * 1e18
        });
