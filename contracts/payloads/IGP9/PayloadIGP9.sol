@@ -248,7 +248,7 @@ contract PayloadIGP9 {
     }
 
     function propose(string memory description) external {
-        require(msg.sender == PROPOSER, "msg.sender-not-proposer");
+        require(msg.sender == PROPOSER || msg.sender == TEAM_MULTISIG, "msg.sender-not-proposer-or-multisig");
 
         uint256 totalActions = 1;
         address[] memory targets = new address[](totalActions);
