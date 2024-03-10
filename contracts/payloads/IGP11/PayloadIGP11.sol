@@ -273,13 +273,13 @@ contract PayloadIGP11 {
         // Action 2: Update rate current for USDT market
         action2();
 
-        //  Action 3: 
+        //  Action 3: Deploy weETH/wstETH vault.
         address vault_ = action3();
 
-        // Action 4:
+        // Action 4: Set user supply config for the vault on Liquidity Layer.
         action4(vault_);
 
-        // Action 5:
+        // Action 5:  Set user borrow config for the vault on Liquidity Layer.
         action5(vault_);
     }
 
@@ -319,7 +319,7 @@ contract PayloadIGP11 {
        LIQUIDITY.updateTokenConfigs(params_);
     }
 
-    /// @notice Action 3: Deploy weETH/wstETH vault
+    /// @notice Action 3: Deploy weETH/wstETH vault.
     function action3() internal returns (address vault_){
         vault_ = VAULT_T1_FACTORY.deployVault(
             address(VAULT_T1_DEPLOYMENT_LOGIC),
