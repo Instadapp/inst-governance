@@ -217,7 +217,7 @@ interface IstETHProtocol {
     function setGuardian(address guardian_, bool allowed_) external;
 }
 
-contract PayloadIGP9 {
+contract PayloadIGP10 {
     uint256 public constant PROPOSAL_ID = 10;
 
     address public constant PROPOSER =
