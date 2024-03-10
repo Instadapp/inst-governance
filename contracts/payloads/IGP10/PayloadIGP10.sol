@@ -270,10 +270,10 @@ contract PayloadIGP10 {
     function execute() external {
         require(address(this) == address(TIMELOCK), "not-valid-caller");
 
-        // Action 1: Update rate current for USDC market
+        // Action 1: Update market rates for USDC.
         action1();
 
-        // Action 1: Update rate current for USDT market
+        // Action 1: Update market rates for USDT.
         action2();
     }
 
@@ -283,7 +283,7 @@ contract PayloadIGP10 {
     |     Proposal Payload Actions      |
     |__________________________________*/
 
-    /// @notice Action 1: Update rate current for USDC market
+    /// @notice Action 1: Update market rates for USDC.
     function action1() internal {
        AdminModuleStructs.RateDataV2Params[] memory params_ = new AdminModuleStructs.RateDataV2Params[](1);
 
@@ -300,7 +300,7 @@ contract PayloadIGP10 {
        LIQUIDITY.updateRateDataV2s(params_);
     }
 
-    /// @notice Action 2: Update rate current for USDT market
+    /// @notice Action 2: Update market rates for USDT.
     function action2() internal {
        AdminModuleStructs.RateDataV2Params[] memory params_ = new AdminModuleStructs.RateDataV2Params[](1);
 
