@@ -210,6 +210,31 @@ interface IFluidVaultT1DeploymentLogic {
     ) external;
 }
 
+
+interface IFluidVaultT1 {
+    /// @notice updates the Vault oracle to `newOracle_`. Must implement the FluidOracle interface.
+    function updateOracle(address newOracle_) external;
+
+    /// @notice updates the all Vault core settings according to input params.
+    /// All input values are expected in 1e2 (1% = 100, 100% = 10_000).
+    function updateCoreSettings(
+        uint256 supplyRateMagnifier_,
+        uint256 borrowRateMagnifier_,
+        uint256 collateralFactor_,
+        uint256 liquidationThreshold_,
+        uint256 liquidationMaxLimit_,
+        uint256 withdrawGap_,
+        uint256 liquidationPenalty_,
+        uint256 borrowFee_
+    ) external;
+
+    /// @notice updates the allowed rebalancer to `newRebalancer_`.
+    function updateRebalancer(address newRebalancer_) external;
+
+    /// @notice updates the supply rate magnifier to `supplyRateMagnifier_`. Input in 1e2 (1% = 100, 100% = 10_000).
+    function updateSupplyRateMagnifier(uint supplyRateMagnifier_) public
+}
+
 contract PayloadIGP11 {
     uint256 public constant PROPOSAL_ID = 11;
 
@@ -267,10 +292,10 @@ contract PayloadIGP11 {
     function execute() external {
         require(address(this) == address(TIMELOCK), "not-valid-caller");
 
-        // Action 1: Update rate current for USDC market
+        // Action 1: Set market rates for weETH.
         action1();
 
-        // Action 2: Update rate current for USDT market
+        // Action 2: Set token config for weETH.
         action2();
 
         //  Action 3: Deploy weETH/wstETH vault.
@@ -279,8 +304,26 @@ contract PayloadIGP11 {
         // Action 4: Set user supply config for the vault on Liquidity Layer.
         action4(vault_);
 
-        // Action 5:  Set user borrow config for the vault on Liquidity Layer.
+        // Action 5: Set user borrow config for the vault on Liquidity Layer.
         action5(vault_);
+
+        // Action 6: Update core settings on weETH/wstETH vault.
+        action6(vault_);
+
+        // Action 7: Update oracle on weETH/wstETH vault.
+        action7(vault_);
+
+        // Action 8: Update rebalancer on weETH/wstETH vault.
+        action8(vault_);
+
+        // Action 9: Update supply magnifier on wstETH/ETH, wstETH/USDC & wstETH/USDT vault 
+        action9(vault_);
+
+        // Action 10: Update wstETH rates on Liquidity.
+        action10();
+
+        // Action 11: Update wstETH tokenconfig on Liquidity.
+        action11();
     }
 
     function verifyProposal() external view {}
@@ -362,5 +405,72 @@ contract PayloadIGP11 {
         });
 
         LIQUIDITY.updateUserBorrowConfigs(configs_);
+    }
+
+    /// @notice Action 6: UpdateCoreSettings on weETH/wstETH vault.
+    function action6(address vault_) internal {
+        IFluidVaultT1(vault_).updateCoreSettings(
+            0   * 1e2, // 1%   supplyRateMagnifier
+            100 * 1e2, // 100% borrowRateMagnifier
+            85  * 1e2, // 85%  collateralFactor
+            90  * 1e2, // 90%  liquidationThreshold
+            95  * 1e2, // 95%  liquidationMaxLimit
+            5   * 1e2, // 5%   withdrawGap
+            2   * 1e2, // 2%   liquidationPenalty
+            0   * 1e2  // 0%   borrowFee
+        );
+    }
+
+    /// @notice Action 7: UpdateOracle on weETH/wstETH vault.
+    function action7(address vault_) internal {
+        IFluidVaultT1(vault_).updateOracle(0x9eC721a12b6005aF8c6E8CFa9c86B5f12ff473E4);
+    }
+
+    /// @notice Action 8: UpdateRebalancer on weETH/wstETH vault.
+    function action8(address vault_) internal {
+        IFluidVaultT1(vault_).updateRebalancer(0x264786EF916af64a1DB19F513F24a3681734ce92);
+    }
+
+    /// @notice Action 9: UpdateSupplyMagnifier on wstETH/ETH, wstETH/USDC & wstETH/USDT vault 
+    function action9() internal {
+        address[] memory wstETHVaults_ = [
+            0xA0F83Fc5885cEBc0420ce7C7b139Adc80c4F4D91, // wstETH/ETH
+            0x51197586F6A9e2571868b6ffaef308f3bdfEd3aE, // wstETH/USDC
+            0x1c2bB46f36561bc4F05A94BD50916496aa501078, // wstETH/USDT
+        ]
+
+        for (uint256 i = 0; i < wstETHVaults_; i++) {
+            IFluidVaultT1(wstETHVaults_[i]).updateSupplyRateMagnifier(1 * 1e4); // 1x
+        }
+    }
+
+    /// @notice Action 10: Update wstETH rates on Liquidity.
+    function action10() internal {
+        AdminModuleStructs.RateDataV2Params[] memory params_ = new AdminModuleStructs.RateDataV2Params[](1);
+
+       params_[0] = AdminModuleStructs.RateDataV2Params({
+            token: wstETH_ADDRESS, // wstETH
+            kink1: 50 * 1e2, // 50%
+            kink2: 80 * 1e2, // 80%
+            rateAtUtilizationZero: 0, // 0%
+            rateAtUtilizationKink1: 1 * 1e2, // 1%
+            rateAtUtilizationKink2: 4 * 1e2, // 4%
+            rateAtUtilizationMax: 100 * 1e2 // 100%
+       });
+
+       LIQUIDITY.updateRateDataV2s(params_);
+    }
+
+    /// @notice Action 11: Update wstETH tokenconfig on Liquidity.
+    function action11() internal {
+        AdminModuleStructs.TokenConfig[] memory params_ = new AdminModuleStructs.TokenConfig[](1);
+
+        params_[0] = AdminModuleStructs.TokenConfig({
+                token: wstETH_ADDRESS, // wstETH
+                threshold: 0.3 * 1e2, // 0.3
+                fee: 1 * 1e2 // 1%
+        });
+
+       LIQUIDITY.updateTokenConfigs(params_);
     }
 }
