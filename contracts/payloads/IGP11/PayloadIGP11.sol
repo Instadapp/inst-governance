@@ -292,10 +292,10 @@ contract PayloadIGP11 {
     function execute() external {
         require(address(this) == address(TIMELOCK), "not-valid-caller");
 
-        // Action 1: Set market rates for weETH.
+        // Action 1: Set market rates for weETH on Liquidity.
         action1();
 
-        // Action 2: Set token config for weETH.
+        // Action 2: Set token config for weETH on Liquidity.
         action2();
 
         //  Action 3: Deploy weETH/wstETH vault.
@@ -319,10 +319,10 @@ contract PayloadIGP11 {
         // Action 9: Update supply magnifier on wstETH/ETH, wstETH/USDC & wstETH/USDT vault 
         action9(vault_);
 
-        // Action 10: Update wstETH rates on Liquidity.
+        // Action 10: Update market rates for wstETH on Liquidity.
         action10();
 
-        // Action 11: Update wstETH tokenconfig on Liquidity.
+        // Action 11: Update token config for wstETH on Liquidity.
         action11();
     }
 
@@ -332,7 +332,7 @@ contract PayloadIGP11 {
     |     Proposal Payload Actions      |
     |__________________________________*/
 
-    /// @notice Action 1: Set market rates for weETH.
+    /// @notice Action 1: Set market rates for weETH on Liquidity.
     function action1() internal {
        AdminModuleStructs.RateDataV2Params[] memory params_ = new AdminModuleStructs.RateDataV2Params[](1);
 
@@ -349,7 +349,7 @@ contract PayloadIGP11 {
        LIQUIDITY.updateRateDataV2s(params_);
     }
 
-    /// @notice Action 2: Set token config for weETH.
+    /// @notice Action 2: Set token config for weETH on Liquidity.
     function action2() internal {
        AdminModuleStructs.TokenConfig[] memory params_ = new AdminModuleStructs.TokenConfig[](1);
 
@@ -407,7 +407,7 @@ contract PayloadIGP11 {
         LIQUIDITY.updateUserBorrowConfigs(configs_);
     }
 
-    /// @notice Action 6: UpdateCoreSettings on weETH/wstETH vault.
+    /// @notice Action 6: Update core settings on weETH/wstETH vault.
     function action6(address vault_) internal {
         IFluidVaultT1(vault_).updateCoreSettings(
             0   * 1e2, // 1%   supplyRateMagnifier
@@ -421,12 +421,12 @@ contract PayloadIGP11 {
         );
     }
 
-    /// @notice Action 7: UpdateOracle on weETH/wstETH vault.
+    /// @notice Action 7: Update oracle on weETH/wstETH vault.
     function action7(address vault_) internal {
         IFluidVaultT1(vault_).updateOracle(0x9eC721a12b6005aF8c6E8CFa9c86B5f12ff473E4);
     }
 
-    /// @notice Action 8: UpdateRebalancer on weETH/wstETH vault.
+    /// @notice Action 8: Update rebalancer on weETH/wstETH vault.
     function action8(address vault_) internal {
         IFluidVaultT1(vault_).updateRebalancer(0x264786EF916af64a1DB19F513F24a3681734ce92);
     }
@@ -444,7 +444,7 @@ contract PayloadIGP11 {
         }
     }
 
-    /// @notice Action 10: Update wstETH rates on Liquidity.
+    /// @notice Action 10: Update market rates for wstETH on Liquidity.
     function action10() internal {
         AdminModuleStructs.RateDataV2Params[] memory params_ = new AdminModuleStructs.RateDataV2Params[](1);
 
@@ -461,7 +461,7 @@ contract PayloadIGP11 {
        LIQUIDITY.updateRateDataV2s(params_);
     }
 
-    /// @notice Action 11: Update wstETH tokenconfig on Liquidity.
+    /// @notice Action 11: Update token config for wstETH on Liquidity.
     function action11() internal {
         AdminModuleStructs.TokenConfig[] memory params_ = new AdminModuleStructs.TokenConfig[](1);
 
