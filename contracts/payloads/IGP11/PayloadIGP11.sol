@@ -341,8 +341,8 @@ contract PayloadIGP11 {
             kink1: 50 * 1e2, // 50%
             kink2: 80 * 1e2, // 80%
             rateAtUtilizationZero: 0, // 0%
-            rateAtUtilizationKink1: 1 * 1e2, // 1%
-            rateAtUtilizationKink2: 4 * 1e2, // 4%
+            rateAtUtilizationKink1: 20 * 1e2, // 20%
+            rateAtUtilizationKink2: 40 * 1e2, // 40%
             rateAtUtilizationMax: 100 * 1e2 // 100%
        });
 
@@ -356,7 +356,7 @@ contract PayloadIGP11 {
        params_[0] = AdminModuleStructs.TokenConfig({
             token: weETH_ADDRESS, // weETH
             threshold: 0.3 * 1e2, // 0.3
-            fee: 10 * 1e2 // 1%
+            fee: 10 * 1e2 // 10%
        });
 
        LIQUIDITY.updateTokenConfigs(params_);
@@ -384,7 +384,7 @@ contract PayloadIGP11 {
             mode: 1,
             expandPercent: 25 * 1e2,
             expandDuration: 12 hours,
-            baseWithdrawalLimit: 5000 * 1e18
+            baseWithdrawalLimit: 4000 * 1e18
         });
 
         LIQUIDITY.updateUserSupplyConfigs(configs_);
@@ -410,14 +410,14 @@ contract PayloadIGP11 {
     /// @notice Action 6: Update core settings on weETH/wstETH vault.
     function action6(address vault_) internal {
         IFluidVaultT1(vault_).updateCoreSettings(
-            0        , // 0x   supplyRateMagnifier
-            100 * 1e2, // 1x   borrowRateMagnifier
-            91  * 1e2, // 85%  collateralFactor
-            93  * 1e2, // 90%  liquidationThreshold
-            95  * 1e2, // 95%  liquidationMaxLimit
-            5   * 1e2, // 5%   withdrawGap
-            1   * 1e2, // 2%   liquidationPenalty
-            0          // 0%   borrowFee
+            100  * 1e2, // 1x     supplyRateMagnifier
+            100  * 1e2, // 1x     borrowRateMagnifier
+            90.5 * 1e2, // 90.5%  collateralFactor
+            93   * 1e2, // 93%    liquidationThreshold
+            95   * 1e2, // 95%    liquidationMaxLimit
+            5    * 1e2, // 5%     withdrawGap
+            1    * 1e2, // 2%     liquidationPenalty
+            0           // 0%     borrowFee
         );
     }
 
