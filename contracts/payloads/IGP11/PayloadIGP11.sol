@@ -356,7 +356,7 @@ contract PayloadIGP11 {
        params_[0] = AdminModuleStructs.TokenConfig({
             token: weETH_ADDRESS, // weETH
             threshold: 0.3 * 1e2, // 0.3
-            fee: 1 * 1e2 // 1%
+            fee: 10 * 1e2 // 1%
        });
 
        LIQUIDITY.updateTokenConfigs(params_);
@@ -382,8 +382,8 @@ contract PayloadIGP11 {
             user: address(vault_),
             token: weETH_ADDRESS,
             mode: 1,
-            expandPercent: 0,
-            expandDuration: 1,
+            expandPercent: 25 * 1e2,
+            expandDuration: 12 hours,
             baseWithdrawalLimit: 5000 * 1e18
         });
 
@@ -398,10 +398,10 @@ contract PayloadIGP11 {
             user: address(vault_),
             token: wstETH_ADDRESS,
             mode: 1,
-            expandPercent: 0,
-            expandDuration: 1,
-            baseDebtCeiling: 5000 * 1e18,
-            maxDebtCeiling: 5000 * 1e18
+            expandPercent: 25 * 1e2,
+            expandDuration: 12 hours,
+            baseDebtCeiling: 4000 * 1e18,
+            maxDebtCeiling: 10000 * 1e18
         });
 
         LIQUIDITY.updateUserBorrowConfigs(configs_);
@@ -410,14 +410,14 @@ contract PayloadIGP11 {
     /// @notice Action 6: Update core settings on weETH/wstETH vault.
     function action6(address vault_) internal {
         IFluidVaultT1(vault_).updateCoreSettings(
-            0   * 1e2, // 1%   supplyRateMagnifier
-            100 * 1e2, // 100% borrowRateMagnifier
-            85  * 1e2, // 85%  collateralFactor
-            90  * 1e2, // 90%  liquidationThreshold
+            0        , // 0x   supplyRateMagnifier
+            100 * 1e2, // 1x   borrowRateMagnifier
+            91  * 1e2, // 85%  collateralFactor
+            93  * 1e2, // 90%  liquidationThreshold
             95  * 1e2, // 95%  liquidationMaxLimit
             5   * 1e2, // 5%   withdrawGap
-            2   * 1e2, // 2%   liquidationPenalty
-            0   * 1e2  // 0%   borrowFee
+            1   * 1e2, // 2%   liquidationPenalty
+            0          // 0%   borrowFee
         );
     }
 
@@ -453,9 +453,9 @@ contract PayloadIGP11 {
             kink1: 50 * 1e2, // 50%
             kink2: 80 * 1e2, // 80%
             rateAtUtilizationZero: 0, // 0%
-            rateAtUtilizationKink1: 1 * 1e2, // 1%
-            rateAtUtilizationKink2: 4 * 1e2, // 4%
-            rateAtUtilizationMax: 100 * 1e2 // 100%
+            rateAtUtilizationKink1: 15 * 1e2, // 15%
+            rateAtUtilizationKink2: 30 * 1e2, // 30%
+            rateAtUtilizationMax: 150 * 1e2 // 150%
        });
 
        LIQUIDITY.updateRateDataV2s(params_);
@@ -468,7 +468,7 @@ contract PayloadIGP11 {
         params_[0] = AdminModuleStructs.TokenConfig({
                 token: wstETH_ADDRESS, // wstETH
                 threshold: 0.3 * 1e2, // 0.3
-                fee: 1 * 1e2 // 1%
+                fee: 70 * 1e2 // 70%
         });
 
        LIQUIDITY.updateTokenConfigs(params_);
