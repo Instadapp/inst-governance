@@ -232,7 +232,7 @@ interface IFluidVaultT1 {
     function updateRebalancer(address newRebalancer_) external;
 
     /// @notice updates the supply rate magnifier to `supplyRateMagnifier_`. Input in 1e2 (1% = 100, 100% = 10_000).
-    function updateSupplyRateMagnifier(uint supplyRateMagnifier_) public
+    function updateSupplyRateMagnifier(uint supplyRateMagnifier_) external;
 }
 
 contract PayloadIGP11 {
@@ -317,7 +317,7 @@ contract PayloadIGP11 {
         action8(vault_);
 
         // Action 9: Update supply magnifier on wstETH/ETH, wstETH/USDC & wstETH/USDT vault 
-        action9(vault_);
+        action9();
 
         // Action 10: Update market rates for wstETH on Liquidity.
         action10();
@@ -433,15 +433,12 @@ contract PayloadIGP11 {
 
     /// @notice Action 9: UpdateSupplyMagnifier on wstETH/ETH, wstETH/USDC & wstETH/USDT vault 
     function action9() internal {
-        address[] memory wstETHVaults_ = [
-            0xA0F83Fc5885cEBc0420ce7C7b139Adc80c4F4D91, // wstETH/ETH
-            0x51197586F6A9e2571868b6ffaef308f3bdfEd3aE, // wstETH/USDC
-            0x1c2bB46f36561bc4F05A94BD50916496aa501078, // wstETH/USDT
-        ]
-
-        for (uint256 i = 0; i < wstETHVaults_; i++) {
-            IFluidVaultT1(wstETHVaults_[i]).updateSupplyRateMagnifier(1 * 1e4); // 1x
-        }
+        // wstETH/ETH
+        IFluidVaultT1(0xA0F83Fc5885cEBc0420ce7C7b139Adc80c4F4D91).updateSupplyRateMagnifier(1 * 1e4); // 1x
+        // wstETH/USDC
+        IFluidVaultT1(0x51197586F6A9e2571868b6ffaef308f3bdfEd3aE).updateSupplyRateMagnifier(1 * 1e4); // 1x
+        // wstETH/USDT
+        IFluidVaultT1(0x1c2bB46f36561bc4F05A94BD50916496aa501078).updateSupplyRateMagnifier(1 * 1e4); // 1x
     }
 
     /// @notice Action 10: Update market rates for wstETH on Liquidity.
