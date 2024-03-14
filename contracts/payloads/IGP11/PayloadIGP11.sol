@@ -268,8 +268,11 @@ interface IFluidVaultT1 {
 contract PayloadIGP11 {
     uint256 public constant PROPOSAL_ID = 11;
 
-    address public constant PROPOSER =
+    address public constant PROPOSER_1 =
         0xA45f7bD6A5Ff45D31aaCE6bCD3d426D9328cea01;
+
+    address public constant PROPOSER_2 =
+        0x059A94A72951c0ae1cc1CE3BF0dB52421bbE8210;
 
     IGovernorBravo public constant GOVERNOR =
         IGovernorBravo(0x0204Cd037B2ec03605CFdFe482D8e257C765fA1B);
@@ -303,8 +306,10 @@ contract PayloadIGP11 {
 
     function propose(string memory description) external {
         require(
-            msg.sender == PROPOSER || msg.sender == TEAM_MULTISIG,
-            "msg.sender-not-proposer-or-multisig"
+            msg.sender == PROPOSER_1 || 
+            msg.sender == PROPOSER_2 || 
+            msg.sender == TEAM_MULTISIG,
+            "msg.sender-not-allowed"
         );
 
         uint256 totalActions = 1;
