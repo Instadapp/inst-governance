@@ -555,11 +555,55 @@ contract PayloadIGP12 {
     }
 
 
-
-
     /***********************************|
     |     Proposal Payload Helpers      |
     |__________________________________*/
+
+    function getSupplyTokenConfig(address token_, address user_, uint256 expandPercent) internal returns(AdminModuleStructs.UserSupplyConfig memory config_){
+        bytes32 _LIQUDITY_PROTOCOL_SUPPLY_SLOT = LiquiditySlotsLink.calculateDoubleMappingStorageSlot(
+            LiquiditySlotsLink.LIQUIDITY_USER_SUPPLY_DOUBLE_MAPPING_SLOT,
+            user_,
+            token_
+        );
+
+        bytes32 userSupplyData_ = LIQUIDITY.readFromStorage(_LIQUDITY_PROTOCOL_SUPPLY_SLOT); 
+
+        config_ = AdminModuleStructs.UserSupplyConfig({
+            user: user_,
+            token: token_,
+            mode: uint8(userSupplyData_ & 1),
+            expandPercent: expandPercent,
+            expandDuration: (userSupplyData_ >> LiquiditySlotsLink.BITS_USER_SUPPLY_EXPAND_DURATION) & X24,
+            baseWithdrawalLimit: BigMathMinified.fromBigNumber(
+                (userSupplyData_ >> LiquiditySlotsLink.BITS_USER_SUPPLY_BASE_WITHDRAWAL_LIMIT) & X18,
+                DEFAULT_EXPONENT_SIZE,
+                DEFAULT_EXPONENT_MASK
+            )
+        });
+    }
+
+    function getBorrowTokenConfig(address token_, address user_, uint256 expandPercent) internal returns(AdminModuleStructs.UserSupplyConfig memory config_){
+        bytes32 _LIQUDITY_PROTOCOL_SUPPLY_SLOT = LiquiditySlotsLink.calculateDoubleMappingStorageSlot(
+            LiquiditySlotsLink.LIQUIDITY_USER_SUPPLY_DOUBLE_MAPPING_SLOT,
+            user_,
+            token_
+        );
+
+        bytes32 userSupplyData_ = LIQUIDITY.readFromStorage(_LIQUDITY_PROTOCOL_SUPPLY_SLOT); 
+
+        config_ = AdminModuleStructs.UserSupplyConfig({
+            user: user_,
+            token: token_,
+            mode: uint8(userSupplyData_ & 1),
+            expandPercent: expandPercent,
+            expandDuration: (userSupplyData_ >> LiquiditySlotsLink.BITS_USER_SUPPLY_EXPAND_DURATION) & X24,
+            baseWithdrawalLimit: BigMathMinified.fromBigNumber(
+                (userSupplyData_ >> LiquiditySlotsLink.BITS_USER_SUPPLY_BASE_WITHDRAWAL_LIMIT) & X18,
+                DEFAULT_EXPONENT_SIZE,
+                DEFAULT_EXPONENT_MASK
+            )
+        });
+    }
 
     function getUserSupplyData(address token_, address user_) internal returns(AdminModuleStructs.UserSupplyConfig memory config_) {
         bytes32 _LIQUDITY_PROTOCOL_SUPPLY_SLOT = LiquiditySlotsLink.calculateDoubleMappingStorageSlot(
