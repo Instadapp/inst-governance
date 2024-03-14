@@ -1,4 +1,4 @@
-pragma solidity ^0.7.0;
+pragma solidity >=0.7.0;
 pragma experimental ABIEncoderV2;
 
 import { BigMathMinified } from "./libraries/bigMathMinified.sol";
@@ -246,6 +246,9 @@ contract PayloadIGP12 {
     uint256 internal constant X24 = 0xffffff;
     uint256 internal constant X64 = 0xffffffffffffffff;
 
+    uint256 internal constant DEFAULT_EXPONENT_SIZE = 8;
+    uint256 internal constant DEFAULT_EXPONENT_MASK = 0xff;
+
     constructor() {
         ADDRESS_THIS = address(this);
     }
@@ -398,14 +401,14 @@ contract PayloadIGP12 {
         address token_,
         address user_,
         uint256 expandPercent_
-    ) internal returns(AdminModuleStructs.UserSupplyConfig memory config_){
+    ) internal view returns(AdminModuleStructs.UserSupplyConfig memory config_){
         bytes32 _LIQUDITY_PROTOCOL_SUPPLY_SLOT = LiquiditySlotsLink.calculateDoubleMappingStorageSlot(
             LiquiditySlotsLink.LIQUIDITY_USER_SUPPLY_DOUBLE_MAPPING_SLOT,
             user_,
             token_
         );
 
-        bytes32 userSupplyData_ = LIQUIDITY.readFromStorage(_LIQUDITY_PROTOCOL_SUPPLY_SLOT); 
+        uint256 userSupplyData_ = LIQUIDITY.readFromStorage(_LIQUDITY_PROTOCOL_SUPPLY_SLOT); 
 
         config_ = AdminModuleStructs.UserSupplyConfig({
             user: user_,
@@ -421,27 +424,32 @@ contract PayloadIGP12 {
         });
     }
 
-    function getBorrowTokenConfigAndSetExpandPercent(
+    function getUserBorrowDataAndSetExpandPercent(
         address token_,
         address user_,
         uint256 expandPercent_
-    ) internal returns(AdminModuleStructs.UserSupplyConfig memory config_){
-        bytes32 _LIQUDITY_PROTOCOL_SUPPLY_SLOT = LiquiditySlotsLink.calculateDoubleMappingStorageSlot(
-            LiquiditySlotsLink.LIQUIDITY_USER_SUPPLY_DOUBLE_MAPPING_SLOT,
+    ) internal view returns(AdminModuleStructs.UserBorrowConfig memory config_) {
+        bytes32 _LIQUDITY_PROTOCOL_BORROW_SLOT = LiquiditySlotsLink.calculateDoubleMappingStorageSlot(
+            LiquiditySlotsLink.LIQUIDITY_USER_BORROW_DOUBLE_MAPPING_SLOT,
             user_,
             token_
         );
 
-        bytes32 userSupplyData_ = LIQUIDITY.readFromStorage(_LIQUDITY_PROTOCOL_SUPPLY_SLOT); 
+        uint256 userBorrowData_ = LIQUIDITY.readFromStorage(_LIQUDITY_PROTOCOL_BORROW_SLOT);
 
-        config_ = AdminModuleStructs.UserSupplyConfig({
+        config_ = AdminModuleStructs.UserBorrowConfig({
             user: user_,
             token: token_,
-            mode: uint8(userSupplyData_ & 1),
+            mode: uint8(userBorrowData_ & 1),
             expandPercent: expandPercent_,
-            expandDuration: (userSupplyData_ >> LiquiditySlotsLink.BITS_USER_SUPPLY_EXPAND_DURATION) & X24,
-            baseWithdrawalLimit: BigMathMinified.fromBigNumber(
-                (userSupplyData_ >> LiquiditySlotsLink.BITS_USER_SUPPLY_BASE_WITHDRAWAL_LIMIT) & X18,
+            expandDuration: (userBorrowData_ >> LiquiditySlotsLink.BITS_USER_BORROW_EXPAND_DURATION) & X24,
+            baseDebtCeiling: BigMathMinified.fromBigNumber(
+                (userBorrowData_ >> LiquiditySlotsLink.BITS_USER_BORROW_BASE_BORROW_LIMIT) & X18,
+                DEFAULT_EXPONENT_SIZE,
+                DEFAULT_EXPONENT_MASK
+            ),
+            maxDebtCeiling: BigMathMinified.fromBigNumber(
+                (userBorrowData_ >> LiquiditySlotsLink.BITS_USER_BORROW_MAX_BORROW_LIMIT) & X18,
                 DEFAULT_EXPONENT_SIZE,
                 DEFAULT_EXPONENT_MASK
             )
