@@ -239,7 +239,6 @@ contract PayloadIGP12 {
     address public constant F_USDT = 0x5C20B550819128074FD538Edf79791733ccEdd18;
     address public constant F_USDC = 0x9Fb7b4477576Fe5B32be4C1843aFB1e55F251B33;
     address public constant F_WETH = 0x90551c1795392094FE6D29B758EcCD233cFAa260;
-
     
     uint256 internal constant X14 = 0x3fff;
     uint256 internal constant X18 = 0x3ffff;
