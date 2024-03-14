@@ -205,8 +205,11 @@ interface IFluidVaultT1 {
 contract PayloadIGP12 {
     uint256 public constant PROPOSAL_ID = 12;
 
-    address public constant PROPOSER =
+    address public constant PROPOSER_1 =
         0xA45f7bD6A5Ff45D31aaCE6bCD3d426D9328cea01;
+
+    address public constant PROPOSER_2 =
+        0x059A94A72951c0ae1cc1CE3BF0dB52421bbE8210;
 
     IGovernorBravo public constant GOVERNOR =
         IGovernorBravo(0x0204Cd037B2ec03605CFdFe482D8e257C765fA1B);
@@ -233,6 +236,10 @@ contract PayloadIGP12 {
     address public constant VAULT_WSTETH_ETH = address(0xA0F83Fc5885cEBc0420ce7C7b139Adc80c4F4D91);
     address public constant VAULT_WSTETH_USDC = address(0x51197586F6A9e2571868b6ffaef308f3bdfEd3aE);
     address public constant VAULT_WSTETH_USDT = address(0x1c2bB46f36561bc4F05A94BD50916496aa501078);
+    address public constant F_USDT = 0x5C20B550819128074FD538Edf79791733ccEdd18;
+    address public constant F_USDC = 0x9Fb7b4477576Fe5B32be4C1843aFB1e55F251B33;
+    address public constant F_WETH = 0x90551c1795392094FE6D29B758EcCD233cFAa260;
+
     
     uint256 internal constant X14 = 0x3fff;
     uint256 internal constant X18 = 0x3ffff;
@@ -244,7 +251,12 @@ contract PayloadIGP12 {
     }
 
     function propose(string memory description) external {
-        require(msg.sender == PROPOSER || msg.sender == TEAM_MULTISIG, "msg.sender-not-proposer-or-multisig");
+        require(
+            msg.sender == PROPOSER_1 || 
+            msg.sender == PROPOSER_2 || 
+            msg.sender == TEAM_MULTISIG,
+            "msg.sender-not-allowed"
+        );
 
         uint256 totalActions = 1;
         address[] memory targets = new address[](totalActions);
@@ -272,32 +284,14 @@ contract PayloadIGP12 {
     function execute() external {
         require(address(this) == address(TIMELOCK), "not-valid-caller");
 
-        // Action 1: Update supply expand percent to 20% for fUSDT on liquidity. 
+        // Action 1: Update supply expand percent for all the protocols on Liquidity.
         action1();
 
-        // Action 2: Update supply expand percent to 20% for fUSDC on liquidity. 
+        // Action 2: Update borrow expand percent for all the protocols on Liquidity.
         action2();
 
-        // Action 3: Update supply expand percent to 20% for fWETH on liquidity. 
+        // Action 3: Remove config handlers for vaults and lending tokens on liquidity. 
         action3();
-
-        // Action 4: Update supply expand percent to 25% and borrow expand percent to 20% for ETH/USDC vault on liquidity.
-        action4();
-
-        // Action 5: Update supply expand percent to 25% and borrow expand percent to 20% for ETH/USDT vault on liquidity.
-        action5();
-
-        // Action 6: Update supply expand percent to 25% and borrow expand percent to 20% for WSTETH/ETH vault on liquidity.
-        action6();
-
-        // Action 7: Update supply expand percent to 25% and borrow expand percent to 20% for WSTETH/USDC vault on liquidity.
-        action7();
-
-        // Action 8: Update supply expand percent to 25% and borrow expand percent to 20% for WSTETH/USDT vault on liquidity.
-        action8();
-
-        // @notice Action 9: Remove config handlers for vaults and lending tokens on liquidity. 
-        action9();
     }
 
     function verifyProposal() external view {}
@@ -306,200 +300,41 @@ contract PayloadIGP12 {
     |     Proposal Payload Actions      |
     |__________________________________*/
 
-    /// @notice Action 1: Update supply expand percent to 20% for fUSDT on liquidity. 
+    /// @notice Action 1: Update supply expand percent for all the protocols on Liquidity.
     function action1() internal {
-        address fUSDT = 0x5C20B550819128074FD538Edf79791733ccEdd18;
+        AdminModuleStructs.UserSupplyConfig[] memory configs_ = new AdminModuleStructs.UserSupplyConfig[](8);
 
-        AdminModuleStructs.UserSupplyConfig[] memory configs_ = new AdminModuleStructs.UserSupplyConfig[]();
-        configs_[0] = getUserSupplyData(
-            USDT_ADDRESS,
-            fUSDT
-        );
+        // Update to 20%
+        configs_[0] = getUserSupplyDataAndSetExpandPercent(USDT_ADDRESS, F_USDT, 20 * 1e2);
+        configs_[1] = getUserSupplyDataAndSetExpandPercent(USDC_ADDRESS, F_USDC, 20 * 1e2);
+        configs_[2] = getUserSupplyDataAndSetExpandPercent(WETH_ADDRESS, F_WETH, 20 * 1e2);
 
-        configs_[0].expandPercent = 20 * 1e2; // 20%
+        // Update to 25%
+        configs_[3] = getUserSupplyDataAndSetExpandPercent(ETH_ADDRESS, VAULT_ETH_USDC, 25 * 1e2);
+        configs_[4] = getUserSupplyDataAndSetExpandPercent(ETH_ADDRESS, VAULT_ETH_USDT, 25 * 1e2);
+        configs_[5] = getUserSupplyDataAndSetExpandPercent(WSTETH_ADDRESS, VAULT_WSTETH_USDC, 25 * 1e2);
+        configs_[6] = getUserSupplyDataAndSetExpandPercent(WSTETH_ADDRESS, VAULT_WSTETH_USDT, 25 * 1e2);
+        configs_[7] = getUserSupplyDataAndSetExpandPercent(WSTETH_ADDRESS, VAULT_WSTETH_ETH, 25 * 1e2);
 
         LIQUIDITY.updateUserSupplyConfigs(configs_);
     }
 
-    /// @notice Action 2: Update supply expand percent to 20% for fUSDC on liquidity. 
+    /// @notice Action 2: Update borrow expand percent for all the protocols on Liquidity.
     function action2() internal {
-        address fUSDC = address(0x9Fb7b4477576Fe5B32be4C1843aFB1e55F251B33);
+        AdminModuleStructs.UserBorrowConfig[] memory configs_ = new AdminModuleStructs.UserBorrowConfig[](5);
 
-        AdminModuleStructs.UserSupplyConfig[] memory configs_ = new AdminModuleStructs.UserSupplyConfig[]();
-        configs_[0] = getUserSupplyData(
-            USDC_ADDRESS,
-            fUSDC
-        );
+        // Update to 20%
+        configs_[1] = getUserBorrowDataAndSetExpandPercent(USDC_ADDRESS, VAULT_ETH_USDC, 20 * 1e2);
+        configs_[2] = getUserBorrowDataAndSetExpandPercent(USDT_ADDRESS, VAULT_ETH_USDT, 20 * 1e2);
+        configs_[3] = getUserBorrowDataAndSetExpandPercent(USDC_ADDRESS, VAULT_WSTETH_USDC, 20 * 1e2);
+        configs_[4] = getUserBorrowDataAndSetExpandPercent(USDT_ADDRESS, VAULT_WSTETH_USDT, 20 * 1e2);
+        configs_[5] = getUserBorrowDataAndSetExpandPercent(ETH_ADDRESS, VAULT_WSTETH_ETH, 20 * 1e2);
 
-        configs_[0].expandPercent = 20 * 1e2; // 20%
-
-        LIQUIDITY.updateUserSupplyConfigs(configs_);
+        LIQUIDITY.updateUserBorrowConfigs(configs_);
     }
 
-    /// @notice Action 3: Update supply expand percent to 20% for fWETH on liquidity. 
+    /// @notice Action 3: Remove config handlers for vaults and lending tokens on liquidity. 
     function action3() internal {
-        address fWETH = address(0x90551c1795392094FE6D29B758EcCD233cFAa260);
-
-        AdminModuleStructs.UserSupplyConfig[] memory configs_ = new AdminModuleStructs.UserSupplyConfig[]();
-        configs_[0] = getUserSupplyData(
-            WETH_ADDRESS,
-            fWETH
-        );
-
-        configs_[0].expandPercent = 20 * 1e2; // 20%
-
-        LIQUIDITY.updateUserSupplyConfigs(configs_);
-    }
-
-
-    /// @notice Action 4: Update supply expand percent to 25% and borrow expand percent to 20% for ETH/USDC vault on liquidity. 
-    function action4() internal {
-        address user_ = VAULT_ETH_USDC;
-        address supplyToken_ = ETH_ADDRESS;
-        address borrowToken_ = USDC_ADDRESS;
-
-        // Supply expand percent to 25%
-        AdminModuleStructs.UserSupplyConfig[] memory configs_ = new AdminModuleStructs.UserSupplyConfig[]();
-        configs_[0] = getUserSupplyData(
-            supplyToken_,
-            user_
-        );
-
-        configs_[0].expandPercent = 25 * 1e2; // 25%
-
-        LIQUIDITY.updateUserSupplyConfigs(configs_);
-
-        // Borrow expand percent to 20%
-        AdminModuleStructs.UserBorrowConfig[] memory configs_ = new AdminModuleStructs.UserBorrowConfig[]();
-        configs_[0] = getUserBorrowData(
-            borrowToken_,
-            user_
-        );
-
-        configs_[0].expandPercent = 20 * 1e2; // 20%
-
-        LIQUIDITY.updateUserBorrowConfigs(configs_);
-    }
-
-    /// @notice Action 5: Update supply expand percent to 25% and borrow expand percent to 20% for ETH/USDT vault on liquidity. 
-    function action5() internal {
-        address user_ = VAULT_ETH_USDT;
-        address supplyToken_ = ETH_ADDRESS;
-        address borrowToken_ = USDT_ADDRESS;
-
-        // Supply expand percent to 25%
-        AdminModuleStructs.UserSupplyConfig[] memory configs_ = new AdminModuleStructs.UserSupplyConfig[]();
-        configs_[0] = getUserSupplyData(
-            supplyToken_,
-            user_
-        );
-
-        configs_[0].expandPercent = 25 * 1e2; // 25%
-
-        LIQUIDITY.updateUserSupplyConfigs(configs_);
-
-        // Borrow expand percent to 20%
-        AdminModuleStructs.UserBorrowConfig[] memory configs_ = new AdminModuleStructs.UserBorrowConfig[]();
-        configs_[0] = getUserBorrowData(
-            borrowToken_,
-            user_
-        );
-
-        configs_[0].expandPercent = 20 * 1e2; // 20%
-
-        LIQUIDITY.updateUserBorrowConfigs(configs_);
-    }
-
-    /// @notice Action 6: Update supply expand percent to 25% and borrow expand percent to 20% for wstETH/ETH vault on liquidity. 
-    function action6() internal {
-        address user_ = VAUTH_WSTETH_ETH;
-        address supplyToken_ = WSTETH_ADDRESS;
-        address borrowToken_ = ETH_ADDRESS;
-
-        // Supply expand percent to 25%
-        AdminModuleStructs.UserSupplyConfig[] memory configs_ = new AdminModuleStructs.UserSupplyConfig[]();
-        configs_[0] = getUserSupplyData(
-            supplyToken_,
-            user_
-        );
-
-        configs_[0].expandPercent = 25 * 1e2; // 25%
-
-        LIQUIDITY.updateUserSupplyConfigs(configs_);
-
-        // Borrow expand percent to 20%
-        AdminModuleStructs.UserBorrowConfig[] memory configs_ = new AdminModuleStructs.UserBorrowConfig[]();
-        configs_[0] = getUserBorrowData(
-            borrowToken_,
-            user_
-        );
-
-        configs_[0].expandPercent = 20 * 1e2; // 20%
-
-        LIQUIDITY.updateUserBorrowConfigs(configs_);
-    }
-
-    /// @notice Action 7: Update supply expand percent to 25% and borrow expand percent to 20% for wstETH/USDC vault on liquidity. 
-    function action7() internal {
-        address user_ = VAULT_WSTETH_USDC;
-        address supplyToken_ = WSTETH_ADDRESS;
-        address borrowToken_ = USDC_ADDRESS;
-
-        // Supply expand percent to 25%
-        AdminModuleStructs.UserSupplyConfig[] memory configs_ = new AdminModuleStructs.UserSupplyConfig[]();
-        configs_[0] = getUserSupplyData(
-            supplyToken_,
-            user_
-        );
-
-        configs_[0].expandPercent = 25 * 1e2; // 25%
-
-        LIQUIDITY.updateUserSupplyConfigs(configs_);
-
-        // Borrow expand percent to 20%
-        AdminModuleStructs.UserBorrowConfig[] memory configs_ = new AdminModuleStructs.UserBorrowConfig[]();
-        configs_[0] = getUserBorrowData(
-            borrowToken_,
-            user_
-        );
-
-        configs_[0].expandPercent = 20 * 1e2; // 20%
-
-        LIQUIDITY.updateUserBorrowConfigs(configs_);
-    }
-
-
-    /// @notice Action 8: Update supply expand percent to 25% and borrow expand percent to 20% for WSTETH/USDT vault on liquidity. 
-    function action8() internal {
-        address user_ = VAULT_WSTETH_USDC;
-        address supplyToken_ = WSTETH_ADDRESS;
-        address borrowToken_ = USDT_ADDRESS;
-
-        // Supply expand percent to 25%
-        AdminModuleStructs.UserSupplyConfig[] memory configs_ = new AdminModuleStructs.UserSupplyConfig[]();
-        configs_[0] = getUserSupplyData(
-            supplyToken_,
-            user_
-        );
-
-        configs_[0].expandPercent = 25 * 1e2; // 25%
-
-        LIQUIDITY.updateUserSupplyConfigs(configs_);
-
-        // Borrow expand percent to 20%
-        AdminModuleStructs.UserBorrowConfig[] memory configs_ = new AdminModuleStructs.UserBorrowConfig[]();
-        configs_[0] = getUserBorrowData(
-            borrowToken_,
-            user_
-        );
-
-        configs_[0].expandPercent = 20 * 1e2; // 20%
-
-        LIQUIDITY.updateUserBorrowConfigs(configs_);
-    }
-
-    /// @notice Action 9: Remove config handlers for vaults and lending tokens on liquidity. 
-    function action9() internal {
         AdminModuleStructs.AddressBool[] memory addrBools_ = new AdminModuleStructs.AddressBool[](8);
 
 
@@ -507,49 +342,49 @@ contract PayloadIGP12 {
         addrBools_[0] = AdminModuleStructs.AddressBool({
             addr: 0x02AfbFA971299c2434E7a04565d9f5a1eD6180F1,
             value: false
-        })
+        });
 
         // fToken_fUSDT_LiquidityConfigHandler
         addrBools_[1] = AdminModuleStructs.AddressBool({
             addr: 0xF45364EC2230c64B1AB0cE1E4c7E63F0a2078F30,
             value: false
-        })
+        });
 
         // fToken_fWETH_LiquidityConfigHandler
         addrBools_[2] = AdminModuleStructs.AddressBool({
             addr: 0x580f8C04080347F5675CF67C1E90d935463148dC,
             value: false
-        })
+        });
 
         // Vault_ETH_USDC_LiquidityConfigHandler
         addrBools_[3] = AdminModuleStructs.AddressBool({
             addr: 0xacdf9C61720A4D97Afa7f215ddDD56C2d1019FC9,
             value: false
-        })
+        });
 
         // Vault_ETH_USDT_LiquidityConfigHandler
         addrBools_[4] = AdminModuleStructs.AddressBool({
             addr: 0x2274F61847703DBA28300BD7a0Fb3f1166Cb0E7C,
             value: false
-        })
+        });
 
         // Vault_wstETH_ETH_LiquidityConfigHandler
         addrBools_[5] = AdminModuleStructs.AddressBool({
             addr: 0x28D64d5c85E9a0f0a33A481E71842255aeFf0Fe9,
             value: false
-        })
+        });
 
         // Vault_wstETH_USDC_LiquidityConfigHandler
         addrBools_[6] = AdminModuleStructs.AddressBool({
             addr: 0xa66906140D5d413E40b1AE452B52DD1f162D47cA,
             value: false
-        })
+        });
 
         // Vault_wstETH_USDT_LiquidityConfigHandler
         addrBools_[7] = AdminModuleStructs.AddressBool({
             addr: 0xB7AE8D080c7C26152e43DD6e8dcA7451BB33Be68,
             value: false
-        })
+        });
 
         LIQUIDITY.updateAuths(addrBools_);
     }
@@ -559,7 +394,11 @@ contract PayloadIGP12 {
     |     Proposal Payload Helpers      |
     |__________________________________*/
 
-    function getSupplyTokenConfig(address token_, address user_, uint256 expandPercent) internal returns(AdminModuleStructs.UserSupplyConfig memory config_){
+    function getUserSupplyDataAndSetExpandPercent(
+        address token_,
+        address user_,
+        uint256 expandPercent_
+    ) internal returns(AdminModuleStructs.UserSupplyConfig memory config_){
         bytes32 _LIQUDITY_PROTOCOL_SUPPLY_SLOT = LiquiditySlotsLink.calculateDoubleMappingStorageSlot(
             LiquiditySlotsLink.LIQUIDITY_USER_SUPPLY_DOUBLE_MAPPING_SLOT,
             user_,
@@ -572,7 +411,7 @@ contract PayloadIGP12 {
             user: user_,
             token: token_,
             mode: uint8(userSupplyData_ & 1),
-            expandPercent: expandPercent,
+            expandPercent: expandPercent_,
             expandDuration: (userSupplyData_ >> LiquiditySlotsLink.BITS_USER_SUPPLY_EXPAND_DURATION) & X24,
             baseWithdrawalLimit: BigMathMinified.fromBigNumber(
                 (userSupplyData_ >> LiquiditySlotsLink.BITS_USER_SUPPLY_BASE_WITHDRAWAL_LIMIT) & X18,
@@ -582,7 +421,11 @@ contract PayloadIGP12 {
         });
     }
 
-    function getBorrowTokenConfig(address token_, address user_, uint256 expandPercent) internal returns(AdminModuleStructs.UserSupplyConfig memory config_){
+    function getBorrowTokenConfigAndSetExpandPercent(
+        address token_,
+        address user_,
+        uint256 expandPercent_
+    ) internal returns(AdminModuleStructs.UserSupplyConfig memory config_){
         bytes32 _LIQUDITY_PROTOCOL_SUPPLY_SLOT = LiquiditySlotsLink.calculateDoubleMappingStorageSlot(
             LiquiditySlotsLink.LIQUIDITY_USER_SUPPLY_DOUBLE_MAPPING_SLOT,
             user_,
@@ -595,61 +438,10 @@ contract PayloadIGP12 {
             user: user_,
             token: token_,
             mode: uint8(userSupplyData_ & 1),
-            expandPercent: expandPercent,
+            expandPercent: expandPercent_,
             expandDuration: (userSupplyData_ >> LiquiditySlotsLink.BITS_USER_SUPPLY_EXPAND_DURATION) & X24,
             baseWithdrawalLimit: BigMathMinified.fromBigNumber(
                 (userSupplyData_ >> LiquiditySlotsLink.BITS_USER_SUPPLY_BASE_WITHDRAWAL_LIMIT) & X18,
-                DEFAULT_EXPONENT_SIZE,
-                DEFAULT_EXPONENT_MASK
-            )
-        });
-    }
-
-    function getUserSupplyData(address token_, address user_) internal returns(AdminModuleStructs.UserSupplyConfig memory config_) {
-        bytes32 _LIQUDITY_PROTOCOL_SUPPLY_SLOT = LiquiditySlotsLink.calculateDoubleMappingStorageSlot(
-            LiquiditySlotsLink.LIQUIDITY_USER_SUPPLY_DOUBLE_MAPPING_SLOT,
-            user_,
-            token_
-        );
-
-        bytes32 userSupplyData_ = LIQUIDITY.readFromStorage(_LIQUDITY_PROTOCOL_SUPPLY_SLOT); 
-
-        config_ = AdminModuleStructs.UserSupplyConfig({
-            user: user_,
-            token: token_,
-            mode: uint8(userSupplyData_ & 1),
-            expandPercent: (userSupplyData_ >> LiquiditySlotsLink.BITS_USER_SUPPLY_EXPAND_PERCENT) & X14,
-            expandDuration: (userSupplyData_ >> LiquiditySlotsLink.BITS_USER_SUPPLY_EXPAND_DURATION) & X24,
-            baseWithdrawalLimit: BigMathMinified.fromBigNumber(
-                (userSupplyData_ >> LiquiditySlotsLink.BITS_USER_SUPPLY_BASE_WITHDRAWAL_LIMIT) & X18,
-                DEFAULT_EXPONENT_SIZE,
-                DEFAULT_EXPONENT_MASK
-            )
-        });
-    }
-
-    function getUserBorrowData(address token_, address user_) internal returns(AdminModuleStructs.UserBorrowConfig memory config_) {
-        bytes32 _LIQUDITY_PROTOCOL_BORROW_SLOT = LiquiditySlotsLink.calculateDoubleMappingStorageSlot(
-            LiquiditySlotsLink.LIQUIDITY_USER_BORROW_DOUBLE_MAPPING_SLOT,
-            user_,
-            token_
-        );
-
-        userBorrowData_ = LIQUIDITY.readFromStorage(_LIQUDITY_PROTOCOL_BORROW_SLOT);
-
-        config_ = AdminModuleStructs.UserBorrowConfig({
-            user: user_,
-            token: token_,
-            mode: uint8(userBorrowData_ & 1),
-            expandPercent: (userBorrowData_ >> LiquiditySlotsLink.BITS_USER_BORROW_EXPAND_PERCENT) & X14;,
-            expandDuration: (userBorrowData_ >> LiquiditySlotsLink.BITS_USER_BORROW_EXPAND_DURATION) & X24,
-            baseDebtCeiling: BigMathMinified.fromBigNumber(
-                (userBorrowData_ >> LiquiditySlotsLink.BITS_USER_BORROW_BASE_BORROW_LIMIT) & X18,
-                DEFAULT_EXPONENT_SIZE,
-                DEFAULT_EXPONENT_MASK
-            ),
-            maxDebtCeiling: BigMathMinified.fromBigNumber(
-                (userBorrowData_ >> LiquiditySlotsLink.BITS_USER_BORROW_MAX_BORROW_LIMIT) & X18,
                 DEFAULT_EXPONENT_SIZE,
                 DEFAULT_EXPONENT_MASK
             )
