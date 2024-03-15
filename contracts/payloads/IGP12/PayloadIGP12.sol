@@ -311,7 +311,7 @@ contract PayloadIGP12 {
         // Update to 20%
         configs_[0] = getUserSupplyDataAndSetExpandPercent(USDT_ADDRESS, F_USDT, 20 * 1e2);
         configs_[1] = getUserSupplyDataAndSetExpandPercent(USDC_ADDRESS, F_USDC, 20 * 1e2);
-        configs_[2] = getUserSupplyDataAndSetExpandPercent(WETH_ADDRESS, F_WETH, 20 * 1e2);
+        configs_[2] = getUserSupplyDataAndSetExpandPercent(ETH_ADDRESS, F_WETH, 20 * 1e2);
 
         // Update to 25%
         configs_[3] = getUserSupplyDataAndSetExpandPercent(ETH_ADDRESS, VAULT_ETH_USDC, 25 * 1e2);
@@ -328,11 +328,11 @@ contract PayloadIGP12 {
         AdminModuleStructs.UserBorrowConfig[] memory configs_ = new AdminModuleStructs.UserBorrowConfig[](5);
 
         // Update to 20%
-        configs_[1] = getUserBorrowDataAndSetExpandPercent(USDC_ADDRESS, VAULT_ETH_USDC, 20 * 1e2);
-        configs_[2] = getUserBorrowDataAndSetExpandPercent(USDT_ADDRESS, VAULT_ETH_USDT, 20 * 1e2);
-        configs_[3] = getUserBorrowDataAndSetExpandPercent(USDC_ADDRESS, VAULT_WSTETH_USDC, 20 * 1e2);
-        configs_[4] = getUserBorrowDataAndSetExpandPercent(USDT_ADDRESS, VAULT_WSTETH_USDT, 20 * 1e2);
-        configs_[5] = getUserBorrowDataAndSetExpandPercent(ETH_ADDRESS, VAULT_WSTETH_ETH, 20 * 1e2);
+        configs_[0] = getUserBorrowDataAndSetExpandPercent(USDC_ADDRESS, VAULT_ETH_USDC, 20 * 1e2);
+        configs_[1] = getUserBorrowDataAndSetExpandPercent(USDT_ADDRESS, VAULT_ETH_USDT, 20 * 1e2);
+        configs_[2] = getUserBorrowDataAndSetExpandPercent(USDC_ADDRESS, VAULT_WSTETH_USDC, 20 * 1e2);
+        configs_[3] = getUserBorrowDataAndSetExpandPercent(USDT_ADDRESS, VAULT_WSTETH_USDT, 20 * 1e2);
+        configs_[4] = getUserBorrowDataAndSetExpandPercent(ETH_ADDRESS, VAULT_WSTETH_ETH, 20 * 1e2);
 
         LIQUIDITY.updateUserBorrowConfigs(configs_);
     }
