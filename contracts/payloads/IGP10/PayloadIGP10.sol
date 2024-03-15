@@ -273,7 +273,7 @@ contract PayloadIGP10 {
         // Action 1: Update market rates for USDC.
         action1();
 
-        // Action 1: Update market rates for USDT.
+        // Action 2: Update market rates for USDT.
         action2();
     }
 
