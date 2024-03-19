@@ -135,10 +135,10 @@ contract PayloadIGP8 {
         address(0); // TODO
 
     address public constant DUMMY_IMPLEMENTATION =
-        0x3AC94ba5465BF3429fE237468EaBa5aa20072d61;
+        address(0); // TODO;
 
-    address public constant VAULT_WEETH_WSTETH = address(0); // TODO
-    address public constant VAULT_WEETH_WSTETH_ORACLE = address(0); // TODO
+    address public constant VAULT_WEETH_WSTETH = 0x40D9b8417E6E1DcD358f04E3328bCEd061018A82;
+    address public constant VAULT_WEETH_WSTETH_ORACLE = 0x322F7FCEA001bEBB63413f42B0028E5A81b933EF;
 
     constructor() {
         ADDRESS_THIS = address(this);
