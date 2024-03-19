@@ -226,18 +226,15 @@ contract PayloadIGP13 {
     |__________________________________*/
     
     function withdrawalsSigs() public pure returns (bytes4[] memory sigs_) {
-        sigs_ = new bytes4[](3);
-        sigs_[0] = bytes4(
-            keccak256("onERC721Received(address,address,uint256,bytes)")
-        );
-        sigs_[1] = bytes4(keccak256("paybackDebt(uint8)"));
-        sigs_[2] = bytes4(keccak256("claimEthWithdrawal(uint256,uint8)"));
+        sigs_ = new bytes4[](2);
+        sigs_[0] = bytes4(keccak256("paybackDebt(uint8)"));
+        sigs_[1] = bytes4(keccak256("claimEthWithdrawal(uint256,uint8)"));
     }
 
     function fluidStETHSigs() public pure returns (bytes4[] memory sigs_) {
         sigs_ = new bytes4[](3);
         sigs_[0] = bytes4(keccak256("queueSteth(uint8,uint256,uint256,uint256)"));
         sigs_[1] = bytes4(keccak256("claimSteth(uint256)"));
-        sigs_[3] = bytes4(keccak256("claimStethAndPaybackFluid(uint256)"));
+        sigs_[2] = bytes4(keccak256("claimStethAndPaybackFluid(uint256)"));
     }
 }
