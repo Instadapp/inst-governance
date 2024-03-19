@@ -132,10 +132,10 @@ contract PayloadIGP8 {
     address public constant WITHDRAWALS_MODULE =
         0x6A64A3E0af38279ac7455c85b2C683f5621cE2e7;
     address public constant FLUID_STETH_MODULE =
-        address(0); // TODO
+        0x0F1679FB1d5B2981423c757e8ea91979fabDB2D1;
 
     address public constant DUMMY_IMPLEMENTATION =
-        address(0); // TODO;
+        0xd58ca26C8e888Fb628753F08816bED4a07d0E4af;
 
     address public constant VAULT_WEETH_WSTETH = 0x40D9b8417E6E1DcD358f04E3328bCEd061018A82;
     address public constant VAULT_WEETH_WSTETH_ORACLE = 0x322F7FCEA001bEBB63413f42B0028E5A81b933EF;
@@ -160,7 +160,7 @@ contract PayloadIGP8 {
         string[] memory signatures = new string[](totalActions);
         bytes[] memory calldatas = new bytes[](totalActions);
 
-        // Action 1: call executePayload on timelock contract to execute payload related to lite
+        // Action 1: call executePayload on timelock contract to execute payload related to lite & fluid
         targets[0] = address(TIMELOCK);
         values[0] = 0;
         signatures[0] = "executePayload(address,string,bytes)";
