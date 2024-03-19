@@ -107,7 +107,7 @@ interface IFluidVaultT1 {
     function updateSupplyRateMagnifier(uint supplyRateMagnifier_) external;
 }
 
-contract PayloadIGP8 {
+contract PayloadIGP13 {
     uint256 public constant PROPOSAL_ID = 13;
 
     address public constant PROPOSER =
