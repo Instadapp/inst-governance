@@ -151,7 +151,7 @@ contract PayloadIGP14 {
         ILite(0xA0D3707c569ff8C87FA923d3823eC5D81c98Be78);
 
     IstETHProtocol public constant STETH_PROTOCOL = IstETHProtocol(0x1F6B2bFDd5D1e6AdE7B17027ff5300419a56Ad6b);
-    address public constant VAULT_WSTETH_ETH = address(0); // TODO
+    address public constant VAULT_WSTETH_ETH = 0xA0F83Fc5885cEBc0420ce7C7b139Adc80c4F4D91;
 
     constructor() {
         ADDRESS_THIS = address(this);
