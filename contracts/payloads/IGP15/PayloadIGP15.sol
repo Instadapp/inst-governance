@@ -227,6 +227,12 @@ interface IFluidVaultT1Factory {
         address vaultDeploymentLogic_,
         bytes calldata vaultDeploymentData_
     ) external returns (address vault_);
+
+    function setVaultAuth(
+        address vault_,
+        address vaultAuth_,
+        bool allowed_
+    ) external;
 }
 
 interface IFluidVaultT1DeploymentLogic {
@@ -435,7 +441,7 @@ contract PayloadIGP15 {
        AdminModuleStructs.RateDataV2Params[] memory params_ = new AdminModuleStructs.RateDataV2Params[](1);
 
        params_[0] = AdminModuleStructs.RateDataV2Params({
-            token: 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48, // USDC
+            token: USDC_ADDRESS, // USDC
             kink1: 80 * 1e2, // 80%
             kink2: 93 * 1e2, // 93%
             rateAtUtilizationZero: 0, // 0%
@@ -452,7 +458,7 @@ contract PayloadIGP15 {
        AdminModuleStructs.RateDataV2Params[] memory params_ = new AdminModuleStructs.RateDataV2Params[](1);
 
        params_[0] = AdminModuleStructs.RateDataV2Params({
-            token: 0xdAC17F958D2ee523a2206206994597C13D831ec7, // USDT
+            token: USDT_ADDRESS, // USDT
             kink1: 80 * 1e2, // 80%
             kink2: 93 * 1e2, // 93%
             rateAtUtilizationZero: 0, // 0%
@@ -466,12 +472,12 @@ contract PayloadIGP15 {
 
     /// @notice Action 7: Update rewards for fUSDT.
     function action7() internal {
-       IFTokenAdmin(F_USDT).updateRewards(address(0)); // TODO
+       IFTokenAdmin(F_USDT).updateRewards(0x6CC89782495A2162b2A4f5b206E2A06Dc8675090);
     }
 
     /// @notice Action 8: Update rewards for fUSDC.
     function action8() internal {
-       IFTokenAdmin(F_USDC).updateRewards(address(0)); // TODO
+       IFTokenAdmin(F_USDC).updateRewards(0x6CC89782495A2162b2A4f5b206E2A06Dc8675090);
     }
 
 
@@ -542,7 +548,7 @@ contract PayloadIGP15 {
         // Update oracle on sUSDe/USDC vault.
         {
             IFluidVaultT1(vault_).updateOracle(
-                0x9eC721a12b6005aF8c6E8CFa9c86B5f12ff473E4
+                0x7779EC4694752A118580cc8ad28B9A11F7e3bB12
             );
         }
 
@@ -550,6 +556,15 @@ contract PayloadIGP15 {
         {
             IFluidVaultT1(vault_).updateRebalancer(
                 0x264786EF916af64a1DB19F513F24a3681734ce92
+            );
+        }
+
+        // Set Config hander as auth on vault factory for sUSDe/USDc vault.
+        {
+            VAULT_T1_FACTORY.setVaultAuth(
+                vault_,
+                0x36639DAd77eC858574aaF07a68bBa62b7db19FfA,
+                true
             );
         }
     }
@@ -618,7 +633,7 @@ contract PayloadIGP15 {
         // Update oracle on sUSDe/USDT vault.
         {
             IFluidVaultT1(vault_).updateOracle(
-                0x9eC721a12b6005aF8c6E8CFa9c86B5f12ff473E4
+                0x7779EC4694752A118580cc8ad28B9A11F7e3bB12
             );
         }
 
@@ -626,6 +641,15 @@ contract PayloadIGP15 {
         {
             IFluidVaultT1(vault_).updateRebalancer(
                 0x264786EF916af64a1DB19F513F24a3681734ce92
+            );
+        }
+
+        // Set Config hander as auth on vault factory for sUSDe/USDT vault.
+        {
+            VAULT_T1_FACTORY.setVaultAuth(
+                vault_,
+                0xafE3974f4916140a093F1de7Fc064A3Da220DD41,
+                true
             );
         }
     }
