@@ -260,6 +260,34 @@ interface IFluidVaultT1 {
     function updateCollateralFactor(uint collateralFactor_) external;
 }
 
+interface IFTokenAdmin {
+    /// @notice updates the rewards rate model contract.
+    ///         Only callable by LendingFactory auths.
+    /// @param rewardsRateModel_  the new rewards rate model contract address.
+    ///                           can be set to address(0) to set no rewards (to save gas)
+    function updateRewards(address rewardsRateModel_) external;
+
+    /// @notice Balances out the difference between fToken supply at Liquidity vs totalAssets().
+    ///         Deposits underlying from rebalancer address into Liquidity but doesn't mint any shares
+    ///         -> thus making deposit available as rewards.
+    ///         Only callable by rebalancer.
+    /// @return assets_ amount deposited to Liquidity
+    function rebalance() external payable returns (uint256 assets_);
+
+    /// @notice gets the liquidity exchange price of the underlying asset, calculates the updated exchange price (with reward rates)
+    ///         and writes those values to storage.
+    ///         Callable by anyone.
+    /// @return tokenExchangePrice_ exchange price of fToken share to underlying asset
+    /// @return liquidityExchangePrice_ exchange price at Liquidity for the underlying asset
+    function updateRates() external returns (uint256 tokenExchangePrice_, uint256 liquidityExchangePrice_);
+
+    /// @notice sends any potentially stuck funds to Liquidity contract. Only callable by LendingFactory auths.
+    function rescueFunds(address token_) external;
+
+    /// @notice Updates the rebalancer address (ReserveContract). Only callable by LendingFactory auths.
+    function updateRebalancer(address rebalancer_) external;
+}
+
 contract PayloadIGP15 {
     uint256 public constant PROPOSAL_ID = 15;
 
@@ -287,6 +315,9 @@ contract PayloadIGP15 {
         IFluidVaultT1DeploymentLogic(
             0x15f6F562Ae136240AB9F4905cb50aCA54bCbEb5F
         );
+
+    address public constant F_USDT = 0x5C20B550819128074FD538Edf79791733ccEdd18;
+    address public constant F_USDC = 0x9Fb7b4477576Fe5B32be4C1843aFB1e55F251B33;
     
     address public constant sUSDCe_ADDRESS = 0x9D39A5DE30e57443BfF2A8307A4256c8797A3497;
     address public constant USDC_ADDRESS = 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
@@ -431,6 +462,16 @@ contract PayloadIGP15 {
        });
 
        LIQUIDITY.updateRateDataV2s(params_);
+    }
+
+    /// @notice Action 7: Update rewards for fUSDT.
+    function action7() internal {
+       IFTokenAdmin(F_USDT).updateRewards(address(0)); // TODO
+    }
+
+    /// @notice Action 8: Update rewards for fUSDC.
+    function action8() internal {
+       IFTokenAdmin(F_USDC).updateRewards(address(0)); // TODO
     }
 
 
