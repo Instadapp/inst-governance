@@ -549,7 +549,7 @@ contract PayloadIGP15 {
             IFluidVaultT1(vault_).updateCoreSettings(
                 100 * 1e2, // 1x     supplyRateMagnifier
                 100 * 1e2, // 1x     borrowRateMagnifier
-                88 * 1e2, // 88%  collateralFactor
+                88 * 1e2, // 88%     collateralFactor
                 90 * 1e2, // 90%    liquidationThreshold
                 95 * 1e2, // 95%    liquidationMaxLimit
                 5 * 1e2, // 5%     withdrawGap
