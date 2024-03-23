@@ -621,7 +621,7 @@ contract PayloadIGP15 {
                 mode: 1,
                 expandPercent: 20 * 1e2,
                 expandDuration: 12 hours,
-                baseDebtCeiling: 7500000 * 1e18,
+                baseDebtCeiling: 7500000 * 1e6,
                 maxDebtCeiling: 20000000 * 1e6
             });
 
