@@ -340,7 +340,8 @@ contract PayloadIGP15 {
 
     function propose(string memory description) external {
         require(
-            (msg.sender == PROPOSER || msg.sender == TEAM_MULTISIG) ||
+            msg.sender == PROPOSER ||
+                msg.sender == TEAM_MULTISIG ||
                 address(this) == PROPOSER_AVO_MULTISIG,
             "msg.sender-not-allowed"
         );
@@ -383,11 +384,17 @@ contract PayloadIGP15 {
         // Action 4: Deploy sUSDe/USDT vault and set related configs.
         action4();
 
-        // Action 6: Update market rates for USDC.
+        // Action 5: Update market rates for USDC.
         action5();
 
-        // Action 2: Update market rates for USDT.
+        // Action 6: Update market rates for USDT.
         action6();
+
+        // Action 7: Update reward rates for USDC.
+        action7();
+
+        // Action 8: Update reward rates for USDT.
+        action8();
     }
 
     function verifyProposal() external view {}
@@ -448,9 +455,9 @@ contract PayloadIGP15 {
             kink1: 80 * 1e2, // 80%
             kink2: 93 * 1e2, // 93%
             rateAtUtilizationZero: 0, // 0%
-            rateAtUtilizationKink1: 12 * 1e2, // 12%
-            rateAtUtilizationKink2: 18 * 1e2, // 18%
-            rateAtUtilizationMax: 33.34 * 1e2 // 33.34%
+            rateAtUtilizationKink1: 10 * 1e2, // 10%
+            rateAtUtilizationKink2: 15 * 1e2, // 15%
+            rateAtUtilizationMax: 25 * 1e2 // 25%
         });
 
         LIQUIDITY.updateRateDataV2s(params_);
@@ -466,24 +473,24 @@ contract PayloadIGP15 {
             kink1: 80 * 1e2, // 80%
             kink2: 93 * 1e2, // 93%
             rateAtUtilizationZero: 0, // 0%
-            rateAtUtilizationKink1: 12 * 1e2, // 12%
-            rateAtUtilizationKink2: 18 * 1e2, // 18%
-            rateAtUtilizationMax: 33.34 * 1e2 // 33.34%
+            rateAtUtilizationKink1: 10 * 1e2, // 10%
+            rateAtUtilizationKink2: 15 * 1e2, // 15%
+            rateAtUtilizationMax: 25 * 1e2 // 25%
         });
 
         LIQUIDITY.updateRateDataV2s(params_);
     }
 
-    /// @notice Action 7: Update rewards for fUSDT.
+    /// @notice Action 7: Update rewards for fUSDC.
     function action7() internal {
-        IFTokenAdmin(F_USDT).updateRewards(
+        IFTokenAdmin(F_USDC).updateRewards(
             0x6CC89782495A2162b2A4f5b206E2A06Dc8675090
         );
     }
 
-    /// @notice Action 8: Update rewards for fUSDC.
+    /// @notice Action 8: Update rewards for fUSDT.
     function action8() internal {
-        IFTokenAdmin(F_USDC).updateRewards(
+        IFTokenAdmin(F_USDT).updateRewards(
             0x6CC89782495A2162b2A4f5b206E2A06Dc8675090
         );
     }
@@ -513,7 +520,7 @@ contract PayloadIGP15 {
                 mode: 1,
                 expandPercent: 25 * 1e2,
                 expandDuration: 12 hours,
-                baseWithdrawalLimit: 4000 * 1e18
+                baseWithdrawalLimit: 7500000 * 1e18
             });
 
             LIQUIDITY.updateUserSupplyConfigs(configs_);
@@ -528,10 +535,10 @@ contract PayloadIGP15 {
                 user: address(vault_),
                 token: USDC_ADDRESS,
                 mode: 1,
-                expandPercent: 25 * 1e2,
+                expandPercent: 20 * 1e2,
                 expandDuration: 12 hours,
-                baseDebtCeiling: 4000 * 1e18,
-                maxDebtCeiling: 10000 * 1e18
+                baseDebtCeiling: 7500000 * 1e18,
+                maxDebtCeiling: 20000000 * 1e6
             });
 
             LIQUIDITY.updateUserBorrowConfigs(configs_);
@@ -542,11 +549,11 @@ contract PayloadIGP15 {
             IFluidVaultT1(vault_).updateCoreSettings(
                 100 * 1e2, // 1x     supplyRateMagnifier
                 100 * 1e2, // 1x     borrowRateMagnifier
-                90.5 * 1e2, // 90.5%  collateralFactor
-                93 * 1e2, // 93%    liquidationThreshold
+                88 * 1e2, // 88%  collateralFactor
+                90 * 1e2, // 90%    liquidationThreshold
                 95 * 1e2, // 95%    liquidationMaxLimit
                 5 * 1e2, // 5%     withdrawGap
-                1 * 1e2, // 1%     liquidationPenalty
+                2 * 1e2, // 2%     liquidationPenalty
                 0 // 0%     borrowFee
             );
         }
@@ -565,7 +572,7 @@ contract PayloadIGP15 {
             );
         }
 
-        // Set Config hander as auth on vault factory for sUSDe/USDc vault.
+        // Set Config hander as auth on vault factory for sUSDe/USDC vault.
         {
             VAULT_T1_FACTORY.setVaultAuth(
                 vault_,
@@ -597,7 +604,7 @@ contract PayloadIGP15 {
                 mode: 1,
                 expandPercent: 25 * 1e2,
                 expandDuration: 12 hours,
-                baseWithdrawalLimit: 4000 * 1e18
+                baseWithdrawalLimit: 7500000 * 1e18
             });
 
             LIQUIDITY.updateUserSupplyConfigs(configs_);
@@ -612,10 +619,10 @@ contract PayloadIGP15 {
                 user: address(vault_),
                 token: USDT_ADDRESS,
                 mode: 1,
-                expandPercent: 25 * 1e2,
+                expandPercent: 20 * 1e2,
                 expandDuration: 12 hours,
-                baseDebtCeiling: 4000 * 1e18,
-                maxDebtCeiling: 10000 * 1e18
+                baseDebtCeiling: 7500000 * 1e18,
+                maxDebtCeiling: 20000000 * 1e6
             });
 
             LIQUIDITY.updateUserBorrowConfigs(configs_);
@@ -626,11 +633,11 @@ contract PayloadIGP15 {
             IFluidVaultT1(vault_).updateCoreSettings(
                 100 * 1e2, // 1x     supplyRateMagnifier
                 100 * 1e2, // 1x     borrowRateMagnifier
-                90.5 * 1e2, // 90.5%  collateralFactor
-                93 * 1e2, // 93%    liquidationThreshold
+                88 * 1e2, // 88%     collateralFactor
+                90 * 1e2, // 90%    liquidationThreshold
                 95 * 1e2, // 95%    liquidationMaxLimit
                 5 * 1e2, // 5%     withdrawGap
-                1 * 1e2, // 1%     liquidationPenalty
+                2 * 1e2, // 2%     liquidationPenalty
                 0 // 0%     borrowFee
             );
         }
