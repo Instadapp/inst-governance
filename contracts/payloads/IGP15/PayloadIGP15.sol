@@ -518,9 +518,9 @@ contract PayloadIGP15 {
                 user: address(vault_),
                 token: sUSDe_ADDRESS,
                 mode: 1,
-                expandPercent: 25 * 1e2,
+                expandPercent: 25 * 1e2, // 25%
                 expandDuration: 12 hours,
-                baseWithdrawalLimit: 7500000 * 1e18
+                baseWithdrawalLimit: 7_500_000 * 1e18 // 7.5M
             });
 
             LIQUIDITY.updateUserSupplyConfigs(configs_);
@@ -535,10 +535,10 @@ contract PayloadIGP15 {
                 user: address(vault_),
                 token: USDC_ADDRESS,
                 mode: 1,
-                expandPercent: 20 * 1e2,
+                expandPercent: 20 * 1e2, // 20%
                 expandDuration: 12 hours,
-                baseDebtCeiling: 7500000 * 1e18,
-                maxDebtCeiling: 20000000 * 1e6
+                baseDebtCeiling: 7_500_000 * 1e6, // 7.5M
+                maxDebtCeiling: 20_000_000 * 1e6  // 20M
             });
 
             LIQUIDITY.updateUserBorrowConfigs(configs_);
@@ -602,9 +602,9 @@ contract PayloadIGP15 {
                 user: address(vault_),
                 token: sUSDe_ADDRESS,
                 mode: 1,
-                expandPercent: 25 * 1e2,
+                expandPercent: 25 * 1e2, // 25%
                 expandDuration: 12 hours,
-                baseWithdrawalLimit: 7500000 * 1e18
+                baseWithdrawalLimit: 7_500_000 * 1e18 // 7.5M
             });
 
             LIQUIDITY.updateUserSupplyConfigs(configs_);
@@ -619,10 +619,10 @@ contract PayloadIGP15 {
                 user: address(vault_),
                 token: USDT_ADDRESS,
                 mode: 1,
-                expandPercent: 20 * 1e2,
+                expandPercent: 20 * 1e2, // 20%
                 expandDuration: 12 hours,
-                baseDebtCeiling: 7500000 * 1e6,
-                maxDebtCeiling: 20000000 * 1e6
+                baseDebtCeiling: 7_500_000 * 1e6, // 7.5M
+                maxDebtCeiling: 20_000_000 * 1e6  // 20M
             });
 
             LIQUIDITY.updateUserBorrowConfigs(configs_);
