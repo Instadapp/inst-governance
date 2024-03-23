@@ -285,7 +285,9 @@ interface IFTokenAdmin {
     ///         Callable by anyone.
     /// @return tokenExchangePrice_ exchange price of fToken share to underlying asset
     /// @return liquidityExchangePrice_ exchange price at Liquidity for the underlying asset
-    function updateRates() external returns (uint256 tokenExchangePrice_, uint256 liquidityExchangePrice_);
+    function updateRates()
+        external
+        returns (uint256 tokenExchangePrice_, uint256 liquidityExchangePrice_);
 
     /// @notice sends any potentially stuck funds to Liquidity contract. Only callable by LendingFactory auths.
     function rescueFunds(address token_) external;
@@ -310,7 +312,7 @@ contract PayloadIGP15 {
 
     address public immutable ADDRESS_THIS;
 
-    address public constant TEAM_MULTISIG = 
+    address public constant TEAM_MULTISIG =
         0x4F6F977aCDD1177DCD81aB83074855EcB9C2D49e;
 
     IFluidLiquidityAdmin public constant LIQUIDITY =
@@ -324,10 +326,13 @@ contract PayloadIGP15 {
 
     address public constant F_USDT = 0x5C20B550819128074FD538Edf79791733ccEdd18;
     address public constant F_USDC = 0x9Fb7b4477576Fe5B32be4C1843aFB1e55F251B33;
-    
-    address public constant sUSDCe_ADDRESS = 0x9D39A5DE30e57443BfF2A8307A4256c8797A3497;
-    address public constant USDC_ADDRESS = 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
-    address public constant USDT_ADDRESS = 0xdAC17F958D2ee523a2206206994597C13D831ec7;
+
+    address public constant sUSDe_ADDRESS =
+        0x9D39A5DE30e57443BfF2A8307A4256c8797A3497;
+    address public constant USDC_ADDRESS =
+        0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
+    address public constant USDT_ADDRESS =
+        0xdAC17F958D2ee523a2206206994597C13D831ec7;
 
     constructor() {
         ADDRESS_THIS = address(this);
@@ -335,11 +340,8 @@ contract PayloadIGP15 {
 
     function propose(string memory description) external {
         require(
-            (
-                msg.sender == PROPOSER || 
-                msg.sender == TEAM_MULTISIG
-            ) || 
-            address(this) == PROPOSER_AVO_MULTISIG,
+            (msg.sender == PROPOSER || msg.sender == TEAM_MULTISIG) ||
+                address(this) == PROPOSER_AVO_MULTISIG,
             "msg.sender-not-allowed"
         );
 
@@ -400,7 +402,7 @@ contract PayloadIGP15 {
             memory params_ = new AdminModuleStructs.RateDataV2Params[](1);
 
         params_[0] = AdminModuleStructs.RateDataV2Params({
-            token: sUSDCe_ADDRESS, // sUSDe
+            token: sUSDe_ADDRESS, // sUSDe
             kink1: 50 * 1e2, // 50%
             kink2: 80 * 1e2, // 80%
             rateAtUtilizationZero: 0, // 0%
@@ -418,7 +420,7 @@ contract PayloadIGP15 {
             memory params_ = new AdminModuleStructs.TokenConfig[](1);
 
         params_[0] = AdminModuleStructs.TokenConfig({
-            token: sUSDCe_ADDRESS, // sUSDe
+            token: sUSDe_ADDRESS, // sUSDe
             threshold: 0.3 * 1e2, // 0.3
             fee: 10 * 1e2 // 10%
         });
@@ -438,9 +440,10 @@ contract PayloadIGP15 {
 
     /// @notice Action 5: Update market rates for USDC.
     function action5() internal {
-       AdminModuleStructs.RateDataV2Params[] memory params_ = new AdminModuleStructs.RateDataV2Params[](1);
+        AdminModuleStructs.RateDataV2Params[]
+            memory params_ = new AdminModuleStructs.RateDataV2Params[](1);
 
-       params_[0] = AdminModuleStructs.RateDataV2Params({
+        params_[0] = AdminModuleStructs.RateDataV2Params({
             token: USDC_ADDRESS, // USDC
             kink1: 80 * 1e2, // 80%
             kink2: 93 * 1e2, // 93%
@@ -448,16 +451,17 @@ contract PayloadIGP15 {
             rateAtUtilizationKink1: 12 * 1e2, // 12%
             rateAtUtilizationKink2: 18 * 1e2, // 18%
             rateAtUtilizationMax: 33.34 * 1e2 // 33.34%
-       });
+        });
 
-       LIQUIDITY.updateRateDataV2s(params_);
+        LIQUIDITY.updateRateDataV2s(params_);
     }
 
     /// @notice Action 6: Update market rates for USDT.
     function action6() internal {
-       AdminModuleStructs.RateDataV2Params[] memory params_ = new AdminModuleStructs.RateDataV2Params[](1);
+        AdminModuleStructs.RateDataV2Params[]
+            memory params_ = new AdminModuleStructs.RateDataV2Params[](1);
 
-       params_[0] = AdminModuleStructs.RateDataV2Params({
+        params_[0] = AdminModuleStructs.RateDataV2Params({
             token: USDT_ADDRESS, // USDT
             kink1: 80 * 1e2, // 80%
             kink2: 93 * 1e2, // 93%
@@ -465,33 +469,35 @@ contract PayloadIGP15 {
             rateAtUtilizationKink1: 12 * 1e2, // 12%
             rateAtUtilizationKink2: 18 * 1e2, // 18%
             rateAtUtilizationMax: 33.34 * 1e2 // 33.34%
-       });
+        });
 
-       LIQUIDITY.updateRateDataV2s(params_);
+        LIQUIDITY.updateRateDataV2s(params_);
     }
 
     /// @notice Action 7: Update rewards for fUSDT.
     function action7() internal {
-       IFTokenAdmin(F_USDT).updateRewards(0x6CC89782495A2162b2A4f5b206E2A06Dc8675090);
+        IFTokenAdmin(F_USDT).updateRewards(
+            0x6CC89782495A2162b2A4f5b206E2A06Dc8675090
+        );
     }
 
     /// @notice Action 8: Update rewards for fUSDC.
     function action8() internal {
-       IFTokenAdmin(F_USDC).updateRewards(0x6CC89782495A2162b2A4f5b206E2A06Dc8675090);
+        IFTokenAdmin(F_USDC).updateRewards(
+            0x6CC89782495A2162b2A4f5b206E2A06Dc8675090
+        );
     }
-
 
     /***********************************|
     |     Vault Deployment Helper       |
     |__________________________________*/
     function deploy_sUSDe_USDC_VAULT() internal {
-
         // Deploy sUSDe/USDC vault.
         address vault_ = VAULT_T1_FACTORY.deployVault(
             address(VAULT_T1_DEPLOYMENT_LOGIC),
             abi.encodeWithSelector(
                 IFluidVaultT1DeploymentLogic.vaultT1.selector,
-                sUSDCe_ADDRESS, // sUSDe,
+                sUSDe_ADDRESS, // sUSDe,
                 USDC_ADDRESS // USDC
             )
         );
@@ -499,11 +505,11 @@ contract PayloadIGP15 {
         // Set user supply config for the vault on Liquidity Layer.
         {
             AdminModuleStructs.UserSupplyConfig[]
-            memory configs_ = new AdminModuleStructs.UserSupplyConfig[](1);
+                memory configs_ = new AdminModuleStructs.UserSupplyConfig[](1);
 
             configs_[0] = AdminModuleStructs.UserSupplyConfig({
                 user: address(vault_),
-                token: sUSDCe_ADDRESS,
+                token: sUSDe_ADDRESS,
                 mode: 1,
                 expandPercent: 25 * 1e2,
                 expandDuration: 12 hours,
@@ -569,14 +575,13 @@ contract PayloadIGP15 {
         }
     }
 
-
     function deploy_sUSDe_USDT_VAULT() internal {
         // Deploy sUSDe/USDT vault.
         address vault_ = VAULT_T1_FACTORY.deployVault(
             address(VAULT_T1_DEPLOYMENT_LOGIC),
             abi.encodeWithSelector(
                 IFluidVaultT1DeploymentLogic.vaultT1.selector,
-                sUSDCe_ADDRESS, // sUSDe,
+                sUSDe_ADDRESS, // sUSDe,
                 USDT_ADDRESS // USDT
             )
         );
@@ -584,11 +589,11 @@ contract PayloadIGP15 {
         // Set user supply config for the vault on Liquidity Layer.
         {
             AdminModuleStructs.UserSupplyConfig[]
-            memory configs_ = new AdminModuleStructs.UserSupplyConfig[](1);
+                memory configs_ = new AdminModuleStructs.UserSupplyConfig[](1);
 
             configs_[0] = AdminModuleStructs.UserSupplyConfig({
                 user: address(vault_),
-                token: sUSDCe_ADDRESS,
+                token: sUSDe_ADDRESS,
                 mode: 1,
                 expandPercent: 25 * 1e2,
                 expandDuration: 12 hours,
