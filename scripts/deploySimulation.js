@@ -2,10 +2,10 @@ const hre = require("hardhat");
 const { ethers } = hre;
 
 async function main() {
-  const payload = await ethers.deployContract("PayloadIGP13", [])
+  const payload = await ethers.deployContract("PayloadIGP14", [])
   await payload.waitForDeployment()
 
-  console.log("PayloadIGP13: ", payload.target)
+  console.log("PayloadIGP14: ", payload.target)
   console.log()
 }
 
