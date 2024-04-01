@@ -384,7 +384,7 @@ contract PayloadIGP16 {
         // Action 2: Update ETH market rate curve and set fee as 0%.
         action2();
 
-        // Action 3: Make weETH/wstETH Vault borrow limit as dynamic
+        // Action 3: Add config handler on liquidity layer for weETH/wstETH vault to make borrow limit dynamic.
         action3();
 
         // Action 4: Update supply rate magnifier wstETH/USDC and wstETH/USDT vault.
@@ -470,22 +470,19 @@ contract PayloadIGP16 {
         }
     }
 
-    /// @notice Action 3: Make weETH/wstETH Vault borrow limit as dynamic
+    /// @notice Action 3: Add config handler on liquidity layer for weETH/wstETH vault to make borrow limit dynamic
     function action3() internal {
-        AdminModuleStructs.UserBorrowConfig[]
-            memory configs_ = new AdminModuleStructs.UserBorrowConfig[](1);
+        address VAULT_weETH_wstETH_CONFIG_HANDLER = address(0);
 
-        configs_[0] = AdminModuleStructs.UserBorrowConfig({
-            user: address(VAULT_weETH_wstETH),
-            token: wstETH_ADDRESS,
-            mode: 1,
-            expandPercent: 25 * 1e2, // 25%
-            expandDuration: 12 hours, // 12 hours
-            baseDebtCeiling: 4000 * 1e18, // 4000 wstETH
-            maxDebtCeiling: 15000 * 1e18 // 15_000 wstETH
+        AdminModuleStructs.AddressBool[]
+            memory configs_ = new AdminModuleStructs.AddressBool[](1);
+
+        configs_[0] = AdminModuleStructs.AddressBool({
+            addr: address(VAULT_weETH_wstETH_CONFIG_HANDLER),
+            value: true
         });
 
-        LIQUIDITY.updateUserBorrowConfigs(configs_);
+        LIQUIDITY.updateAuths(configs_);
     }
 
     /// @notice Action 4: Update supply rate magnifier wstETH/USDC and wstETH/USDT vault.
