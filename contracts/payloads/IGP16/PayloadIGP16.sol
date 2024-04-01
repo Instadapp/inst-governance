@@ -521,7 +521,7 @@ contract PayloadIGP16 {
         VAULT_T1_FACTORY.setVaultAuth(VAULT_ETH_USDC, 0x58Dc7894a7B1B9D065CE2e94a73f62686B439A2A, false); // Removing Rewards contracts as auth
 
         IFluidVaultT1(VAULT_ETH_USDT).updateSupplyRateMagnifier(100 * 1e2); // 1x supplyRateMagnifier
-        VAULT_T1_FACTORY.setVaultAuth(VAULT_ETH_USDC, 0xB36Db4dfF978D2d552a5149E2fd0FBefA2a32809, false); // Removing Rewards contracts as auth
+        VAULT_T1_FACTORY.setVaultAuth(VAULT_ETH_USDT, 0xB36Db4dfF978D2d552a5149E2fd0FBefA2a32809, false); // Removing Rewards contracts as auth
 
     }
 
