@@ -222,6 +222,22 @@ interface IFluidLiquidityAdmin {
         );
 }
 
+interface IFluidLendingFactory {
+    /// @notice creates token for `asset_` for a lending protocol with interest. Only callable by deployers.
+    /// @param  asset_              address of the asset
+    /// @param  fTokenType_         type of fToken:
+    /// - if it's the native token, it should use `NativeUnderlying`
+    /// - otherwise it should use `fToken`
+    /// - could be more types available, check `fTokenTypes()`
+    /// @param  isNativeUnderlying_ flag to signal fToken type that uses native underlying at Liquidity
+    /// @return token_              address of the created token
+    function createToken(
+        address asset_,
+        string calldata fTokenType_,
+        bool isNativeUnderlying_
+    ) external returns (address token_);
+}
+
 interface IFluidVaultT1Factory {
     function deployVault(
         address vaultDeploymentLogic_,
@@ -264,6 +280,11 @@ interface IFluidVaultT1 {
 
     /// @notice updates the collateral factor to `collateralFactor_`. Input in 1e2 (1% = 100, 100% = 10_000).
     function updateCollateralFactor(uint collateralFactor_) external;
+}
+
+interface IFluidLending {
+    /// @notice Updates the rebalancer address (ReserveContract). Only callable by LendingFactory auths.
+    function updateRebalancer(address rebalancer_) external;
 }
 
 interface IFTokenAdmin {
@@ -319,6 +340,8 @@ contract PayloadIGP16 {
         IFluidLiquidityAdmin(0x52Aa899454998Be5b000Ad077a46Bbe360F4e497);
     IFluidVaultT1Factory public constant VAULT_T1_FACTORY =
         IFluidVaultT1Factory(0x324c5Dc1fC42c7a4D43d92df1eBA58a54d13Bf2d);
+     IFluidLendingFactory public constant LENDING_FACTORY =
+        IFluidLendingFactory(0x54B91A0D94cb471F37f949c60F7Fa7935b551D03);
 
     address public constant USDC_ADDRESS =
         0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
@@ -502,9 +525,10 @@ contract PayloadIGP16 {
 
     }
 
-    /// @notice Action 6: Enabling wstETH token on lending protocol.
+    /// @notice Action 6: Deploy and enable wstETH token on lending protocol.
     function action6() internal {
-        address F_WSTETH = address(0);
+        // deploy fToken for wstETH
+        address F_WSTETH = LENDING_FACTORY.createToken(wstETH_ADDRESS, "fToken", false);
 
         // Set user supply config for the vault on Liquidity Layer.
         {
@@ -522,5 +546,8 @@ contract PayloadIGP16 {
 
             LIQUIDITY.updateUserSupplyConfigs(configs_);
         }
+
+        // set rebalancer at fToken to reserve contract proxy
+        IFluidLending(F_WSTETH).updateRebalancer(0x264786EF916af64a1DB19F513F24a3681734ce92);
     }
 }
