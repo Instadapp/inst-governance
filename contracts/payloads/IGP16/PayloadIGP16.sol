@@ -317,6 +317,8 @@ contract PayloadIGP16 {
 
     IFluidLiquidityAdmin public constant LIQUIDITY =
         IFluidLiquidityAdmin(0x52Aa899454998Be5b000Ad077a46Bbe360F4e497);
+    IFluidVaultT1Factory public constant VAULT_T1_FACTORY =
+        IFluidVaultT1Factory(0x324c5Dc1fC42c7a4D43d92df1eBA58a54d13Bf2d);
 
     address public constant USDC_ADDRESS =
         0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
@@ -332,6 +334,8 @@ contract PayloadIGP16 {
 
     address public constant VAULT_ETH_USDC = address(0xeAbBfca72F8a8bf14C4ac59e69ECB2eB69F0811C);
     address public constant VAULT_ETH_USDT = address(0xbEC491FeF7B4f666b270F9D5E5C3f443cBf20991);
+    address public constant VAULT_wstETH_USDC = address(0x51197586F6A9e2571868b6ffaef308f3bdfEd3aE);
+    address public constant VAULT_wstETH_USDT = address(0x1c2bB46f36561bc4F05A94BD50916496aa501078);
     address public constant VAULT_weETH_wstETH = address(0x40D9b8417E6E1DcD358f04E3328bCEd061018A82);
 
     
@@ -377,14 +381,20 @@ contract PayloadIGP16 {
         // Action 1: Update wstETH market rate curve and set fee as 10%
         action1();
 
-        // Action 2: Update ETH market rate curve.
+        // Action 2: Update ETH market rate curve and set fee as 0%.
         action2();
 
-        // Action 3: Update weETH/wstETH Vault borrow limit
+        // Action 3: Make weETH/wstETH Vault borrow limit as dynamic
         action3();
 
-        // Action 4: Pause ETH Rewards on ETH Vaults
+        // Action 4: Update supply rate magnifier wstETH/USDC and wstETH/USDT vault.
         action4();
+
+        // Action 5: Pauses ETH Rewards on ETH/USDC and ETH/USDT vaults.
+        action5();
+
+        // Action 6: Enabling wstETH token on lending protocol.
+        action6();
     }
 
     function verifyProposal() external view {}
@@ -426,25 +436,41 @@ contract PayloadIGP16 {
         }
     }
 
-    /// @notice Action 2: Update ETH market rate curve.
+    /// @notice Action 2: Update ETH market rate curve and set fee as 0%.
     function action2() internal {
-        AdminModuleStructs.RateDataV2Params[]
-            memory params_ = new AdminModuleStructs.RateDataV2Params[](1);
+        {
+            AdminModuleStructs.RateDataV2Params[]
+                memory params_ = new AdminModuleStructs.RateDataV2Params[](1);
 
-        params_[0] = AdminModuleStructs.RateDataV2Params({
-            token: ETH_ADDRESS, // ETH
-            kink1: 70 * 1e2, // 70%
-            kink2: 90 * 1e2, // 90%
-            rateAtUtilizationZero: 0, // 0%
-            rateAtUtilizationKink1: 15 * 1e2, // 15%
-            rateAtUtilizationKink2: 25 * 1e2, // 25%
-            rateAtUtilizationMax: 150 * 1e2 // 150%
-        });
+            params_[0] = AdminModuleStructs.RateDataV2Params({
+                token: ETH_ADDRESS, // ETH
+                kink1: 70 * 1e2, // 70%
+                kink2: 90 * 1e2, // 90%
+                rateAtUtilizationZero: 0, // 0%
+                rateAtUtilizationKink1: 15 * 1e2, // 15%
+                rateAtUtilizationKink2: 25 * 1e2, // 25%
+                rateAtUtilizationMax: 150 * 1e2 // 150%
+            });
 
-        LIQUIDITY.updateRateDataV2s(params_);
+            LIQUIDITY.updateRateDataV2s(params_);
+        }
+
+
+         {
+            AdminModuleStructs.TokenConfig[]
+                memory params_ = new AdminModuleStructs.TokenConfig[](1);
+
+            params_[0] = AdminModuleStructs.TokenConfig({
+                token: ETH_ADDRESS, // wstETH
+                threshold: 0.3 * 1e2, // 0.3
+                fee: 0 * 1e2 // 0%
+            });
+
+            LIQUIDITY.updateTokenConfigs(params_);
+        }
     }
 
-    /// @notice Action 3: Update weETH/wstETH Vault borrow limit
+    /// @notice Action 3: Make weETH/wstETH Vault borrow limit as dynamic
     function action3() internal {
         AdminModuleStructs.UserBorrowConfig[]
             memory configs_ = new AdminModuleStructs.UserBorrowConfig[](1);
@@ -462,8 +488,42 @@ contract PayloadIGP16 {
         LIQUIDITY.updateUserBorrowConfigs(configs_);
     }
 
-    /// @notice Action 4: Pause ETH Rewards on ETH Vaults
+    /// @notice Action 4: Update supply rate magnifier wstETH/USDC and wstETH/USDT vault.
     function action4() internal {
-        // TODO
+        IFluidVaultT1(VAULT_wstETH_USDC).updateSupplyRateMagnifier(80 * 1e2); // 0.8x supplyRateMagnifier
+        IFluidVaultT1(VAULT_wstETH_USDT).updateSupplyRateMagnifier(80 * 1e2); // 0.8x supplyRateMagnifier
+    }
+
+
+    /// @notice Action 5: Pauses ETH Rewards on ETH/USDC and ETH/USDT vaults.
+    function action5() internal {
+        IFluidVaultT1(VAULT_ETH_USDC).updateSupplyRateMagnifier(100 * 1e2); // 1x supplyRateMagnifier
+        VAULT_T1_FACTORY.setVaultAuth(VAULT_ETH_USDC, 0x58Dc7894a7B1B9D065CE2e94a73f62686B439A2A, false); // Removing Rewards contracts as auth
+
+        IFluidVaultT1(VAULT_ETH_USDT).updateSupplyRateMagnifier(100 * 1e2); // 1x supplyRateMagnifier
+        VAULT_T1_FACTORY.setVaultAuth(VAULT_ETH_USDC, 0xB36Db4dfF978D2d552a5149E2fd0FBefA2a32809, false); // Removing Rewards contracts as auth
+
+    }
+
+    /// @notice Action 6: Enabling wstETH token on lending protocol.
+    function action6() internal {
+        address F_WSTETH = address(0);
+
+        // Set user supply config for the vault on Liquidity Layer.
+        {
+            AdminModuleStructs.UserSupplyConfig[]
+                memory configs_ = new AdminModuleStructs.UserSupplyConfig[](1);
+
+            configs_[0] = AdminModuleStructs.UserSupplyConfig({
+                user: address(F_WSTETH),
+                token: wstETH_ADDRESS,
+                mode: 1,
+                expandPercent: 25 * 1e2, // 25%
+                expandDuration: 12 hours,
+                baseWithdrawalLimit: 4000 * 1e18 // 4000 wstETH
+            });
+
+            LIQUIDITY.updateUserSupplyConfigs(configs_);
+        }
     }
 }
