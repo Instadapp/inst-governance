@@ -412,9 +412,6 @@ contract PayloadIGP17 {
 
         // Action 2: Add new max borrow handler and remove old max borrow handler from liquidity layer for weETH/wstETH vault to make borrow limit dynamic.
         action2();
-
-        // Action 3: Increase max ratio for Spark to 90% & Aave to 92% on Lite.
-        action3();
     }
 
     function verifyProposal() external view {}
