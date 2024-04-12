@@ -451,7 +451,7 @@ contract PayloadIGP17 {
         LIQUIDITY.updateRateDataV2s(params_);
     }
 
-    /// @notice Action 3: Add new max borrow handler and remove old max borrow handler from liquidity layer for weETH/wstETH vault to make borrow limit dynamic.
+    /// @notice Action 2: Add new max borrow handler and remove old max borrow handler from liquidity layer for weETH/wstETH vault to make borrow limit dynamic.
     function action2() internal {
         address OLD_VAULT_weETH_wstETH_CONFIG_HANDLER = address(
             0x133098588cdF2e35B9478a1f4979C4f7Ccee3a06
@@ -474,20 +474,5 @@ contract PayloadIGP17 {
         });
 
         LIQUIDITY.updateAuths(configs_);
-    }
-
-    /// @notice Action 4: Increase max ratio for Spark to 90% & Aave to 92% on Lite.
-    function action3() internal {
-        uint8[] memory protocolIds_ = new uint8[](2);
-        uint256[] memory newRiskRatios_ = new uint256[](2);
-
-        protocolIds_[0] = 7; // Protocol Id of Spark: 7
-        newRiskRatios_[0] = 90 * 1e4; // 90% or 90 * 1e4
-
-        protocolIds_[1] = 2; // Protocol Id of Aave v3: 2
-        newRiskRatios_[1] = 92 * 1e4; // 92% or 92 * 1e4
-
-        // Update max risk ratios
-        LITE.updateMaxRiskRatio(protocolIds_, newRiskRatios_);
     }
 }
