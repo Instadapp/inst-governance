@@ -407,17 +407,14 @@ contract PayloadIGP17 {
     function execute() external {
         require(address(this) == address(TIMELOCK), "not-valid-caller");
 
-        // Action 1: Update USDC market rate curve.
+        // Action 1: Update USDC & USDT market rate curve.
         action1();
 
-        // Action 2: Update USDT market rate curve.
+        // Action 2: Add new max borrow handler and remove old max borrow handler from liquidity layer for weETH/wstETH vault to make borrow limit dynamic.
         action2();
 
-        // Action 3: Add new max borrow handler and remove old max borrow handler from liquidity layer for weETH/wstETH vault to make borrow limit dynamic.
+        // Action 3: Increase max ratio for Spark to 90% & Aave to 92% on Lite.
         action3();
-
-        // Action 4: Increase max ratio for Spark to 90% & Aave to 92% on Lite.
-        action4();
     }
 
     function verifyProposal() external view {}
@@ -426,10 +423,10 @@ contract PayloadIGP17 {
     |     Proposal Payload Actions      |
     |__________________________________*/
 
-    /// @notice Action 1: Update USDC market rate curve.
+    /// @notice Action 1: Update USDC & USDT market rate curve.
     function action1() internal {
         AdminModuleStructs.RateDataV2Params[]
-            memory params_ = new AdminModuleStructs.RateDataV2Params[](1);
+            memory params_ = new AdminModuleStructs.RateDataV2Params[](2);
 
         params_[0] = AdminModuleStructs.RateDataV2Params({
             token: USDC_ADDRESS, // USDC
@@ -441,16 +438,8 @@ contract PayloadIGP17 {
             rateAtUtilizationMax: 33.34 * 1e2 // 33.34%
         });
 
-        LIQUIDITY.updateRateDataV2s(params_);
-    }
-
-    /// @notice Action 2: Update USDT market rate curve.
-    function action2() internal {
-        AdminModuleStructs.RateDataV2Params[]
-            memory params_ = new AdminModuleStructs.RateDataV2Params[](1);
-
-        params_[0] = AdminModuleStructs.RateDataV2Params({
-            token: USDC_ADDRESS, // USDC
+        params_[1] = AdminModuleStructs.RateDataV2Params({
+            token: USDT_ADDRESS, // USDT
             kink1: 80 * 1e2, // 80%
             kink2: 93 * 1e2, // 93%
             rateAtUtilizationZero: 0, // 0%
@@ -463,9 +452,13 @@ contract PayloadIGP17 {
     }
 
     /// @notice Action 3: Add new max borrow handler and remove old max borrow handler from liquidity layer for weETH/wstETH vault to make borrow limit dynamic.
-    function action3() internal {
-        address OLD_VAULT_weETH_wstETH_CONFIG_HANDLER = address(0x133098588cdF2e35B9478a1f4979C4f7Ccee3a06);
-        address NEW_VAULT_weETH_wstETH_CONFIG_HANDLER = address(0x383683D4414Fc27CC9669b7Cc6c7067716814b6a);
+    function action2() internal {
+        address OLD_VAULT_weETH_wstETH_CONFIG_HANDLER = address(
+            0x133098588cdF2e35B9478a1f4979C4f7Ccee3a06
+        );
+        address NEW_VAULT_weETH_wstETH_CONFIG_HANDLER = address(
+            0x383683D4414Fc27CC9669b7Cc6c7067716814b6a
+        );
 
         AdminModuleStructs.AddressBool[]
             memory configs_ = new AdminModuleStructs.AddressBool[](2);
@@ -484,7 +477,7 @@ contract PayloadIGP17 {
     }
 
     /// @notice Action 4: Increase max ratio for Spark to 90% & Aave to 92% on Lite.
-    function action4() internal {
+    function action3() internal {
         uint8[] memory protocolIds_ = new uint8[](2);
         uint256[] memory newRiskRatios_ = new uint256[](2);
 
