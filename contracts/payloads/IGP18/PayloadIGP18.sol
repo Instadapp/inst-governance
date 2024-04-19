@@ -357,13 +357,13 @@ contract PayloadIGP18 {
 
     /// @notice Action 1: Update weETH/wstETH vault parameters.
     function action1() internal {
-        // Update collateral factor from 90.5% to 93%.
-        IFluidVaultT1(VAULT_weETH_wstETH).updateCollateralFactor(93 * 1e2); // 93% or 93 * 1e2
+        // Update max liquidation limit from 95% to 96%.
+        IFluidVaultT1(VAULT_weETH_wstETH).updateLiquidationMaxLimit(96 * 1e2); // 96% or 96 * 1e2
 
         // Update liquidation threshold from 93% to 95%.
         IFluidVaultT1(VAULT_weETH_wstETH).updateLiquidationThreshold(95 * 1e2); // 95% or 95 * 1e2
 
-        // Update max liquidation limit from 95% to 96%.
-        IFluidVaultT1(VAULT_weETH_wstETH).updateLiquidationMaxLimit(96 * 1e2); // 96% or 96 * 1e2
+        // Update collateral factor from 90.5% to 93%.
+        IFluidVaultT1(VAULT_weETH_wstETH).updateCollateralFactor(93 * 1e2); // 93% or 93 * 1e2
     }
 }
