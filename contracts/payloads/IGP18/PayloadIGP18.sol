@@ -242,8 +242,37 @@ interface IFluidLiquidityAdmin {
         );
 }
 
-interface IFluidLiquidityWeETHTransferModule {
-    function depositZircuit() external;
+interface IFluidVaultT1 {
+    /// @notice updates the Vault oracle to `newOracle_`. Must implement the FluidOracle interface.
+    function updateOracle(address newOracle_) external;
+
+    /// @notice updates the all Vault core settings according to input params.
+    /// All input values are expected in 1e2 (1% = 100, 100% = 10_000).
+    function updateCoreSettings(
+        uint256 supplyRateMagnifier_,
+        uint256 borrowRateMagnifier_,
+        uint256 collateralFactor_,
+        uint256 liquidationThreshold_,
+        uint256 liquidationMaxLimit_,
+        uint256 withdrawGap_,
+        uint256 liquidationPenalty_,
+        uint256 borrowFee_
+    ) external;
+
+    /// @notice updates the allowed rebalancer to `newRebalancer_`.
+    function updateRebalancer(address newRebalancer_) external;
+
+    /// @notice updates the supply rate magnifier to `supplyRateMagnifier_`. Input in 1e2 (1% = 100, 100% = 10_000).
+    function updateSupplyRateMagnifier(uint supplyRateMagnifier_) external;
+
+    /// @notice updates the collateral factor to `collateralFactor_`. Input in 1e2 (1% = 100, 100% = 10_000).
+    function updateCollateralFactor(uint collateralFactor_) external;
+
+    /// @notice updates the liquidation threshold to `liquidationThreshold_`. Input in 1e2 (1% = 100, 100% = 10_000).
+    function updateLiquidationThreshold(uint liquidationThreshold_) external;
+
+    /// @notice updates the liquidation max limit to `liquidationMaxLimit_`. Input in 1e2 (1% = 100, 100% = 10_000).
+    function updateLiquidationMaxLimit(uint liquidationMaxLimit_) external;
 }
 
 contract PayloadIGP18 {
@@ -267,6 +296,8 @@ contract PayloadIGP18 {
 
     IFluidLiquidityAdmin public constant LIQUIDITY =
         IFluidLiquidityAdmin(0x52Aa899454998Be5b000Ad077a46Bbe360F4e497);
+        
+    address public constant VAULT_weETH_wstETH = address(0x40D9b8417E6E1DcD358f04E3328bCEd061018A82);
 
     constructor() {
         ADDRESS_THIS = address(this);
@@ -306,17 +337,8 @@ contract PayloadIGP18 {
     function execute() external {
         require(address(this) == address(TIMELOCK), "not-valid-caller");
 
-        // Action 1: Remove old UserModule from Liquidity infiniteProxy.
+        // Action 1: Update weETH/wstETH vault parameters.
         action1();
-
-        // Action 2:Add new UserModule to Liquidity infiniteProxy.
-        action2();
-
-        // Action 3: Add new WeETHTransferModule to Liquidity infiniteProxy.
-        action3();
-
-        // Action 4: call WeETHTransferModule depositZircuit() on Liquidity
-        action4();
     }
 
     function verifyProposal() external view {}
@@ -325,39 +347,15 @@ contract PayloadIGP18 {
     |     Proposal Payload Actions      |
     |__________________________________*/
 
-    /// @notice Action 1: Remove old UserModule from Liquidity infiniteProxy.
+    /// @notice Action 1: Update weETH/wstETH vault parameters.
     function action1() internal {
-       IProxy(address(LIQUIDITY)).removeImplementation(0xfB45BC79e01b4e92706412A54e011db251104C74);
-    }
+        // Update collateral factor from 90.5% to 93%.
+        IFluidVaultT1(VAULT_weETH_wstETH).updateCollateralFactor(93 * 1e2); // 93% or 93 * 1e2
 
-    /// @notice Action 2: Add new UserModule to Liquidity infiniteProxy.
-    function action2() internal {
-        bytes4[] memory sigs_ = new bytes4[](1);
+        // Update collateral factor from 93% to 95%.
+        IFluidVaultT1(VAULT_weETH_wstETH).updateLiquidationThreshold(53 * 1e2); // 95% or 95 * 1e2
 
-        sigs_[0] = 
-            bytes4(keccak256("operate(address,int256,int256,address,address,bytes)"));
-
-        IProxy(address(LIQUIDITY)).addImplementation(
-            0x968738c127f91b560bD614487F859999D5D02d9c,
-            sigs_
-        );
-    }
-
-    /// @notice Action 3: Add new WeETHTransferModule to Liquidity infiniteProxy 
-    function action3() internal {
-        bytes4[] memory sigs_ = new bytes4[](2);
-
-        sigs_[0] = bytes4(keccak256("depositZircuit()"));
-        sigs_[1] = bytes4(keccak256("withdrawZircuit()"));
-
-        IProxy(address(LIQUIDITY)).addImplementation(
-            0xaD99E8416f505aCE0A087C5dAB7214F15aE3D1d1,
-            sigs_
-        );
-    }
-
-    /// @notice Action 4: call WeETHTransferModule depositZircuit() on Liquidity
-    function action4() internal {
-        IFluidLiquidityWeETHTransferModule(address(LIQUIDITY)).depositZircuit();
+        // Update collateral factor from 95% to 96%.
+        IFluidVaultT1(VAULT_weETH_wstETH).updateLiquidationMaxLimit(96 * 1e2); // 96% or 96 * 1e2
     }
 }
