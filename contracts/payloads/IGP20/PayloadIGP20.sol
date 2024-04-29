@@ -414,14 +414,13 @@ contract PayloadIGP20 {
             AdminModuleStructs.UserSupplyConfig[]
                 memory configs_ = new AdminModuleStructs.UserSupplyConfig[](1);
 
-            // TODO
             configs_[0] = AdminModuleStructs.UserSupplyConfig({
                 user: address(vault_),
                 token: WEETH_ADDRESS,
                 mode: 1,
                 expandPercent: 25 * 1e2, // 25%
                 expandDuration: 12 hours,
-                baseWithdrawalLimit: 7_500_000 * 1e18 // 7.5M
+                baseWithdrawalLimit: 2_500 * 1e18 // 2_500 weETH
             });
 
             LIQUIDITY.updateUserSupplyConfigs(configs_);
@@ -462,23 +461,14 @@ contract PayloadIGP20 {
         // Update oracle on weETH/USDC vault.
         {
             IFluidVaultT1(vault_).updateOracle(
-                0x7779EC4694752A118580cc8ad28B9A11F7e3bB12 /// TODO
+                0x67e40d401286f21e92adbf8DB2D392a1af735A95
             );
         }
 
         // Update rebalancer on weETH/USDC vault.
         {
             IFluidVaultT1(vault_).updateRebalancer(
-                0x264786EF916af64a1DB19F513F24a3681734ce92 // TODO
-            );
-        }
-
-        // Set Config hander as auth on vault factory for weETH/USDC vault.
-        {
-            VAULT_T1_FACTORY.setVaultAuth(
-                vault_,
-                0x36639DAd77eC858574aaF07a68bBa62b7db19FfA, // TODO
-                true
+                0x264786EF916af64a1DB19F513F24a3681734ce92
             );
         }
     }
@@ -505,7 +495,7 @@ contract PayloadIGP20 {
                 mode: 1,
                 expandPercent: 25 * 1e2, // 25%
                 expandDuration: 12 hours,
-                baseWithdrawalLimit: 7_500_000 * 1e18 // 7.5M
+                baseWithdrawalLimit: 2_500 * 1e18 // 2_500 weETH
             });
 
             LIQUIDITY.updateUserSupplyConfigs(configs_);
@@ -546,7 +536,7 @@ contract PayloadIGP20 {
         // Update oracle on weETH/USDT vault.
         {
             IFluidVaultT1(vault_).updateOracle(
-                0x7779EC4694752A118580cc8ad28B9A11F7e3bB12
+                0x64D9cd2B6a63100d8305ca8e3b46E26d5a38951f
             );
         }
 
@@ -554,15 +544,6 @@ contract PayloadIGP20 {
         {
             IFluidVaultT1(vault_).updateRebalancer(
                 0x264786EF916af64a1DB19F513F24a3681734ce92
-            );
-        }
-
-        // Set Config hander as auth on vault factory for weETH/USDT vault.
-        {
-            VAULT_T1_FACTORY.setVaultAuth(
-                vault_,
-                0xafE3974f4916140a093F1de7Fc064A3Da220DD41,
-                true
             );
         }
     }
