@@ -324,9 +324,6 @@ contract PayloadIGP20 {
             0x15f6F562Ae136240AB9F4905cb50aCA54bCbEb5F
         );
 
-    address public constant F_USDT = 0x5C20B550819128074FD538Edf79791733ccEdd18;
-    address public constant F_USDC = 0x9Fb7b4477576Fe5B32be4C1843aFB1e55F251B33;
-
     address public constant WEETH_ADDRESS =
         0xCd5fE23C85820F7B72D0926FC9b05b43E359b7ee;
     address public constant USDC_ADDRESS =
@@ -461,7 +458,7 @@ contract PayloadIGP20 {
         // Update oracle on weETH/USDC vault.
         {
             IFluidVaultT1(vault_).updateOracle(
-                0x67e40d401286f21e92adbf8DB2D392a1af735A95
+                0xA9271615297eF2b471f6d87617b0452773d7651C
             );
         }
 
