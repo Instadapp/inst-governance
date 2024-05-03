@@ -309,7 +309,7 @@ contract PayloadIGP21 {
             kink2: 90 * 1e2, // 90%
             rateAtUtilizationZero: 0, // 0%
             rateAtUtilizationKink1: 15 * 1e2, // 15%
-            rateAtUtilizationKink2: 25 * 1e2, // 25%
+            rateAtUtilizationKink2: 20 * 1e2, // 20%
             rateAtUtilizationMax: 150 * 1e2 // 150%
         });
 
