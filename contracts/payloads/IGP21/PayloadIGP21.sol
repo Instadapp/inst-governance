@@ -232,6 +232,9 @@ contract PayloadIGP21 {
     address public constant PROPOSER_AVO_MULTISIG =
         0x059A94A72951c0ae1cc1CE3BF0dB52421bbE8210;
 
+    address public constant PROPOSER_AVO_MULTISIG_2 =
+        0x9efdE135CA4832AbF0408c44c6f5f370eB0f35e8;
+
     IGovernorBravo public constant GOVERNOR =
         IGovernorBravo(0x0204Cd037B2ec03605CFdFe482D8e257C765fA1B);
     ITimelock public immutable TIMELOCK =
@@ -258,7 +261,8 @@ contract PayloadIGP21 {
         require(
             msg.sender == PROPOSER ||
                 msg.sender == TEAM_MULTISIG ||
-                address(this) == PROPOSER_AVO_MULTISIG,
+                address(this) == PROPOSER_AVO_MULTISIG ||
+                address(this) == PROPOSER_AVO_MULTISIG_2,
             "msg.sender-not-allowed"
         );
 
