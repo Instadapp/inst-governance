@@ -365,9 +365,9 @@ contract PayloadIGP22 {
             kink1: 70 * 1e2, // 70%
             kink2: 90 * 1e2, // 90%
             rateAtUtilizationZero: 0, // 0%
-            rateAtUtilizationKink1: 18 * 1e2, // 18%
-            rateAtUtilizationKink2: 26 * 1e2, // 26%
-            rateAtUtilizationMax: 150 * 1e2 // 150%
+            rateAtUtilizationKink1: 17 * 1e2, // 17%
+            rateAtUtilizationKink2: 14 * 1e2, // 14%
+            rateAtUtilizationMax: 100 * 1e2 // 100%
         });
 
         LIQUIDITY.updateRateDataV2s(params_);
