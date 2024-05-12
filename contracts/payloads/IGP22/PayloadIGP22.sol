@@ -242,11 +242,7 @@ interface IFluidLiquidityAdmin {
         );
 }
 
-interface IFluidLiquidityWeETHTransferModule {
-    function depositZircuit() external;
-}
-
-contract PayloadIGP19 {
+contract PayloadIGP22 {
     uint256 public constant PROPOSAL_ID = 22;
 
     address public constant PROPOSER =
@@ -317,6 +313,7 @@ contract PayloadIGP19 {
         action1();
 
         // Action 2: Update AdminModule from Liquidity infiniteProxy.
+        action2();
 
         // Action 3: Update wstETH market rate curve.
         action3();
