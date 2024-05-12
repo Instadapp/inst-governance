@@ -362,7 +362,7 @@ contract PayloadIGP22 {
 
         params_[0] = AdminModuleStructs.RateDataV2Params({
             token: wstETH_ADDRESS, // wstETH
-            kink1: 70 * 1e2, // 70%
+            kink1: 50 * 1e2, // 50%
             kink2: 90 * 1e2, // 90%
             rateAtUtilizationZero: 0, // 0%
             rateAtUtilizationKink1: 17 * 1e2, // 17%
