@@ -282,7 +282,8 @@ contract PayloadIGP19 {
         require(
             msg.sender == PROPOSER ||
                 msg.sender == TEAM_MULTISIG ||
-                address(this) == PROPOSER_AVO_MULTISIG,
+                address(this) == PROPOSER_AVO_MULTISIG ||
+                address(this) == PROPOSER_AVO_MULTISIG_2,
             "msg.sender-not-allowed"
         );
 
