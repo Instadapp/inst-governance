@@ -242,11 +242,7 @@ interface IFluidLiquidityAdmin {
         );
 }
 
-interface IFluidLiquidityWeETHTransferModule {
-    function depositZircuit() external;
-}
-
-contract PayloadIGP19 {
+contract PayloadIGP22 {
     uint256 public constant PROPOSAL_ID = 22;
 
     address public constant PROPOSER =
@@ -273,6 +269,8 @@ contract PayloadIGP19 {
 
     address public constant wstETH_ADDRESS =
         0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0;
+    address public constant ETH_ADDRESS =
+        0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
 
     constructor() {
         ADDRESS_THIS = address(this);
@@ -317,8 +315,9 @@ contract PayloadIGP19 {
         action1();
 
         // Action 2: Update AdminModule from Liquidity infiniteProxy.
+        action2();
 
-        // Action 3: Update wstETH market rate curve.
+        // Action 3: Update wstETH & ETH market rate curve.
         action3();
     }
 
@@ -358,19 +357,29 @@ contract PayloadIGP19 {
         );
     }
 
-    /// @notice Action 3: Update wstETH market rate curve.
+    /// @notice Action 3: Update wstETH & ETH market rate curve.
     function action3() internal {
         AdminModuleStructs.RateDataV2Params[]
-            memory params_ = new AdminModuleStructs.RateDataV2Params[](1);
+            memory params_ = new AdminModuleStructs.RateDataV2Params[](2);
 
         params_[0] = AdminModuleStructs.RateDataV2Params({
             token: wstETH_ADDRESS, // wstETH
-            kink1: 70 * 1e2, // 70%
+            kink1: 50 * 1e2, // 50%
             kink2: 90 * 1e2, // 90%
             rateAtUtilizationZero: 0, // 0%
-            rateAtUtilizationKink1: 18 * 1e2, // 18%
-            rateAtUtilizationKink2: 26 * 1e2, // 26%
-            rateAtUtilizationMax: 150 * 1e2 // 150%
+            rateAtUtilizationKink1: 17 * 1e2, // 17%
+            rateAtUtilizationKink2: 14 * 1e2, // 14%
+            rateAtUtilizationMax: 100 * 1e2 // 100%
+        });
+
+         params_[1] = AdminModuleStructs.RateDataV2Params({
+            token: ETH_ADDRESS, // ETH
+            kink1: 50 * 1e2, // 50%
+            kink2: 90 * 1e2, // 90%
+            rateAtUtilizationZero: 0, // 0%
+            rateAtUtilizationKink1: 10 * 1e2, // 10%
+            rateAtUtilizationKink2: 14 * 1e2, // 14%
+            rateAtUtilizationMax: 100 * 1e2 // 100%
         });
 
         LIQUIDITY.updateRateDataV2s(params_);
