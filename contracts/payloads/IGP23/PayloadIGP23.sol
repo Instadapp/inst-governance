@@ -286,7 +286,7 @@ interface IFTokenAdmin {
 }
 
 
-contract PayloadIGP19 {
+contract PayloadIGP23 {
     uint256 public constant PROPOSAL_ID = 23;
 
     address public constant PROPOSER =
