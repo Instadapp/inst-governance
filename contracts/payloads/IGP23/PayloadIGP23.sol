@@ -378,7 +378,7 @@ contract PayloadIGP23 {
         // Spell 1: Transfer stETH
         {   
             address STETH_ADDRESS = 0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84;
-            uint256 STETH_AMOUNT = 100 * 1e18; // 100 stETH
+            uint256 STETH_AMOUNT = 300 * 1e18; // 300 stETH
             targets[0] = "BASIC-A";
             encodedSpells[0] = abi.encodeWithSignature(withdrawSignature, STETH_ADDRESS, STETH_AMOUNT, TEAM_MULTISIG, 0, 0);
         }
