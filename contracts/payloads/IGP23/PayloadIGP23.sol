@@ -369,7 +369,7 @@ contract PayloadIGP23 {
     |__________________________________*/
 
      /// @notice Action 1: call cast() - transfer rewards to Team Multisig from treasury.
-    function action1() public view returns(address target, uint256 value, string memory signature, bytes memory calldatas) {
+    function action1() internal {
         string[] memory targets = new string[](2);
         bytes[] memory encodedSpells = new bytes[](2);
 
@@ -391,10 +391,7 @@ contract PayloadIGP23 {
             encodedSpells[1] = abi.encodeWithSignature(withdrawSignature, INST_ADDRESS, INST_AMOUNT, TEAM_MULTISIG, 0, 0);
         }
 
-        target = address(TREASURY);
-        value = 0;
-        signature = "cast(string[],bytes[],address)";
-        calldatas = abi.encode(targets, encodedSpells, address(this));
+        IDSAV2(TREASURY).cast(targets, encodedSpells, address(this));
     }
 
     /// @notice Action 2: Update rewards for fUSDC & fUSDT.
