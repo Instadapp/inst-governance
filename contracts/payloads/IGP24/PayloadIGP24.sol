@@ -432,20 +432,22 @@ contract PayloadIGP24 {
         tokens[2] = wstETH_ADDRESS;
 
         // VAULT_WSTETH_USDC
-        protocols[3] = VAULT_WSTETH_USDC;
-        tokens[3] = wstETH_ADDRESS;
+        {
+            protocols[3] = VAULT_WSTETH_USDC;
+            tokens[3] = wstETH_ADDRESS;
 
-        // VAULT_WSTETH_USDC
-        protocols[4] = VAULT_WSTETH_USDC;
-        tokens[4] = USDC_ADDRESS;
-
-        // VAULT_WSTETH_USDT
-        protocols[5] = VAULT_WSTETH_USDT;
-        tokens[5] = wstETH_ADDRESS;
+            protocols[4] = VAULT_WSTETH_USDC;
+            tokens[4] = USDC_ADDRESS;
+        }
 
         // VAULT_WSTETH_USDT
-        protocols[6] = VAULT_WSTETH_USDT;
-        tokens[6] = USDT_ADDRESS;
+        {
+            protocols[5] = VAULT_WSTETH_USDT;
+            tokens[5] = wstETH_ADDRESS;
+
+            protocols[6] = VAULT_WSTETH_USDT;
+            tokens[6] = USDT_ADDRESS;
+        }
 
         FLUID_RESERVE.revoke(protocols, tokens);
     }
