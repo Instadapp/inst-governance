@@ -121,7 +121,10 @@ interface IProxy {
 
     function setDummyImplementation(address newDummyImplementation_) external;
 
-    function addImplementation(address implementation_, bytes4[] calldata sigs_) external;
+    function addImplementation(
+        address implementation_,
+        bytes4[] calldata sigs_
+    ) external;
 
     function removeImplementation(address implementation_) external;
 
@@ -129,11 +132,15 @@ interface IProxy {
 
     function getDummyImplementation() external view returns (address);
 
-    function getImplementationSigs(address impl_) external view returns (bytes4[] memory);
+    function getImplementationSigs(
+        address impl_
+    ) external view returns (bytes4[] memory);
 
     function getSigsImplementation(bytes4 sig_) external view returns (address);
 
-    function readFromStorage(bytes32 slot_) external view returns (uint256 result_);
+    function readFromStorage(
+        bytes32 slot_
+    ) external view returns (uint256 result_);
 }
 
 interface IFluidLiquidityAdmin {
@@ -257,9 +264,16 @@ interface IFluidReserveContract {
 
     function updateRebalancer(address rebalancer_, bool isRebalancer_) external;
 
-    function approve(address[] memory protocols_, address[] memory tokens_, uint256[] memory amounts_) external;
+    function approve(
+        address[] memory protocols_,
+        address[] memory tokens_,
+        uint256[] memory amounts_
+    ) external;
 
-    function revoke(address[] memory protocols_, address[] memory tokens_) external;
+    function revoke(
+        address[] memory protocols_,
+        address[] memory tokens_
+    ) external;
 }
 
 interface IFluidVaultT1 {
@@ -286,7 +300,6 @@ interface IFluidVaultT1 {
     function updateBorrowRateMagnifier(uint borrowRateMagnifier_) external;
 }
 
-
 contract PayloadIGP24 {
     uint256 public constant PROPOSAL_ID = 24;
 
@@ -295,7 +308,7 @@ contract PayloadIGP24 {
 
     address public constant PROPOSER_AVO_MULTISIG =
         0x059A94A72951c0ae1cc1CE3BF0dB52421bbE8210;
-    
+
     address public constant PROPOSER_AVO_MULTISIG_2 =
         0x9efdE135CA4832AbF0408c44c6f5f370eB0f35e8;
 
@@ -312,7 +325,8 @@ contract PayloadIGP24 {
     IFluidLiquidityAdmin public constant LIQUIDITY =
         IFluidLiquidityAdmin(0x52Aa899454998Be5b000Ad077a46Bbe360F4e497);
 
-    IFluidReserveContract public constant FLUID_RESERVE = IFluidReserveContract(0x264786EF916af64a1DB19F513F24a3681734ce92);
+    IFluidReserveContract public constant FLUID_RESERVE =
+        IFluidReserveContract(0x264786EF916af64a1DB19F513F24a3681734ce92);
 
     address public constant F_USDT = 0x5C20B550819128074FD538Edf79791733ccEdd18;
     address public constant F_USDC = 0x9Fb7b4477576Fe5B32be4C1843aFB1e55F251B33;
@@ -326,11 +340,11 @@ contract PayloadIGP24 {
 
     address public constant sUSDe_ADDRESS =
         0x9D39A5DE30e57443BfF2A8307A4256c8797A3497;
-    address public constant USDC_ADDRESS = 
+    address public constant USDC_ADDRESS =
         0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
-    address public constant USDT_ADDRESS = 
+    address public constant USDT_ADDRESS =
         0xdAC17F958D2ee523a2206206994597C13D831ec7;
-    
+
     constructor() {
         ADDRESS_THIS = address(this);
     }
@@ -398,12 +412,12 @@ contract PayloadIGP24 {
         // fUSDC
         protocols[0] = F_USDC;
         tokens[0] = USDC_ADDRESS;
-        amounts[0] = 315_000 * 1e6; // 315k USDC
+        amounts[0] = 320_000 * 1e6; // 320k USDC
 
         // fUSDT
         protocols[1] = F_USDT;
         tokens[1] = USDT_ADDRESS;
-        amounts[1] = 315_000 * 1e6; // 315k USDT
+        amounts[1] = 320_000 * 1e6; // 320k USDT
 
         FLUID_RESERVE.approve(protocols, tokens, amounts);
     }
@@ -422,7 +436,7 @@ contract PayloadIGP24 {
         // OLD_VAULT_ETH_USDC
         protocols[0] = OLD_VAULT_ETH_USDC;
         tokens[0] = USDC_ADDRESS;
-        
+
         // OLD_VAULT_ETH_USDT
         protocols[1] = OLD_VAULT_ETH_USDT;
         tokens[1] = USDT_ADDRESS;
@@ -541,7 +555,11 @@ contract PayloadIGP24 {
     |          Vault Helper             |
     |__________________________________*/
 
-    function closeVault(address vault, address supplyToken, address borrowToken) internal {
+    function closeVault(
+        address vault,
+        address supplyToken,
+        address borrowToken
+    ) internal {
         // Set user supply config for the vault on Liquidity Layer.
         {
             AdminModuleStructs.UserSupplyConfig[]
@@ -553,7 +571,9 @@ contract PayloadIGP24 {
                 mode: 1,
                 expandPercent: 0,
                 expandDuration: 1,
-                baseWithdrawalLimit: supplyToken == wstETH_ADDRESS ? 2 * 1e18 : 10 * 1e18 // 2 wstETH or 10 ETH
+                baseWithdrawalLimit: supplyToken == wstETH_ADDRESS
+                    ? 2 * 1e18
+                    : 10 * 1e18 // 2 wstETH or 10 ETH
             });
 
             LIQUIDITY.updateUserSupplyConfigs(configs_);
