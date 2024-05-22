@@ -428,7 +428,7 @@ contract PayloadIGP24 {
                 mode: 1,
                 expandPercent: 0,
                 expandDuration: 1,
-                baseWithdrawalLimit: supplyToken == wstETH_ADDRESS ? 2 * 1e18 : 10 * 1e18
+                baseWithdrawalLimit: supplyToken == wstETH_ADDRESS ? 2 * 1e18 : 10 * 1e18 // 2 wstETH or 10 ETH
             });
 
             LIQUIDITY.updateUserSupplyConfigs(configs_);
