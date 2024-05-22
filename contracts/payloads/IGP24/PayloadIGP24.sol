@@ -413,39 +413,39 @@ contract PayloadIGP24 {
         address[] memory protocols = new address[](7);
         address[] memory tokens = new address[](7);
 
-        address OLD_ETH_USDC = 0x5eA9A2B42Bc9aC8CAC76E19F0Fcd5C1b06950807;
-        address OLD_ETH_USDT = 0xE53794f2ed0839F24170079A9F3c5368147F6c81;
-        address OLD_WSTETH_ETH = 0x28680f14C4Bb86B71119BC6e90E4e6D87E6D1f51;
-        address OLD_WSTETH_USDC = 0x460143a489729a3cA32DeA82fa48ea61175accbc;
-        address OLD_WSTETH_USDT = 0x2B251211f5Ff0A753A8d5B9411d736875174f375;
+        address OLD_VAULT_ETH_USDC = 0x5eA9A2B42Bc9aC8CAC76E19F0Fcd5C1b06950807;
+        address OLD_VAULT_ETH_USDT = 0xE53794f2ed0839F24170079A9F3c5368147F6c81;
+        address OLD_VAULT_WSTETH_ETH = 0x28680f14C4Bb86B71119BC6e90E4e6D87E6D1f51;
+        address OLD_VAULT_WSTETH_USDC = 0x460143a489729a3cA32DeA82fa48ea61175accbc;
+        address OLD_VAULT_WSTETH_USDT = 0x2B251211f5Ff0A753A8d5B9411d736875174f375;
 
-        // OLD_ETH_USDC
-        protocols[0] = OLD_ETH_USDC;
+        // OLD_VAULT_ETH_USDC
+        protocols[0] = OLD_VAULT_ETH_USDC;
         tokens[0] = USDC_ADDRESS;
         
-        // OLD_ETH_USDT
-        protocols[1] = OLD_ETH_USDT;
+        // OLD_VAULT_ETH_USDT
+        protocols[1] = OLD_VAULT_ETH_USDT;
         tokens[1] = USDT_ADDRESS;
 
-        // OLD_WSTETH_ETH
-        protocols[2] = OLD_WSTETH_ETH;
+        // OLD_VAULT_WSTETH_ETH
+        protocols[2] = OLD_VAULT_WSTETH_ETH;
         tokens[2] = wstETH_ADDRESS;
 
-        // OLD_WSTETH_USDC
+        // OLD_VAULT_WSTETH_USDC
         {
-            protocols[3] = OLD_WSTETH_USDC;
+            protocols[3] = OLD_VAULT_WSTETH_USDC;
             tokens[3] = wstETH_ADDRESS;
 
-            protocols[4] = OLD_WSTETH_USDC;
+            protocols[4] = OLD_VAULT_WSTETH_USDC;
             tokens[4] = USDC_ADDRESS;
         }
 
-        // OLD_WSTETH_USDT
+        // OLD_VAULT_WSTETH_USDT
         {
-            protocols[5] = OLD_WSTETH_USDT;
+            protocols[5] = OLD_VAULT_WSTETH_USDT;
             tokens[5] = wstETH_ADDRESS;
 
-            protocols[6] = OLD_WSTETH_USDT;
+            protocols[6] = OLD_VAULT_WSTETH_USDT;
             tokens[6] = USDT_ADDRESS;
         }
 
