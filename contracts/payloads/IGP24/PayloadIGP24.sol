@@ -405,18 +405,18 @@ contract PayloadIGP24 {
         address VAULT_WSTETH_USDC = 0x460143a489729a3cA32DeA82fa48ea61175accbc;
         address VAULT_WSTETH_USDT = 0x2B251211f5Ff0A753A8d5B9411d736875174f375;
 
-        closeOldVault(VAULT_ETH_USDC, ETH_ADDRESS, USDC_ADDRESS);
-        closeOldVault(VAULT_ETH_USDT, ETH_ADDRESS, USDT_ADDRESS);
-        closeOldVault(VAULT_WSTETH_ETH, wstETH_ADDRESS, ETH_ADDRESS);
-        closeOldVault(VAULT_WSTETH_USDC, wstETH_ADDRESS, USDC_ADDRESS);
-        closeOldVault(VAULT_WSTETH_USDT, wstETH_ADDRESS, USDT_ADDRESS);
+        closeVault(VAULT_ETH_USDC, ETH_ADDRESS, USDC_ADDRESS);
+        closeVault(VAULT_ETH_USDT, ETH_ADDRESS, USDT_ADDRESS);
+        closeVault(VAULT_WSTETH_ETH, wstETH_ADDRESS, ETH_ADDRESS);
+        closeVault(VAULT_WSTETH_USDC, wstETH_ADDRESS, USDC_ADDRESS);
+        closeVault(VAULT_WSTETH_USDT, wstETH_ADDRESS, USDT_ADDRESS);
     }
 
     /***********************************|
     |          Vault Helper             |
     |__________________________________*/
 
-    function closeOldVault(address vault, address supplyToken, address borrowToken) internal {
+    function closeVault(address vault, address supplyToken, address borrowToken) internal {
         // Set user supply config for the vault on Liquidity Layer.
         {
             AdminModuleStructs.UserSupplyConfig[]
