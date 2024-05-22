@@ -262,6 +262,30 @@ interface IFluidReserveContract {
     function revoke(address[] memory protocols_, address[] memory tokens_) external;
 }
 
+interface IFluidVaultT1 {
+    /// @notice updates the Vault oracle to `newOracle_`. Must implement the FluidOracle interface.
+    function updateOracle(address newOracle_) external;
+
+    /// @notice updates the all Vault core settings according to input params.
+    /// All input values are expected in 1e2 (1% = 100, 100% = 10_000).
+    function updateCoreSettings(
+        uint256 supplyRateMagnifier_,
+        uint256 borrowRateMagnifier_,
+        uint256 collateralFactor_,
+        uint256 liquidationThreshold_,
+        uint256 liquidationMaxLimit_,
+        uint256 withdrawGap_,
+        uint256 liquidationPenalty_,
+        uint256 borrowFee_
+    ) external;
+
+    /// @notice updates the supply rate magnifier to `supplyRateMagnifier_`. Input in 1e2 (1% = 100, 100% = 10_000).
+    function updateSupplyRateMagnifier(uint supplyRateMagnifier_) external;
+
+    /// @notice updates the borrow rate magnifier to `borrowRateMagnifier_`. Input in 1e2 (1% = 100, 100% = 10_000).
+    function updateBorrowRateMagnifier(uint borrowRateMagnifier_) external;
+}
+
 
 contract PayloadIGP24 {
     uint256 public constant PROPOSAL_ID = 24;
@@ -293,8 +317,12 @@ contract PayloadIGP24 {
     address public constant F_USDT = 0x5C20B550819128074FD538Edf79791733ccEdd18;
     address public constant F_USDC = 0x9Fb7b4477576Fe5B32be4C1843aFB1e55F251B33;
 
-    address public constant USDC = 0xdAC17F958D2ee523a2206206994597C13D831ec7;
-    address public constant USDT = 0xdAC17F958D2ee523a2206206994597C13D831ec7;
+    address public constant ETH_ADDRESS =
+        0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
+    address public constant wstETH_ADDRESS =
+        0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0;
+    address public constant USDC_ADDRESS = 0xdAC17F958D2ee523a2206206994597C13D831ec7;
+    address public constant USDT_ADDRESS = 0xdAC17F958D2ee523a2206206994597C13D831ec7;
     
     constructor() {
         ADDRESS_THIS = address(this);
@@ -337,6 +365,9 @@ contract PayloadIGP24 {
 
         // Action 1: Approve fUSDC and fUSDT protocols to spend the reserves tokens.
         action1();
+
+        // Action 2: closure of old vaults
+        action2();
     }
 
     function verifyProposal() external view {}
@@ -353,14 +384,76 @@ contract PayloadIGP24 {
 
         // fUSDC
         protocols[0] = F_USDC;
-        protocols[0] = USDC;
+        protocols[0] = USDC_ADDRESS;
         amounts[0] = 165_000 * 1e6; // 165k USDC
 
         // fUSDT
         protocols[1] = F_USDT;
-        protocols[1] = USDT;
+        protocols[1] = USDT_ADDRESS;
         amounts[1] = 165_000 * 1e6; // 165k USDT
 
         FLUID_RESERVE.approve(protocols, tokens, amounts);
+    }
+
+    /// @notice Action 2: closure of old vaults
+    function action2() internal {
+        address VAULT_ETH_USDC = 0x5eA9A2B42Bc9aC8CAC76E19F0Fcd5C1b06950807;
+        address VAULT_ETH_USDT = 0xE53794f2ed0839F24170079A9F3c5368147F6c81;
+        address VAULT_WSTETH_ETH = 0x28680f14C4Bb86B71119BC6e90E4e6D87E6D1f51;
+        address VAULT_WSTETH_USDC = 0x460143a489729a3cA32DeA82fa48ea61175accbc;
+        address VAULT_WSTETH_USDT = 0x2B251211f5Ff0A753A8d5B9411d736875174f375;
+
+        closeOldVault(VAULT_ETH_USDC, ETH_ADDRESS, USDC_ADDRESS);
+        closeOldVault(VAULT_ETH_USDT, ETH_ADDRESS, USDT_ADDRESS);
+        closeOldVault(VAULT_WSTETH_ETH, wstETH_ADDRESS, ETH_ADDRESS);
+        closeOldVault(VAULT_WSTETH_USDC, wstETH_ADDRESS, USDC_ADDRESS);
+        closeOldVault(VAULT_WSTETH_USDT, wstETH_ADDRESS, USDT_ADDRESS);
+    }
+
+    /***********************************|
+    |          Vault Helper             |
+    |__________________________________*/
+
+    function closeOldVault(address vault, address supplyToken, address borrowToken) internal {
+        // Set user supply config for the vault on Liquidity Layer.
+        {
+            AdminModuleStructs.UserSupplyConfig[]
+                memory configs_ = new AdminModuleStructs.UserSupplyConfig[](1);
+
+            configs_[0] = AdminModuleStructs.UserSupplyConfig({
+                user: address(vault),
+                token: supplyToken,
+                mode: 1,
+                expandPercent: 0,
+                expandDuration: 1,
+                baseWithdrawalLimit: supplyToken == wstETH_ADDRESS ? 2 * 1e18 : 10 * 1e18
+            });
+
+            LIQUIDITY.updateUserSupplyConfigs(configs_);
+        }
+
+        // Set user borrow config for the vault on Liquidity Layer.
+        {
+            AdminModuleStructs.UserBorrowConfig[]
+                memory configs_ = new AdminModuleStructs.UserBorrowConfig[](1);
+
+            configs_[0] = AdminModuleStructs.UserBorrowConfig({
+                user: address(supplyToken),
+                token: borrowToken,
+                mode: 1,
+                expandPercent: 0,
+                expandDuration: 1,
+                baseDebtCeiling: 10 * 1e6,
+                maxDebtCeiling: 100 * 1e6
+            });
+
+            LIQUIDITY.updateUserBorrowConfigs(configs_);
+        }
+
+        // Update supply and borrow rate magnifier
+        {
+            IFluidVaultT1(vault).updateSupplyRateMagnifier(0); // 0x
+            IFluidVaultT1(vault).updateBorrowRateMagnifier(200 * 1e2); // 2x
+        }
     }
 }
