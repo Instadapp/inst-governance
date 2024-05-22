@@ -321,8 +321,10 @@ contract PayloadIGP24 {
         0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
     address public constant wstETH_ADDRESS =
         0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0;
-    address public constant USDC_ADDRESS = 0xdAC17F958D2ee523a2206206994597C13D831ec7;
-    address public constant USDT_ADDRESS = 0xdAC17F958D2ee523a2206206994597C13D831ec7;
+    address public constant USDC_ADDRESS = 
+        0xdAC17F958D2ee523a2206206994597C13D831ec7;
+    address public constant USDT_ADDRESS = 
+        0xdAC17F958D2ee523a2206206994597C13D831ec7;
     
     constructor() {
         ADDRESS_THIS = address(this);
