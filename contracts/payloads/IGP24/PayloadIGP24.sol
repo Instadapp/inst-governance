@@ -398,12 +398,12 @@ contract PayloadIGP24 {
         // fUSDC
         protocols[0] = F_USDC;
         tokens[0] = USDC_ADDRESS;
-        amounts[0] = 165_000 * 1e6; // 165k USDC
+        amounts[0] = 315_000 * 1e6; // 315k USDC
 
         // fUSDT
         protocols[1] = F_USDT;
         tokens[1] = USDT_ADDRESS;
-        amounts[1] = 165_000 * 1e6; // 165k USDT
+        amounts[1] = 315_000 * 1e6; // 315k USDT
 
         FLUID_RESERVE.approve(protocols, tokens, amounts);
     }
