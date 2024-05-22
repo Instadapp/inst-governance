@@ -321,6 +321,11 @@ contract PayloadIGP24 {
         0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
     address public constant wstETH_ADDRESS =
         0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0;
+    address public constant weETH_ADDRESS =
+        0xCd5fE23C85820F7B72D0926FC9b05b43E359b7ee;
+
+    address public constant sUSDe_ADDRESS =
+        0x9D39A5DE30e57443BfF2A8307A4256c8797A3497;
     address public constant USDC_ADDRESS = 
         0xdAC17F958D2ee523a2206206994597C13D831ec7;
     address public constant USDT_ADDRESS = 
@@ -368,8 +373,14 @@ contract PayloadIGP24 {
         // Action 1: Approve fUSDC and fUSDT protocols to spend the reserves tokens.
         action1();
 
-        // Action 2: closure of old vaults
+        // Action 2: Revoke protocols to spend the reserves tokens
         action2();
+
+        // Action 3: Approve new protocols to spend the reserves dust tokens
+        action3();
+
+        // Action 4: closure of old vaults
+        action4();
     }
 
     function verifyProposal() external view {}
@@ -386,19 +397,131 @@ contract PayloadIGP24 {
 
         // fUSDC
         protocols[0] = F_USDC;
-        protocols[0] = USDC_ADDRESS;
+        tokens[0] = USDC_ADDRESS;
         amounts[0] = 165_000 * 1e6; // 165k USDC
 
         // fUSDT
         protocols[1] = F_USDT;
-        protocols[1] = USDT_ADDRESS;
+        tokens[1] = USDT_ADDRESS;
         amounts[1] = 165_000 * 1e6; // 165k USDT
 
         FLUID_RESERVE.approve(protocols, tokens, amounts);
     }
 
-    /// @notice Action 2: closure of old vaults
+    /// @notice Action 2: Revoke old protocols to spend the reserves tokens
     function action2() internal {
+        address[] memory protocols = new address[](7);
+        address[] memory tokens = new address[](7);
+
+        address VAULT_ETH_USDC = 0x5eA9A2B42Bc9aC8CAC76E19F0Fcd5C1b06950807;
+        address VAULT_ETH_USDT = 0xE53794f2ed0839F24170079A9F3c5368147F6c81;
+        address VAULT_WSTETH_ETH = 0x28680f14C4Bb86B71119BC6e90E4e6D87E6D1f51;
+        address VAULT_WSTETH_USDC = 0x460143a489729a3cA32DeA82fa48ea61175accbc;
+        address VAULT_WSTETH_USDT = 0x2B251211f5Ff0A753A8d5B9411d736875174f375;
+
+        // VAULT_ETH_USDC
+        protocols[0] = VAULT_ETH_USDC;
+        tokens[0] = USDC_ADDRESS;
+        
+        // VAULT_ETH_USDT
+        protocols[1] = VAULT_ETH_USDT;
+        tokens[1] = USDT_ADDRESS;
+
+        // VAULT_WSTETH_ETH
+        protocols[2] = VAULT_WSTETH_ETH;
+        tokens[2] = wstETH_ADDRESS;
+
+        // VAULT_WSTETH_USDC
+        protocols[3] = VAULT_WSTETH_USDC;
+        tokens[3] = wstETH_ADDRESS;
+
+        // VAULT_WSTETH_USDC
+        protocols[4] = VAULT_WSTETH_USDC;
+        tokens[4] = USDC_ADDRESS;
+
+        // VAULT_WSTETH_USDT
+        protocols[5] = VAULT_WSTETH_USDT;
+        tokens[5] = wstETH_ADDRESS;
+
+        // VAULT_WSTETH_USDT
+        protocols[6] = VAULT_WSTETH_USDT;
+        tokens[6] = USDT_ADDRESS;
+
+        FLUID_RESERVE.revoke(protocols, tokens);
+    }
+
+    /// @notice Action 3: Approve new protocols to spend the reserves dust tokens
+    function action3() internal {
+        address[] memory protocols = new address[](10);
+        address[] memory tokens = new address[](10);
+        uint256[] memory amounts = new uint256[](10);
+
+        address VAULT_weETH_wstETH = 0x40D9b8417E6E1DcD358f04E3328bCEd061018A82;
+        address VAULT_sUSDe_USDC = 0x4045720a33193b4Fe66c94DFbc8D37B0b4D9B469;
+        address VAULT_sUSDe_USDT = 0xBFADEA65591235f38809076e14803Ac84AcF3F97;
+        address VAULT_weETH_USDC = 0xf55B8e9F0c51Ace009f4b41d03321675d4C643b3;
+        address VAULT_weETH_USDT = 0xdF16AdaF80584b2723F3BA1Eb7a601338Ba18c4e;
+
+        // VAULT_weETH_wstETH
+        {
+            protocols[0] = VAULT_weETH_wstETH;
+            tokens[0] = weETH_ADDRESS;
+            amounts[0] = 0.03 * 1e18;
+
+            protocols[1] = VAULT_weETH_wstETH;
+            tokens[1] = wstETH_ADDRESS;
+            amounts[1] = 0.03 * 1e18;
+        }
+
+        // VAULT_sUSDe_USDC
+        {
+            protocols[2] = VAULT_sUSDe_USDC;
+            tokens[2] = sUSDe_ADDRESS;
+            amounts[2] = 100 * 1e18;
+
+            protocols[3] = VAULT_sUSDe_USDC;
+            tokens[3] = USDC_ADDRESS;
+            amounts[3] = 100 * 1e6;
+        }
+
+        // VAULT_sUSDe_USDT
+        {
+            protocols[4] = VAULT_sUSDe_USDT;
+            tokens[4] = sUSDe_ADDRESS;
+            amounts[4] = 100 * 1e18;
+
+            protocols[5] = VAULT_sUSDe_USDT;
+            tokens[5] = USDT_ADDRESS;
+            amounts[5] = 100 * 1e6;
+        }
+
+        // VAULT_weETH_USDC
+        {
+            protocols[6] = VAULT_weETH_USDC;
+            tokens[6] = weETH_ADDRESS;
+            amounts[6] = 0.03 * 1e18;
+
+            protocols[7] = VAULT_weETH_USDC;
+            tokens[7] = USDC_ADDRESS;
+            amounts[7] = 100 * 1e6;
+        }
+
+        // VAULT_weETH_USDT
+        {
+            protocols[8] = VAULT_weETH_USDT;
+            tokens[8] = weETH_ADDRESS;
+            amounts[8] = 0.03 * 1e18;
+
+            protocols[9] = VAULT_weETH_USDT;
+            tokens[9] = USDT_ADDRESS;
+            amounts[9] = 100 * 1e6;
+        }
+
+        FLUID_RESERVE.revoke(protocols, tokens);
+    }
+
+    /// @notice Action 4: closure of old vaults
+    function action4() internal {
         address VAULT_ETH_USDC = 0x5eA9A2B42Bc9aC8CAC76E19F0Fcd5C1b06950807;
         address VAULT_ETH_USDT = 0xE53794f2ed0839F24170079A9F3c5368147F6c81;
         address VAULT_WSTETH_ETH = 0x28680f14C4Bb86B71119BC6e90E4e6D87E6D1f51;
