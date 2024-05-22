@@ -576,11 +576,5 @@ contract PayloadIGP24 {
 
             LIQUIDITY.updateUserBorrowConfigs(configs_);
         }
-
-        // Update supply and borrow rate magnifier
-        {
-            IFluidVaultT1(vault).updateSupplyRateMagnifier(0); // 0x
-            IFluidVaultT1(vault).updateBorrowRateMagnifier(200 * 1e2); // 2x
-        }
     }
 }
