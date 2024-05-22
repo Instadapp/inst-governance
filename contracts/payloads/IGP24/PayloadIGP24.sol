@@ -570,8 +570,8 @@ contract PayloadIGP24 {
                 mode: 1,
                 expandPercent: 0,
                 expandDuration: 1,
-                baseDebtCeiling: 10 * 1e6,
-                maxDebtCeiling: 100 * 1e6
+                baseDebtCeiling: 10,
+                maxDebtCeiling: 100
             });
 
             LIQUIDITY.updateUserBorrowConfigs(configs_);
