@@ -440,7 +440,7 @@ contract PayloadIGP24 {
                 memory configs_ = new AdminModuleStructs.UserBorrowConfig[](1);
 
             configs_[0] = AdminModuleStructs.UserBorrowConfig({
-                user: address(supplyToken),
+                user: vault,
                 token: borrowToken,
                 mode: 1,
                 expandPercent: 0,
