@@ -330,6 +330,7 @@ contract PayloadIGP24 {
 
     address public constant F_USDT = 0x5C20B550819128074FD538Edf79791733ccEdd18;
     address public constant F_USDC = 0x9Fb7b4477576Fe5B32be4C1843aFB1e55F251B33;
+    address public constant F_WSTETH = 0x2411802D8BEA09be0aF8fD8D08314a63e706b29C;
 
     address public constant ETH_ADDRESS =
         0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
@@ -468,9 +469,9 @@ contract PayloadIGP24 {
 
     /// @notice Action 3: Approve new protocols to spend the reserves dust tokens
     function action3() internal {
-        address[] memory protocols = new address[](10);
-        address[] memory tokens = new address[](10);
-        uint256[] memory amounts = new uint256[](10);
+        address[] memory protocols = new address[](11);
+        address[] memory tokens = new address[](11);
+        uint256[] memory amounts = new uint256[](11);
 
         address VAULT_weETH_wstETH = 0x40D9b8417E6E1DcD358f04E3328bCEd061018A82;
         address VAULT_sUSDe_USDC = 0x4045720a33193b4Fe66c94DFbc8D37B0b4D9B469;
@@ -531,6 +532,13 @@ contract PayloadIGP24 {
             protocols[9] = VAULT_weETH_USDT;
             tokens[9] = USDT_ADDRESS;
             amounts[9] = 100 * 1e6;
+        }
+
+        // F_WSTETH
+        {
+            protocols[10] = F_WSTETH;
+            tokens[10] = wstETH_ADDRESS;
+            amounts[10] = 0.03 * 1e18;
         }
 
         FLUID_RESERVE.approve(protocols, tokens, amounts);
