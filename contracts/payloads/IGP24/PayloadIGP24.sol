@@ -330,7 +330,8 @@ contract PayloadIGP24 {
 
     address public constant F_USDT = 0x5C20B550819128074FD538Edf79791733ccEdd18;
     address public constant F_USDC = 0x9Fb7b4477576Fe5B32be4C1843aFB1e55F251B33;
-    address public constant F_WSTETH = 0x2411802D8BEA09be0aF8fD8D08314a63e706b29C;
+    address public constant F_WSTETH =
+        0x2411802D8BEA09be0aF8fD8D08314a63e706b29C;
 
     address public constant ETH_ADDRESS =
         0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
@@ -419,7 +420,6 @@ contract PayloadIGP24 {
         protocols[1] = F_USDT;
         tokens[1] = USDT_ADDRESS;
         amounts[1] = 320_000 * 1e6; // 320k USDT
-
 
         // fWSTETH
         protocols[2] = F_WSTETH;
