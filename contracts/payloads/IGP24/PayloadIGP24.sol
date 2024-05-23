@@ -533,7 +533,7 @@ contract PayloadIGP24 {
             amounts[9] = 100 * 1e6;
         }
 
-        FLUID_RESERVE.revoke(protocols, tokens);
+        FLUID_RESERVE.approve(protocols, tokens, amounts);
     }
 
     /// @notice Action 4: closure of old vaults
