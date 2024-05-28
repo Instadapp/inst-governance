@@ -250,57 +250,6 @@ interface IFluidLiquidityAdmin {
         );
 }
 
-interface IFluidReserveContract {
-    function isRebalancer(address user) external returns (bool);
-
-    function rebalanceFToken(address protocol_) external;
-
-    function rebalanceVault(address protocol_) external;
-
-    function transferFunds(address token_) external;
-
-    function getProtocolTokens(address protocol_) external;
-
-    function updateAuth(address auth_, bool isAuth_) external;
-
-    function updateRebalancer(address rebalancer_, bool isRebalancer_) external;
-
-    function approve(
-        address[] memory protocols_,
-        address[] memory tokens_,
-        uint256[] memory amounts_
-    ) external;
-
-    function revoke(
-        address[] memory protocols_,
-        address[] memory tokens_
-    ) external;
-}
-
-interface IFluidVaultT1 {
-    /// @notice updates the Vault oracle to `newOracle_`. Must implement the FluidOracle interface.
-    function updateOracle(address newOracle_) external;
-
-    /// @notice updates the all Vault core settings according to input params.
-    /// All input values are expected in 1e2 (1% = 100, 100% = 10_000).
-    function updateCoreSettings(
-        uint256 supplyRateMagnifier_,
-        uint256 borrowRateMagnifier_,
-        uint256 collateralFactor_,
-        uint256 liquidationThreshold_,
-        uint256 liquidationMaxLimit_,
-        uint256 withdrawGap_,
-        uint256 liquidationPenalty_,
-        uint256 borrowFee_
-    ) external;
-
-    /// @notice updates the supply rate magnifier to `supplyRateMagnifier_`. Input in 1e2 (1% = 100, 100% = 10_000).
-    function updateSupplyRateMagnifier(uint supplyRateMagnifier_) external;
-
-    /// @notice updates the borrow rate magnifier to `borrowRateMagnifier_`. Input in 1e2 (1% = 100, 100% = 10_000).
-    function updateBorrowRateMagnifier(uint borrowRateMagnifier_) external;
-}
-
 interface IFluidVaultT1Factory {
     /// @notice                         Deploys a new vault using the specified deployment logic `vaultDeploymentLogic_` and data `vaultDeploymentData_`.
     ///                                 Only accounts with deployer access or the owner can deploy a new vault.
