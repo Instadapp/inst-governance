@@ -415,6 +415,20 @@ contract PayloadIGP25 {
         });
 
         LIQUIDITY.updateTokenConfigs(tokenConfigs_);
+
+        AdminModuleStructs.UserBorrowConfig[] memory configs_ = new AdminModuleStructs.UserBorrowConfig[](1);
+
+        configs_[0] = AdminModuleStructs.UserBorrowConfig({
+            user: 0x40D9b8417E6E1DcD358f04E3328bCEd061018A82, // weETH / wstETH vault,
+            token: wstETH_ADDRESS, // wstETH 
+            mode: 1, // same as before: with interest
+            expandPercent: 25 * 1e2, // same as before. 25%
+            expandDuration: 12 hours, // same as before. 12h
+            baseDebtCeiling: 4000 * 1e18, // same as before. 4000 wstETH
+            maxDebtCeiling: 85_000 * 1e18 // updated as max cap is now handled w.r.t. to utilization 85% automatically. ~400M USD worth of wsteth, considering that this is set in raw with a borrow exchange price of ~1.043
+        });
+
+        LIQUIDITY.updateUserBorrowConfigs(configs_);
     }
 
     /// @notice Action 5: Remove max borrow handler for wstETH and add new buffer rate handler
