@@ -340,10 +340,10 @@ contract PayloadIGP25 {
     function execute() external {
         require(address(this) == address(TIMELOCK), "not-valid-caller");
 
-        // Action 1: Update UserModule from Liquidity infiniteProxy.
+        // Action 1: Update UserModule on Liquidity infiniteProxy.
         action1();
 
-        // Action 2: Update UserModule from Liquidity infiniteProxy.
+        // Action 2: Update AdminModule on Liquidity infiniteProxy.
         action2();
 
         // Action 3: Update dummyImplementation of Liquidity infiniteProxy.
@@ -365,27 +365,26 @@ contract PayloadIGP25 {
     |     Proposal Payload Actions      |
     |__________________________________*/
 
-    /// @notice Action 1: Update UserModule from Liquidity infiniteProxy.
+    /// @notice Action 1: Update UserModule on Liquidity infiniteProxy.
     function action1() internal {
         address oldImplementation_ = 0x4Fc6D37FE897D6a7FfF0093D3B8418194ce1B1Bb;
         address newImplementation_ = 0xb290b44D34C4a44E233af73998C543832c418120;
 
-        bytes4[] memory sigs_ = IProxy(address(LIQUIDITY)).getImplementationSigs(oldImplementation_);
+        bytes4[] memory sigs_ = IProxy(address(LIQUIDITY))
+            .getImplementationSigs(oldImplementation_);
 
         IProxy(address(LIQUIDITY)).removeImplementation(oldImplementation_);
 
-        IProxy(address(LIQUIDITY)).addImplementation(
-            newImplementation_,
-            sigs_
-        );
+        IProxy(address(LIQUIDITY)).addImplementation(newImplementation_, sigs_);
     }
 
-    /// @notice Action 2: Update UserModule from Liquidity infiniteProxy.
+    /// @notice Action 2: Update AdminModule on Liquidity infiniteProxy.
     function action2() internal {
         address oldImplementation_ = 0xF191F36385FFeefda54fB564cE374AAA86E2D08b;
         address newImplementation_ = 0xBDF3e6A0c721117B69150D00D9Fb27873023E4Df;
 
-        bytes4[] memory sigs_ = IProxy(address(LIQUIDITY)).getImplementationSigs(oldImplementation_);
+        bytes4[] memory sigs_ = IProxy(address(LIQUIDITY))
+            .getImplementationSigs(oldImplementation_);
 
         for (uint i = 0; i < sigs_.length; i++) {
             if (sigs_[i] == 0x38b7e8e7) sigs_[i] = 0x7f7b6002;
@@ -393,21 +392,20 @@ contract PayloadIGP25 {
 
         IProxy(address(LIQUIDITY)).removeImplementation(oldImplementation_);
 
-        IProxy(address(LIQUIDITY)).addImplementation(
-            newImplementation_,
-            sigs_
-        );
+        IProxy(address(LIQUIDITY)).addImplementation(newImplementation_, sigs_);
     }
 
     /// @notice Action 3: Update dummyImplementation of Liquidity infiniteProxy.
     function action3() internal {
-        IProxy(address(LIQUIDITY)).setDummyImplementation(0x102a42aa1F6BEA5c9eC200B95AFbf928ae4b855b);
+        IProxy(address(LIQUIDITY)).setDummyImplementation(
+            0x102a42aa1F6BEA5c9eC200B95AFbf928ae4b855b
+        );
     }
-
 
     /// @notice Action 4: Set max utilization to 85% for wstETH.
     function action4() internal {
-        AdminModuleStructs.TokenConfig[] memory tokenConfigs_ = new AdminModuleStructs.TokenConfig[](1);
+        AdminModuleStructs.TokenConfig[]
+            memory tokenConfigs_ = new AdminModuleStructs.TokenConfig[](1);
 
         tokenConfigs_[0] = AdminModuleStructs.TokenConfig({
             token: wstETH_ADDRESS,
@@ -421,11 +419,11 @@ contract PayloadIGP25 {
 
     /// @notice Action 5: Remove max borrow handler for wstETH and add new buffer rate handler
     function action5() internal {
-        AdminModuleStructs.AddressBool[] memory configs_ = new AdminModuleStructs.AddressBool[](2);
+        AdminModuleStructs.AddressBool[]
+            memory configs_ = new AdminModuleStructs.AddressBool[](2);
 
         // Remove max borrow handler for wstETH.
         {
-
             configs_[0] = AdminModuleStructs.AddressBool({
                 addr: 0x383683D4414Fc27CC9669b7Cc6c7067716814b6a,
                 value: false
@@ -434,7 +432,6 @@ contract PayloadIGP25 {
 
         // Add new buffer rate handler
         {
-
             configs_[1] = AdminModuleStructs.AddressBool({
                 addr: 0xDF10FE6163c1bfB99d7179e1bFC2e0Bb6128704f,
                 value: true
