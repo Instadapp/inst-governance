@@ -502,8 +502,8 @@ contract PayloadIGP25 {
 
     /// @notice Action 7: Update supply rate magnifier wstETH/USDC and wstETH/USDT vault.
     function action7() internal {
-        IFluidVaultT1(VAULT_wstETH_USDC).updateSupplyRateMagnifier(80 * 1e2); // 0.8x supplyRateMagnifier
-        IFluidVaultT1(VAULT_wstETH_USDT).updateSupplyRateMagnifier(80 * 1e2); // 0.8x supplyRateMagnifier
+        IFluidVaultT1(VAULT_wstETH_USDC).updateSupplyRateMagnifier(100 * 1e2); // 1x supplyRateMagnifier
+        IFluidVaultT1(VAULT_wstETH_USDT).updateSupplyRateMagnifier(100 * 1e2); // 1x supplyRateMagnifier
     }
 
 }
