@@ -271,6 +271,34 @@ interface IFluidVaultT1Factory {
     ) external;
 }
 
+
+interface IFluidVaultT1 {
+    /// @notice updates the Vault oracle to `newOracle_`. Must implement the FluidOracle interface.
+    function updateOracle(address newOracle_) external;
+
+    /// @notice updates the all Vault core settings according to input params.
+    /// All input values are expected in 1e2 (1% = 100, 100% = 10_000).
+    function updateCoreSettings(
+        uint256 supplyRateMagnifier_,
+        uint256 borrowRateMagnifier_,
+        uint256 collateralFactor_,
+        uint256 liquidationThreshold_,
+        uint256 liquidationMaxLimit_,
+        uint256 withdrawGap_,
+        uint256 liquidationPenalty_,
+        uint256 borrowFee_
+    ) external;
+
+    /// @notice updates the allowed rebalancer to `newRebalancer_`.
+    function updateRebalancer(address newRebalancer_) external;
+
+    /// @notice updates the supply rate magnifier to `supplyRateMagnifier_`. Input in 1e2 (1% = 100, 100% = 10_000).
+    function updateSupplyRateMagnifier(uint supplyRateMagnifier_) external;
+
+    /// @notice updates the collateral factor to `collateralFactor_`. Input in 1e2 (1% = 100, 100% = 10_000).
+    function updateCollateralFactor(uint collateralFactor_) external;
+}
+
 contract PayloadIGP25 {
     uint256 public constant PROPOSAL_ID = 25;
 
@@ -297,6 +325,10 @@ contract PayloadIGP25 {
         IFluidLiquidityAdmin(0x52Aa899454998Be5b000Ad077a46Bbe360F4e497);
     IFluidVaultT1Factory public constant VAULT_T1_FACTORY =
         IFluidVaultT1Factory(0x324c5Dc1fC42c7a4D43d92df1eBA58a54d13Bf2d);
+
+    address public constant VAULT_wstETH_USDC = address(0x51197586F6A9e2571868b6ffaef308f3bdfEd3aE);
+    address public constant VAULT_wstETH_USDT = address(0x1c2bB46f36561bc4F05A94BD50916496aa501078);
+    address public constant VAULT_weETH_wstETH = address(0x40D9b8417E6E1DcD358f04E3328bCEd061018A82);
 
     address public constant wstETH_ADDRESS =
         0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0;
@@ -357,6 +389,9 @@ contract PayloadIGP25 {
 
         // Action 6: Update vault deployment logic on vaultT1 factory.
         action6();
+
+        // Action 7: Update supply rate magnifier wstETH/USDC and wstETH/USDT vault.
+        action7();
     }
 
     function verifyProposal() external view {}
@@ -419,7 +454,7 @@ contract PayloadIGP25 {
         AdminModuleStructs.UserBorrowConfig[] memory configs_ = new AdminModuleStructs.UserBorrowConfig[](1);
 
         configs_[0] = AdminModuleStructs.UserBorrowConfig({
-            user: 0x40D9b8417E6E1DcD358f04E3328bCEd061018A82, // weETH / wstETH vault,
+            user: VAULT_weETH_wstETH, // weETH / wstETH vault,
             token: wstETH_ADDRESS, // wstETH 
             mode: 1, // same as before: with interest
             expandPercent: 25 * 1e2, // same as before. 25%
@@ -464,4 +499,11 @@ contract PayloadIGP25 {
 
         VAULT_T1_FACTORY.setVaultDeploymentLogic(newImplementation_, true);
     }
+
+    /// @notice Action 7: Update supply rate magnifier wstETH/USDC and wstETH/USDT vault.
+    function action7() internal {
+        IFluidVaultT1(VAULT_wstETH_USDC).updateSupplyRateMagnifier(80 * 1e2); // 0.8x supplyRateMagnifier
+        IFluidVaultT1(VAULT_wstETH_USDT).updateSupplyRateMagnifier(80 * 1e2); // 0.8x supplyRateMagnifier
+    }
+
 }
