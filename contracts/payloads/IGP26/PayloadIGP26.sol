@@ -528,7 +528,7 @@ contract PayloadIGP26 {
         });
     }
 
-    function getAllowance(address token) internal returns (uint256, uint256) {
+    function getAllowance(address token) internal pure returns (uint256, uint256) {
         if (token == ETH_ADDRESS) {
             return (3 * 1e18, 4 * 1e18);
         } else if (token == wstETH_ADDRESS) {
@@ -544,7 +544,7 @@ contract PayloadIGP26 {
         }
     }
 
-    function getOracleAddress(uint256 vaultId) internal returns(address) {
+    function getOracleAddress(uint256 vaultId) internal pure returns(address) {
         if (vaultId == 11) {
             return 0x5b2860C6D6F888319C752aaCDaf8165C21095E3a; // VAULT_ETH_USDC
         } else if (vaultId == 12) {
