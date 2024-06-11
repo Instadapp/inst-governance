@@ -503,13 +503,14 @@ contract PayloadIGP26 {
 
     function getUserSupplyDataAndSetLimits(
         address token_,
-        address user_,
+        address oldVault_,
+        address newVault_,
         uint256 withdrawalLimit
     ) internal view returns(AdminModuleStructs.UserSupplyConfig memory config_) {
         uint256 userSupplyData_ = LIQUIDITY.readFromStorage(
             LiquiditySlotsLink.calculateDoubleMappingStorageSlot(
                 LiquiditySlotsLink.LIQUIDITY_USER_SUPPLY_DOUBLE_MAPPING_SLOT,
-                user_,
+                oldVault_,
                 token_
             )
         );
@@ -524,7 +525,7 @@ contract PayloadIGP26 {
         );
 
         config_ = AdminModuleStructs.UserSupplyConfig({
-            user: user_,
+            user: newVault_,
             token: token_,
             mode: uint8(userSupplyData_ & 1),
             expandPercent: (userSupplyData_ >> LiquiditySlotsLink.BITS_USER_SUPPLY_EXPAND_PERCENT) & X14,
@@ -535,14 +536,15 @@ contract PayloadIGP26 {
 
     function getUserBorrowDataAndSetLimits(
         address token_,
-        address user_,
+        address oldVault_,
+        address newVault_,
         uint256 baseLimit,
         uint256 maxLimit
     ) internal view returns(AdminModuleStructs.UserBorrowConfig memory config_) {
         uint256 userBorrowData_ = LIQUIDITY.readFromStorage(
             LiquiditySlotsLink.calculateDoubleMappingStorageSlot(
                 LiquiditySlotsLink.LIQUIDITY_USER_BORROW_DOUBLE_MAPPING_SLOT,
-                user_,
+                oldVault_,
                 token_
             )
         );
@@ -557,7 +559,7 @@ contract PayloadIGP26 {
         );
 
         config_ = AdminModuleStructs.UserBorrowConfig({
-            user: user_,
+            user: newVault_,
             token: token_,
             mode: uint8(userBorrowData_ & 1),
             expandPercent: (userBorrowData_ >> LiquiditySlotsLink.BITS_USER_BORROW_EXPAND_PERCENT) & X14,
@@ -569,7 +571,7 @@ contract PayloadIGP26 {
 
     function getAllowance(address token) internal pure returns (uint256, uint256, uint256) {
         if (token == ETH_ADDRESS) {
-            return (3 * 1e18, 4 * 1e18, 0.03 * 1e18);
+            return (3 * 1e18, 4 * 1e18, 0);
         } else if (token == wstETH_ADDRESS) {
             return (2.33 * 1e18, 3.5 * 1e18, 0.03 * 1e18);
         } else if (token == weETH_ADDRESS) {
@@ -622,16 +624,33 @@ contract PayloadIGP26 {
         configs.oracle = address(uint160(vaultVariables2 >> 96));
     }
 
+    struct CloneVaultStruct {
+        address oldVaultAddress;
+        address newVaultAddress;
+        address newOracleAddress;
+        address[] protocols;
+        address[] tokens;
+        uint256[] amounts;
+        uint256 supplyBaseAllowance;
+        uint256 supplyReserveAllowance;
+        uint256 borrowBaseAllowance;
+        uint256 borrowMaxAllowance;
+        uint256 borrowReserveAllowance;
+    }
+
     function cloneVault(uint256 oldVaultId) internal {
-        address oldVaultAddress = VAULT_T1_FACTORY.getVaultAddress(oldVaultId);
-        address newVaultAddress = VAULT_T1_FACTORY.getVaultAddress(oldVaultId + 10);
+        CloneVaultStruct memory data;
 
-        IFluidVaultT1.ConstantViews memory oldConstants = IFluidVaultT1(oldVaultAddress).constantsView();
-        IFluidVaultT1.ConstantViews memory newConstants = IFluidVaultT1(newVaultAddress).constantsView();
+        data.oldVaultAddress = VAULT_T1_FACTORY.getVaultAddress(oldVaultId);
+        data.newVaultAddress = VAULT_T1_FACTORY.getVaultAddress(oldVaultId + 10);
 
-        address newOracleAddress = getOracleAddress(oldVaultId + 10);
+        IFluidVaultT1.ConstantViews memory oldConstants = IFluidVaultT1(data.oldVaultAddress).constantsView();
+        IFluidVaultT1.ConstantViews memory newConstants = IFluidVaultT1(data.newVaultAddress).constantsView();
 
-        uint256[] memory amounts = new uint256[](2);
+        data.newOracleAddress = getOracleAddress(oldVaultId + 10);
+
+        (data.supplyBaseAllowance, , data.supplyReserveAllowance) = getAllowance(newConstants.supplyToken);
+        (data.borrowBaseAllowance, data.borrowMaxAllowance, data.borrowReserveAllowance) = getAllowance(newConstants.borrowToken);
 
         {
             require(oldConstants.supplyToken == newConstants.supplyToken, "not-same-supply-token");
@@ -643,14 +662,12 @@ contract PayloadIGP26 {
             AdminModuleStructs.UserSupplyConfig[]
                 memory configs_ = new AdminModuleStructs.UserSupplyConfig[](1);
 
-            (uint256 baseAllowance, , uint256 supplyAllowance) = getAllowance(newConstants.supplyToken);
-
-            amounts[0] = supplyAllowance;
 
             configs_[0] = getUserSupplyDataAndSetLimits(
                 newConstants.supplyToken,
-                oldVaultAddress,
-                baseAllowance
+                data.oldVaultAddress,
+                data.newVaultAddress,
+                data.supplyBaseAllowance
             );
 
             LIQUIDITY.updateUserSupplyConfigs(configs_);
@@ -661,15 +678,12 @@ contract PayloadIGP26 {
             AdminModuleStructs.UserBorrowConfig[]
                 memory configs_ =  new AdminModuleStructs.UserBorrowConfig[](1);
             
-            (uint256 baseAllowance, uint256 maxAllowance, uint256 borrowAllowance) = getAllowance(newConstants.borrowToken);
-
-            amounts[1] = borrowAllowance;
-
             configs_[0] = getUserBorrowDataAndSetLimits(
                 newConstants.borrowToken,
-                oldVaultAddress,
-                baseAllowance,
-                maxAllowance
+                data.oldVaultAddress,
+                data.newVaultAddress,
+                data.borrowBaseAllowance,
+                data.borrowMaxAllowance
             );
 
             LIQUIDITY.updateUserBorrowConfigs(configs_);
@@ -677,16 +691,16 @@ contract PayloadIGP26 {
 
         // Clone core settings from old vault to new vault.
         {
-            IFluidVaultT1.Configs memory configs = getVaultConfig(oldVaultAddress);
+            IFluidVaultT1.Configs memory configs = getVaultConfig(data.oldVaultAddress);
 
             {
                 require(
-                    IFluidOracle(configs.oracle).getExchangeRate() == IFluidOracle(newOracleAddress).getExchangeRate(),
+                    IFluidOracle(configs.oracle).getExchangeRate() == IFluidOracle(data.newOracleAddress).getExchangeRate(),
                     "oracle exchangePrice is not same"
                 );
             }
 
-            IFluidVaultT1(newVaultAddress).updateCoreSettings(
+            IFluidVaultT1(data.newVaultAddress).updateCoreSettings(
                 configs.supplyRateMagnifier, //     supplyRateMagnifier
                 configs.borrowRateMagnifier, //     borrowRateMagnifier
                 configs.collateralFactor, //        collateralFactor
@@ -700,29 +714,39 @@ contract PayloadIGP26 {
 
         // Update oracle on new vault.
         {
-            IFluidVaultT1(newVaultAddress).updateOracle(newOracleAddress);
+            IFluidVaultT1(data.newVaultAddress).updateOracle(data.newOracleAddress);
         }
 
         // Update rebalancer on new vault.
         {
-            IFluidVaultT1(newVaultAddress).updateRebalancer(0x264786EF916af64a1DB19F513F24a3681734ce92);
+            IFluidVaultT1(data.newVaultAddress).updateRebalancer(0x264786EF916af64a1DB19F513F24a3681734ce92);
         }
 
         // Approve new vault to spend the reserves dust tokens
         {
-            address[] memory protocols = new address[](2);
-            address[] memory tokens = new address[](2);
+            uint256 len = data.supplyReserveAllowance == 0 || data.borrowReserveAllowance == 0 ? 1 : 2;
+            uint256 i = 0;
+
+            data.protocols = new address[](len);
+            data.tokens = new address[](len);
+            data.amounts = new uint256[](len);
 
             {   
-                protocols[0] = newVaultAddress;
-                tokens[0] = newConstants.supplyToken;
+                if (data.supplyReserveAllowance != 0) {
+                    data.protocols[i] = data.newVaultAddress;
+                    data.tokens[i] = newConstants.supplyToken;
+                    data.amounts[i] = data.supplyReserveAllowance;
+                    i++;
+                }
+                
+                if (data.borrowReserveAllowance != 0) {
+                    data.protocols[i] = data.newVaultAddress;
+                    data.tokens[i] = newConstants.borrowToken;
+                    data.amounts[i] = data.borrowReserveAllowance;
+                }
 
-                protocols[1] = newVaultAddress;
-                tokens[1] = newConstants.borrowToken;
-
-                FLUID_RESERVE.approve(protocols, tokens, amounts);
+                FLUID_RESERVE.approve(data.protocols, data.tokens, data.amounts);
             }
         }
     }
-
 }
