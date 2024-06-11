@@ -3,6 +3,7 @@ pragma experimental ABIEncoderV2;
 
 import { BigMathMinified } from "./libraries/bigMathMinified.sol";
 import { LiquiditySlotsLink } from "./libraries/liquiditySlotsLink.sol";
+import { LiquidityCalcs } from "./libraries/liquidityCalcs.sol";
 
 interface IGovernorBravo {
     function _acceptAdmin() external;
@@ -360,6 +361,33 @@ interface IFluidOracle {
     function getExchangeRateLiquidate() external view returns (uint256 exchangeRate_);
 }
 
+interface IFluidReserveContract {
+    function isRebalancer(address user) external returns (bool);
+
+    function rebalanceFToken(address protocol_) external;
+
+    function rebalanceVault(address protocol_) external;
+
+    function transferFunds(address token_) external;
+
+    function getProtocolTokens(address protocol_) external;
+
+    function updateAuth(address auth_, bool isAuth_) external;
+
+    function updateRebalancer(address rebalancer_, bool isRebalancer_) external;
+
+    function approve(
+        address[] memory protocols_,
+        address[] memory tokens_,
+        uint256[] memory amounts_
+    ) external;
+
+    function revoke(
+        address[] memory protocols_,
+        address[] memory tokens_
+    ) external;
+}
+
 contract PayloadIGP26 {
     uint256 public constant PROPOSAL_ID = 26;
 
@@ -386,6 +414,8 @@ contract PayloadIGP26 {
         IFluidLiquidityAdmin(0x52Aa899454998Be5b000Ad077a46Bbe360F4e497);
     IFluidVaultT1Factory public constant VAULT_T1_FACTORY =
         IFluidVaultT1Factory(0x324c5Dc1fC42c7a4D43d92df1eBA58a54d13Bf2d);
+    IFluidReserveContract public constant FLUID_RESERVE =
+        IFluidReserveContract(0x264786EF916af64a1DB19F513F24a3681734ce92);
 
     uint256 internal constant X8 = 0xff;
     uint256 internal constant X10 = 0x3ff;
@@ -471,17 +501,27 @@ contract PayloadIGP26 {
     |     Proposal Payload Helpers      |
     |__________________________________*/
 
-    function getUserSupplyData(
+    function getUserSupplyDataAndSetLimits(
         address token_,
-        address user_
+        address user_,
+        uint256 withdrawalLimit
     ) internal view returns(AdminModuleStructs.UserSupplyConfig memory config_) {
-        bytes32 _LIQUDITY_PROTOCOL_SUPPLY_SLOT = LiquiditySlotsLink.calculateDoubleMappingStorageSlot(
-            LiquiditySlotsLink.LIQUIDITY_USER_SUPPLY_DOUBLE_MAPPING_SLOT,
-            user_,
-            token_
+        uint256 userSupplyData_ = LIQUIDITY.readFromStorage(
+            LiquiditySlotsLink.calculateDoubleMappingStorageSlot(
+                LiquiditySlotsLink.LIQUIDITY_USER_SUPPLY_DOUBLE_MAPPING_SLOT,
+                user_,
+                token_
+            )
         );
-
-        uint256 userSupplyData_ = LIQUIDITY.readFromStorage(_LIQUDITY_PROTOCOL_SUPPLY_SLOT); 
+        
+        (uint256 supplyExchangePrice, ) = LiquidityCalcs.calcExchangePrices(
+            LIQUIDITY.readFromStorage(
+                LiquiditySlotsLink.calculateMappingStorageSlot(
+                    LiquiditySlotsLink.LIQUIDITY_EXCHANGE_PRICES_MAPPING_SLOT,
+                    token_
+                )
+            )
+        );
 
         config_ = AdminModuleStructs.UserSupplyConfig({
             user: user_,
@@ -489,25 +529,32 @@ contract PayloadIGP26 {
             mode: uint8(userSupplyData_ & 1),
             expandPercent: (userSupplyData_ >> LiquiditySlotsLink.BITS_USER_SUPPLY_EXPAND_PERCENT) & X14,
             expandDuration: (userSupplyData_ >> LiquiditySlotsLink.BITS_USER_SUPPLY_EXPAND_DURATION) & X24,
-            baseWithdrawalLimit: BigMathMinified.fromBigNumber(
-                (userSupplyData_ >> LiquiditySlotsLink.BITS_USER_SUPPLY_BASE_WITHDRAWAL_LIMIT) & X18,
-                DEFAULT_EXPONENT_SIZE,
-                DEFAULT_EXPONENT_MASK
-            )
+            baseWithdrawalLimit: withdrawalLimit * 1e12 / supplyExchangePrice
         });
     }
 
-    function getUserBorrowData(
+    function getUserBorrowDataAndSetLimits(
         address token_,
-        address user_
+        address user_,
+        uint256 baseLimit,
+        uint256 maxLimit
     ) internal view returns(AdminModuleStructs.UserBorrowConfig memory config_) {
-        bytes32 _LIQUDITY_PROTOCOL_BORROW_SLOT = LiquiditySlotsLink.calculateDoubleMappingStorageSlot(
-            LiquiditySlotsLink.LIQUIDITY_USER_BORROW_DOUBLE_MAPPING_SLOT,
-            user_,
-            token_
+        uint256 userBorrowData_ = LIQUIDITY.readFromStorage(
+            LiquiditySlotsLink.calculateDoubleMappingStorageSlot(
+                LiquiditySlotsLink.LIQUIDITY_USER_BORROW_DOUBLE_MAPPING_SLOT,
+                user_,
+                token_
+            )
         );
 
-        uint256 userBorrowData_ = LIQUIDITY.readFromStorage(_LIQUDITY_PROTOCOL_BORROW_SLOT);
+        (, uint256 borrowExchangePrice) = LiquidityCalcs.calcExchangePrices(
+            LIQUIDITY.readFromStorage(
+                LiquiditySlotsLink.calculateMappingStorageSlot(
+                    LiquiditySlotsLink.LIQUIDITY_EXCHANGE_PRICES_MAPPING_SLOT,
+                    token_
+                )
+            )
+        );
 
         config_ = AdminModuleStructs.UserBorrowConfig({
             user: user_,
@@ -515,20 +562,12 @@ contract PayloadIGP26 {
             mode: uint8(userBorrowData_ & 1),
             expandPercent: (userBorrowData_ >> LiquiditySlotsLink.BITS_USER_BORROW_EXPAND_PERCENT) & X14,
             expandDuration: (userBorrowData_ >> LiquiditySlotsLink.BITS_USER_BORROW_EXPAND_DURATION) & X24,
-            baseDebtCeiling: BigMathMinified.fromBigNumber(
-                (userBorrowData_ >> LiquiditySlotsLink.BITS_USER_BORROW_BASE_BORROW_LIMIT) & X18,
-                DEFAULT_EXPONENT_SIZE,
-                DEFAULT_EXPONENT_MASK
-            ),
-            maxDebtCeiling: BigMathMinified.fromBigNumber(
-                (userBorrowData_ >> LiquiditySlotsLink.BITS_USER_BORROW_MAX_BORROW_LIMIT) & X18,
-                DEFAULT_EXPONENT_SIZE,
-                DEFAULT_EXPONENT_MASK
-            )
+            baseDebtCeiling: baseLimit * 1e12 / borrowExchangePrice,
+            maxDebtCeiling:  maxLimit * 1e12 / borrowExchangePrice
         });
     }
 
-    function getAllowance(address token) internal pure returns (uint256, uint256, ) {
+    function getAllowance(address token) internal pure returns (uint256, uint256, uint256) {
         if (token == ETH_ADDRESS) {
             return (3 * 1e18, 4 * 1e18, 0.03 * 1e18);
         } else if (token == wstETH_ADDRESS) {
@@ -604,13 +643,15 @@ contract PayloadIGP26 {
             AdminModuleStructs.UserSupplyConfig[]
                 memory configs_ = new AdminModuleStructs.UserSupplyConfig[](1);
 
-            configs_[0] = getUserSupplyData(newConstants.supplyToken, oldVaultAddress);
-
-            (uint256 baseAllowance, , supplyAllowance) = getAllowance(newConstants.supplyToken);
+            (uint256 baseAllowance, , uint256 supplyAllowance) = getAllowance(newConstants.supplyToken);
 
             amounts[0] = supplyAllowance;
 
-            configs_[0].baseWithdrawalLimit = baseAllowance;
+            configs_[0] = getUserSupplyDataAndSetLimits(
+                newConstants.supplyToken,
+                oldVaultAddress,
+                baseAllowance
+            );
 
             LIQUIDITY.updateUserSupplyConfigs(configs_);
         }
@@ -620,22 +661,16 @@ contract PayloadIGP26 {
             AdminModuleStructs.UserBorrowConfig[]
                 memory configs_ =  new AdminModuleStructs.UserBorrowConfig[](1);
             
-            configs_[0] = getUserBorrowData(newConstants.borrowToken, oldVaultAddress);
             (uint256 baseAllowance, uint256 maxAllowance, uint256 borrowAllowance) = getAllowance(newConstants.borrowToken);
 
             amounts[1] = borrowAllowance;
 
-            uint256 exchangePriceAndConfig_ = LIQUIDITY.readFromStorage(
-                LiquiditySlotsLink.calculateMappingStorageSlot(
-                    LiquiditySlotsLink.LIQUIDITY_EXCHANGE_PRICES_MAPPING_SLOT,
-                    newConstants.borrowToken
-                )
+            configs_[0] = getUserBorrowDataAndSetLimits(
+                newConstants.borrowToken,
+                oldVaultAddress,
+                baseAllowance,
+                maxAllowance
             );
-
-            (uint256 supplyExchangePrice, uint256 borrowExchangePrice) = LiquidityCalcs.calcExchangePrices(exchangePriceAndConfig_);
-
-            configs_[0].baseDebtCeiling = baseAllowance;
-            configs_[0].maxDebtCeiling = maxAllowance;
 
             LIQUIDITY.updateUserBorrowConfigs(configs_);
         }
