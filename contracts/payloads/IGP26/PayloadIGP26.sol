@@ -497,6 +497,18 @@ contract PayloadIGP26 {
         }
     }
 
+    /// @notice Action 2: Collect revenue from Liquditiy Layer
+    function action2() internal {
+        address[] memory tokens = new address[](4);
+
+        tokens[0] = ETH_ADDRESS;
+        tokens[1] = wstETH_ADDRESS;
+        tokens[2] = USDC_ADDRESS;
+        tokens[3] = USDT_ADDRESS;
+
+        LIQUIDITY.collectRevenue(tokens);
+    }
+
     /***********************************|
     |     Proposal Payload Helpers      |
     |__________________________________*/
