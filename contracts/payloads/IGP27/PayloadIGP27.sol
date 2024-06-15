@@ -304,8 +304,6 @@ contract PayloadIGP27 {
 
     IFluidLiquidityAdmin public constant LIQUIDITY =
         IFluidLiquidityAdmin(0x52Aa899454998Be5b000Ad077a46Bbe360F4e497);
-    IFluidVaultT1Factory public constant VAULT_T1_FACTORY =
-        IFluidVaultT1Factory(0x324c5Dc1fC42c7a4D43d92df1eBA58a54d13Bf2d);
 
     address public constant F_USDT = 0x5C20B550819128074FD538Edf79791733ccEdd18;
     address public constant F_USDC = 0x9Fb7b4477576Fe5B32be4C1843aFB1e55F251B33;
