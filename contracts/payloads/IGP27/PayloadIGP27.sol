@@ -429,7 +429,7 @@ contract PayloadIGP27 {
     }
 
 
-    /// @notice Action 3: Set max utilization to 85% for wstETH & Update Reserve fee to 10%.
+    /// @notice Action 3: Set max utilization to 88% for wstETH & Update ETH Reserve fee to 10%.
     function action3() internal {
         AdminModuleStructs.TokenConfig[]
             memory tokenConfigs_ = new AdminModuleStructs.TokenConfig[](2);
