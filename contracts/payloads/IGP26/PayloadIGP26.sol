@@ -499,6 +499,9 @@ contract PayloadIGP26 {
 
         // Action 1: Clone from old vault config to new vault
         action1();
+
+        // Action 2: Collect revenue from Liquditiy Layer
+        action2();
     }
 
     /***********************************|
