@@ -250,55 +250,6 @@ interface IFluidLiquidityAdmin {
         );
 }
 
-interface IFluidVaultT1Factory {
-    /// @notice                         Deploys a new vault using the specified deployment logic `vaultDeploymentLogic_` and data `vaultDeploymentData_`.
-    ///                                 Only accounts with deployer access or the owner can deploy a new vault.
-    /// @param vaultDeploymentLogic_    The address of the vault deployment logic contract.
-    /// @param vaultDeploymentData_     The data to be used for vault deployment.
-    /// @return vault_                  Returns the address of the newly deployed vault.
-    function deployVault(
-        address vaultDeploymentLogic_,
-        bytes calldata vaultDeploymentData_
-    ) external returns (address vault_);
-
-    /// @notice                         Sets an address as allowed vault deployment logic (`deploymentLogic_`) contract or not.
-    ///                                 This function can only be called by the owner.
-    /// @param deploymentLogic_         The address of the vault deployment logic contract to be set.
-    /// @param allowed_                 A boolean indicating whether the specified address is allowed to deploy new type of vault.
-    function setVaultDeploymentLogic(
-        address deploymentLogic_,
-        bool allowed_
-    ) external;
-}
-
-
-interface IFluidVaultT1 {
-    /// @notice updates the Vault oracle to `newOracle_`. Must implement the FluidOracle interface.
-    function updateOracle(address newOracle_) external;
-
-    /// @notice updates the all Vault core settings according to input params.
-    /// All input values are expected in 1e2 (1% = 100, 100% = 10_000).
-    function updateCoreSettings(
-        uint256 supplyRateMagnifier_,
-        uint256 borrowRateMagnifier_,
-        uint256 collateralFactor_,
-        uint256 liquidationThreshold_,
-        uint256 liquidationMaxLimit_,
-        uint256 withdrawGap_,
-        uint256 liquidationPenalty_,
-        uint256 borrowFee_
-    ) external;
-
-    /// @notice updates the allowed rebalancer to `newRebalancer_`.
-    function updateRebalancer(address newRebalancer_) external;
-
-    /// @notice updates the supply rate magnifier to `supplyRateMagnifier_`. Input in 1e2 (1% = 100, 100% = 10_000).
-    function updateSupplyRateMagnifier(uint supplyRateMagnifier_) external;
-
-    /// @notice updates the collateral factor to `collateralFactor_`. Input in 1e2 (1% = 100, 100% = 10_000).
-    function updateCollateralFactor(uint collateralFactor_) external;
-}
-
 interface IFTokenAdmin {
     /// @notice updates the rewards rate model contract.
     ///         Only callable by LendingFactory auths.
@@ -494,7 +445,7 @@ contract PayloadIGP27 {
             token: ETH_ADDRESS,
             fee: 10 * 1e2, // 10%
             threshold: 0.3 * 1e2, // 0.3%
-            maxUtilization: 0
+            maxUtilization: 0 // 0
         });
 
         LIQUIDITY.updateTokenConfigs(tokenConfigs_);
