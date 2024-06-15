@@ -400,9 +400,9 @@ contract PayloadIGP27 {
             kink1: 80 * 1e2, // 80%
             kink2: 93 * 1e2, // 93%
             rateAtUtilizationZero: 0, // 0%
-            rateAtUtilizationKink1: 12 * 1e2, // 12%
-            rateAtUtilizationKink2: 18 * 1e2, // 18%
-            rateAtUtilizationMax: 33.33 * 1e2 // 33.33%
+            rateAtUtilizationKink1: 10 * 1e2, // 10%
+            rateAtUtilizationKink2: 15 * 1e2, // 15%
+            rateAtUtilizationMax: 25 * 1e2 // 25%
         });
 
         params_[1] = AdminModuleStructs.RateDataV2Params({
@@ -410,9 +410,9 @@ contract PayloadIGP27 {
             kink1: 80 * 1e2, // 80%
             kink2: 93 * 1e2, // 93%
             rateAtUtilizationZero: 0, // 0%
-            rateAtUtilizationKink1: 12 * 1e2, // 12%
-            rateAtUtilizationKink2: 18 * 1e2, // 18%
-            rateAtUtilizationMax: 33.33 * 1e2 // 33.33%
+            rateAtUtilizationKink1: 10 * 1e2, // 10%
+            rateAtUtilizationKink2: 15 * 1e2, // 15%
+            rateAtUtilizationMax: 25 * 1e2 // 25%
         });
 
         params_[2] = AdminModuleStructs.RateDataV2Params({
