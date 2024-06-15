@@ -445,7 +445,7 @@ contract PayloadIGP27 {
             token: ETH_ADDRESS,
             fee: 10 * 1e2, // 10%
             threshold: 0.3 * 1e2, // 0.3%
-            maxUtilization: 0 // 0
+            maxUtilization: 100 * 1e2 // set to 100% to disable and have default limit of 100% (avoiding SLOAD).
         });
 
         LIQUIDITY.updateTokenConfigs(tokenConfigs_);
