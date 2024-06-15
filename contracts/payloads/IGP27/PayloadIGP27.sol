@@ -418,7 +418,7 @@ contract PayloadIGP27 {
         params_[2] = AdminModuleStructs.RateDataV2Params({
             token: wstETH_ADDRESS, // wstETH
             kink1: 50 * 1e2, // 50%
-            kink2: 90 * 1e2, // 90%
+            kink2: 93 * 1e2, // 93%
             rateAtUtilizationZero: 0, // 0%
             rateAtUtilizationKink1: 15 * 1e2, // 15%
             rateAtUtilizationKink2: 12 * 1e2, // 12%
@@ -427,7 +427,6 @@ contract PayloadIGP27 {
 
         LIQUIDITY.updateRateDataV2s(params_);
     }
-
 
     /// @notice Action 3: Set max utilization to 88% for wstETH & Update ETH Reserve fee to 10%.
     function action3() internal {
