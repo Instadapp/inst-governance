@@ -346,7 +346,7 @@ contract PayloadIGP28 {
 
             paramsV1_[0] = AdminModuleStructs.RateDataV1Params({
                 token: USDC_ADDRESS, // USDC
-                kink: 83 * 1e2, // 83%
+                kink: 93 * 1e2, // 93%
                 rateAtUtilizationZero: 0, // 0%
                 rateAtUtilizationKink: 12 * 1e2, // 12%
                 rateAtUtilizationMax: 25 * 1e2 // 25%
@@ -354,7 +354,7 @@ contract PayloadIGP28 {
 
             paramsV1_[1] = AdminModuleStructs.RateDataV1Params({
                 token: USDT_ADDRESS, // USDT
-                kink: 83 * 1e2, // 83%
+                kink: 93 * 1e2, // 93%
                 rateAtUtilizationZero: 0, // 0%
                 rateAtUtilizationKink: 12 * 1e2, // 12%
                 rateAtUtilizationMax: 25 * 1e2 // 25%
