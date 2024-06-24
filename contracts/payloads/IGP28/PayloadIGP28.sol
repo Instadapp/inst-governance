@@ -367,7 +367,7 @@ contract PayloadIGP28 {
             AdminModuleStructs.RateDataV2Params[]
                 memory paramsV2_ = new AdminModuleStructs.RateDataV2Params[](1);
 
-            paramsV2_[1] = AdminModuleStructs.RateDataV2Params({
+            paramsV2_[0] = AdminModuleStructs.RateDataV2Params({
                 token: wstETH_ADDRESS, // wstETH
                 kink1: 50 * 1e2, // 50%
                 kink2: 90 * 1e2, // 90%
