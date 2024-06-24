@@ -333,7 +333,7 @@ contract PayloadIGP28 {
         0xCd5fE23C85820F7B72D0926FC9b05b43E359b7ee;
 
     address public constant PT_sUSDe_ADDRESS =
-        0x9D39A5DE30e57443BfF2A8307A4256c8797A3497; // TODO
+        0x6c9f097e044506712B58EAC670c9a5fd4BCceF13;
 
     address public constant sUSDe_ADDRESS =
         0x9D39A5DE30e57443BfF2A8307A4256c8797A3497;
@@ -381,6 +381,12 @@ contract PayloadIGP28 {
     function execute() external {
         require(address(this) == address(TIMELOCK), "not-valid-caller");
 
+        /// Action 1: Set PT_sUSDe token config and market rate curve on liquidity.
+        action1();
+
+       /// Action 2: Update PT_sUSDe/USDC and PT_sUSDe/USDT vaults.
+       action2();
+
     }
 
     function verifyProposal() external view {}
@@ -389,14 +395,61 @@ contract PayloadIGP28 {
     |     Proposal Payload Actions      |
     |__________________________________*/
 
-    function deploy_PT_sUSDe_USDC_VAULT() internal {
+    /// @notice Action 1: Set PT_sUSDe token config and market rate curve on liquidity.
+    function action1() internal {
+        {
+            AdminModuleStructs.TokenConfig[]
+                memory params_ = new AdminModuleStructs.TokenConfig[](1);
+
+            params_[0] = AdminModuleStructs.TokenConfig({
+                token: PT_sUSDe_ADDRESS, // PT_sUSDe
+                threshold: 0.3 * 1e2, // 0.3
+                fee: 10 * 1e2, // 10%
+                maxUtilization: 0
+            });
+
+            LIQUIDITY.updateTokenConfigs(params_);
+        }
+
+        {
+            AdminModuleStructs.RateDataV2Params[]
+                memory params_ = new AdminModuleStructs.RateDataV2Params[](1);
+
+            params_[0] = AdminModuleStructs.RateDataV2Params({
+                token: PT_sUSDe_ADDRESS, // PT_sUSDe
+                kink1: 50 * 1e2, // 50%
+                kink2: 80 * 1e2, // 80%
+                rateAtUtilizationZero: 0, // 0%
+                rateAtUtilizationKink1: 20 * 1e2, // 20%
+                rateAtUtilizationKink2: 40 * 1e2, // 40%
+                rateAtUtilizationMax: 100 * 1e2 // 100%
+            });
+
+            LIQUIDITY.updateRateDataV2s(params_);
+        }
+    }
+
+    /// @notice Action 2: Update PT_sUSDe/USDC and PT_sUSDe/USDT vaults.
+    function action2() internal {
         // Deploy PT_sUSDe/USDC vault.
+        deploy_PT_sUSDe_VAULT(USDC_ADDRESS);
+
+        // Deploy PT_sUSDe/USDT vault.
+        deploy_PT_sUSDe_VAULT(USDT_ADDRESS);
+    }
+
+    /***********************************|
+    |     Proposal Payload Helpers      |
+    |__________________________________*/
+
+    function deploy_PT_sUSDe_VAULT(address debtToken) internal {
+        // Deploy PT_sUSDe based vault.
         address vault_ = VAULT_T1_FACTORY.deployVault(
             address(VAULT_T1_DEPLOYMENT_LOGIC),
             abi.encodeWithSelector(
                 IFluidVaultT1DeploymentLogic.vaultT1.selector,
                 PT_sUSDe_ADDRESS, // PT_sUSDe,
-                USDC_ADDRESS // USDC
+                debtToken // USDC or USDT
             )
         );
 
@@ -411,7 +464,7 @@ contract PayloadIGP28 {
                 mode: 1,
                 expandPercent: 25 * 1e2, // 25%
                 expandDuration: 12 hours,
-                baseWithdrawalLimit: 2_500 * 1e18 // 2_500 PT_sUSDe
+                baseWithdrawalLimit: 5_000_000 * 1e18 // 5M PT_sUSDe
             });
 
             LIQUIDITY.updateUserSupplyConfigs(configs_);
@@ -424,39 +477,39 @@ contract PayloadIGP28 {
 
             configs_[0] = AdminModuleStructs.UserBorrowConfig({
                 user: address(vault_),
-                token: USDC_ADDRESS,
+                token: debtToken,
                 mode: 1,
                 expandPercent: 20 * 1e2, // 20%
                 expandDuration: 12 hours,
                 baseDebtCeiling: 7_500_000 * 1e6, // 7.5M
-                maxDebtCeiling: 20_000_000 * 1e6  // 20M
+                maxDebtCeiling: 10_000_000 * 1e6  // 10M
             });
 
             LIQUIDITY.updateUserBorrowConfigs(configs_);
         }
 
-        // Update core settings on PT_sUSDe/USDC vault.
+        // Update core settings on vault.
         {
             IFluidVaultT1(vault_).updateCoreSettings(
                 100 * 1e2, // 1x     supplyRateMagnifier
-                100 * 1e2, // 1x     borrowRateMagnifier
-                75 * 1e2, // 75%     collateralFactor
-                80 * 1e2, // 80%    liquidationThreshold
-                90 * 1e2, // 90%    liquidationMaxLimit
-                5 * 1e2, // 5%     withdrawGap
-                4 * 1e2, // 4%     liquidationPenalty
-                0 // 0%     borrowFee
+                200 * 1e2, // 2x     borrowRateMagnifier
+                88 * 1e2, // 88%     collateralFactor
+                90 * 1e2, // 90%     liquidationThreshold
+                95 * 1e2, // 95%     liquidationMaxLimit
+                2 * 1e2, //  2%      withdrawGap
+                5 * 1e2, //  5%      liquidationPenalty
+                0 //         0%      borrowFee
             );
         }
 
-        // Update oracle on PT_sUSDe/USDC vault.
+        // Update oracle on vault.
         {
             IFluidVaultT1(vault_).updateOracle(
-                0x64D9cd2B6a63100d8305ca8e3b46E26d5a38951f
+                0x58455665979fdf24c3Ea8674323326bD99237e12
             );
         }
 
-        // Update rebalancer on weETH/USDC vault.
+        // Update rebalancer on vault.
         {
             IFluidVaultT1(vault_).updateRebalancer(
                 0x264786EF916af64a1DB19F513F24a3681734ce92
