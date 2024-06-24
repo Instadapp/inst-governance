@@ -482,8 +482,8 @@ contract PayloadIGP29 {
                 mode: 1,
                 expandPercent: 20 * 1e2, // 20%
                 expandDuration: 12 hours,
-                baseDebtCeiling: 7_500_000 * 1e6, // 7.5M
-                maxDebtCeiling: 10_000_000 * 1e6  // 10M
+                baseDebtCeiling: 7_125_000 * 1e6, // ~7.125M
+                maxDebtCeiling: 9_500_000 * 1e6  // 9.5M
             });
 
             LIQUIDITY.updateUserBorrowConfigs(configs_);
