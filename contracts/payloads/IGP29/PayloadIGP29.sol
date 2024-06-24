@@ -294,8 +294,8 @@ interface IFluidVaultT1DeploymentLogic {
     function vaultT1(address supplyToken_, address borrowToken_) external;
 }
 
-contract PayloadIGP28 {
-    uint256 public constant PROPOSAL_ID = 28;
+contract PayloadIGP29 {
+    uint256 public constant PROPOSAL_ID = 29;
 
     address public constant PROPOSER =
         0xA45f7bD6A5Ff45D31aaCE6bCD3d426D9328cea01;
