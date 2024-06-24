@@ -295,7 +295,7 @@ interface IFluidVaultT1DeploymentLogic {
 }
 
 contract PayloadIGP29 {
-    uint256 public constant PROPOSAL_ID = 29;
+    uint256 public constant PROPOSAL_ID = 28;
 
     address public constant PROPOSER =
         0xA45f7bD6A5Ff45D31aaCE6bCD3d426D9328cea01;
@@ -496,9 +496,9 @@ contract PayloadIGP29 {
                 200 * 1e2, // 2x     borrowRateMagnifier
                 88 * 1e2, // 88%     collateralFactor
                 90 * 1e2, // 90%     liquidationThreshold
-                95 * 1e2, // 95%     liquidationMaxLimit
+                94 * 1e2, // 94%     liquidationMaxLimit
                 2 * 1e2, //  2%      withdrawGap
-                4.5 * 1e2, //  5%      liquidationPenalty
+                4 * 1e2, //  4%      liquidationPenalty
                 0 //         0%      borrowFee
             );
         }
