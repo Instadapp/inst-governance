@@ -370,10 +370,10 @@ contract PayloadIGP28 {
             paramsV2_[1] = AdminModuleStructs.RateDataV2Params({
                 token: wstETH_ADDRESS, // wstETH
                 kink1: 50 * 1e2, // 50%
-                kink2: 93 * 1e2, // 93%
+                kink2: 90 * 1e2, // 90%
                 rateAtUtilizationZero: 0, // 0%
-                rateAtUtilizationKink1: 15 * 1e2, // 15%
-                rateAtUtilizationKink2: 12 * 1e2, // 12%
+                rateAtUtilizationKink1: 10 * 1e2, // 10%
+                rateAtUtilizationKink2: 10 * 1e2, // 10%
                 rateAtUtilizationMax: 100 * 1e2 // 100%
             });
 
