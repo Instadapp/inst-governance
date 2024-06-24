@@ -398,20 +398,6 @@ contract PayloadIGP29 {
     /// @notice Action 1: Set PT_sUSDe token config and market rate curve on liquidity.
     function action1() internal {
         {
-            AdminModuleStructs.TokenConfig[]
-                memory params_ = new AdminModuleStructs.TokenConfig[](1);
-
-            params_[0] = AdminModuleStructs.TokenConfig({
-                token: PT_sUSDe_ADDRESS, // PT_sUSDe
-                threshold: 0.3 * 1e2, // 0.3
-                fee: 10 * 1e2, // 10%
-                maxUtilization: 0
-            });
-
-            LIQUIDITY.updateTokenConfigs(params_);
-        }
-
-        {
             AdminModuleStructs.RateDataV2Params[]
                 memory params_ = new AdminModuleStructs.RateDataV2Params[](1);
 
@@ -427,6 +413,21 @@ contract PayloadIGP29 {
 
             LIQUIDITY.updateRateDataV2s(params_);
         }
+
+        {
+            AdminModuleStructs.TokenConfig[]
+                memory params_ = new AdminModuleStructs.TokenConfig[](1);
+
+            params_[0] = AdminModuleStructs.TokenConfig({
+                token: PT_sUSDe_ADDRESS, // PT_sUSDe
+                threshold: 0.3 * 1e2, // 0.3
+                fee: 10 * 1e2, // 10%
+                maxUtilization: 0
+            });
+
+            LIQUIDITY.updateTokenConfigs(params_);
+        }
+
     }
 
     /// @notice Action 2: Update PT_sUSDe/USDC and PT_sUSDe/USDT vaults.
@@ -497,7 +498,7 @@ contract PayloadIGP29 {
                 90 * 1e2, // 90%     liquidationThreshold
                 95 * 1e2, // 95%     liquidationMaxLimit
                 2 * 1e2, //  2%      withdrawGap
-                5 * 1e2, //  5%      liquidationPenalty
+                4.5 * 1e2, //  5%      liquidationPenalty
                 0 //         0%      borrowFee
             );
         }
