@@ -451,8 +451,8 @@ contract PayloadIGP29 {
 
     /// @notice Action 3: call cast() - transfer 100 stETH to Team Multisig from treasury.
     function action3() internal {
-        string[] memory targets = new string[](2);
-        bytes[] memory encodedSpells = new bytes[](2);
+        string[] memory targets = new string[](1);
+        bytes[] memory encodedSpells = new bytes[](1);
 
         string memory withdrawSignature = "withdraw(address,uint256,address,uint256,uint256)";
 
