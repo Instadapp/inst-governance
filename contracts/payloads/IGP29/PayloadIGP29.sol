@@ -434,7 +434,7 @@ contract PayloadIGP29 {
         address VAULT_sUSDe_USDT_CONFIG_HANDLER = address(0x7607968F40d7Ac4Ef39E809F29fADDe34C00A0A6);
 
         AdminModuleStructs.AddressBool[]
-            memory configs_ = new AdminModuleStructs.AddressBool[](1);
+            memory configs_ = new AdminModuleStructs.AddressBool[](2);
 
         configs_[0] = AdminModuleStructs.AddressBool({
             addr: address(VAULT_sUSDe_USDC_CONFIG_HANDLER),
