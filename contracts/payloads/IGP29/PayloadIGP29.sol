@@ -317,6 +317,19 @@ interface IDSAV2 {
     function isAuth(address user) external view returns (bool);
 }
 
+interface IFluidVaultT1Factory {
+    function deployVault(
+        address vaultDeploymentLogic_,
+        bytes calldata vaultDeploymentData_
+    ) external returns (address vault_);
+
+    function setVaultAuth(
+        address vault_,
+        address vaultAuth_,
+        bool allowed_
+    ) external;
+}
+
 contract PayloadIGP29 {
     uint256 public constant PROPOSAL_ID = 29;
 
@@ -343,6 +356,8 @@ contract PayloadIGP29 {
         IFluidLiquidityAdmin(0x52Aa899454998Be5b000Ad077a46Bbe360F4e497);
     IFluidReserveContract public constant FLUID_RESERVE =
         IFluidReserveContract(0x264786EF916af64a1DB19F513F24a3681734ce92);
+    IFluidVaultT1Factory public constant VAULT_T1_FACTORY =
+        IFluidVaultT1Factory(0x324c5Dc1fC42c7a4D43d92df1eBA58a54d13Bf2d);
 
     IDSAV2 public constant TREASURY = IDSAV2(0x28849D2b63fA8D361e5fc15cB8aBB13019884d09);
 
@@ -430,23 +445,28 @@ contract PayloadIGP29 {
 
     /// @notice Action 2: Add config handler on liquidity layer for sUSDe/USDC & sUSDe/USDT vault.
     function action2() internal {
-        address VAULT_sUSDe_USDC_CONFIG_HANDLER = address(0xa7C805988f04f0e841504761E5aa8387600e430b);
-        address VAULT_sUSDe_USDT_CONFIG_HANDLER = address(0x7607968F40d7Ac4Ef39E809F29fADDe34C00A0A6);
+        {
+            address VAULT_sUSDe_USDC = address(0x3996464c0fCCa8183e13ea5E5e74375e2c8744Dd);
+            address VAULT_sUSDe_USDC_CONFIG_HANDLER = address(0xa7C805988f04f0e841504761E5aa8387600e430b);
 
-        AdminModuleStructs.AddressBool[]
-            memory configs_ = new AdminModuleStructs.AddressBool[](2);
+            VAULT_T1_FACTORY.setVaultAuth(
+                VAULT_sUSDe_USDC,
+                VAULT_sUSDe_USDC_CONFIG_HANDLER,
+                true
+            );
+        }
 
-        configs_[0] = AdminModuleStructs.AddressBool({
-            addr: address(VAULT_sUSDe_USDC_CONFIG_HANDLER),
-            value: true
-        });
+        {
+            address VAULT_sUSDe_USDT = address(0xBc345229C1b52e4c30530C614BB487323BA38Da5);
+            address VAULT_sUSDe_USDT_CONFIG_HANDLER = address(0x7607968F40d7Ac4Ef39E809F29fADDe34C00A0A6);
 
-        configs_[1] = AdminModuleStructs.AddressBool({
-            addr: address(VAULT_sUSDe_USDT_CONFIG_HANDLER),
-            value: true
-        });
+            VAULT_T1_FACTORY.setVaultAuth(
+                VAULT_sUSDe_USDT,
+                VAULT_sUSDe_USDT_CONFIG_HANDLER,
+                true
+            );
+        }
 
-        LIQUIDITY.updateAuths(configs_);
     }
 
     /// @notice Action 3: call cast() - transfer 100 stETH to Team Multisig from treasury.
