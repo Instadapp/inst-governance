@@ -121,7 +121,10 @@ interface IProxy {
 
     function setDummyImplementation(address newDummyImplementation_) external;
 
-    function addImplementation(address implementation_, bytes4[] calldata sigs_) external;
+    function addImplementation(
+        address implementation_,
+        bytes4[] calldata sigs_
+    ) external;
 
     function removeImplementation(address implementation_) external;
 
@@ -129,11 +132,15 @@ interface IProxy {
 
     function getDummyImplementation() external view returns (address);
 
-    function getImplementationSigs(address impl_) external view returns (bytes4[] memory);
+    function getImplementationSigs(
+        address impl_
+    ) external view returns (bytes4[] memory);
 
     function getSigsImplementation(bytes4 sig_) external view returns (address);
 
-    function readFromStorage(bytes32 slot_) external view returns (uint256 result_);
+    function readFromStorage(
+        bytes32 slot_
+    ) external view returns (uint256 result_);
 }
 
 interface IFluidLiquidityAdmin {
@@ -296,8 +303,9 @@ contract PayloadIGP18 {
 
     IFluidLiquidityAdmin public constant LIQUIDITY =
         IFluidLiquidityAdmin(0x52Aa899454998Be5b000Ad077a46Bbe360F4e497);
-        
-    address public constant VAULT_weETH_wstETH = address(0x40D9b8417E6E1DcD358f04E3328bCEd061018A82);
+
+    address public constant VAULT_weETH_wstETH =
+        address(0x40D9b8417E6E1DcD358f04E3328bCEd061018A82);
 
     constructor() {
         ADDRESS_THIS = address(this);
@@ -349,13 +357,13 @@ contract PayloadIGP18 {
 
     /// @notice Action 1: Update weETH/wstETH vault parameters.
     function action1() internal {
+        // Update max liquidation limit from 95% to 96%.
+        IFluidVaultT1(VAULT_weETH_wstETH).updateLiquidationMaxLimit(96 * 1e2); // 96% or 96 * 1e2
+
+        // Update liquidation threshold from 93% to 95%.
+        IFluidVaultT1(VAULT_weETH_wstETH).updateLiquidationThreshold(95 * 1e2); // 95% or 95 * 1e2
+
         // Update collateral factor from 90.5% to 93%.
         IFluidVaultT1(VAULT_weETH_wstETH).updateCollateralFactor(93 * 1e2); // 93% or 93 * 1e2
-
-        // Update collateral factor from 93% to 95%.
-        IFluidVaultT1(VAULT_weETH_wstETH).updateLiquidationThreshold(53 * 1e2); // 95% or 95 * 1e2
-
-        // Update collateral factor from 95% to 96%.
-        IFluidVaultT1(VAULT_weETH_wstETH).updateLiquidationMaxLimit(96 * 1e2); // 96% or 96 * 1e2
     }
 }
