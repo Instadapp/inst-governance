@@ -277,21 +277,31 @@ interface IFluidVaultT1 {
     function updateCollateralFactor(uint collateralFactor_) external;
 }
 
-interface IFluidVaultT1Factory {
-    function deployVault(
-        address vaultDeploymentLogic_,
-        bytes calldata vaultDeploymentData_
-    ) external returns (address vault_);
+interface IFluidReserveContract {
+    function isRebalancer(address user) external returns (bool);
 
-    function setVaultAuth(
-        address vault_,
-        address vaultAuth_,
-        bool allowed_
+    function rebalanceFToken(address protocol_) external;
+
+    function rebalanceVault(address protocol_) external;
+
+    function transferFunds(address token_) external;
+
+    function getProtocolTokens(address protocol_) external;
+
+    function updateAuth(address auth_, bool isAuth_) external;
+
+    function updateRebalancer(address rebalancer_, bool isRebalancer_) external;
+
+    function approve(
+        address[] memory protocols_,
+        address[] memory tokens_,
+        uint256[] memory amounts_
     ) external;
-}
 
-interface IFluidVaultT1DeploymentLogic {
-    function vaultT1(address supplyToken_, address borrowToken_) external;
+    function revoke(
+        address[] memory protocols_,
+        address[] memory tokens_
+    ) external;
 }
 
 contract PayloadIGP29 {
@@ -318,12 +328,8 @@ contract PayloadIGP29 {
 
     IFluidLiquidityAdmin public constant LIQUIDITY =
         IFluidLiquidityAdmin(0x52Aa899454998Be5b000Ad077a46Bbe360F4e497);
-    IFluidVaultT1Factory public constant VAULT_T1_FACTORY =
-        IFluidVaultT1Factory(0x324c5Dc1fC42c7a4D43d92df1eBA58a54d13Bf2d);
-    IFluidVaultT1DeploymentLogic public constant VAULT_T1_DEPLOYMENT_LOGIC =
-        IFluidVaultT1DeploymentLogic(
-            0x2Cc710218F2e3a82CcC77Cc4B3B93Ee6Ba9451CD
-        );
+    IFluidReserveContract public constant FLUID_RESERVE =
+        IFluidReserveContract(0x264786EF916af64a1DB19F513F24a3681734ce92);
 
     address public constant ETH_ADDRESS =
         0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
@@ -332,8 +338,8 @@ contract PayloadIGP29 {
     address public constant weETH_ADDRESS =
         0xCd5fE23C85820F7B72D0926FC9b05b43E359b7ee;
 
-    address public constant PT_sUSDe_ADDRESS =
-        0x6c9f097e044506712B58EAC670c9a5fd4BCceF13;
+    address public constant F_USDT = 0x5C20B550819128074FD538Edf79791733ccEdd18;
+    address public constant F_USDC = 0x9Fb7b4477576Fe5B32be4C1843aFB1e55F251B33;
 
     address public constant sUSDe_ADDRESS =
         0x9D39A5DE30e57443BfF2A8307A4256c8797A3497;
@@ -381,10 +387,10 @@ contract PayloadIGP29 {
     function execute() external {
         require(address(this) == address(TIMELOCK), "not-valid-caller");
 
-        /// Action 1: Set PT_sUSDe token config and market rate curve on liquidity.
+        /// Action 1: Approve fUSDC and fUSDT protocols to spend the reserves tokens
         action1();
 
-       /// Action 2: Update PT_sUSDe/USDC and PT_sUSDe/USDT vaults.
+       /// Action 2: Add config handler on liquidity layer for sUSDe/USDC & sUSDe/USDT vault.
        action2();
 
     }
@@ -395,126 +401,43 @@ contract PayloadIGP29 {
     |     Proposal Payload Actions      |
     |__________________________________*/
 
-    /// @notice Action 1: Set PT_sUSDe token config and market rate curve on liquidity.
+    /// @notice Action 1: Approve fUSDC and fUSDT protocols to spend the reserves tokens
     function action1() internal {
-        {
-            AdminModuleStructs.RateDataV2Params[]
-                memory params_ = new AdminModuleStructs.RateDataV2Params[](1);
+        address[] memory protocols = new address[](2);
+        address[] memory tokens = new address[](2);
+        uint256[] memory amounts = new uint256[](2);
 
-            params_[0] = AdminModuleStructs.RateDataV2Params({
-                token: PT_sUSDe_ADDRESS, // PT_sUSDe
-                kink1: 50 * 1e2, // 50%
-                kink2: 80 * 1e2, // 80%
-                rateAtUtilizationZero: 0, // 0%
-                rateAtUtilizationKink1: 20 * 1e2, // 20%
-                rateAtUtilizationKink2: 40 * 1e2, // 40%
-                rateAtUtilizationMax: 100 * 1e2 // 100%
-            });
+        // fUSDC
+        protocols[0] = F_USDC;
+        tokens[0] = USDC_ADDRESS;
+        amounts[0] = 290_000 * 1e6; // 290k USDC
 
-            LIQUIDITY.updateRateDataV2s(params_);
-        }
+        // fUSDT
+        protocols[1] = F_USDT;
+        tokens[1] = USDT_ADDRESS;
+        amounts[1] = 290_000 * 1e6; // 290k USDT
 
-        {
-            AdminModuleStructs.TokenConfig[]
-                memory params_ = new AdminModuleStructs.TokenConfig[](1);
-
-            params_[0] = AdminModuleStructs.TokenConfig({
-                token: PT_sUSDe_ADDRESS, // PT_sUSDe
-                threshold: 0.3 * 1e2, // 0.3
-                fee: 10 * 1e2, // 10%
-                maxUtilization: 0
-            });
-
-            LIQUIDITY.updateTokenConfigs(params_);
-        }
-
+        FLUID_RESERVE.approve(protocols, tokens, amounts);
     }
 
-    /// @notice Action 2: Update PT_sUSDe/USDC and PT_sUSDe/USDT vaults.
+    /// @notice Action 2: Add config handler on liquidity layer for sUSDe/USDC & sUSDe/USDT vault.
     function action2() internal {
-        // Deploy PT_sUSDe/USDC vault.
-        deploy_PT_sUSDe_VAULT(USDC_ADDRESS);
+        address VAULT_sUSDe_USDC_CONFIG_HANDLER = address(0xa7C805988f04f0e841504761E5aa8387600e430b);
+        address VAULT_sUSDe_USDT_CONFIG_HANDLER = address(0x7607968F40d7Ac4Ef39E809F29fADDe34C00A0A6);
 
-        // Deploy PT_sUSDe/USDT vault.
-        deploy_PT_sUSDe_VAULT(USDT_ADDRESS);
-    }
+        AdminModuleStructs.AddressBool[]
+            memory configs_ = new AdminModuleStructs.AddressBool[](1);
 
-    /***********************************|
-    |     Proposal Payload Helpers      |
-    |__________________________________*/
+        configs_[0] = AdminModuleStructs.AddressBool({
+            addr: address(VAULT_sUSDe_USDC_CONFIG_HANDLER),
+            value: true
+        });
 
-    function deploy_PT_sUSDe_VAULT(address debtToken) internal {
-        // Deploy PT_sUSDe based vault.
-        address vault_ = VAULT_T1_FACTORY.deployVault(
-            address(VAULT_T1_DEPLOYMENT_LOGIC),
-            abi.encodeWithSelector(
-                IFluidVaultT1DeploymentLogic.vaultT1.selector,
-                PT_sUSDe_ADDRESS, // PT_sUSDe,
-                debtToken // USDC or USDT
-            )
-        );
+        configs_[1] = AdminModuleStructs.AddressBool({
+            addr: address(VAULT_sUSDe_USDT_CONFIG_HANDLER),
+            value: true
+        });
 
-        // Set user supply config for the vault on Liquidity Layer.
-        {
-            AdminModuleStructs.UserSupplyConfig[]
-                memory configs_ = new AdminModuleStructs.UserSupplyConfig[](1);
-
-            configs_[0] = AdminModuleStructs.UserSupplyConfig({
-                user: address(vault_),
-                token: PT_sUSDe_ADDRESS,
-                mode: 1,
-                expandPercent: 25 * 1e2, // 25%
-                expandDuration: 12 hours,
-                baseWithdrawalLimit: 5_000_000 * 1e18 // 5M PT_sUSDe
-            });
-
-            LIQUIDITY.updateUserSupplyConfigs(configs_);
-        }
-
-        // Set user borrow config for the vault on Liquidity Layer.
-        {
-            AdminModuleStructs.UserBorrowConfig[]
-                memory configs_ = new AdminModuleStructs.UserBorrowConfig[](1);
-
-            configs_[0] = AdminModuleStructs.UserBorrowConfig({
-                user: address(vault_),
-                token: debtToken,
-                mode: 1,
-                expandPercent: 20 * 1e2, // 20%
-                expandDuration: 12 hours,
-                baseDebtCeiling: 7_125_000 * 1e6, // ~7.125M
-                maxDebtCeiling: 9_500_000 * 1e6  // 9.5M
-            });
-
-            LIQUIDITY.updateUserBorrowConfigs(configs_);
-        }
-
-        // Update core settings on vault.
-        {
-            IFluidVaultT1(vault_).updateCoreSettings(
-                100 * 1e2, // 1x     supplyRateMagnifier
-                200 * 1e2, // 2x     borrowRateMagnifier
-                88 * 1e2, // 88%     collateralFactor
-                90 * 1e2, // 90%     liquidationThreshold
-                94 * 1e2, // 94%     liquidationMaxLimit
-                2 * 1e2, //  2%      withdrawGap
-                4 * 1e2, //  4%      liquidationPenalty
-                0 //         0%      borrowFee
-            );
-        }
-
-        // Update oracle on vault.
-        {
-            IFluidVaultT1(vault_).updateOracle(
-                0x58455665979fdf24c3Ea8674323326bD99237e12
-            );
-        }
-
-        // Update rebalancer on vault.
-        {
-            IFluidVaultT1(vault_).updateRebalancer(
-                0x264786EF916af64a1DB19F513F24a3681734ce92
-            );
-        }
+        LIQUIDITY.updateAuths(configs_);
     }
 }
