@@ -304,6 +304,19 @@ interface IFluidReserveContract {
     ) external;
 }
 
+interface IDSAV2 {
+    function cast(
+        string[] memory _targetNames,
+        bytes[] memory _datas,
+        address _origin
+    )
+    external
+    payable 
+    returns (bytes32);
+
+    function isAuth(address user) external view returns (bool);
+}
+
 contract PayloadIGP29 {
     uint256 public constant PROPOSAL_ID = 29;
 
@@ -331,18 +344,11 @@ contract PayloadIGP29 {
     IFluidReserveContract public constant FLUID_RESERVE =
         IFluidReserveContract(0x264786EF916af64a1DB19F513F24a3681734ce92);
 
-    address public constant ETH_ADDRESS =
-        0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
-    address public constant wstETH_ADDRESS =
-        0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0;
-    address public constant weETH_ADDRESS =
-        0xCd5fE23C85820F7B72D0926FC9b05b43E359b7ee;
+    IDSAV2 public constant TREASURY = IDSAV2(0x28849D2b63fA8D361e5fc15cB8aBB13019884d09);
 
     address public constant F_USDT = 0x5C20B550819128074FD538Edf79791733ccEdd18;
     address public constant F_USDC = 0x9Fb7b4477576Fe5B32be4C1843aFB1e55F251B33;
 
-    address public constant sUSDe_ADDRESS =
-        0x9D39A5DE30e57443BfF2A8307A4256c8797A3497;
     address public constant USDC_ADDRESS =
         0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
     address public constant USDT_ADDRESS =
@@ -393,6 +399,8 @@ contract PayloadIGP29 {
        /// Action 2: Add config handler on liquidity layer for sUSDe/USDC & sUSDe/USDT vault.
        action2();
 
+       /// Action 3: call cast() - transfer 100 stETH to Team Multisig from treasury.
+        action3();
     }
 
     function verifyProposal() external view {}
@@ -439,5 +447,23 @@ contract PayloadIGP29 {
         });
 
         LIQUIDITY.updateAuths(configs_);
+    }
+
+    /// @notice Action 3: call cast() - transfer 100 stETH to Team Multisig from treasury.
+    function action3() internal {
+        string[] memory targets = new string[](2);
+        bytes[] memory encodedSpells = new bytes[](2);
+
+        string memory withdrawSignature = "withdraw(address,uint256,address,uint256,uint256)";
+
+        // Spell 1: Transfer stETH
+        {   
+            address STETH_ADDRESS = 0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84;
+            uint256 STETH_AMOUNT = 100 * 1e18; // 100 stETH
+            targets[0] = "BASIC-A";
+            encodedSpells[0] = abi.encodeWithSignature(withdrawSignature, STETH_ADDRESS, STETH_AMOUNT, TEAM_MULTISIG, 0, 0);
+        }
+
+        IDSAV2(TREASURY).cast(targets, encodedSpells, address(this));
     }
 }
