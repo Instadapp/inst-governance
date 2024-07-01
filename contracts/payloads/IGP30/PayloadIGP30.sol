@@ -459,14 +459,14 @@ contract PayloadIGP30 {
             supplyMode: 1, // Mode 1
             supplyExpandPercent: 25 * 1e2, // 25%
             supplyExpandDuration: 12 hours, // 12 hours
-            supplyBaseLimit: 81 * 1e8, // ~$5014118.7 @ $61,902.70/wBTC
+            supplyBaseLimitInUSD: 5_000_000, // $5M
 
             borrowToken: address(0),
             borrowMode: 1, // Mode 1
             borrowExpandPercent: 20 * 1e2, // 20%
             borrowExpandDuration: 12 hours, // 12 hours
-            borrowBaseLimit: 7_500_000 * 1e6, // 7.5M
-            borrowMaxLimit: 20_000_000 * 1e6, // 20M
+            borrowBaseLimitInUSD: 7_500_000, // $7.5M
+            borrowMaxLimitInUSD: 20_000_000, // $20M
 
             supplyRateMagnifier: 100 * 1e2, // 1x
             borrowRateMagnifier: 100 * 1e2, // 1x
@@ -503,14 +503,14 @@ contract PayloadIGP30 {
             supplyMode: 1, // Mode 1
             supplyExpandPercent: 25 * 1e2, // 25%
             supplyExpandDuration: 12 hours, // 12 hours
-            supplyBaseLimit: 0,
+            supplyBaseLimitInUSD: 5_000_000, // $5M
 
             borrowToken: address(0),
             borrowMode: 1, // Mode 1
             borrowExpandPercent: 20 * 1e2, // 20%
             borrowExpandDuration: 12 hours, // 12 hours
-            borrowBaseLimit: 0, // 7.5M
-            borrowMaxLimit: 0, // 20M
+            borrowBaseLimitInUSD: 7_500_000, // $7.5M
+            borrowMaxLimitInUSD: 200_000_000, // $200M
 
             supplyRateMagnifier: 100 * 1e2, // 1x
             borrowRateMagnifier: 100 * 1e2, // 1x
@@ -528,11 +528,6 @@ contract PayloadIGP30 {
             vaultConfig.supplyToken = wBTC_ADDRESS;
             vaultConfig.borrowToken = ETH_ADDRESS;
 
-            vaultConfig.supplyBaseLimit = 81 * 1e8; // ~$5014118 @ $61,902.70/wBTC
-
-            vaultConfig.borrowBaseLimit = 2200 * 1e18; // ~$7530930 @ $3,423.15/ETH
-            vaultConfig.borrowMaxLimit = 5850 * 1e18; // ~$20025427 @ $3,423.15/ETH
-
             vaultConfig.oracle = address(0);
 
             // Deploy wBTC/ETH vault.
@@ -542,11 +537,6 @@ contract PayloadIGP30 {
         {
             vaultConfig.supplyToken = ETH_ADDRESS;
             vaultConfig.borrowToken = wBTC_ADDRESS;
-
-            vaultConfig.supplyBaseLimit = 1461 * 1e18; // ~$5001222 @ $3,423.15/ETH
-
-            vaultConfig.borrowBaseLimit = 122 * 1e8; // ~$7552129 @ $61,902.70/wBTC
-            vaultConfig.borrowMaxLimit = 324 * 1e8; // ~$20056474 @ $61,902.70/wBTC
 
             vaultConfig.oracle = address(0);
 
@@ -565,14 +555,14 @@ contract PayloadIGP30 {
                 supplyMode: 1, // Mode 1
                 supplyExpandPercent: 25 * 1e2, // 25%
                 supplyExpandDuration: 12 hours, // 12 hours
-                supplyBaseLimit: 1875 * 1e18, // ~$7507575 @ $4,004.04/wstETH
+                supplyBaseLimitInUSD: 5_000_000, // $5M
 
                 borrowToken: wBTC_ADDRESS,
                 borrowMode: 1, // Mode 1
                 borrowExpandPercent: 20 * 1e2, // 20%
                 borrowExpandDuration: 12 hours, // 12 hours
-                borrowBaseLimit: 122 * 1e8, // ~$7552129 @ $61,902.70/wBTC
-                borrowMaxLimit: 324 * 1e8, // ~$20056474 @ $61,902.70/wBTC
+                borrowBaseLimitInUSD: 7_500_000, // $7.5M
+                borrowMaxLimitInUSD: 200_000_000, // $200M
 
                 supplyRateMagnifier: 100 * 1e2, // 1x
                 borrowRateMagnifier: 100 * 1e2, // 1x
@@ -598,14 +588,14 @@ contract PayloadIGP30 {
                 supplyMode: 1, // Mode 1
                 supplyExpandPercent: 25 * 1e2, // 25%
                 supplyExpandDuration: 12 hours, // 12 hours
-                supplyBaseLimit: 2107 * 1e18, // // ~$7501615 @ $3,560.33/wstETH 
+                supplyBaseLimitInUSD: 5_000_000, // $5M
 
                 borrowToken: wBTC_ADDRESS,
                 borrowMode: 1, // Mode 1
                 borrowExpandPercent: 20 * 1e2, // 20%
                 borrowExpandDuration: 12 hours, // 12 hours
-                borrowBaseLimit: 122 * 1e8, // ~$7552129 @ $61,902.70/wBTC
-                borrowMaxLimit: 324 * 1e8, // ~$20056474 @ $61,902.70/wBTC
+                borrowBaseLimitInUSD: 7_500_000, // $7.5M
+                borrowMaxLimitInUSD: 20_000_000, // $20M
 
                 supplyRateMagnifier: 100 * 1e2, // 1x
                 borrowRateMagnifier: 100 * 1e2, // 1x
@@ -641,14 +631,14 @@ contract PayloadIGP30 {
         uint8 supplyMode;
         uint256 supplyExpandPercent;
         uint256 supplyExpandDuration;
-        uint256 supplyBaseLimit;
+        uint256 supplyBaseLimitInUSD;
 
         address borrowToken;
         uint8 borrowMode;
         uint256 borrowExpandPercent;
         uint256 borrowExpandDuration;
-        uint256 borrowBaseLimit;
-        uint256 borrowMaxLimit;
+        uint256 borrowBaseLimitInUSD;
+        uint256 borrowMaxLimitInUSD;
 
         uint256 supplyRateMagnifier;
         uint256 borrowRateMagnifier;
@@ -684,7 +674,11 @@ contract PayloadIGP30 {
                 mode: vaultConfig.supplyMode,
                 expandPercent: vaultConfig.supplyExpandPercent,
                 expandDuration: vaultConfig.supplyExpandDuration,
-                baseWithdrawalLimit: vaultConfig.supplyBaseLimit
+                baseWithdrawalLimit: getRawAmount(
+                    vaultConfig.supplyToken,
+                    vaultConfig.supplyBaseLimitInUSD,
+                    true
+                )
             });
 
             LIQUIDITY.updateUserSupplyConfigs(configs_);
@@ -701,8 +695,16 @@ contract PayloadIGP30 {
                 mode: vaultConfig.borrowMode,
                 expandPercent: vaultConfig.supplyExpandPercent,
                 expandDuration: vaultConfig.borrowExpandDuration,
-                baseDebtCeiling:vaultConfig.borrowBaseLimit,
-                maxDebtCeiling: vaultConfig.borrowMaxLimit
+                baseDebtCeiling:getRawAmount(
+                    vaultConfig.borrow,
+                    vaultConfig.borrowBaseLimitInUSD,
+                    false
+                )
+                maxDebtCeiling: getRawAmount(
+                    vaultConfig.borrow,
+                    vaultConfig.borrowMaxLimitInUSD,
+                    false
+                )
             });
 
             LIQUIDITY.updateUserBorrowConfigs(configs_);
@@ -872,5 +874,42 @@ contract PayloadIGP30 {
 
             LIQUIDITY.updateUserBorrowConfigs(configs_);
         }
+    }
+
+    function getRawAmount(address token, uint256 amountInUSD, bool isSupply) public returns(uint256){
+        uint256 exchangePricesAndConfig = 
+            LIQUIDITY.readFromStorage(
+                LiquiditySlotsLink.calculateMappingStorageSlot(
+                    LiquiditySlotsLink.LIQUIDITY_EXCHANGE_PRICES_MAPPING_SLOT,
+                    token
+                )
+            );
+
+        (uint256 supplyExchangePrice, uint256 borrowExchangePrice) = LiquidityCalcs
+                .calcExchangePrices(exchangePriceAndConfig_);
+
+        uint256 usdPrice = 0;
+        uint256 decimals = 18;
+        if (token == wBTC_ADDRESS) {
+            usdPrice = 61_000;
+            decimals = 8;
+        } if (token == ETH_ADDRESS) {
+            usdPrice = 3_400;
+            decimals = 18;
+        } if (token == wstETH_ADDRESS) {
+            usdPrice = 4_000;
+            decimals = 18;
+        } if (token == weETH_ADDRESS) {
+            usdPrice = 3_550;
+            decimals = 18;
+        } if (token == USDC_ADDRESS || token == USDT_ADDRESS) {
+            usdPrice = 1;
+            decimals = 6;
+        } else {
+            revert;
+        }
+
+        uint256 exchangePrice = isSupply ? supplyExchangePrice : borrowExchangePrice;
+        return (amountInUSD * 1e12 * (10 ** decimals)) / (usdPrice * exchangePrice);
     }
 }
