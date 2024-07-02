@@ -398,18 +398,17 @@ contract PayloadIGP30 {
         /// Action 1: Set wBTC token config and market rate curve on liquidity.
         action1();
 
-       /// Action 2: Deploy wBTC/USDC and wBTC/USDT vaults.
-       action2();
+        /// Action 2: Deploy wBTC/USDC and wBTC/USDT vaults.
+        action2();
 
-       /// Action 3: Deploy wBTC/ETH and ETH/wBTC vaults.
-       action3();
+        /// Action 3: Deploy wBTC/ETH and ETH/wBTC vaults.
+        action3();
 
-       /// Action 4: Deploy wstETH/wBTC and weETH/wBTC vaults.
-       action4();
+        /// Action 4: Deploy wstETH/wBTC and weETH/wBTC vaults.
+        action4();
 
-       /// Action 5: Clone from old vault config to new vault
-       action5();
-
+        /// Action 5: Clone from old vault config to new vault
+        action5();
     }
 
     function verifyProposal() external view {}
@@ -443,7 +442,7 @@ contract PayloadIGP30 {
                 token: wBTC_ADDRESS, // wBTC
                 threshold: 0.3 * 1e2, // 0.3
                 fee: 10 * 1e2, // 10%
-                maxUtilization: 100
+                maxUtilization: 100 * 1e2
             });
 
             LIQUIDITY.updateTokenConfigs(params_);
@@ -474,7 +473,7 @@ contract PayloadIGP30 {
             liquidationThreshold: 85 * 1e2, // 85% 
             liquidationMaxLimit: 90 * 1e2, // 90% 
             withdrawGap: 5 * 1e2, // 5% 
-            liquidationPenalty: 4 * 1e2, // 4% 
+            liquidationPenalty: 0,
             borrowFee: 0 * 1e2, // 0% 
 
             oracle: address(0)
@@ -483,12 +482,20 @@ contract PayloadIGP30 {
         {
             vaultConfig.borrowToken = USDC_ADDRESS;
 
+            vaultConfig.liquidationPenalty = 3 * 1e2; // 3% 
+
+            vaultConfig.oracle = 0x131BA983Ab640Ce291B98694b3Def4288596cD09;
+
             // Deploy wBTC/USDC vault.
             deployVault(vaultConfig);
         }
 
         {
             vaultConfig.borrowToken = USDT_ADDRESS;
+
+            vaultConfig.liquidationPenalty = 4 * 1e2; // 4% 
+
+            vaultConfig.oracle = 0xFF272430E88B3f804d9E30886677A36021864Cc4;
 
             // Deploy wBTC/USDT vault.
             deployVault(vaultConfig);
@@ -521,26 +528,26 @@ contract PayloadIGP30 {
             liquidationPenalty: 2 * 1e2, // 2% 
             borrowFee: 0 * 1e2, // 0% 
 
-            oracle: address(0)
+            oracle: address()
         });
 
+        // Deploy wBTC/ETH vault.
         {
             vaultConfig.supplyToken = wBTC_ADDRESS;
             vaultConfig.borrowToken = ETH_ADDRESS;
 
-            vaultConfig.oracle = address(0);
+            vaultConfig.oracle = address(0x4C57Ef1012bDFFCe68FDDcD793Bb2b8B7D27DC06);
 
-            // Deploy wBTC/ETH vault.
             deployVault(vaultConfig);
         }
 
+        // Deploy ETH/wBTC vault.
         {
             vaultConfig.supplyToken = ETH_ADDRESS;
             vaultConfig.borrowToken = wBTC_ADDRESS;
 
-            vaultConfig.oracle = address(0);
+            vaultConfig.oracle = address(0x63Ae926f97A480B18d58370268672766643f577F);
 
-            // Deploy ETH/wBTC vault.
             deployVault(vaultConfig);
         }
     }
@@ -573,7 +580,7 @@ contract PayloadIGP30 {
                 liquidationPenalty: 2 * 1e2, // 2% 
                 borrowFee: 0 * 1e2, // 0% 
 
-                oracle: address(0)
+                oracle: 0xD25c68bb507f8E19386F4F102462e1bfbfA7869F
             });
 
             // Deploy wstETH/wBTC
@@ -606,7 +613,7 @@ contract PayloadIGP30 {
                 liquidationPenalty: 5 * 1e2, // 5% 
                 borrowFee: 0 * 1e2, // 0% 
 
-                oracle: address(0)
+                oracle: 0xBD7ea28840B120E2a2645F103273B0Dc23599E05
             });
 
             // Deploy weETH/wBTC
