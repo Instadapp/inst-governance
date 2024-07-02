@@ -149,6 +149,10 @@ interface IProxy {
 }
 
 interface IFluidLiquidityAdmin {
+    function readFromStorage(
+        bytes32 slot_
+    ) external view returns (uint256 result_);
+
     /// @notice adds/removes auths. Auths generally could be contracts which can have restricted actions defined on contract.
     ///         auths can be helpful in reducing governance overhead where it's not needed.
     /// @param authsStatus_ array of structs setting allowed status for an address.
@@ -315,6 +319,14 @@ interface IFluidVaultT1Factory {
         address vaultAuth_,
         bool allowed_
     ) external;
+
+    function getVaultAddress(
+        uint256 vaultId_
+    ) external view returns (address vault_);
+
+    function readFromStorage(
+        bytes32 slot_
+    ) external view returns (uint256 result_);
 }
 
 interface IFluidVaultT1DeploymentLogic {
@@ -609,7 +621,7 @@ contract PayloadIGP30 {
             liquidationPenalty: 2 * 1e2, // 2% 
             borrowFee: 0 * 1e2, // 0% 
 
-            oracle: address()
+            oracle: address(0)
         });
 
         // Deploy wBTC/ETH vault.
@@ -799,13 +811,13 @@ contract PayloadIGP30 {
                 mode: vaultConfig.borrowMode,
                 expandPercent: vaultConfig.supplyExpandPercent,
                 expandDuration: vaultConfig.borrowExpandDuration,
-                baseDebtCeilingInUSD: getRawAmount(
-                    vaultConfig.borrow,
+                baseDebtCeiling: getRawAmount(
+                    vaultConfig.borrowToken,
                     vaultConfig.borrowBaseLimitInUSD,
                     false
                 ),
-                maxDebtCeilingInUSD: getRawAmount(
-                    vaultConfig.borrow,
+                maxDebtCeiling: getRawAmount(
+                    vaultConfig.borrowToken,
                     vaultConfig.borrowMaxLimitInUSD,
                     false
                 )
@@ -877,9 +889,7 @@ contract PayloadIGP30 {
     function getUserBorrowData(
         address token_,
         address oldVault_,
-        address newVault_,
-        uint256 baseLimit,
-        uint256 maxLimit
+        address newVault_
     )
         internal
         view
@@ -956,8 +966,7 @@ contract PayloadIGP30 {
             configs_[0] = getUserSupplyData(
                 newConstants.supplyToken,
                 data.oldVaultAddress,
-                data.newVaultAddress,
-                data.supplyBaseAllowance
+                data.newVaultAddress
             );
 
             LIQUIDITY.updateUserSupplyConfigs(configs_);
@@ -971,9 +980,7 @@ contract PayloadIGP30 {
             configs_[0] = getUserBorrowData(
                 newConstants.borrowToken,
                 data.oldVaultAddress,
-                data.newVaultAddress,
-                data.borrowBaseAllowance,
-                data.borrowMaxAllowance
+                data.newVaultAddress
             );
 
             LIQUIDITY.updateUserBorrowConfigs(configs_);
@@ -1009,7 +1016,7 @@ contract PayloadIGP30 {
             usdPrice = 1;
             decimals = 6;
         } else {
-            revert;
+            revert("not-found");
         }
 
         uint256 exchangePrice = isSupply ? supplyExchangePrice : borrowExchangePrice;
