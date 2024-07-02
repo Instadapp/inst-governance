@@ -488,6 +488,9 @@ contract PayloadIGP30 {
 
         /// Action 5: Clone from old vault config to new vault
         action5();
+
+        /// Action 6: call cast() - transfer 2 wBTC to Fluid Reserve contract from treasury.
+        action6();
     }
 
     function verifyProposal() external view {}
