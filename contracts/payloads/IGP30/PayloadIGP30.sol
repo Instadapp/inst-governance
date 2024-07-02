@@ -322,6 +322,8 @@ contract PayloadIGP30 {
 
     IFluidLiquidityAdmin public constant LIQUIDITY =
         IFluidLiquidityAdmin(0x52Aa899454998Be5b000Ad077a46Bbe360F4e497);
+    IFluidReserveContract public constant FLUID_RESERVE =
+        IFluidReserveContract(0x264786EF916af64a1DB19F513F24a3681734ce92);
     IFluidVaultT1Factory public constant VAULT_T1_FACTORY =
         IFluidVaultT1Factory(0x324c5Dc1fC42c7a4D43d92df1eBA58a54d13Bf2d);
     IFluidVaultT1DeploymentLogic public constant VAULT_T1_DEPLOYMENT_LOGIC =
@@ -487,7 +489,14 @@ contract PayloadIGP30 {
             vaultConfig.oracle = 0x131BA983Ab640Ce291B98694b3Def4288596cD09;
 
             // Deploy wBTC/USDC vault.
-            deployVault(vaultConfig);
+            address vault_ = deployVault(vaultConfig);
+
+            // Set USDC rewards contract
+            VAULT_T1_FACTORY.setVaultAuth(
+                vault_,
+                0xF561347c306E3Ccf213b73Ce2353D6ed79f92408,
+                true
+            );
         }
 
         {
@@ -498,7 +507,14 @@ contract PayloadIGP30 {
             vaultConfig.oracle = 0xFF272430E88B3f804d9E30886677A36021864Cc4;
 
             // Deploy wBTC/USDT vault.
-            deployVault(vaultConfig);
+            address vault_ = deployVault(vaultConfig);
+
+            // Set USDC rewards contract
+            VAULT_T1_FACTORY.setVaultAuth(
+                vault_,
+                0x36C677a6AbDa7D6409fB74d1136A65aF1415F539,
+                true
+            );
         }
     }
 
@@ -628,6 +644,23 @@ contract PayloadIGP30 {
         }
     }
 
+    /// @notice Action 6: call cast() - transfer 2 wBTC to Fluid Reserve contract from treasury.
+    function action6() internal {
+        string[] memory targets = new string[](1);
+        bytes[] memory encodedSpells = new bytes[](1);
+
+        string memory withdrawSignature = "withdraw(address,uint256,address,uint256,uint256)";
+
+        // Spell 1: Transfer wBTC
+        {   
+            uint256 wBTC_AMOUNT = 2 * 1e8; // 2 wBTC
+            targets[0] = "BASIC-A";
+            encodedSpells[0] = abi.encodeWithSignature(withdrawSignature, wBTC_ADDRESS, wBTC_AMOUNT, FLUID_RESERVE, 0, 0);
+        }
+
+        IDSAV2(TREASURY).cast(targets, encodedSpells, address(this));
+    }
+
 
     /***********************************|
     |     Proposal Payload Helpers      |
@@ -659,9 +692,9 @@ contract PayloadIGP30 {
         address oracle;
     }
 
-    function deployVault(VaultConfig memory vaultConfig) internal {
+    function deployVault(VaultConfig memory vaultConfig) internal returns (address vault_) {
         // Deploy vault.
-        address vault_ = VAULT_T1_FACTORY.deployVault(
+        vault_ = VAULT_T1_FACTORY.deployVault(
             address(VAULT_T1_DEPLOYMENT_LOGIC),
             abi.encodeWithSelector(
                 IFluidVaultT1DeploymentLogic.vaultT1.selector,
