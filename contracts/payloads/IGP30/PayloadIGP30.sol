@@ -1,4 +1,4 @@
-pragma solidity ^0.7.0;
+pragma solidity >=0.7.0;
 pragma experimental ABIEncoderV2;
 
 import {BigMathMinified} from "./libraries/bigMathMinified.sol";
@@ -279,6 +279,29 @@ interface IFluidVaultT1 {
 
     /// @notice updates the collateral factor to `collateralFactor_`. Input in 1e2 (1% = 100, 100% = 10_000).
     function updateCollateralFactor(uint collateralFactor_) external;
+
+    struct ConstantViews {
+        address liquidity;
+        address factory;
+        address adminImplementation;
+        address secondaryImplementation;
+        address supplyToken;
+        address borrowToken;
+        uint8 supplyDecimals;
+        uint8 borrowDecimals;
+        uint vaultId;
+        bytes32 liquiditySupplyExchangePriceSlot;
+        bytes32 liquidityBorrowExchangePriceSlot;
+        bytes32 liquidityUserSupplySlot;
+        bytes32 liquidityUserBorrowSlot;
+    }
+
+    /// @notice returns all Vault constants
+    function constantsView()
+        external
+        view
+        returns (ConstantViews memory constantsView_);
+
 }
 
 interface IFluidVaultT1Factory {
@@ -296,6 +319,46 @@ interface IFluidVaultT1Factory {
 
 interface IFluidVaultT1DeploymentLogic {
     function vaultT1(address supplyToken_, address borrowToken_) external;
+}
+
+interface IFluidReserveContract {
+    function isRebalancer(address user) external returns (bool);
+
+    function rebalanceFToken(address protocol_) external;
+
+    function rebalanceVault(address protocol_) external;
+
+    function transferFunds(address token_) external;
+
+    function getProtocolTokens(address protocol_) external;
+
+    function updateAuth(address auth_, bool isAuth_) external;
+
+    function updateRebalancer(address rebalancer_, bool isRebalancer_) external;
+
+    function approve(
+        address[] memory protocols_,
+        address[] memory tokens_,
+        uint256[] memory amounts_
+    ) external;
+
+    function revoke(
+        address[] memory protocols_,
+        address[] memory tokens_
+    ) external;
+}
+
+interface IDSAV2 {
+    function cast(
+        string[] memory _targetNames,
+        bytes[] memory _datas,
+        address _origin
+    )
+    external
+    payable 
+    returns (bytes32);
+
+    function isAuth(address user) external view returns (bool);
 }
 
 contract PayloadIGP30 {
@@ -319,6 +382,8 @@ contract PayloadIGP30 {
 
     address public constant TEAM_MULTISIG =
         0x4F6F977aCDD1177DCD81aB83074855EcB9C2D49e;
+
+    IDSAV2 public constant TREASURY = IDSAV2(0x28849D2b63fA8D361e5fc15cB8aBB13019884d09);
 
     IFluidLiquidityAdmin public constant LIQUIDITY =
         IFluidLiquidityAdmin(0x52Aa899454998Be5b000Ad077a46Bbe360F4e497);
@@ -467,7 +532,7 @@ contract PayloadIGP30 {
             borrowExpandPercent: 20 * 1e2, // 20%
             borrowExpandDuration: 12 hours, // 12 hours
             borrowBaseLimitInUSD: 7_500_000, // $7.5M
-            borrowMaxLimitInUSD: 20_000_000, // $20M
+            borrowMaxLimitInUSD: 200_000_000, // $200M
 
             supplyRateMagnifier: 100 * 1e2, // 1x
             borrowRateMagnifier: 100 * 1e2, // 1x
@@ -640,7 +705,7 @@ contract PayloadIGP30 {
     /// @notice Action 5: Clone from old vault config to new vault
     function action5() internal {
         for (uint oldVaultId = 1; oldVaultId <= 10; oldVaultId++) {
-            cloneVault(oldVaultId);
+            configNewVaultWithOldVaultConfigs(oldVaultId);
         }
     }
 
@@ -660,7 +725,6 @@ contract PayloadIGP30 {
 
         IDSAV2(TREASURY).cast(targets, encodedSpells, address(this));
     }
-
 
     /***********************************|
     |     Proposal Payload Helpers      |
@@ -735,12 +799,12 @@ contract PayloadIGP30 {
                 mode: vaultConfig.borrowMode,
                 expandPercent: vaultConfig.supplyExpandPercent,
                 expandDuration: vaultConfig.borrowExpandDuration,
-                baseDebtCeiling:getRawAmount(
+                baseDebtCeilingInUSD: getRawAmount(
                     vaultConfig.borrow,
                     vaultConfig.borrowBaseLimitInUSD,
                     false
-                )
-                maxDebtCeiling: getRawAmount(
+                ),
+                maxDebtCeilingInUSD: getRawAmount(
                     vaultConfig.borrow,
                     vaultConfig.borrowMaxLimitInUSD,
                     false
@@ -917,7 +981,7 @@ contract PayloadIGP30 {
     }
 
     function getRawAmount(address token, uint256 amountInUSD, bool isSupply) public returns(uint256){
-        uint256 exchangePricesAndConfig = 
+        uint256 exchangePriceAndConfig_ = 
             LIQUIDITY.readFromStorage(
                 LiquiditySlotsLink.calculateMappingStorageSlot(
                     LiquiditySlotsLink.LIQUIDITY_EXCHANGE_PRICES_MAPPING_SLOT,
@@ -925,8 +989,7 @@ contract PayloadIGP30 {
                 )
             );
 
-        (uint256 supplyExchangePrice, uint256 borrowExchangePrice) = LiquidityCalcs
-                .calcExchangePrices(exchangePriceAndConfig_);
+        (uint256 supplyExchangePrice, uint256 borrowExchangePrice) = LiquidityCalcs.calcExchangePrices(exchangePriceAndConfig_);
 
         uint256 usdPrice = 0;
         uint256 decimals = 18;
