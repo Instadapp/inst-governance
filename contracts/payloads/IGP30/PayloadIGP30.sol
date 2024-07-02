@@ -987,7 +987,7 @@ contract PayloadIGP30 {
         }
     }
 
-    function getRawAmount(address token, uint256 amountInUSD, bool isSupply) public returns(uint256){
+    function getRawAmount(address token, uint256 amountInUSD, bool isSupply) public view returns(uint256){
         uint256 exchangePriceAndConfig_ = 
             LIQUIDITY.readFromStorage(
                 LiquiditySlotsLink.calculateMappingStorageSlot(
@@ -1003,16 +1003,16 @@ contract PayloadIGP30 {
         if (token == wBTC_ADDRESS) {
             usdPrice = 61_000;
             decimals = 8;
-        } if (token == ETH_ADDRESS) {
+        } else if (token == ETH_ADDRESS) {
             usdPrice = 3_400;
             decimals = 18;
-        } if (token == wstETH_ADDRESS) {
+        } else if (token == wstETH_ADDRESS) {
             usdPrice = 4_000;
             decimals = 18;
-        } if (token == weETH_ADDRESS) {
+        } else if (token == weETH_ADDRESS) {
             usdPrice = 3_550;
             decimals = 18;
-        } if (token == USDC_ADDRESS || token == USDT_ADDRESS) {
+        } else if (token == USDC_ADDRESS || token == USDT_ADDRESS) {
             usdPrice = 1;
             decimals = 6;
         } else {
