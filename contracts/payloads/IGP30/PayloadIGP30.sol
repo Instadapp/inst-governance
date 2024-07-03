@@ -545,9 +545,9 @@ contract PayloadIGP30 {
 
             supplyRateMagnifier: 100 * 1e2, // 1x
             borrowRateMagnifier: 100 * 1e2, // 1x
-            collateralFactor: 90 * 1e2, // 90% 
-            liquidationThreshold: 94 * 1e2, // 94% 
-            liquidationMaxLimit: 96 * 1e2, // 96% 
+            collateralFactor: 90 * 1e2, // 90%
+            liquidationThreshold: 0,
+            liquidationMaxLimit: 0,
             withdrawGap: 5 * 1e2, // 5% 
             liquidationPenalty: 2 * 1e2, // 2% 
             borrowFee: 0 * 1e2, // 0% 
@@ -560,6 +560,9 @@ contract PayloadIGP30 {
             vaultConfig.supplyToken = wBTC_ADDRESS;
             vaultConfig.borrowToken = ETH_ADDRESS;
 
+            vaultConfig.liquidationThreshold = 91 * 1e2; // 91% 
+            vaultConfig.liquidationMaxLimit = 93 * 1e2; // 93% 
+
             vaultConfig.oracle = address(0x4C57Ef1012bDFFCe68FDDcD793Bb2b8B7D27DC06);
 
             deployVault(vaultConfig);
@@ -569,6 +572,9 @@ contract PayloadIGP30 {
         {
             vaultConfig.supplyToken = ETH_ADDRESS;
             vaultConfig.borrowToken = wBTC_ADDRESS;
+
+            vaultConfig.liquidationThreshold = 93 * 1e2; // 93% 
+            vaultConfig.liquidationMaxLimit = 95 * 1e2; // 95% 
 
             vaultConfig.oracle = address(0x63Ae926f97A480B18d58370268672766643f577F);
 
