@@ -333,6 +333,33 @@ interface IFluidVaultT1DeploymentLogic {
     function vaultT1(address supplyToken_, address borrowToken_) external;
 }
 
+interface IFluidReserveContract {
+    function isRebalancer(address user) external returns (bool);
+
+    function rebalanceFToken(address protocol_) external;
+
+    function rebalanceVault(address protocol_) external;
+
+    function transferFunds(address token_) external;
+
+    function getProtocolTokens(address protocol_) external;
+
+    function updateAuth(address auth_, bool isAuth_) external;
+
+    function updateRebalancer(address rebalancer_, bool isRebalancer_) external;
+
+    function approve(
+        address[] memory protocols_,
+        address[] memory tokens_,
+        uint256[] memory amounts_
+    ) external;
+
+    function revoke(
+        address[] memory protocols_,
+        address[] memory tokens_
+    ) external;
+}
+
 contract PayloadIGP31 {
     uint256 public constant PROPOSAL_ID = 31;
 
@@ -363,6 +390,8 @@ contract PayloadIGP31 {
         IFluidVaultT1DeploymentLogic(
             0x2Cc710218F2e3a82CcC77Cc4B3B93Ee6Ba9451CD
         );
+    IFluidReserveContract public constant FLUID_RESERVE =
+        IFluidReserveContract(0x264786EF916af64a1DB19F513F24a3681734ce92);
 
     address public constant ETH_ADDRESS =
         0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
@@ -649,7 +678,7 @@ contract PayloadIGP31 {
                 user: address(vault_),
                 token: vaultConfig.borrowToken,
                 mode: vaultConfig.borrowMode,
-                expandPercent: vaultConfig.supplyExpandPercent,
+                expandPercent: vaultConfig.borrowExpandPercent,
                 expandDuration: vaultConfig.borrowExpandDuration,
                 baseDebtCeiling: getRawAmount(
                     vaultConfig.borrowToken,
@@ -687,9 +716,7 @@ contract PayloadIGP31 {
 
         // Update rebalancer on vault.
         {
-            IFluidVaultT1(vault_).updateRebalancer(
-                0x264786EF916af64a1DB19F513F24a3681734ce92
-            );
+            IFluidVaultT1(vault_).updateRebalancer(address(FLUID_RESERVE));
         }
     }
 

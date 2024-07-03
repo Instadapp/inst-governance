@@ -677,7 +677,7 @@ contract PayloadIGP30 {
                 user: address(vault_),
                 token: vaultConfig.borrowToken,
                 mode: vaultConfig.borrowMode,
-                expandPercent: vaultConfig.supplyExpandPercent,
+                expandPercent: vaultConfig.borrowExpandPercent,
                 expandDuration: vaultConfig.borrowExpandDuration,
                 baseDebtCeiling: getRawAmount(
                     vaultConfig.borrowToken,
@@ -715,9 +715,7 @@ contract PayloadIGP30 {
 
         // Update rebalancer on vault.
         {
-            IFluidVaultT1(vault_).updateRebalancer(
-                0x264786EF916af64a1DB19F513F24a3681734ce92
-            );
+            IFluidVaultT1(vault_).updateRebalancer(address(FLUID_RESERVE));
         }
     }
 
