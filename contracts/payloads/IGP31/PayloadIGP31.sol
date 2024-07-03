@@ -305,7 +305,6 @@ interface IFluidVaultT1 {
         external
         view
         returns (ConstantViews memory constantsView_);
-
 }
 
 interface IFluidVaultT1Factory {
@@ -459,13 +458,13 @@ contract PayloadIGP31 {
     function execute() external {
         require(address(this) == address(TIMELOCK), "not-valid-caller");
 
-        /// Action 1: Deploy wBTC/ETH and ETH/wBTC vaults.
+        // Action 1: Deploy wBTC/ETH and ETH/wBTC vaults.
         action1();
 
-        /// Action 2: Deploy wstETH/wBTC and weETH/wBTC vaults.
+        // Action 2: Deploy wstETH/wBTC and weETH/wBTC vaults.
         action2();
 
-        /// Action 3: Clone from old vault config to new vault
+        // Action 3: Clone from old vault config to new vault
         action3();
     }
 
@@ -475,7 +474,7 @@ contract PayloadIGP31 {
     |     Proposal Payload Actions      |
     |__________________________________*/
 
-   /// @notice Action 1: Deploy wBTC/ETH and ETH/wBTC vaults.
+    /// @notice Action 1: Deploy wBTC/ETH and ETH/wBTC vaults.
     function action1() internal {
         VaultConfig memory vaultConfig = VaultConfig({
             // user supply config for the vault on Liquidity Layer.
@@ -484,23 +483,20 @@ contract PayloadIGP31 {
             supplyExpandPercent: 25 * 1e2, // 25%
             supplyExpandDuration: 12 hours, // 12 hours
             supplyBaseLimitInUSD: 5_000_000, // $5M
-
             borrowToken: address(0),
             borrowMode: 1, // Mode 1
             borrowExpandPercent: 20 * 1e2, // 20%
             borrowExpandDuration: 12 hours, // 12 hours
             borrowBaseLimitInUSD: 7_500_000, // $7.5M
             borrowMaxLimitInUSD: 200_000_000, // $200M
-
             supplyRateMagnifier: 100 * 1e2, // 1x
             borrowRateMagnifier: 100 * 1e2, // 1x
             collateralFactor: 90 * 1e2, // 90%
             liquidationThreshold: 0,
             liquidationMaxLimit: 0,
-            withdrawGap: 5 * 1e2, // 5% 
-            liquidationPenalty: 2 * 1e2, // 2% 
-            borrowFee: 0 * 1e2, // 0% 
-
+            withdrawGap: 5 * 1e2, // 5%
+            liquidationPenalty: 2 * 1e2, // 2%
+            borrowFee: 0 * 1e2, // 0%
             oracle: address(0)
         });
 
@@ -509,10 +505,12 @@ contract PayloadIGP31 {
             vaultConfig.supplyToken = wBTC_ADDRESS;
             vaultConfig.borrowToken = ETH_ADDRESS;
 
-            vaultConfig.liquidationThreshold = 91 * 1e2; // 91% 
-            vaultConfig.liquidationMaxLimit = 93 * 1e2; // 93% 
+            vaultConfig.liquidationThreshold = 91 * 1e2; // 91%
+            vaultConfig.liquidationMaxLimit = 93 * 1e2; // 93%
 
-            vaultConfig.oracle = address(0x4C57Ef1012bDFFCe68FDDcD793Bb2b8B7D27DC06);
+            vaultConfig.oracle = address(
+                0x4C57Ef1012bDFFCe68FDDcD793Bb2b8B7D27DC06
+            );
 
             deployVault(vaultConfig);
         }
@@ -522,10 +520,12 @@ contract PayloadIGP31 {
             vaultConfig.supplyToken = ETH_ADDRESS;
             vaultConfig.borrowToken = wBTC_ADDRESS;
 
-            vaultConfig.liquidationThreshold = 93 * 1e2; // 93% 
-            vaultConfig.liquidationMaxLimit = 95 * 1e2; // 95% 
+            vaultConfig.liquidationThreshold = 93 * 1e2; // 93%
+            vaultConfig.liquidationMaxLimit = 95 * 1e2; // 95%
 
-            vaultConfig.oracle = address(0x63Ae926f97A480B18d58370268672766643f577F);
+            vaultConfig.oracle = address(
+                0x63Ae926f97A480B18d58370268672766643f577F
+            );
 
             deployVault(vaultConfig);
         }
@@ -542,23 +542,20 @@ contract PayloadIGP31 {
                 supplyExpandPercent: 25 * 1e2, // 25%
                 supplyExpandDuration: 12 hours, // 12 hours
                 supplyBaseLimitInUSD: 5_000_000, // $5M
-
                 borrowToken: wBTC_ADDRESS,
                 borrowMode: 1, // Mode 1
                 borrowExpandPercent: 20 * 1e2, // 20%
                 borrowExpandDuration: 12 hours, // 12 hours
                 borrowBaseLimitInUSD: 7_500_000, // $7.5M
                 borrowMaxLimitInUSD: 200_000_000, // $200M
-
                 supplyRateMagnifier: 100 * 1e2, // 1x
                 borrowRateMagnifier: 100 * 1e2, // 1x
-                collateralFactor: 88 * 1e2, // 88% 
-                liquidationThreshold: 91 * 1e2, // 91% 
-                liquidationMaxLimit: 94 * 1e2, // 94% 
-                withdrawGap: 5 * 1e2, // 5% 
-                liquidationPenalty: 2 * 1e2, // 2% 
-                borrowFee: 0 * 1e2, // 0% 
-
+                collateralFactor: 88 * 1e2, // 88%
+                liquidationThreshold: 91 * 1e2, // 91%
+                liquidationMaxLimit: 94 * 1e2, // 94%
+                withdrawGap: 5 * 1e2, // 5%
+                liquidationPenalty: 2 * 1e2, // 2%
+                borrowFee: 0 * 1e2, // 0%
                 oracle: 0xD25c68bb507f8E19386F4F102462e1bfbfA7869F
             });
 
@@ -575,23 +572,20 @@ contract PayloadIGP31 {
                 supplyExpandPercent: 25 * 1e2, // 25%
                 supplyExpandDuration: 12 hours, // 12 hours
                 supplyBaseLimitInUSD: 5_000_000, // $5M
-
                 borrowToken: wBTC_ADDRESS,
                 borrowMode: 1, // Mode 1
                 borrowExpandPercent: 20 * 1e2, // 20%
                 borrowExpandDuration: 12 hours, // 12 hours
                 borrowBaseLimitInUSD: 7_500_000, // $7.5M
                 borrowMaxLimitInUSD: 20_000_000, // $20M
-
                 supplyRateMagnifier: 100 * 1e2, // 1x
                 borrowRateMagnifier: 100 * 1e2, // 1x
-                collateralFactor: 80 * 1e2, // 80% 
-                liquidationThreshold: 85 * 1e2, // 85% 
-                liquidationMaxLimit: 90 * 1e2, // 90% 
-                withdrawGap: 5 * 1e2, // 5% 
-                liquidationPenalty: 5 * 1e2, // 5% 
-                borrowFee: 0 * 1e2, // 0% 
-
+                collateralFactor: 80 * 1e2, // 80%
+                liquidationThreshold: 85 * 1e2, // 85%
+                liquidationMaxLimit: 90 * 1e2, // 90%
+                withdrawGap: 5 * 1e2, // 5%
+                liquidationPenalty: 5 * 1e2, // 5%
+                borrowFee: 0 * 1e2, // 0%
                 oracle: 0xBD7ea28840B120E2a2645F103273B0Dc23599E05
             });
 
@@ -617,14 +611,12 @@ contract PayloadIGP31 {
         uint256 supplyExpandPercent;
         uint256 supplyExpandDuration;
         uint256 supplyBaseLimitInUSD;
-
         address borrowToken;
         uint8 borrowMode;
         uint256 borrowExpandPercent;
         uint256 borrowExpandDuration;
         uint256 borrowBaseLimitInUSD;
         uint256 borrowMaxLimitInUSD;
-
         uint256 supplyRateMagnifier;
         uint256 borrowRateMagnifier;
         uint256 collateralFactor;
@@ -633,18 +625,19 @@ contract PayloadIGP31 {
         uint256 withdrawGap;
         uint256 liquidationPenalty;
         uint256 borrowFee;
-
         address oracle;
     }
 
-    function deployVault(VaultConfig memory vaultConfig) internal returns (address vault_) {
+    function deployVault(
+        VaultConfig memory vaultConfig
+    ) internal returns (address vault_) {
         // Deploy vault.
         vault_ = VAULT_T1_FACTORY.deployVault(
             address(VAULT_T1_DEPLOYMENT_LOGIC),
             abi.encodeWithSelector(
                 IFluidVaultT1DeploymentLogic.vaultT1.selector,
                 vaultConfig.supplyToken,
-                vaultConfig.borrowToken 
+                vaultConfig.borrowToken
             )
         );
 
@@ -744,12 +737,13 @@ contract PayloadIGP31 {
                 LiquiditySlotsLink.BITS_USER_SUPPLY_EXPAND_PERCENT) & X14,
             expandDuration: (userSupplyData_ >>
                 LiquiditySlotsLink.BITS_USER_SUPPLY_EXPAND_DURATION) & X24,
-            baseWithdrawalLimit: 
-                BigMathMinified.fromBigNumber(
-                    (userSupplyData_ >> LiquiditySlotsLink.BITS_USER_SUPPLY_BASE_WITHDRAWAL_LIMIT) & X18,
-                    DEFAULT_EXPONENT_SIZE,
-                    DEFAULT_EXPONENT_MASK
-                )
+            baseWithdrawalLimit: BigMathMinified.fromBigNumber(
+                (userSupplyData_ >>
+                    LiquiditySlotsLink.BITS_USER_SUPPLY_BASE_WITHDRAWAL_LIMIT) &
+                    X18,
+                DEFAULT_EXPONENT_SIZE,
+                DEFAULT_EXPONENT_MASK
+            )
         });
     }
 
@@ -778,18 +772,19 @@ contract PayloadIGP31 {
                 LiquiditySlotsLink.BITS_USER_BORROW_EXPAND_PERCENT) & X14,
             expandDuration: (userBorrowData_ >>
                 LiquiditySlotsLink.BITS_USER_BORROW_EXPAND_DURATION) & X24,
-            baseDebtCeiling: 
-                BigMathMinified.fromBigNumber(
-                    (userBorrowData_ >> LiquiditySlotsLink.BITS_USER_BORROW_BASE_BORROW_LIMIT) & X18,
-                    DEFAULT_EXPONENT_SIZE,
-                    DEFAULT_EXPONENT_MASK
-                ),
-            maxDebtCeiling: 
-                BigMathMinified.fromBigNumber(
-                    (userBorrowData_ >> LiquiditySlotsLink.BITS_USER_BORROW_MAX_BORROW_LIMIT) & X18,
-                    DEFAULT_EXPONENT_SIZE,
-                    DEFAULT_EXPONENT_MASK
-                )
+            baseDebtCeiling: BigMathMinified.fromBigNumber(
+                (userBorrowData_ >>
+                    LiquiditySlotsLink.BITS_USER_BORROW_BASE_BORROW_LIMIT) &
+                    X18,
+                DEFAULT_EXPONENT_SIZE,
+                DEFAULT_EXPONENT_MASK
+            ),
+            maxDebtCeiling: BigMathMinified.fromBigNumber(
+                (userBorrowData_ >>
+                    LiquiditySlotsLink.BITS_USER_BORROW_MAX_BORROW_LIMIT) & X18,
+                DEFAULT_EXPONENT_SIZE,
+                DEFAULT_EXPONENT_MASK
+            )
         });
     }
 
@@ -854,16 +849,22 @@ contract PayloadIGP31 {
         }
     }
 
-    function getRawAmount(address token, uint256 amountInUSD, bool isSupply) public view returns(uint256){
-        uint256 exchangePriceAndConfig_ = 
-            LIQUIDITY.readFromStorage(
-                LiquiditySlotsLink.calculateMappingStorageSlot(
-                    LiquiditySlotsLink.LIQUIDITY_EXCHANGE_PRICES_MAPPING_SLOT,
-                    token
-                )
-            );
+    function getRawAmount(
+        address token,
+        uint256 amountInUSD,
+        bool isSupply
+    ) public view returns (uint256) {
+        uint256 exchangePriceAndConfig_ = LIQUIDITY.readFromStorage(
+            LiquiditySlotsLink.calculateMappingStorageSlot(
+                LiquiditySlotsLink.LIQUIDITY_EXCHANGE_PRICES_MAPPING_SLOT,
+                token
+            )
+        );
 
-        (uint256 supplyExchangePrice, uint256 borrowExchangePrice) = LiquidityCalcs.calcExchangePrices(exchangePriceAndConfig_);
+        (
+            uint256 supplyExchangePrice,
+            uint256 borrowExchangePrice
+        ) = LiquidityCalcs.calcExchangePrices(exchangePriceAndConfig_);
 
         uint256 usdPrice = 0;
         uint256 decimals = 18;
@@ -886,7 +887,11 @@ contract PayloadIGP31 {
             revert("not-found");
         }
 
-        uint256 exchangePrice = isSupply ? supplyExchangePrice : borrowExchangePrice;
-        return (amountInUSD * 1e12 * (10 ** decimals)) / (usdPrice * exchangePrice);
+        uint256 exchangePrice = isSupply
+            ? supplyExchangePrice
+            : borrowExchangePrice;
+        return
+            (amountInUSD * 1e12 * (10 ** decimals)) /
+            (usdPrice * exchangePrice);
     }
 }

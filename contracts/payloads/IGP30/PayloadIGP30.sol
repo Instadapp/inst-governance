@@ -305,7 +305,6 @@ interface IFluidVaultT1 {
         external
         view
         returns (ConstantViews memory constantsView_);
-
 }
 
 interface IFluidVaultT1Factory {
@@ -365,10 +364,7 @@ interface IDSAV2 {
         string[] memory _targetNames,
         bytes[] memory _datas,
         address _origin
-    )
-    external
-    payable 
-    returns (bytes32);
+    ) external payable returns (bytes32);
 
     function isAuth(address user) external view returns (bool);
 }
@@ -395,7 +391,8 @@ contract PayloadIGP30 {
     address public constant TEAM_MULTISIG =
         0x4F6F977aCDD1177DCD81aB83074855EcB9C2D49e;
 
-    IDSAV2 public constant TREASURY = IDSAV2(0x28849D2b63fA8D361e5fc15cB8aBB13019884d09);
+    IDSAV2 public constant TREASURY =
+        IDSAV2(0x28849D2b63fA8D361e5fc15cB8aBB13019884d09);
 
     IFluidLiquidityAdmin public constant LIQUIDITY =
         IFluidLiquidityAdmin(0x52Aa899454998Be5b000Ad077a46Bbe360F4e497);
@@ -474,14 +471,17 @@ contract PayloadIGP30 {
     function execute() external {
         require(address(this) == address(TIMELOCK), "not-valid-caller");
 
-        /// Action 1: Set wBTC token config and market rate curve on liquidity.
+        // Action 1: Set wBTC token config and market rate curve on liquidity.
         action1();
 
-        /// Action 2: Deploy wBTC/USDC and wBTC/USDT vaults.
+        // Action 2: Deploy wBTC/USDC and wBTC/USDT vaults.
         action2();
 
-        /// Action 3: call cast() - transfer 2 wBTC to Fluid Reserve contract from treasury.
+        // Action 3: call cast() - transfer 2 wBTC to Fluid Reserve contract from treasury.
         action3();
+
+        // Action 4: Update wstETH market rate curve.
+        action4();
     }
 
     function verifyProposal() external view {}
@@ -520,7 +520,6 @@ contract PayloadIGP30 {
 
             LIQUIDITY.updateTokenConfigs(params_);
         }
-
     }
 
     /// @notice Action 2: Deploy wBTC/USDC and wBTC/USDT vaults.
@@ -532,30 +531,27 @@ contract PayloadIGP30 {
             supplyExpandPercent: 25 * 1e2, // 25%
             supplyExpandDuration: 12 hours, // 12 hours
             supplyBaseLimitInUSD: 5_000_000, // $5M
-
             borrowToken: address(0),
             borrowMode: 1, // Mode 1
             borrowExpandPercent: 20 * 1e2, // 20%
             borrowExpandDuration: 12 hours, // 12 hours
             borrowBaseLimitInUSD: 7_500_000, // $7.5M
             borrowMaxLimitInUSD: 200_000_000, // $200M
-
             supplyRateMagnifier: 100 * 1e2, // 1x
             borrowRateMagnifier: 100 * 1e2, // 1x
-            collateralFactor: 80 * 1e2, // 80% 
-            liquidationThreshold: 85 * 1e2, // 85% 
-            liquidationMaxLimit: 90 * 1e2, // 90% 
-            withdrawGap: 5 * 1e2, // 5% 
+            collateralFactor: 80 * 1e2, // 80%
+            liquidationThreshold: 85 * 1e2, // 85%
+            liquidationMaxLimit: 90 * 1e2, // 90%
+            withdrawGap: 5 * 1e2, // 5%
             liquidationPenalty: 0,
-            borrowFee: 0 * 1e2, // 0% 
-
+            borrowFee: 0 * 1e2, // 0%
             oracle: address(0)
         });
 
         {
             vaultConfig.borrowToken = USDC_ADDRESS;
 
-            vaultConfig.liquidationPenalty = 3 * 1e2; // 3% 
+            vaultConfig.liquidationPenalty = 3 * 1e2; // 3%
 
             vaultConfig.oracle = 0x131BA983Ab640Ce291B98694b3Def4288596cD09;
 
@@ -573,7 +569,7 @@ contract PayloadIGP30 {
         {
             vaultConfig.borrowToken = USDT_ADDRESS;
 
-            vaultConfig.liquidationPenalty = 4 * 1e2; // 4% 
+            vaultConfig.liquidationPenalty = 4 * 1e2; // 4%
 
             vaultConfig.oracle = 0xFF272430E88B3f804d9E30886677A36021864Cc4;
 
@@ -594,16 +590,44 @@ contract PayloadIGP30 {
         string[] memory targets = new string[](1);
         bytes[] memory encodedSpells = new bytes[](1);
 
-        string memory withdrawSignature = "withdraw(address,uint256,address,uint256,uint256)";
+        string
+            memory withdrawSignature = "withdraw(address,uint256,address,uint256,uint256)";
 
         // Spell 1: Transfer wBTC
-        {   
+        {
             uint256 wBTC_AMOUNT = 2 * 1e8; // 2 wBTC
             targets[0] = "BASIC-A";
-            encodedSpells[0] = abi.encodeWithSignature(withdrawSignature, wBTC_ADDRESS, wBTC_AMOUNT, FLUID_RESERVE, 0, 0);
+            encodedSpells[0] = abi.encodeWithSignature(
+                withdrawSignature,
+                wBTC_ADDRESS,
+                wBTC_AMOUNT,
+                FLUID_RESERVE,
+                0,
+                0
+            );
         }
 
         IDSAV2(TREASURY).cast(targets, encodedSpells, address(this));
+    }
+
+    /// @notice Action 4: Update wstETH market rate curve.
+    function action4() internal {
+        {
+            AdminModuleStructs.RateDataV2Params[]
+                memory paramsV2_ = new AdminModuleStructs.RateDataV2Params[](1);
+
+            paramsV2_[0] = AdminModuleStructs.RateDataV2Params({
+                token: wstETH_ADDRESS, // wstETH
+                kink1: 80 * 1e2, // 80%
+                kink2: 90 * 1e2, // 90%
+                rateAtUtilizationZero: 0, // 0%
+                rateAtUtilizationKink1: 5 * 1e2, // 5%
+                rateAtUtilizationKink2: 10 * 1e2, // 10%
+                rateAtUtilizationMax: 100 * 1e2 // 100%
+            });
+
+            LIQUIDITY.updateRateDataV2s(paramsV2_);
+        }
     }
 
     /***********************************|
@@ -616,14 +640,12 @@ contract PayloadIGP30 {
         uint256 supplyExpandPercent;
         uint256 supplyExpandDuration;
         uint256 supplyBaseLimitInUSD;
-
         address borrowToken;
         uint8 borrowMode;
         uint256 borrowExpandPercent;
         uint256 borrowExpandDuration;
         uint256 borrowBaseLimitInUSD;
         uint256 borrowMaxLimitInUSD;
-
         uint256 supplyRateMagnifier;
         uint256 borrowRateMagnifier;
         uint256 collateralFactor;
@@ -632,18 +654,19 @@ contract PayloadIGP30 {
         uint256 withdrawGap;
         uint256 liquidationPenalty;
         uint256 borrowFee;
-
         address oracle;
     }
 
-    function deployVault(VaultConfig memory vaultConfig) internal returns (address vault_) {
+    function deployVault(
+        VaultConfig memory vaultConfig
+    ) internal returns (address vault_) {
         // Deploy vault.
         vault_ = VAULT_T1_FACTORY.deployVault(
             address(VAULT_T1_DEPLOYMENT_LOGIC),
             abi.encodeWithSelector(
                 IFluidVaultT1DeploymentLogic.vaultT1.selector,
                 vaultConfig.supplyToken,
-                vaultConfig.borrowToken 
+                vaultConfig.borrowToken
             )
         );
 
@@ -719,16 +742,22 @@ contract PayloadIGP30 {
         }
     }
 
-    function getRawAmount(address token, uint256 amountInUSD, bool isSupply) public view returns(uint256){
-        uint256 exchangePriceAndConfig_ = 
-            LIQUIDITY.readFromStorage(
-                LiquiditySlotsLink.calculateMappingStorageSlot(
-                    LiquiditySlotsLink.LIQUIDITY_EXCHANGE_PRICES_MAPPING_SLOT,
-                    token
-                )
-            );
+    function getRawAmount(
+        address token,
+        uint256 amountInUSD,
+        bool isSupply
+    ) public view returns (uint256) {
+        uint256 exchangePriceAndConfig_ = LIQUIDITY.readFromStorage(
+            LiquiditySlotsLink.calculateMappingStorageSlot(
+                LiquiditySlotsLink.LIQUIDITY_EXCHANGE_PRICES_MAPPING_SLOT,
+                token
+            )
+        );
 
-        (uint256 supplyExchangePrice, uint256 borrowExchangePrice) = LiquidityCalcs.calcExchangePrices(exchangePriceAndConfig_);
+        (
+            uint256 supplyExchangePrice,
+            uint256 borrowExchangePrice
+        ) = LiquidityCalcs.calcExchangePrices(exchangePriceAndConfig_);
 
         uint256 usdPrice = 0;
         uint256 decimals = 18;
@@ -751,7 +780,11 @@ contract PayloadIGP30 {
             revert("not-found");
         }
 
-        uint256 exchangePrice = isSupply ? supplyExchangePrice : borrowExchangePrice;
-        return (amountInUSD * 1e12 * (10 ** decimals)) / (usdPrice * exchangePrice);
+        uint256 exchangePrice = isSupply
+            ? supplyExchangePrice
+            : borrowExchangePrice;
+        return
+            (amountInUSD * 1e12 * (10 ** decimals)) /
+            (usdPrice * exchangePrice);
     }
 }
