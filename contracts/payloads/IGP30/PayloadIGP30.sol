@@ -477,14 +477,11 @@ contract PayloadIGP30 {
         /// Action 1: Set wBTC token config and market rate curve on liquidity.
         action1();
 
-        /// Action 2: Deploy wBTC/ETH and ETH/wBTC vaults.
+        /// Action 2: Deploy wBTC/USDC and wBTC/USDT vaults.
         action2();
 
-        /// Action 3: Deploy wstETH/wBTC and weETH/wBTC vaults.
+        /// Action 3: call cast() - transfer 2 wBTC to Fluid Reserve contract from treasury.
         action3();
-
-        /// Action 4: Clone from old vault config to new vault
-        action4();
     }
 
     function verifyProposal() external view {}
@@ -526,11 +523,11 @@ contract PayloadIGP30 {
 
     }
 
-    /// @notice Action 2: Deploy wBTC/ETH and ETH/wBTC vaults.
+    /// @notice Action 2: Deploy wBTC/USDC and wBTC/USDT vaults.
     function action2() internal {
         VaultConfig memory vaultConfig = VaultConfig({
             // user supply config for the vault on Liquidity Layer.
-            supplyToken: address(0),
+            supplyToken: wBTC_ADDRESS,
             supplyMode: 1, // Mode 1
             supplyExpandPercent: 25 * 1e2, // 25%
             supplyExpandDuration: 12 hours, // 12 hours
@@ -545,121 +542,55 @@ contract PayloadIGP30 {
 
             supplyRateMagnifier: 100 * 1e2, // 1x
             borrowRateMagnifier: 100 * 1e2, // 1x
-            collateralFactor: 90 * 1e2, // 90%
-            liquidationThreshold: 0,
-            liquidationMaxLimit: 0,
+            collateralFactor: 80 * 1e2, // 80% 
+            liquidationThreshold: 85 * 1e2, // 85% 
+            liquidationMaxLimit: 90 * 1e2, // 90% 
             withdrawGap: 5 * 1e2, // 5% 
-            liquidationPenalty: 2 * 1e2, // 2% 
+            liquidationPenalty: 0,
             borrowFee: 0 * 1e2, // 0% 
 
             oracle: address(0)
         });
 
-        // Deploy wBTC/ETH vault.
         {
-            vaultConfig.supplyToken = wBTC_ADDRESS;
-            vaultConfig.borrowToken = ETH_ADDRESS;
+            vaultConfig.borrowToken = USDC_ADDRESS;
 
-            vaultConfig.liquidationThreshold = 91 * 1e2; // 91% 
-            vaultConfig.liquidationMaxLimit = 93 * 1e2; // 93% 
+            vaultConfig.liquidationPenalty = 3 * 1e2; // 3% 
 
-            vaultConfig.oracle = address(0x4C57Ef1012bDFFCe68FDDcD793Bb2b8B7D27DC06);
+            vaultConfig.oracle = 0x131BA983Ab640Ce291B98694b3Def4288596cD09;
 
-            deployVault(vaultConfig);
+            // Deploy wBTC/USDC vault.
+            address vault_ = deployVault(vaultConfig);
+
+            // Set USDC rewards contract
+            VAULT_T1_FACTORY.setVaultAuth(
+                vault_,
+                0xF561347c306E3Ccf213b73Ce2353D6ed79f92408,
+                true
+            );
         }
 
-        // Deploy ETH/wBTC vault.
         {
-            vaultConfig.supplyToken = ETH_ADDRESS;
-            vaultConfig.borrowToken = wBTC_ADDRESS;
+            vaultConfig.borrowToken = USDT_ADDRESS;
 
-            vaultConfig.liquidationThreshold = 93 * 1e2; // 93% 
-            vaultConfig.liquidationMaxLimit = 95 * 1e2; // 95% 
+            vaultConfig.liquidationPenalty = 4 * 1e2; // 4% 
 
-            vaultConfig.oracle = address(0x63Ae926f97A480B18d58370268672766643f577F);
+            vaultConfig.oracle = 0xFF272430E88B3f804d9E30886677A36021864Cc4;
 
-            deployVault(vaultConfig);
+            // Deploy wBTC/USDT vault.
+            address vault_ = deployVault(vaultConfig);
+
+            // Set USDT rewards contract
+            VAULT_T1_FACTORY.setVaultAuth(
+                vault_,
+                0x36C677a6AbDa7D6409fB74d1136A65aF1415F539,
+                true
+            );
         }
     }
 
-    /// @notice Action 3: Deploy wstETH/wBTC and weETH/wBTC vaults.
+    /// @notice Action 3: call cast() - transfer 2 wBTC to Fluid Reserve contract from treasury.
     function action3() internal {
-        // wstETH/wBTC
-        {
-            VaultConfig memory vaultConfig = VaultConfig({
-                // user supply config for the vault on Liquidity Layer.
-                supplyToken: wstETH_ADDRESS,
-                supplyMode: 1, // Mode 1
-                supplyExpandPercent: 25 * 1e2, // 25%
-                supplyExpandDuration: 12 hours, // 12 hours
-                supplyBaseLimitInUSD: 5_000_000, // $5M
-
-                borrowToken: wBTC_ADDRESS,
-                borrowMode: 1, // Mode 1
-                borrowExpandPercent: 20 * 1e2, // 20%
-                borrowExpandDuration: 12 hours, // 12 hours
-                borrowBaseLimitInUSD: 7_500_000, // $7.5M
-                borrowMaxLimitInUSD: 200_000_000, // $200M
-
-                supplyRateMagnifier: 100 * 1e2, // 1x
-                borrowRateMagnifier: 100 * 1e2, // 1x
-                collateralFactor: 88 * 1e2, // 88% 
-                liquidationThreshold: 91 * 1e2, // 91% 
-                liquidationMaxLimit: 94 * 1e2, // 94% 
-                withdrawGap: 5 * 1e2, // 5% 
-                liquidationPenalty: 2 * 1e2, // 2% 
-                borrowFee: 0 * 1e2, // 0% 
-
-                oracle: 0xD25c68bb507f8E19386F4F102462e1bfbfA7869F
-            });
-
-            // Deploy wstETH/wBTC
-            deployVault(vaultConfig);
-        }
-
-        // weETH/wBTC
-        {
-            VaultConfig memory vaultConfig = VaultConfig({
-                // user supply config for the vault on Liquidity Layer.
-                supplyToken: weETH_ADDRESS,
-                supplyMode: 1, // Mode 1
-                supplyExpandPercent: 25 * 1e2, // 25%
-                supplyExpandDuration: 12 hours, // 12 hours
-                supplyBaseLimitInUSD: 5_000_000, // $5M
-
-                borrowToken: wBTC_ADDRESS,
-                borrowMode: 1, // Mode 1
-                borrowExpandPercent: 20 * 1e2, // 20%
-                borrowExpandDuration: 12 hours, // 12 hours
-                borrowBaseLimitInUSD: 7_500_000, // $7.5M
-                borrowMaxLimitInUSD: 20_000_000, // $20M
-
-                supplyRateMagnifier: 100 * 1e2, // 1x
-                borrowRateMagnifier: 100 * 1e2, // 1x
-                collateralFactor: 80 * 1e2, // 80% 
-                liquidationThreshold: 85 * 1e2, // 85% 
-                liquidationMaxLimit: 90 * 1e2, // 90% 
-                withdrawGap: 5 * 1e2, // 5% 
-                liquidationPenalty: 5 * 1e2, // 5% 
-                borrowFee: 0 * 1e2, // 0% 
-
-                oracle: 0xBD7ea28840B120E2a2645F103273B0Dc23599E05
-            });
-
-            // Deploy weETH/wBTC
-            deployVault(vaultConfig);
-        }
-    }
-
-    /// @notice Action 4: Clone from old vault config to new vault
-    function action4() internal {
-        for (uint oldVaultId = 1; oldVaultId <= 10; oldVaultId++) {
-            configNewVaultWithOldVaultConfigs(oldVaultId);
-        }
-    }
-
-    /// @notice Action 5: call cast() - transfer 2 wBTC to Fluid Reserve contract from treasury.
-    function action5() internal {
         string[] memory targets = new string[](1);
         bytes[] memory encodedSpells = new bytes[](1);
 
@@ -787,140 +718,6 @@ contract PayloadIGP30 {
             IFluidVaultT1(vault_).updateRebalancer(
                 0x264786EF916af64a1DB19F513F24a3681734ce92
             );
-        }
-    }
-
-    function getUserSupplyData(
-        address token_,
-        address oldVault_,
-        address newVault_
-    )
-        internal
-        view
-        returns (AdminModuleStructs.UserSupplyConfig memory config_)
-    {
-        uint256 userSupplyData_ = LIQUIDITY.readFromStorage(
-            LiquiditySlotsLink.calculateDoubleMappingStorageSlot(
-                LiquiditySlotsLink.LIQUIDITY_USER_SUPPLY_DOUBLE_MAPPING_SLOT,
-                oldVault_,
-                token_
-            )
-        );
-        config_ = AdminModuleStructs.UserSupplyConfig({
-            user: newVault_,
-            token: token_,
-            mode: uint8(userSupplyData_ & 1),
-            expandPercent: (userSupplyData_ >>
-                LiquiditySlotsLink.BITS_USER_SUPPLY_EXPAND_PERCENT) & X14,
-            expandDuration: (userSupplyData_ >>
-                LiquiditySlotsLink.BITS_USER_SUPPLY_EXPAND_DURATION) & X24,
-            baseWithdrawalLimit: 
-                BigMathMinified.fromBigNumber(
-                    (userSupplyData_ >> LiquiditySlotsLink.BITS_USER_SUPPLY_BASE_WITHDRAWAL_LIMIT) & X18,
-                    DEFAULT_EXPONENT_SIZE,
-                    DEFAULT_EXPONENT_MASK
-                )
-        });
-    }
-
-    function getUserBorrowData(
-        address token_,
-        address oldVault_,
-        address newVault_
-    )
-        internal
-        view
-        returns (AdminModuleStructs.UserBorrowConfig memory config_)
-    {
-        uint256 userBorrowData_ = LIQUIDITY.readFromStorage(
-            LiquiditySlotsLink.calculateDoubleMappingStorageSlot(
-                LiquiditySlotsLink.LIQUIDITY_USER_BORROW_DOUBLE_MAPPING_SLOT,
-                oldVault_,
-                token_
-            )
-        );
-
-        config_ = AdminModuleStructs.UserBorrowConfig({
-            user: newVault_,
-            token: token_,
-            mode: uint8(userBorrowData_ & 1),
-            expandPercent: (userBorrowData_ >>
-                LiquiditySlotsLink.BITS_USER_BORROW_EXPAND_PERCENT) & X14,
-            expandDuration: (userBorrowData_ >>
-                LiquiditySlotsLink.BITS_USER_BORROW_EXPAND_DURATION) & X24,
-            baseDebtCeiling: 
-                BigMathMinified.fromBigNumber(
-                    (userBorrowData_ >> LiquiditySlotsLink.BITS_USER_BORROW_BASE_BORROW_LIMIT) & X18,
-                    DEFAULT_EXPONENT_SIZE,
-                    DEFAULT_EXPONENT_MASK
-                ),
-            maxDebtCeiling: 
-                BigMathMinified.fromBigNumber(
-                    (userBorrowData_ >> LiquiditySlotsLink.BITS_USER_BORROW_MAX_BORROW_LIMIT) & X18,
-                    DEFAULT_EXPONENT_SIZE,
-                    DEFAULT_EXPONENT_MASK
-                )
-        });
-    }
-
-    struct CloneVaultStruct {
-        address oldVaultAddress;
-        address newVaultAddress;
-    }
-
-    function configNewVaultWithOldVaultConfigs(uint256 oldVaultId) internal {
-        CloneVaultStruct memory data;
-
-        data.oldVaultAddress = VAULT_T1_FACTORY.getVaultAddress(oldVaultId);
-        data.newVaultAddress = VAULT_T1_FACTORY.getVaultAddress(
-            oldVaultId + 10
-        );
-
-        IFluidVaultT1.ConstantViews memory oldConstants = IFluidVaultT1(
-            data.oldVaultAddress
-        ).constantsView();
-
-        IFluidVaultT1.ConstantViews memory newConstants = IFluidVaultT1(
-            data.newVaultAddress
-        ).constantsView();
-
-        {
-            require(
-                oldConstants.supplyToken == newConstants.supplyToken,
-                "not-same-supply-token"
-            );
-            require(
-                oldConstants.borrowToken == newConstants.borrowToken,
-                "not-same-borrow-token"
-            );
-        }
-
-        // Set user supply config for the vault on Liquidity Layer.
-        {
-            AdminModuleStructs.UserSupplyConfig[]
-                memory configs_ = new AdminModuleStructs.UserSupplyConfig[](1);
-
-            configs_[0] = getUserSupplyData(
-                newConstants.supplyToken,
-                data.oldVaultAddress,
-                data.newVaultAddress
-            );
-
-            LIQUIDITY.updateUserSupplyConfigs(configs_);
-        }
-
-        // Set user borrow config for the vault on Liquidity Layer.
-        {
-            AdminModuleStructs.UserBorrowConfig[]
-                memory configs_ = new AdminModuleStructs.UserBorrowConfig[](1);
-
-            configs_[0] = getUserBorrowData(
-                newConstants.borrowToken,
-                data.oldVaultAddress,
-                data.newVaultAddress
-            );
-
-            LIQUIDITY.updateUserBorrowConfigs(configs_);
         }
     }
 
