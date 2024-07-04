@@ -373,6 +373,9 @@ contract PayloadIGP31 {
     address public constant PROPOSER_AVO_MULTISIG_2 =
         0x9efdE135CA4832AbF0408c44c6f5f370eB0f35e8;
 
+    address public constant PROPOSER_AVO_MULTISIG_3 = 
+        0x5C43AAC965ff230AC1cF63e924D0153291D78BaD;
+
     IGovernorBravo public constant GOVERNOR =
         IGovernorBravo(0x0204Cd037B2ec03605CFdFe482D8e257C765fA1B);
     ITimelock public immutable TIMELOCK =
@@ -430,7 +433,8 @@ contract PayloadIGP31 {
             msg.sender == PROPOSER ||
                 msg.sender == TEAM_MULTISIG ||
                 address(this) == PROPOSER_AVO_MULTISIG ||
-                address(this) == PROPOSER_AVO_MULTISIG_2,
+                address(this) == PROPOSER_AVO_MULTISIG_2 ||
+                address(PROPOSER_AVO_MULTISIG_3) == PROPOSER_AVO_MULTISIG_3,
             "msg.sender-not-allowed"
         );
 
