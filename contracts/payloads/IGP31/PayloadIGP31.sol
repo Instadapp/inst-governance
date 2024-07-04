@@ -326,6 +326,8 @@ interface IFluidVaultT1Factory {
     function readFromStorage(
         bytes32 slot_
     ) external view returns (uint256 result_);
+
+    function totalVaults() external view returns (uint256);
 }
 
 interface IFluidVaultT1DeploymentLogic {
@@ -476,6 +478,10 @@ contract PayloadIGP31 {
 
     /// @notice Action 1: Deploy wBTC/ETH and ETH/wBTC vaults.
     function action1() internal {
+        {
+            require(VAULT_T1_FACTORY.totalVaults() == 22, "total-vaults-doesn't-match");
+        }
+
         VaultConfig memory vaultConfig = VaultConfig({
             // user supply config for the vault on Liquidity Layer.
             supplyToken: address(0),
