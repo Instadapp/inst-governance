@@ -487,8 +487,11 @@ contract PayloadIGP32 {
         // Action 2: Approve fUSDC and fUSDT protocols to spend the reserves tokens
         action2();
 
-        // Action 3: Dust reserves tokens allowance
-        action2();
+        // Action 3: WBTC reserves tokens allowance to WBTC/USDC & WBTC/USDT vault
+        action3();
+
+        // Action 4: Add Rates Config Handler on Liquidity layer
+        action4();
     }
 
     function verifyProposal() external view {}
@@ -517,29 +520,45 @@ contract PayloadIGP32 {
         // fUSDC
         protocols[0] = F_USDC;
         tokens[0] = USDC_ADDRESS;
-        amounts[0] = 250_000 * 1e6; // 250k USDC
+        amounts[0] = 330_000 * 1e6; // 330k USDC
 
         // fUSDT
         protocols[1] = F_USDT;
         tokens[1] = USDT_ADDRESS;
-        amounts[1] = 250_000 * 1e6; // 250k USDT
+        amounts[1] = 330_000 * 1e6; // 330k USDT
 
         FLUID_RESERVE.approve(protocols, tokens, amounts);
     }
 
-    /// @notice Action 3: Dust reserves tokens allowance
+    /// @notice Action 3: WBTC reserves tokens allowance to WBTC/USDC & WBTC/USDT vault
     function action3() internal {
-        address[] memory protocols = new address[](2);
-        address[] memory tokens = new address[](2);
-        uint256[] memory amounts = new uint256[](2);
+        address[] memory protocols = new address[](6);
+        address[] memory tokens = new address[](6);
+        uint256[] memory amounts = new uint256[](6);
 
         protocols[0] = 0x6F72895Cf6904489Bcd862c941c3D02a3eE4f03e;
         tokens[0] = wBTC_ADDRESS;
-        amounts[0] = 0.8 * 1e8;
+        amounts[0] = 0.81 * 1e8;
 
         protocols[1] = 0x3A0b7c8840D74D39552EF53F586dD8c3d1234C40;
         tokens[1] = wBTC_ADDRESS;
-        amounts[1] = 0.8 * 1e8;
+        amounts[1] = 0.81 * 1e8;
+
+        protocols[2] = 0x6F72895Cf6904489Bcd862c941c3D02a3eE4f03e;
+        tokens[2] = USDC_ADDRESS;
+        amounts[2] = 100 * 1e6;
+
+        protocols[3] = 0x3A0b7c8840D74D39552EF53F586dD8c3d1234C40;
+        tokens[3] = USDC_ADDRESS;
+        amounts[3] = 100 * 1e6;
+
+        protocols[5] = 0x6F72895Cf6904489Bcd862c941c3D02a3eE4f03e;
+        tokens[5] = USDT_ADDRESS;
+        amounts[5] = 100 * 1e6;
+
+        protocols[5] = 0x3A0b7c8840D74D39552EF53F586dD8c3d1234C40;
+        tokens[5] = USDT_ADDRESS;
+        amounts[5] = 100 * 1e6;
 
         FLUID_RESERVE.approve(
             protocols,
@@ -548,7 +567,7 @@ contract PayloadIGP32 {
         );
     }
 
-    /// @notice Action 4: Add Rates Config Handler
+    /// @notice Action 4: Add Rates Config Handler on Liquidity layer
     function action4() internal {
         AdminModuleStructs.AddressBool[]
             memory configs_ = new AdminModuleStructs.AddressBool[](1);
