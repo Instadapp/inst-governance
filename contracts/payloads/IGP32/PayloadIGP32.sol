@@ -481,7 +481,7 @@ contract PayloadIGP32 {
     function execute() external {
         require(address(this) == address(TIMELOCK), "not-valid-caller");
 
-        // Action 1: Deploy wBTC/ETH and ETH/wBTC vaults.
+        // Action 1: Update rewards for fUSDC & fUSDT.
         action1();
 
         // Action 2: Approve fUSDC and fUSDT protocols to spend the reserves tokens
@@ -554,7 +554,7 @@ contract PayloadIGP32 {
             memory configs_ = new AdminModuleStructs.AddressBool[](1);
 
         configs_[0] = AdminModuleStructs.AddressBool({
-            addr: address(0), // TODO
+            addr: 0x3eca30f7dB5AeAbD8757cE5Baf850dA8acA086Db,
             value: true
         });
 
