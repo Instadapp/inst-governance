@@ -399,7 +399,7 @@ contract PayloadIGP32 {
     address public constant PROPOSER_AVO_MULTISIG_2 =
         0x9efdE135CA4832AbF0408c44c6f5f370eB0f35e8;
 
-    address public constant PROPOSER_AVO_MULTISIG_3 =
+    address public constant PROPOSER_AVO_MULTISIG_3 = 
         0x5C43AAC965ff230AC1cF63e924D0153291D78BaD;
 
     IGovernorBravo public constant GOVERNOR =
@@ -532,27 +532,34 @@ contract PayloadIGP32 {
 
     /// @notice Action 3: WBTC reserves tokens allowance to WBTC/USDC & WBTC/USDT vault
     function action3() internal {
-        address[] memory protocols = new address[](6);
-        address[] memory tokens = new address[](6);
-        uint256[] memory amounts = new uint256[](6);
+        address[] memory protocols = new address[](4);
+        address[] memory tokens = new address[](4);
+        uint256[] memory amounts = new uint256[](4);
 
-        protocols[0] = 0x6F72895Cf6904489Bcd862c941c3D02a3eE4f03e;
+        address VAULT_wBTC_USDC = 0x6F72895Cf6904489Bcd862c941c3D02a3eE4f03e;
+        address VAULT_wBTC_USDT = 0x3A0b7c8840D74D39552EF53F586dD8c3d1234C40;
+
+        protocols[0] = VAULT_wBTC_USDC;
         tokens[0] = wBTC_ADDRESS;
         amounts[0] = 0.81 * 1e8;
 
-        protocols[1] = 0x3A0b7c8840D74D39552EF53F586dD8c3d1234C40;
+        protocols[1] = VAULT_wBTC_USDT;
         tokens[1] = wBTC_ADDRESS;
         amounts[1] = 0.81 * 1e8;
 
-        protocols[2] = 0x6F72895Cf6904489Bcd862c941c3D02a3eE4f03e;
+        protocols[2] = VAULT_wBTC_USDC;
         tokens[2] = USDC_ADDRESS;
         amounts[2] = 100 * 1e6;
 
-        protocols[5] = 0x3A0b7c8840D74D39552EF53F586dD8c3d1234C40;
-        tokens[5] = USDT_ADDRESS;
-        amounts[5] = 100 * 1e6;
+        protocols[3] = VAULT_wBTC_USDT;
+        tokens[3] = USDT_ADDRESS;
+        amounts[3] = 100 * 1e6;
 
-        FLUID_RESERVE.approve(protocols, tokens, amounts);
+        FLUID_RESERVE.approve(
+            protocols,
+            tokens,
+            amounts
+        );
     }
 
     /// @notice Action 4: Add Rates Config Handler on Liquidity layer
