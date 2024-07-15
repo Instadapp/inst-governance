@@ -399,7 +399,7 @@ contract PayloadIGP32 {
     address public constant PROPOSER_AVO_MULTISIG_2 =
         0x9efdE135CA4832AbF0408c44c6f5f370eB0f35e8;
 
-    address public constant PROPOSER_AVO_MULTISIG_3 = 
+    address public constant PROPOSER_AVO_MULTISIG_3 =
         0x5C43AAC965ff230AC1cF63e924D0153291D78BaD;
 
     IGovernorBravo public constant GOVERNOR =
@@ -548,23 +548,11 @@ contract PayloadIGP32 {
         tokens[2] = USDC_ADDRESS;
         amounts[2] = 100 * 1e6;
 
-        protocols[3] = 0x3A0b7c8840D74D39552EF53F586dD8c3d1234C40;
-        tokens[3] = USDC_ADDRESS;
-        amounts[3] = 100 * 1e6;
-
-        protocols[5] = 0x6F72895Cf6904489Bcd862c941c3D02a3eE4f03e;
-        tokens[5] = USDT_ADDRESS;
-        amounts[5] = 100 * 1e6;
-
         protocols[5] = 0x3A0b7c8840D74D39552EF53F586dD8c3d1234C40;
         tokens[5] = USDT_ADDRESS;
         amounts[5] = 100 * 1e6;
 
-        FLUID_RESERVE.approve(
-            protocols,
-            tokens,
-            amounts
-        );
+        FLUID_RESERVE.approve(protocols, tokens, amounts);
     }
 
     /// @notice Action 4: Add Rates Config Handler on Liquidity layer
