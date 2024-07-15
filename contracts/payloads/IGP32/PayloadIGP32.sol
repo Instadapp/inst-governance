@@ -529,9 +529,9 @@ contract PayloadIGP32 {
 
     /// @notice Action 3: Dust reserves tokens allowance
     function action3() internal {
-        address[] memory protocols = new address[](3);
-        address[] memory tokens = new address[](3);
-        uint256[] memory amounts = new uint256[](3);
+        address[] memory protocols = new address[](2);
+        address[] memory tokens = new address[](2);
+        uint256[] memory amounts = new uint256[](2);
 
         protocols[0] = 0x6F72895Cf6904489Bcd862c941c3D02a3eE4f03e;
         tokens[0] = wBTC_ADDRESS;
