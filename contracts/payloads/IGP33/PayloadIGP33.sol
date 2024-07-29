@@ -227,7 +227,7 @@ contract PayloadIGP33 {
 
     /// @notice Action 1: Update Default Implementation of DSAv2
     function action1() internal {
-        address NEW_DEFAULT_IMPLEMENTATION = address(0);
+        address NEW_DEFAULT_IMPLEMENTATION = address(0x8F4a8675Ea3a069D1D8280Bd19B802430f8F53be);
 
         INSTA_ACCOUNT_V2_IMPLEMENTATIONS.setDefaultImplementation(NEW_DEFAULT_IMPLEMENTATION);
     }
