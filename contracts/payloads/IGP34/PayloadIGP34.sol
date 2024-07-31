@@ -436,8 +436,8 @@ contract PayloadIGP34 {
             VaultConfig memory config_ = configs_[i];
 
             IFluidVaultT1 vault_ = IFluidVaultT1(address(config_.vault));
-            vault_.updateLiquidationThreshold(config_.liquidationThreshold);
             vault_.updateLiquidationMaxLimit(config_.liquidationMaxLimit);
+            vault_.updateLiquidationThreshold(config_.liquidationThreshold);
             vault_.updateCollateralFactor(config_.collateralFactor);
             vault_.updateLiquidationPenalty(config_.liquidationPenalty);
         }
