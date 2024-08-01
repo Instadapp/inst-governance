@@ -563,7 +563,7 @@ contract PayloadIGP34 {
 
         // Spell 1: Transfer wBTC
         {
-            uint256 wBTC_AMOUNT = 2 * 1e8; // 2 wBTC
+            uint256 wBTC_AMOUNT = 1.15 * 1e8; // 1.15 wBTC
             targets[0] = "BASIC-A";
             encodedSpells[0] = abi.encodeWithSignature(
                 withdrawSignature,
