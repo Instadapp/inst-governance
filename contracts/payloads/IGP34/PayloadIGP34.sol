@@ -276,8 +276,8 @@ contract PayloadIGP34 {
     address public constant wBTC_ADDRESS =
         0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599;
 
-    address public constant USDC_ADDRESS =
-        0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
+    address public constant stETH_ADDRESS =
+        0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84;
 
     constructor() {
         ADDRESS_THIS = address(this);
@@ -361,7 +361,7 @@ contract PayloadIGP34 {
         // ETH_USDC
         {
             configs_[i++] = VaultConfig({
-                vault: 0x0C8C77B7FF4c2aF7F6CEBbe67350A490E3DD6cB3,
+                vaultId: 11,
                 collateralFactor: 87 * 1e2,
                 liquidationThreshold: 92 * 1e2,
                 liquidationMaxLimit: 95 * 1e2,
@@ -372,7 +372,7 @@ contract PayloadIGP34 {
         // ETH/USDT
         {
             configs_[i++] = VaultConfig({
-                vault: 0xE16A6f5359ABB1f61cE71e25dD0932e3E00B00eB,
+                vaultId: 12,
                 collateralFactor: 87 * 1e2,
                 liquidationThreshold: 92 * 1e2,
                 liquidationMaxLimit: 95 * 1e2,
@@ -383,7 +383,7 @@ contract PayloadIGP34 {
         // WSTETH/ETH
         {
             configs_[i++] = VaultConfig({
-                vault: 0x82B27fA821419F5689381b565a8B0786aA2548De,
+                vaultId: 13,
                 collateralFactor: 95 * 1e2,
                 liquidationThreshold: 97 * 1e2,
                 liquidationMaxLimit: 98 * 1e2,
@@ -394,7 +394,7 @@ contract PayloadIGP34 {
         // WSTETH/USDC
         {
             configs_[i++] = VaultConfig({
-                vault: 0x1982CC7b1570C2503282d0A0B41F69b3B28fdcc3,
+                vaultId: 14,
                 collateralFactor: 82 * 1e2,
                 liquidationThreshold: 88 * 1e2,
                 liquidationMaxLimit: 92.5 * 1e2,
@@ -405,7 +405,7 @@ contract PayloadIGP34 {
         // WSTETH/USDT
         {
             configs_[i++] = VaultConfig({
-                vault: 0xb4F3bf2d96139563777C0231899cE06EE95Cc946,
+                vaultId: 15,
                 collateralFactor: 82 * 1e2,
                 liquidationThreshold: 88 * 1e2,
                 liquidationMaxLimit: 92.5 * 1e2,
@@ -416,7 +416,7 @@ contract PayloadIGP34 {
         // WEETH/WSTETH
         {
             configs_[i++] = VaultConfig({
-                vault: 0xeAEf563015634a9d0EE6CF1357A3b205C35e028D,
+                vaultId: 16,
                 collateralFactor: 94 * 1e2,
                 liquidationThreshold: 96 * 1e2,
                 liquidationMaxLimit: 97 * 1e2,
@@ -427,7 +427,7 @@ contract PayloadIGP34 {
         // SUSDE/USDC
         {
             configs_[i++] = VaultConfig({
-                vault: 0x3996464c0fCCa8183e13ea5E5e74375e2c8744Dd,
+                vaultId: 17,
                 collateralFactor: 90 * 1e2,
                 liquidationThreshold: 92 * 1e2,
                 liquidationMaxLimit: 95 * 1e2,
@@ -438,7 +438,7 @@ contract PayloadIGP34 {
         // SUSDE/USDT
         {
             configs_[i++] = VaultConfig({
-                vault: 0xBc345229C1b52e4c30530C614BB487323BA38Da5,
+                vaultId: 18,
                 collateralFactor: 90 * 1e2,
                 liquidationThreshold: 92 * 1e2,
                 liquidationMaxLimit: 95 * 1e2,
@@ -449,7 +449,7 @@ contract PayloadIGP34 {
         // WEETH/USDC
         {
             configs_[i++] = VaultConfig({
-                vault: 0xF2c8F54447cbd591C396b0Dd7ac15FAF552d0FA4,
+                vaultId: 19,
                 collateralFactor: 77 * 1e2,
                 liquidationThreshold: 82 * 1e2,
                 liquidationMaxLimit: 90 * 1e2,
@@ -460,7 +460,7 @@ contract PayloadIGP34 {
         // WEETH/USDT
         {
             configs_[i++] = VaultConfig({
-                vault: 0x92643E964CA4b2c165a95CA919b0A819acA6D5F1,
+                vaultId: 20,
                 collateralFactor: 77 * 1e2,
                 liquidationThreshold: 82 * 1e2,
                 liquidationMaxLimit: 90 * 1e2,
@@ -510,14 +510,14 @@ contract PayloadIGP34 {
             );
         }
 
-        // Spell 2: Transfer USDC
+        // Spell 2: Transfer stETH
         {
-            uint256 USDC_AMOUNT = 80_000 * 1e6; // 80k USDC
-            targets[0] = "BASIC-A";
+            uint256 stETH_AMOUNT = 27 * 1e18; // 27 stETH
+            targets[1] = "BASIC-A";
             encodedSpells[1] = abi.encodeWithSignature(
                 withdrawSignature,
-                USDC_ADDRESS,
-                USDC_AMOUNT,
+                stETH_ADDRESS,
+                stETH_AMOUNT,
                 TEAM_MULTISIG,
                 0,
                 0
@@ -529,7 +529,7 @@ contract PayloadIGP34 {
 
     /// Helpers ///
     struct VaultConfig {
-        address vault;
+        uint256 vaultId;
         uint256 collateralFactor;
         uint256 liquidationThreshold;
         uint256 liquidationMaxLimit;
@@ -540,7 +540,7 @@ contract PayloadIGP34 {
         for (uint i = 0; i < configs_.length; i++) {
             VaultConfig memory config_ = configs_[i];
 
-            IFluidVaultT1 vault_ = IFluidVaultT1(address(config_.vault));
+            IFluidVaultT1 vault_ = IFluidVaultT1(VAULT_T1_FACTORY.getVaultAddress(config_.vaultId));
             vault_.updateLiquidationMaxLimit(config_.liquidationMaxLimit);
             vault_.updateLiquidationThreshold(config_.liquidationThreshold);
             vault_.updateCollateralFactor(config_.collateralFactor);
