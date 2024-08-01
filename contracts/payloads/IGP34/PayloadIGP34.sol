@@ -159,7 +159,7 @@ interface IFluidVaultT1 {
     function updateBorrowFee(uint borrowFee_) external;
 }
 
- interface IProxy {
+interface IProxy {
     function setAdmin(address newAdmin_) external;
 
     function setDummyImplementation(address newDummyImplementation_) external;
@@ -266,12 +266,12 @@ interface IFluidReserveContract {
     ) external;
 }
 
-
 interface IERC20 {
-    function allowance(address spender, address caller) external view returns(uint256);
+    function allowance(
+        address spender,
+        address caller
+    ) external view returns (uint256);
 }
-
-
 
 contract PayloadIGP34 {
     uint256 public constant PROPOSAL_ID = 34;
@@ -285,7 +285,7 @@ contract PayloadIGP34 {
     address public constant PROPOSER_AVO_MULTISIG_2 =
         0x9efdE135CA4832AbF0408c44c6f5f370eB0f35e8;
 
-    address public constant PROPOSER_AVO_MULTISIG_3 = 
+    address public constant PROPOSER_AVO_MULTISIG_3 =
         0x5C43AAC965ff230AC1cF63e924D0153291D78BaD;
 
     IGovernorBravo public constant GOVERNOR =
@@ -382,9 +382,12 @@ contract PayloadIGP34 {
         // add Claim Module
 
         bytes4[] memory sigs_ = new bytes4[](1);
-        sigs_[0] =  bytes4(keccak256("claimFromSpark()"));
-        LITE.addImplementation(0xc10A855055Eb3939FCaA512253Ec3f671C4Ab839, sigs_);
-        
+        sigs_[0] = bytes4(keccak256("claimFromSpark()"));
+        LITE.addImplementation(
+            0xc10A855055Eb3939FCaA512253Ec3f671C4Ab839,
+            sigs_
+        );
+
         address(LITE).call(abi.encode(sigs_[0]));
     }
 
@@ -426,7 +429,7 @@ contract PayloadIGP34 {
                 liquidationPenalty: 0.1 * 1e2
             });
         }
-        
+
         // WSTETH/USDC
         {
             configs_[i++] = VaultConfig({
@@ -513,10 +516,9 @@ contract PayloadIGP34 {
         address[] memory tokens = new address[](2);
         uint256[] memory amounts = new uint256[](2);
 
-       
         // WBTC/USDC
-        {   
-            address VAULT_WBTC_USDC = 0x6F72895Cf6904489Bcd862c941c3D02a3eE4f03e;
+        {
+            address VAULT_WBTC_USDC = VAULT_T1_FACTORY.getVaultAddress(21);
             address VAULT_REWARD_CONFIG = 0x4605FC1E6A49D92D97179407E823023F06D5aA0e;
             VAULT_T1_FACTORY.setVaultAuth(
                 VAULT_WBTC_USDC, // WBTC/USDC
@@ -524,17 +526,19 @@ contract PayloadIGP34 {
                 true
             );
 
-            uint256 allowance = IERC20(wBTC_ADDRESS).allowance(address(FLUID_RESERVE), VAULT_WBTC_USDC);
+            uint256 allowance = IERC20(wBTC_ADDRESS).allowance(
+                address(FLUID_RESERVE),
+                VAULT_WBTC_USDC
+            );
 
             protocols[0] = VAULT_WBTC_USDC;
             tokens[0] = wBTC_ADDRESS;
             amounts[0] = allowance + (0.8 * 1e8);
-
         }
 
         // WBTC/USDT
-        {   
-            address VAULT_WBTC_USDT = 0x3A0b7c8840D74D39552EF53F586dD8c3d1234C40;
+        {
+            address VAULT_WBTC_USDT = VAULT_T1_FACTORY.getVaultAddress(22);
             address VAULT_REWARD_CONFIG = 0xbA379AfC2829CbF5DeA14B8bc135a820e144456D;
 
             VAULT_T1_FACTORY.setVaultAuth(
@@ -543,7 +547,10 @@ contract PayloadIGP34 {
                 true
             );
 
-            uint256 allowance = IERC20(wBTC_ADDRESS).allowance(address(FLUID_RESERVE), VAULT_WBTC_USDT);
+            uint256 allowance = IERC20(wBTC_ADDRESS).allowance(
+                address(FLUID_RESERVE),
+                VAULT_WBTC_USDT
+            );
 
             protocols[1] = VAULT_WBTC_USDT;
             tokens[1] = wBTC_ADDRESS;
@@ -605,7 +612,9 @@ contract PayloadIGP34 {
         for (uint i = 0; i < configs_.length; i++) {
             VaultConfig memory config_ = configs_[i];
 
-            IFluidVaultT1 vault_ = IFluidVaultT1(VAULT_T1_FACTORY.getVaultAddress(config_.vaultId));
+            IFluidVaultT1 vault_ = IFluidVaultT1(
+                VAULT_T1_FACTORY.getVaultAddress(config_.vaultId)
+            );
             vault_.updateLiquidationMaxLimit(config_.liquidationMaxLimit);
             vault_.updateLiquidationThreshold(config_.liquidationThreshold);
             vault_.updateCollateralFactor(config_.collateralFactor);
