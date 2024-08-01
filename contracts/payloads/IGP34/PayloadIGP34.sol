@@ -208,6 +208,37 @@ interface ILite {
     function updateAggrMaxVaultRatio(uint256 newAggrMaxVaultRatio_) external;
 }
 
+interface IDSAV2 {
+    function cast(
+        string[] memory _targetNames,
+        bytes[] memory _datas,
+        address _origin
+    ) external payable returns (bytes32);
+
+    function isAuth(address user) external view returns (bool);
+}
+
+interface IFluidVaultT1Factory {
+    function deployVault(
+        address vaultDeploymentLogic_,
+        bytes calldata vaultDeploymentData_
+    ) external returns (address vault_);
+
+    function setVaultAuth(
+        address vault_,
+        address vaultAuth_,
+        bool allowed_
+    ) external;
+
+    function getVaultAddress(
+        uint256 vaultId_
+    ) external view returns (address vault_);
+
+    function readFromStorage(
+        bytes32 slot_
+    ) external view returns (uint256 result_);
+}
+
 contract PayloadIGP34 {
     uint256 public constant PROPOSAL_ID = 34;
 
@@ -228,6 +259,12 @@ contract PayloadIGP34 {
     ITimelock public immutable TIMELOCK =
         ITimelock(0x2386DC45AdDed673317eF068992F19421B481F4c);
 
+    IFluidVaultT1Factory public constant VAULT_T1_FACTORY =
+        IFluidVaultT1Factory(0x324c5Dc1fC42c7a4D43d92df1eBA58a54d13Bf2d);
+
+    IDSAV2 public constant TREASURY =
+        IDSAV2(0x28849D2b63fA8D361e5fc15cB8aBB13019884d09);
+
     address public immutable ADDRESS_THIS;
 
     address public constant TEAM_MULTISIG =
@@ -235,6 +272,12 @@ contract PayloadIGP34 {
 
     ILite public constant LITE =
         ILite(0xA0D3707c569ff8C87FA923d3823eC5D81c98Be78);
+
+    address public constant wBTC_ADDRESS =
+        0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599;
+
+    address public constant USDC_ADDRESS =
+        0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
 
     constructor() {
         ADDRESS_THIS = address(this);
@@ -281,6 +324,12 @@ contract PayloadIGP34 {
 
         // Action 2: Update v1.1.0 Vaults config
         action2();
+
+        //Action 3: Add WBTC vault reward vault on WBTC/USDC and WBTC/USDT
+        action3();
+
+        // Action 4: Transfer WBTC and USDC from Treasury to Team Multisig
+        action4();
     }
 
     function verifyProposal() external view {}
@@ -420,6 +469,62 @@ contract PayloadIGP34 {
         }
 
         _updateVaultConfig(configs_);
+    }
+
+    /// @notice Action 3: Add WBTC vault reward vault on WBTC/USDC and WBTC/USDT
+    function action3() internal {
+        // WBTC/USDC
+        VAULT_T1_FACTORY.setVaultAuth(
+            0x6F72895Cf6904489Bcd862c941c3D02a3eE4f03e, // WBTC/USDC
+            0x4605FC1E6A49D92D97179407E823023F06D5aA0e,
+            true
+        );
+
+        // WBTC/USDT
+        VAULT_T1_FACTORY.setVaultAuth(
+            0xbA379AfC2829CbF5DeA14B8bc135a820e144456D, // WBTC/USDT
+            0x3A0b7c8840D74D39552EF53F586dD8c3d1234C40,
+            true
+        );
+    }
+
+    /// @notice Action 4: Transfer WBTC and USDC from Treasury to Team Multisig
+    function action4() internal {
+        string[] memory targets = new string[](2);
+        bytes[] memory encodedSpells = new bytes[](2);
+
+        string
+            memory withdrawSignature = "withdraw(address,uint256,address,uint256,uint256)";
+
+        // Spell 1: Transfer wBTC
+        {
+            uint256 wBTC_AMOUNT = 2 * 1e8; // 2 wBTC
+            targets[0] = "BASIC-A";
+            encodedSpells[0] = abi.encodeWithSignature(
+                withdrawSignature,
+                wBTC_ADDRESS,
+                wBTC_AMOUNT,
+                TEAM_MULTISIG,
+                0,
+                0
+            );
+        }
+
+        // Spell 2: Transfer USDC
+        {
+            uint256 USDC_AMOUNT = 80_000 * 1e6; // 80k USDC
+            targets[0] = "BASIC-A";
+            encodedSpells[1] = abi.encodeWithSignature(
+                withdrawSignature,
+                USDC_ADDRESS,
+                USDC_AMOUNT,
+                TEAM_MULTISIG,
+                0,
+                0
+            );
+        }
+
+        IDSAV2(TREASURY).cast(targets, encodedSpells, address(this));
     }
 
     /// Helpers ///
