@@ -239,6 +239,40 @@ interface IFluidVaultT1Factory {
     ) external view returns (uint256 result_);
 }
 
+interface IFluidReserveContract {
+    function isRebalancer(address user) external returns (bool);
+
+    function rebalanceFToken(address protocol_) external;
+
+    function rebalanceVault(address protocol_) external;
+
+    function transferFunds(address token_) external;
+
+    function getProtocolTokens(address protocol_) external;
+
+    function updateAuth(address auth_, bool isAuth_) external;
+
+    function updateRebalancer(address rebalancer_, bool isRebalancer_) external;
+
+    function approve(
+        address[] memory protocols_,
+        address[] memory tokens_,
+        uint256[] memory amounts_
+    ) external;
+
+    function revoke(
+        address[] memory protocols_,
+        address[] memory tokens_
+    ) external;
+}
+
+
+interface IERC20 {
+    function allowance(address spender, address caller) external view returns(uint256);
+}
+
+
+
 contract PayloadIGP34 {
     uint256 public constant PROPOSAL_ID = 34;
 
@@ -261,6 +295,8 @@ contract PayloadIGP34 {
 
     IFluidVaultT1Factory public constant VAULT_T1_FACTORY =
         IFluidVaultT1Factory(0x324c5Dc1fC42c7a4D43d92df1eBA58a54d13Bf2d);
+    IFluidReserveContract public constant FLUID_RESERVE =
+        IFluidReserveContract(0x264786EF916af64a1DB19F513F24a3681734ce92);
 
     IDSAV2 public constant TREASURY =
         IDSAV2(0x28849D2b63fA8D361e5fc15cB8aBB13019884d09);
@@ -473,19 +509,48 @@ contract PayloadIGP34 {
 
     /// @notice Action 3: Add WBTC vault reward vault on WBTC/USDC and WBTC/USDT
     function action3() internal {
+        address[] memory protocols = new address[](2);
+        address[] memory tokens = new address[](2);
+        uint256[] memory amounts = new uint256[](2);
+
+       
         // WBTC/USDC
-        VAULT_T1_FACTORY.setVaultAuth(
-            0x6F72895Cf6904489Bcd862c941c3D02a3eE4f03e, // WBTC/USDC
-            0x4605FC1E6A49D92D97179407E823023F06D5aA0e,
-            true
-        );
+        {   
+            address VAULT_WBTC_USDC = 0x6F72895Cf6904489Bcd862c941c3D02a3eE4f03e;
+            address VAULT_REWARD_CONFIG = 0x4605FC1E6A49D92D97179407E823023F06D5aA0e;
+            VAULT_T1_FACTORY.setVaultAuth(
+                VAULT_WBTC_USDC, // WBTC/USDC
+                VAULT_REWARD_CONFIG,
+                true
+            );
+
+            uint256 allowance = IERC20(wBTC_ADDRESS).allowance(address(FLUID_RESERVE), VAULT_WBTC_USDC);
+
+            protocols[0] = VAULT_WBTC_USDC;
+            tokens[0] = wBTC_ADDRESS;
+            amounts[0] = allowance + (0.8 * 1e8);
+
+        }
 
         // WBTC/USDT
-        VAULT_T1_FACTORY.setVaultAuth(
-            0xbA379AfC2829CbF5DeA14B8bc135a820e144456D, // WBTC/USDT
-            0x3A0b7c8840D74D39552EF53F586dD8c3d1234C40,
-            true
-        );
+        {   
+            address VAULT_WBTC_USDT = 0x3A0b7c8840D74D39552EF53F586dD8c3d1234C40;
+            address VAULT_REWARD_CONFIG = 0xbA379AfC2829CbF5DeA14B8bc135a820e144456D;
+
+            VAULT_T1_FACTORY.setVaultAuth(
+                VAULT_WBTC_USDT, // WBTC/USDT
+                VAULT_REWARD_CONFIG,
+                true
+            );
+
+            uint256 allowance = IERC20(wBTC_ADDRESS).allowance(address(FLUID_RESERVE), VAULT_WBTC_USDT);
+
+            protocols[0] = VAULT_WBTC_USDT;
+            tokens[0] = wBTC_ADDRESS;
+            amounts[0] = allowance + (0.8 * 1e8);
+        }
+
+        FLUID_RESERVE.approve(protocols, tokens, amounts);
     }
 
     /// @notice Action 4: Transfer WBTC and USDC from Treasury to Team Multisig
