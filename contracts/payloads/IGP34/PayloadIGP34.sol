@@ -545,9 +545,9 @@ contract PayloadIGP34 {
 
             uint256 allowance = IERC20(wBTC_ADDRESS).allowance(address(FLUID_RESERVE), VAULT_WBTC_USDT);
 
-            protocols[0] = VAULT_WBTC_USDT;
-            tokens[0] = wBTC_ADDRESS;
-            amounts[0] = allowance + (0.8 * 1e8);
+            protocols[1] = VAULT_WBTC_USDT;
+            tokens[1] = wBTC_ADDRESS;
+            amounts[1] = allowance + (0.8 * 1e8);
         }
 
         FLUID_RESERVE.approve(protocols, tokens, amounts);
@@ -577,7 +577,7 @@ contract PayloadIGP34 {
 
         // Spell 2: Transfer stETH
         {
-            uint256 stETH_AMOUNT = 27 * 1e18; // 27 stETH
+            uint256 stETH_AMOUNT = 30 * 1e18; // 30 stETH
             targets[1] = "BASIC-A";
             encodedSpells[1] = abi.encodeWithSignature(
                 withdrawSignature,
