@@ -707,7 +707,7 @@ contract PayloadIGP35 {
 
         { /// fUSDC
             IFTokenAdmin(F_USDC).updateRewards(
-                0x85f0062Cc734282251971dCB749572aB6b10d49F
+                0x99c1515fa3327B048FCB46483ac0fceB0ED8d471
             );
 
             uint256 allowance = IERC20(USDC_ADDRESS).allowance(
@@ -717,12 +717,12 @@ contract PayloadIGP35 {
 
             protocols[0] = F_USDC;
             tokens[0] = USDC_ADDRESS;
-            amounts[0] = allowance + (250_000 * 1e6);
+            amounts[0] = allowance + (205_000 * 1e6);
         }
 
         { /// fUSDT
             IFTokenAdmin(F_USDT).updateRewards(
-                0x85f0062Cc734282251971dCB749572aB6b10d49F
+                0x99c1515fa3327B048FCB46483ac0fceB0ED8d471
             );
 
             uint256 allowance = IERC20(USDT_ADDRESS).allowance(
@@ -732,7 +732,7 @@ contract PayloadIGP35 {
 
             protocols[0] = F_USDT;
             tokens[0] = USDT_ADDRESS;
-            amounts[0] = allowance + (250_000 * 1e6);
+            amounts[0] = allowance + (205_000 * 1e6);
         }
     }
     
