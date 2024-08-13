@@ -734,6 +734,8 @@ contract PayloadIGP35 {
             tokens[1] = USDT_ADDRESS;
             amounts[1] = allowance + (205_000 * 1e6);
         }
+
+        FLUID_RESERVE.approve(protocols, tokens, amounts);
     }
     
 
