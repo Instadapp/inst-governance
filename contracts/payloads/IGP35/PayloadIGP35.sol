@@ -645,25 +645,25 @@ contract PayloadIGP35 {
         VAULT_T1_FACTORY.setVaultAuth(
             getVaultAddress(7),
             0x36639DAd77eC858574aaF07a68bBa62b7db19FfA, // Vault_SUSDE_USDC
-            true
+            false
         );
 
         VAULT_T1_FACTORY.setVaultAuth(
             getVaultAddress(8),
             0xafE3974f4916140a093F1de7Fc064A3Da220DD41, // Vault_SUSDE_USDT
-            true
+            false
         );
 
         VAULT_T1_FACTORY.setVaultAuth(
             getVaultAddress(17),
             0xa7C805988f04f0e841504761E5aa8387600e430b, // Vault_SUSDE_USDC
-            true
+            false
         );
 
         VAULT_T1_FACTORY.setVaultAuth(
             getVaultAddress(18),
             0x7607968F40d7Ac4Ef39E809F29fADDe34C00A0A6, // Vault_SUSDE_USDT
-            true
+            false
         );
     }
 
