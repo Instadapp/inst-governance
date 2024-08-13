@@ -730,9 +730,9 @@ contract PayloadIGP35 {
                 F_USDT
             );
 
-            protocols[0] = F_USDT;
-            tokens[0] = USDT_ADDRESS;
-            amounts[0] = allowance + (205_000 * 1e6);
+            protocols[1] = F_USDT;
+            tokens[1] = USDT_ADDRESS;
+            amounts[1] = allowance + (205_000 * 1e6);
         }
     }
     
