@@ -143,7 +143,7 @@ interface IFluidVaultT1 {
 
     /// @notice updates the supply rate magnifier to `supplyRateMagnifier_`. Input in 1e2 (1% = 100, 100% = 10_000).
     function updateSupplyRateMagnifier(uint supplyRateMagnifier_) external;
-    
+
     /// @notice updates the borrow rate magnifier to `borrowRateMagnifier_`. Input in 1e2 (1% = 100, 100% = 10_000).
     function updateBorrowRateMagnifier(uint borrowRateMagnifier_) external;
 
@@ -526,18 +526,20 @@ contract PayloadIGP36 {
     /// @notice Action 1: Set weETHs token config and market rate curve on liquidity.
     function action1() internal {
         {
-            AdminModuleStructs.RateDataV1Params[]
-                memory params_ = new AdminModuleStructs.RateDataV1Params[](1);
+            AdminModuleStructs.RateDataV2Params[]
+                memory params_ = new AdminModuleStructs.RateDataV2Params[](1);
 
-            params_[0] = AdminModuleStructs.RateDataV1Params({
+            params_[0] = AdminModuleStructs.RateDataV2Params({
                 token: weETHs_ADDRESS, // weETHs
-                kink: 80 * 1e2, // 80%
+                kink1: 50 * 1e2, // 80%
+                kink2: 80 * 1e2, // 93%
                 rateAtUtilizationZero: 0, // 0%
-                rateAtUtilizationKink: 5 * 1e2, // 5%
+                rateAtUtilizationKink1: 20 * 1e2, // 20%
+                rateAtUtilizationKink2: 40 * 1e2, // 40%
                 rateAtUtilizationMax: 100 * 1e2 // 100%
             });
 
-            LIQUIDITY.updateRateDataV1s(params_);
+            LIQUIDITY.updateRateDataV2s(params_);
         }
 
         {
@@ -564,20 +566,20 @@ contract PayloadIGP36 {
             supplyExpandPercent: 25 * 1e2, // 25%
             supplyExpandDuration: 12 hours, // 12 hours
             supplyBaseLimitInUSD: 0, //
-            supplyBaseLimit: 4000 * 1e18, // 4000 weETHs
+            supplyBaseLimit: 3000 * 1e18, // 3000 weETHs
             borrowToken: wstETH_ADDRESS,
             borrowMode: 1, // Mode 1
             borrowExpandPercent: 20 * 1e2, // 20%
             borrowExpandDuration: 12 hours, // 12 hours
-            borrowBaseLimitInUSD: 7_500_000, // $7.5M
+            borrowBaseLimitInUSD: 9_900_000, // $9M
             borrowBaseLimit: 0,
             borrowMaxLimitInUSD: 10_000_000, // $10M
             borrowMaxLimit: 0,
             supplyRateMagnifier: 100 * 1e2, // 1x
             borrowRateMagnifier: 100 * 1e2, // 1x
             collateralFactor: 91 * 1e2, // 91%
-            liquidationThreshold: 94 * 1e2, // 94%
-            liquidationMaxLimit: 96 * 1e2, // 96%
+            liquidationThreshold: 93 * 1e2, // 94%
+            liquidationMaxLimit: 95 * 1e2, // 96%
             withdrawGap: 5 * 1e2, // 5%
             liquidationPenalty: 1 * 1e2, // 1%
             borrowFee: 0 * 1e2, // 0%
@@ -712,7 +714,8 @@ contract PayloadIGP36 {
         uint256 amountInUSD,
         bool isSupply
     ) public view returns (uint256) {
-        if (amount > 0 && amountInUSD > 0) revert("both usd and amount are not zero"); 
+        if (amount > 0 && amountInUSD > 0)
+            revert("both usd and amount are not zero");
         uint256 exchangePriceAndConfig_ = LIQUIDITY.readFromStorage(
             LiquiditySlotsLink.calculateMappingStorageSlot(
                 LiquiditySlotsLink.LIQUIDITY_EXCHANGE_PRICES_MAPPING_SLOT,
@@ -742,7 +745,7 @@ contract PayloadIGP36 {
             : borrowExchangePrice;
 
         if (amount > 0) {
-            return amount * 1e12 / exchangePrice;
+            return (amount * 1e12) / exchangePrice;
         } else {
             return
                 (amountInUSD * 1e12 * (10 ** decimals)) /
