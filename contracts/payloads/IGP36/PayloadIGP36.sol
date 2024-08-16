@@ -564,7 +564,7 @@ contract PayloadIGP36 {
             supplyExpandPercent: 25 * 1e2, // 25%
             supplyExpandDuration: 12 hours, // 12 hours
             supplyBaseLimitInUSD: 0, //
-            supplyBaseLimit: 4000, // 4000 weETHs
+            supplyBaseLimit: 4000 * 1e18, // 4000 weETHs
             borrowToken: wstETH_ADDRESS,
             borrowMode: 1, // Mode 1
             borrowExpandPercent: 20 * 1e2, // 20%
