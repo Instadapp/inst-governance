@@ -644,6 +644,7 @@ contract PayloadIGP36 {
                 expandDuration: vaultConfig.supplyExpandDuration,
                 baseWithdrawalLimit: getRawAmount(
                     vaultConfig.supplyToken,
+                    vaultConfig.supplyBaseLimit,
                     vaultConfig.supplyBaseLimitInUSD,
                     true
                 )
@@ -665,11 +666,13 @@ contract PayloadIGP36 {
                 expandDuration: vaultConfig.borrowExpandDuration,
                 baseDebtCeiling: getRawAmount(
                     vaultConfig.borrowToken,
+                    vaultConfig.borrowBaseLimit,
                     vaultConfig.borrowBaseLimitInUSD,
                     false
                 ),
                 maxDebtCeiling: getRawAmount(
                     vaultConfig.borrowToken,
+                    vaultConfig.borrowMaxLimit,
                     vaultConfig.borrowMaxLimitInUSD,
                     false
                 )
