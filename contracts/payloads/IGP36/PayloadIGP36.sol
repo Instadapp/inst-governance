@@ -571,7 +571,7 @@ contract PayloadIGP36 {
             borrowExpandDuration: 12 hours, // 12 hours
             borrowBaseLimitInUSD: 7_500_000, // $7.5M
             borrowBaseLimit: 0,
-            borrowMaxLimitInUSD: 200_000_000, // $200M
+            borrowMaxLimitInUSD: 10_000_000, // $10M
             borrowMaxLimit: 0,
             supplyRateMagnifier: 100 * 1e2, // 1x
             borrowRateMagnifier: 100 * 1e2, // 1x
