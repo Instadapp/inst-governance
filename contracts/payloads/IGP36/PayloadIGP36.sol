@@ -712,7 +712,7 @@ contract PayloadIGP36 {
         uint256 amountInUSD,
         bool isSupply
     ) public view returns (uint256) {
-        if (amount > 0 & amountInUSD > 0) revert("both usd and amount are not zero"); 
+        if (amount > 0 && amountInUSD > 0) revert("both usd and amount are not zero"); 
         uint256 exchangePriceAndConfig_ = LIQUIDITY.readFromStorage(
             LiquiditySlotsLink.calculateMappingStorageSlot(
                 LiquiditySlotsLink.LIQUIDITY_EXCHANGE_PRICES_MAPPING_SLOT,
