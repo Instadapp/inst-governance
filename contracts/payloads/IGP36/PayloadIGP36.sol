@@ -588,6 +588,8 @@ contract PayloadIGP36 {
 
         // Deploy weETHs/wstETH vault.
         address vault_ = deployVault(vaultConfig);
+
+        require(vault_ != address(0), "vault-not-deployed");
     }
 
     /***********************************|
