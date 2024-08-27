@@ -518,8 +518,8 @@ contract PayloadIGP37 {
     function action1() internal {
         // UserModule
         {
-        bytes4[] memory sigs_ = IProxy(address(LIQUIDITY)).getImplementationSigs(0x968738c127f91b560bD614487F859999D5D02d9c);
-        IProxy(address(LIQUIDITY)).removeImplementation(0x968738c127f91b560bD614487F859999D5D02d9c);
+        bytes4[] memory sigs_ = IProxy(address(LIQUIDITY)).getImplementationSigs(0xb290b44D34C4a44E233af73998C543832c418120);
+        IProxy(address(LIQUIDITY)).removeImplementation(0xb290b44D34C4a44E233af73998C543832c418120);
 
             IProxy(address(LIQUIDITY)).addImplementation(
                 0x8eC5e29eA39b2f64B21e32cB9Ff11D5059982F8C,
