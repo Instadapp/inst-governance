@@ -495,14 +495,17 @@ contract PayloadIGP37 {
     function execute() external {
         require(address(this) == address(TIMELOCK), "not-valid-caller");
 
-        // Action 1: Remove and new wstETH/ETH Buffer rate handler as auth on Liquidity
+        // Action 1: Update UserModule, AdminModule, ZircuitTransferModule, DummyImplementation on Liquidity Layer
         action1();
 
-        // Action 2: Update iETHv2 Lite Implementations
+        // Action 2: Remove and new wstETH/ETH Buffer rate handler as auth on Liquidity
         action2();
 
-        // Action 3: Set Configs on iETHv2 Lite
+        // Action 3: Update iETHv2 Lite Implementations
         action3();
+
+        // Action 4: Set Configs on iETHv2 Lite
+        action4();
     }
 
     function verifyProposal() external view {}
@@ -511,8 +514,50 @@ contract PayloadIGP37 {
     |     Proposal Payload Actions      |
     |__________________________________*/
 
-    /// @notice Action 1: Remove and new wstETH/ETH Buffer rate handler as auth on Liquidity
+    /// @notice Action 1: Update UserModule, AdminModule, ZircuitTransferModule, DummyImplementation on Liquidity Layer.
     function action1() internal {
+        // UserModule
+        {
+        bytes4[] memory sigs_ = IProxy(address(LIQUIDITY)).getImplementationSigs(0x968738c127f91b560bD614487F859999D5D02d9c);
+        IProxy(address(LIQUIDITY)).removeImplementation(0x968738c127f91b560bD614487F859999D5D02d9c);
+
+            IProxy(address(LIQUIDITY)).addImplementation(
+                0x8eC5e29eA39b2f64B21e32cB9Ff11D5059982F8C,
+                sigs_
+            );
+        }
+
+        // AdminModule
+        {
+            bytes4[] memory sigs_ = IProxy(address(LIQUIDITY)).getImplementationSigs(0xBDF3e6A0c721117B69150D00D9Fb27873023E4Df);
+            IProxy(address(LIQUIDITY)).removeImplementation(0xBDF3e6A0c721117B69150D00D9Fb27873023E4Df);
+
+            IProxy(address(LIQUIDITY)).addImplementation(
+                0xC3800E7527145837e525cfA6AD96B6B5DaE01586,
+                sigs_
+            );
+        }
+
+        // ZircuitTransferModule
+        {
+            bytes4[] memory sigs_ = IProxy(address(LIQUIDITY)).getImplementationSigs(0xaD99E8416f505aCE0A087C5dAB7214F15aE3D1d1);
+            IProxy(address(LIQUIDITY)).removeImplementation(0xaD99E8416f505aCE0A087C5dAB7214F15aE3D1d1);
+
+            IProxy(address(LIQUIDITY)).addImplementation(
+                0x9191b9539DD588dB81076900deFDd79Cb1115f72,
+                sigs_
+            );
+        }
+
+        // Update Dummy Implementation
+        {
+            IProxy(address(LIQUIDITY)).setDummyImplementation(0xa57D7CeF617271F4cEa4f665D33ebcFcBA4929f6);
+        }
+    }
+
+
+    /// @notice Action 2: Remove and new wstETH/ETH Buffer rate handler as auth on Liquidity
+    function action2() internal {
         AdminModuleStructs.AddressBool[] memory addrBools_ = new AdminModuleStructs.AddressBool[](2);
 
         // old wstETH/ETH Buffer rate
@@ -530,8 +575,8 @@ contract PayloadIGP37 {
         LIQUIDITY.updateAuths(addrBools_);
     }
 
-    /// @notice Action 2: Update iETHv2 Lite Implementations
-     function action2() internal {
+    /// @notice Action 3: Update iETHv2 Lite Implementations
+     function action3() internal {
         { // Admin Module
             bytes4[] memory newSigs_ = new bytes4[](1);
 
@@ -631,8 +676,8 @@ contract PayloadIGP37 {
         LITE.setDummyImplementation(0x37b1aF815f153cAfCc6BA8f503AbE05AE40099F0);
     }
 
-    /// @notice Action 3: Set Configs on iETHv2 Lite
-    function action3() internal {
+    /// @notice Action 4: Set Configs on iETHv2 Lite
+    function action4() internal {
         // Enable E-Mode on Lido Aave v3 Market
         {
             (bool s_, ) = LITE.call(abi.encodeWithSignature("enableAaveV3LidoEMode()"));
