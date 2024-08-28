@@ -532,16 +532,28 @@ contract PayloadIGP37 {
             bytes4[] memory sigs_ = IProxy(address(LIQUIDITY)).getImplementationSigs(0xBDF3e6A0c721117B69150D00D9Fb27873023E4Df);
             IProxy(address(LIQUIDITY)).removeImplementation(0xBDF3e6A0c721117B69150D00D9Fb27873023E4Df);
 
+            // Add the new signature
+            bytes4 newSig = bytes4(keccak256("updateUserWithdrawalLimit(address,address,uint256)"));
+            bytes4[] memory newSigs = new bytes4[](sigs_.length + 1);
+            for (uint i = 0; i < sigs_.length; i++) {
+                newSigs[i] = sigs_[i];
+            }
+            newSigs[sigs_.length] = newSig;
+
             IProxy(address(LIQUIDITY)).addImplementation(
                 0xC3800E7527145837e525cfA6AD96B6B5DaE01586,
-                sigs_
+                newSigs
             );
         }
 
         // ZircuitTransferModule
         {
-            bytes4[] memory sigs_ = IProxy(address(LIQUIDITY)).getImplementationSigs(0xaD99E8416f505aCE0A087C5dAB7214F15aE3D1d1);
             IProxy(address(LIQUIDITY)).removeImplementation(0xaD99E8416f505aCE0A087C5dAB7214F15aE3D1d1);
+            bytes4[] memory sigs_ = new bytes4[](4);
+            sigs_[0] = bytes4(keccak256("depositZircuitWeETH()"));
+            sigs_[1] = bytes4(keccak256("withdrawZircuitWeETH()"));
+            sigs_[2] = bytes4(keccak256("depositZircuitWeETHs()"));
+            sigs_[3] = bytes4(keccak256("withdrawZircuitWeETHs()"));
 
             IProxy(address(LIQUIDITY)).addImplementation(
                 0x9191b9539DD588dB81076900deFDd79Cb1115f72,
