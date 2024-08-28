@@ -139,7 +139,7 @@ interface IFluidVaultT1 {
 
     /// @notice updates the supply rate magnifier to `supplyRateMagnifier_`. Input in 1e2 (1% = 100, 100% = 10_000).
     function updateSupplyRateMagnifier(uint supplyRateMagnifier_) external;
-    
+
     /// @notice updates the borrow rate magnifier to `borrowRateMagnifier_`. Input in 1e2 (1% = 100, 100% = 10_000).
     function updateBorrowRateMagnifier(uint borrowRateMagnifier_) external;
 
@@ -210,10 +210,9 @@ interface ILite {
 
     function updateAggrMaxVaultRatio(uint256 newAggrMaxVaultRatio_) external;
 
-    function getImplementationSigs(address impl_)
-        external
-        view
-        returns (bytes4[] memory);
+    function getImplementationSigs(
+        address impl_
+    ) external view returns (bytes4[] memory);
 }
 
 interface IDSAV2 {
@@ -518,8 +517,13 @@ contract PayloadIGP37 {
     function action1() internal {
         // UserModule
         {
-        bytes4[] memory sigs_ = IProxy(address(LIQUIDITY)).getImplementationSigs(0xb290b44D34C4a44E233af73998C543832c418120);
-        IProxy(address(LIQUIDITY)).removeImplementation(0xb290b44D34C4a44E233af73998C543832c418120);
+            bytes4[] memory sigs_ = IProxy(address(LIQUIDITY))
+                .getImplementationSigs(
+                    0xb290b44D34C4a44E233af73998C543832c418120
+                );
+            IProxy(address(LIQUIDITY)).removeImplementation(
+                0xb290b44D34C4a44E233af73998C543832c418120
+            );
 
             IProxy(address(LIQUIDITY)).addImplementation(
                 0x8eC5e29eA39b2f64B21e32cB9Ff11D5059982F8C,
@@ -529,11 +533,18 @@ contract PayloadIGP37 {
 
         // AdminModule
         {
-            bytes4[] memory sigs_ = IProxy(address(LIQUIDITY)).getImplementationSigs(0xBDF3e6A0c721117B69150D00D9Fb27873023E4Df);
-            IProxy(address(LIQUIDITY)).removeImplementation(0xBDF3e6A0c721117B69150D00D9Fb27873023E4Df);
+            bytes4[] memory sigs_ = IProxy(address(LIQUIDITY))
+                .getImplementationSigs(
+                    0xBDF3e6A0c721117B69150D00D9Fb27873023E4Df
+                );
+            IProxy(address(LIQUIDITY)).removeImplementation(
+                0xBDF3e6A0c721117B69150D00D9Fb27873023E4Df
+            );
 
             // Add the new signature
-            bytes4 newSig = bytes4(keccak256("updateUserWithdrawalLimit(address,address,uint256)"));
+            bytes4 newSig = bytes4(
+                keccak256("updateUserWithdrawalLimit(address,address,uint256)")
+            );
             bytes4[] memory newSigs = new bytes4[](sigs_.length + 1);
             for (uint i = 0; i < sigs_.length; i++) {
                 newSigs[i] = sigs_[i];
@@ -548,7 +559,9 @@ contract PayloadIGP37 {
 
         // ZircuitTransferModule
         {
-            IProxy(address(LIQUIDITY)).removeImplementation(0xaD99E8416f505aCE0A087C5dAB7214F15aE3D1d1);
+            IProxy(address(LIQUIDITY)).removeImplementation(
+                0xaD99E8416f505aCE0A087C5dAB7214F15aE3D1d1
+            );
             bytes4[] memory sigs_ = new bytes4[](4);
             sigs_[0] = bytes4(keccak256("depositZircuitWeETH()"));
             sigs_[1] = bytes4(keccak256("withdrawZircuitWeETH()"));
@@ -563,14 +576,16 @@ contract PayloadIGP37 {
 
         // Update Dummy Implementation
         {
-            IProxy(address(LIQUIDITY)).setDummyImplementation(0xa57D7CeF617271F4cEa4f665D33ebcFcBA4929f6);
+            IProxy(address(LIQUIDITY)).setDummyImplementation(
+                0xa57D7CeF617271F4cEa4f665D33ebcFcBA4929f6
+            );
         }
     }
 
-
     /// @notice Action 2: Remove and new wstETH/ETH Buffer rate handler as auth on Liquidity
     function action2() internal {
-        AdminModuleStructs.AddressBool[] memory addrBools_ = new AdminModuleStructs.AddressBool[](2);
+        AdminModuleStructs.AddressBool[]
+            memory addrBools_ = new AdminModuleStructs.AddressBool[](2);
 
         // old wstETH/ETH Buffer rate
         addrBools_[0] = AdminModuleStructs.AddressBool({
@@ -588,8 +603,9 @@ contract PayloadIGP37 {
     }
 
     /// @notice Action 3: Update iETHv2 Lite Implementations
-     function action3() internal {
-        { // Admin Module
+    function action3() internal {
+        {
+            // Admin Module
             bytes4[] memory newSigs_ = new bytes4[](1);
 
             newSigs_[0] = bytes4(keccak256("enableAaveV3LidoEMode()"));
@@ -602,7 +618,8 @@ contract PayloadIGP37 {
             );
         }
 
-        { // User Module
+        {
+            // User Module
             bytes4[] memory newSigs_ = new bytes4[](0);
 
             _updateLiteImplementation(
@@ -613,7 +630,8 @@ contract PayloadIGP37 {
             );
         }
 
-        { // Rebalance Module
+        {
+            // Rebalance Module
             bytes4[] memory newSigs_ = new bytes4[](0);
 
             _updateLiteImplementation(
@@ -624,7 +642,8 @@ contract PayloadIGP37 {
             );
         }
 
-        { // Refinance Module
+        {
+            // Refinance Module
             bytes4[] memory newSigs_ = new bytes4[](0);
 
             _updateLiteImplementation(
@@ -635,10 +654,15 @@ contract PayloadIGP37 {
             );
         }
 
-        { // Leverage Module
+        {
+            // Leverage Module
             bytes4[] memory newSigs_ = new bytes4[](1);
 
-            newSigs_[0] = bytes4(keccak256("leverage(uint8,uint256,uint256,uint256,address[],uint256[],uint256,string[],bytes[],uint256)"));
+            newSigs_[0] = bytes4(
+                keccak256(
+                    "leverage(uint8,uint256,uint256,uint256,address[],uint256[],uint256,string[],bytes[],uint256)"
+                )
+            );
 
             _updateLiteImplementation(
                 0x5b94f032799CC36fFd3E8CA9BCeA2bA5af40d43E,
@@ -648,7 +672,8 @@ contract PayloadIGP37 {
             );
         }
 
-        { // Withdrawals Module
+        {
+            // Withdrawals Module
             bytes4[] memory newSigs_ = new bytes4[](0);
 
             _updateLiteImplementation(
@@ -659,7 +684,8 @@ contract PayloadIGP37 {
             );
         }
 
-        { // Fluid stETH Module
+        {
+            // Fluid stETH Module
             bytes4[] memory newSigs_ = new bytes4[](0);
 
             _updateLiteImplementation(
@@ -670,7 +696,8 @@ contract PayloadIGP37 {
             );
         }
 
-        { // View Module
+        {
+            // View Module
             bytes4[] memory newSigs_ = new bytes4[](2);
 
             newSigs_[0] = bytes4(keccak256("getRatioFluidNew(uint256)"));
@@ -692,13 +719,15 @@ contract PayloadIGP37 {
     function action4() internal {
         // Enable E-Mode on Lido Aave v3 Market
         {
-            (bool s_, ) = LITE.call(abi.encodeWithSignature("enableAaveV3LidoEMode()"));
+            (bool s_, ) = LITE.call(
+                abi.encodeWithSignature("enableAaveV3LidoEMode()")
+            );
             if (!s_) revert("enableAaveV3LidoEMode failed");
         }
-        
+
         // Set Max Risk Ratio for Fluid and Lido Aave v3
         {
-            uint8[] memory protocolId_ =  new uint8[](2);
+            uint8[] memory protocolId_ = new uint8[](2);
             uint256[] memory newRiskRatio_ = uint256[](2);
 
             {
@@ -712,7 +741,6 @@ contract PayloadIGP37 {
             }
 
             LITE.updateMaxRiskRatio(protocolId_, newRiskRatio_);
-
         }
     }
 
@@ -724,9 +752,12 @@ contract PayloadIGP37 {
     ) internal {
         bytes4[] memory oldSigs_;
 
-        if (oldImplementation_ != address(0) && !replace_) oldSigs_ = LITE.getImplementationSigs(oldImplementation_);
+        if (oldImplementation_ != address(0) && !replace_)
+            oldSigs_ = LITE.getImplementationSigs(oldImplementation_);
 
-        bytes4[] memory allSigs_ = new bytes4[](oldSigs_.length + newSigs_.length);
+        bytes4[] memory allSigs_ = new bytes4[](
+            oldSigs_.length + newSigs_.length
+        );
         uint256 j_;
         for (uint i = 0; i < oldSigs_.length; i++) {
             allSigs_[j_++] = oldSigs_[i];
