@@ -423,12 +423,19 @@ interface IFTokenAdmin {
 interface ILiquiditySigs {
     // ZircuitTransferModule
     function depositZircuitWeETH() external;
+
     function withdrawZircuitWeETH() external;
+
     function depositZircuitWeETHs() external;
+
     function withdrawZircuitWeETHs() external;
 
     // Admin Module
-    function updateUserWithdrawalLimit(address user_, address token_, uint256 newLimit_) external;
+    function updateUserWithdrawalLimit(
+        address user_,
+        address token_,
+        uint256 newLimit_
+    ) external;
 }
 
 interface ILiteSigs {
@@ -465,14 +472,14 @@ interface ILiteSigs {
     function getRatioAaveV3Lido(
         uint256 stEthPerWsteth_
     )
-    external
-    view
-    returns (
-        uint256 wstEthAmount_,
-        uint256 stEthAmount_,
-        uint256 ethAmount_,
-        uint256 ratio_
-    );
+        external
+        view
+        returns (
+            uint256 wstEthAmount_,
+            uint256 stEthAmount_,
+            uint256 ethAmount_,
+            uint256 ratio_
+        );
 }
 
 contract PayloadIGP37 {
@@ -601,7 +608,9 @@ contract PayloadIGP37 {
             for (uint i = 0; i < sigs_.length; i++) {
                 newSigs[i] = sigs_[i];
             }
-            newSigs[sigs_.length] = ILiquiditySigs.updateUserWithdrawalLimit.selector;
+            newSigs[sigs_.length] = ILiquiditySigs
+                .updateUserWithdrawalLimit
+                .selector;
 
             IProxy(address(LIQUIDITY)).addImplementation(
                 0xC3800E7527145837e525cfA6AD96B6B5DaE01586,
@@ -775,10 +784,10 @@ contract PayloadIGP37 {
             ILiteSigs(address(LITE)).enableAaveV3LidoEMode();
         }
 
-        // Set Max Risk Ratio for Fluid and Lido Aave v3
+        // Set Max Risk Ratio for Fluid, Lido Aave v3 & Aave v3
         {
-            uint8[] memory protocolId_ =  new uint8[](2);
-            uint256[] memory newRiskRatio_ = new uint256[](2);
+            uint8[] memory protocolId_ = new uint8[](3);
+            uint256[] memory newRiskRatio_ = new uint256[](3);
 
             {
                 protocolId_[0] = 9;
@@ -790,7 +799,16 @@ contract PayloadIGP37 {
                 newRiskRatio_[1] = 93_0000;
             }
 
+            {
+                protocolId_[2] = 2;
+                newRiskRatio_[2] = 93_0000;
+            }
+
             LITE.updateMaxRiskRatio(protocolId_, newRiskRatio_);
+        }
+
+        {
+            LITE.updateAggrMaxVaultRatio(92_0000);
         }
     }
 
