@@ -421,6 +421,61 @@ interface IFTokenAdmin {
     function updateRebalancer(address rebalancer_) external;
 }
 
+interface ILiquiditySigs {
+    // ZircuitTransferModule
+    function depositZircuitWeETH() external;
+    function withdrawZircuitWeETH() external;
+    function depositZircuitWeETHs() external;
+    function withdrawZircuitWeETHs() external;
+
+    // Admin Module
+    function updateUserWithdrawalLimit(address user_, address token_, uint256 newLimit_) external;
+}
+
+interface ILiteSigs {
+    // Leverage Module
+    function leverage(
+        uint8 protocolId_,
+        uint256 route_,
+        uint256 wstETHflashAmount_,
+        uint256 wETHBorrowAmount_,
+        address[] memory vaults_,
+        uint256[] memory vaultAmounts_,
+        uint256 swapMode_,
+        string[] memory _swapConnectors,
+        bytes[] memory _swapDatas,
+        uint256 unitAmount_
+    ) external;
+
+    // Admin Module
+    function enableAaveV3LidoEMode() external;
+
+    // View Module
+    function getRatioFluidNew(
+        uint256 stEthPerWsteth_
+    )
+        external
+        view
+        returns (
+            uint256 wstEthAmount_,
+            uint256 stEthAmount_,
+            uint256 ethAmount_,
+            uint256 ratio_
+        );
+
+    function getRatioAaveV3Lido(
+        uint256 stEthPerWsteth_
+    )
+    external
+    view
+    returns (
+        uint256 wstEthAmount_,
+        uint256 stEthAmount_,
+        uint256 ethAmount_,
+        uint256 ratio_
+    );
+}
+
 contract PayloadIGP37 {
     uint256 public constant PROPOSAL_ID = 37;
 
@@ -533,7 +588,7 @@ contract PayloadIGP37 {
             IProxy(address(LIQUIDITY)).removeImplementation(0xBDF3e6A0c721117B69150D00D9Fb27873023E4Df);
 
             // Add the new signature
-            bytes4 newSig = bytes4(keccak256("updateUserWithdrawalLimit(address,address,uint256)"));
+            bytes4 newSig = ILiquiditySigs.updateUserWithdrawalLimit.selector;
             bytes4[] memory newSigs = new bytes4[](sigs_.length + 1);
             for (uint i = 0; i < sigs_.length; i++) {
                 newSigs[i] = sigs_[i];
@@ -550,10 +605,10 @@ contract PayloadIGP37 {
         {
             IProxy(address(LIQUIDITY)).removeImplementation(0xaD99E8416f505aCE0A087C5dAB7214F15aE3D1d1);
             bytes4[] memory sigs_ = new bytes4[](4);
-            sigs_[0] = bytes4(keccak256("depositZircuitWeETH()"));
-            sigs_[1] = bytes4(keccak256("withdrawZircuitWeETH()"));
-            sigs_[2] = bytes4(keccak256("depositZircuitWeETHs()"));
-            sigs_[3] = bytes4(keccak256("withdrawZircuitWeETHs()"));
+            sigs_[0] = ILiquiditySigs.depositZircuitWeETH.selector;
+            sigs_[1] = ILiquiditySigs.withdrawZircuitWeETH.selector;
+            sigs_[2] = ILiquiditySigs.depositZircuitWeETHs.selector;
+            sigs_[3] = ILiquiditySigs.withdrawZircuitWeETHs.selector;
 
             IProxy(address(LIQUIDITY)).addImplementation(
                 0x9191b9539DD588dB81076900deFDd79Cb1115f72,
@@ -564,6 +619,11 @@ contract PayloadIGP37 {
         // Update Dummy Implementation
         {
             IProxy(address(LIQUIDITY)).setDummyImplementation(0xa57D7CeF617271F4cEa4f665D33ebcFcBA4929f6);
+        }
+
+        // Call depositZircuitWeETHs
+        {
+            ILiquiditySigs(address(LIQUIDITY)).depositZircuitWeETHs();
         }
     }
 
@@ -592,7 +652,7 @@ contract PayloadIGP37 {
         { // Admin Module
             bytes4[] memory newSigs_ = new bytes4[](1);
 
-            newSigs_[0] = bytes4(keccak256("enableAaveV3LidoEMode()"));
+            newSigs_[0] = ILiteSigs.enableAaveV3LidoEMode.selector;
 
             _updateLiteImplementation(
                 0xA7dC9540f00358a7ca46780de2FdEBD7F673C127,
@@ -638,7 +698,7 @@ contract PayloadIGP37 {
         { // Leverage Module
             bytes4[] memory newSigs_ = new bytes4[](1);
 
-            newSigs_[0] = bytes4(keccak256("leverage(uint8,uint256,uint256,uint256,address[],uint256[],uint256,string[],bytes[],uint256)"));
+            newSigs_[0] = ILiteSigs.leverage.selector;
 
             _updateLiteImplementation(
                 0x5b94f032799CC36fFd3E8CA9BCeA2bA5af40d43E,
@@ -673,8 +733,8 @@ contract PayloadIGP37 {
         { // View Module
             bytes4[] memory newSigs_ = new bytes4[](2);
 
-            newSigs_[0] = bytes4(keccak256("getRatioFluidNew(uint256)"));
-            newSigs_[1] = bytes4(keccak256("getRatioAaveV3Lido(uint256)"));
+            newSigs_[0] = ILiteSigs.getRatioFluidNew.selector;
+            newSigs_[1] = ILiteSigs.getRatioAaveV3Lido.selector;
 
             _updateLiteImplementation(
                 0x645b137ACa041B85c057a4A396086789cFD99041,
@@ -692,14 +752,13 @@ contract PayloadIGP37 {
     function action4() internal {
         // Enable E-Mode on Lido Aave v3 Market
         {
-            (bool s_, ) = LITE.call(abi.encodeWithSignature("enableAaveV3LidoEMode()"));
-            if (!s_) revert("enableAaveV3LidoEMode failed");
+            ILiteSigs(address(LITE)).enableAaveV3LidoEMode();
         }
         
         // Set Max Risk Ratio for Fluid and Lido Aave v3
         {
             uint8[] memory protocolId_ =  new uint8[](2);
-            uint256[] memory newRiskRatio_ = uint256[](2);
+            uint256[] memory newRiskRatio_ = new uint256[](2);
 
             {
                 protocolId_[0] = 9;
