@@ -302,6 +302,13 @@ interface IFluidLiquidityAdmin {
         );
 }
 
+interface IFluidDexFactory {
+    /// @notice                       Computes the address of a dex based on its given ID (`dexId_`).
+    /// @param dexId_                 The ID of the dex.
+    /// @return dex_                  Returns the computed address of the dex.
+    function getDexAddress(uint256 dexId_) external view returns (address dex_);
+}
+
 contract PayloadIGP38 {
     uint256 public constant PROPOSAL_ID = 38;
 
@@ -324,6 +331,9 @@ contract PayloadIGP38 {
 
     IFluidLiquidityAdmin public constant LIQUIDITY =
         IFluidLiquidityAdmin(0x52Aa899454998Be5b000Ad077a46Bbe360F4e497);
+    
+    IFluidDexFactory public constant FLUID_DEX_FACTORY = 
+        IFluidDexFactory(0x93DD426446B5370F094a1e31f19991AAA6Ac0bE0);
 
     address public immutable ADDRESS_THIS;
 
@@ -388,7 +398,7 @@ contract PayloadIGP38 {
 
     /// @notice Action 1: Set user supply and borrow config for the vault on Liquidity Layer.
     function action1() internal {
-        address DEX_WSTETH_ETH_ADDRESS = address(0x6d83f60eEac0e50A1250760151E81Db2a278e03a);
+        address DEX_WSTETH_ETH_ADDRESS = address(FLUID_DEX_FACTORY.getDexAddress(1));
 
         // Set user supply config for the vault on Liquidity Layer.
         {
@@ -399,11 +409,11 @@ contract PayloadIGP38 {
                 token: ETH_ADDRESS, // ETH address
                 mode: 1,
                 expandPercent: 25 * 1e2,
-                expandDuration: 12 hours,
+                expandDuration: 2 hours,
                 baseWithdrawalLimit: getRawAmount(
                     ETH_ADDRESS,
                     0,
-                    100_000,
+                    50_000,
                     true
                 )
             });
@@ -413,11 +423,11 @@ contract PayloadIGP38 {
                 token: wstETH_ADDRESS, // wstETH address
                 mode: 1,
                 expandPercent: 25 * 1e2,
-                expandDuration: 12 hours,
+                expandDuration: 2 hours,
                 baseWithdrawalLimit: getRawAmount(
                     wstETH_ADDRESS,
                     0,
-                    100_000,
+                    50_000,
                     true
                 )
             });
@@ -434,11 +444,11 @@ contract PayloadIGP38 {
                 token: ETH_ADDRESS, // ETH address
                 mode: 1,
                 expandPercent: 20 * 1e2,
-                expandDuration: 12 hours,
+                expandDuration: 2 hours,
                 baseDebtCeiling: getRawAmount(
                     ETH_ADDRESS,
                     0,
-                    100_000,
+                    50_000,
                     false
                 ),
                 maxDebtCeiling: getRawAmount(
@@ -454,11 +464,11 @@ contract PayloadIGP38 {
                 token: wstETH_ADDRESS, // ETH address
                 mode: 1,
                 expandPercent: 20 * 1e2,
-                expandDuration: 12 hours,
+                expandDuration: 2 hours,
                 baseDebtCeiling: getRawAmount(
                     wstETH_ADDRESS,
                     0,
-                    100_000,
+                    50_000,
                     false
                 ),
                 maxDebtCeiling: getRawAmount(
