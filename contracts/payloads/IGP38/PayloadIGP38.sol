@@ -388,7 +388,7 @@ contract PayloadIGP38 {
 
     /// @notice Action 1: Set user supply and borrow config for the vault on Liquidity Layer.
     function action1() internal {
-        address DEX_WSTETH_ETH_ADDRESS = address(0);
+        address DEX_WSTETH_ETH_ADDRESS = address(0x6d83f60eEac0e50A1250760151E81Db2a278e03a);
 
         // Set user supply config for the vault on Liquidity Layer.
         {
