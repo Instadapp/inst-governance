@@ -384,18 +384,6 @@ contract PayloadIGP38 {
     address public constant wstETH_ADDRESS =
         0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0;
 
-    uint256 internal constant X8 = 0xff;
-    uint256 internal constant X10 = 0x3ff;
-    uint256 internal constant X14 = 0x3fff;
-    uint256 internal constant X15 = 0x7fff;
-    uint256 internal constant X16 = 0xffff;
-    uint256 internal constant X18 = 0x3ffff;
-    uint256 internal constant X24 = 0xffffff;
-    uint256 internal constant X64 = 0xffffffffffffffff;
-
-    uint256 internal constant DEFAULT_EXPONENT_SIZE = 8;
-    uint256 internal constant DEFAULT_EXPONENT_MASK = 0xff;
-
     constructor() {
         ADDRESS_THIS = address(this);
     }
@@ -438,15 +426,6 @@ contract PayloadIGP38 {
 
         // Action 1: Set user supply and borrow config for the vault on Liquidity Layer.
         action1();
-
-        /// @notice Action 2: Update weETH/wstETH Vault Parameter
-        action2();
-
-        /// @notice Action 3: Update wstETH rates
-        action3();
-
-        /// @notice Action 4: Transfer 150 stETH to the team’s multisig for the Cantina Competition
-        action4();
     }
 
     function verifyProposal() external view {}
