@@ -1,9 +1,9 @@
 pragma solidity >=0.7.0;
 pragma experimental ABIEncoderV2;
 
-import {BigMathMinified} from "./libraries/bigMathMinified.sol";
-import {LiquiditySlotsLink} from "./libraries/liquiditySlotsLink.sol";
-import {LiquidityCalcs} from "./libraries/liquidityCalcs.sol";
+import {BigMathMinified} from "../libraries/bigMathMinified.sol";
+import {LiquiditySlotsLink} from "../libraries/liquiditySlotsLink.sol";
+import {LiquidityCalcs} from "../libraries/liquidityCalcs.sol";
 
 interface IGovernorBravo {
     function _acceptAdmin() external;
@@ -542,57 +542,6 @@ contract PayloadIGP38 {
         }
     }
 
-    /// @notice Action 2: Update weETH/wstETH Vault Parameter
-    function action2() internal {
-        AdminModuleStructs.UserBorrowConfig[] memory borrowConfigs_ = new AdminModuleStructs.UserBorrowConfig[](1);
-
-        borrowConfigs_[0] = getUserBorrowData(wstETH_ADDRESS, VAULT_T1_FACTORY.getVaultAddress(16));
-
-        borrowConfigs_[0].maxDebtCeiling = getRawAmount(
-            wstETH_ADDRESS,
-            6500 * 1e18,
-            0,
-            false
-        );
-
-        LIQUIDITY.updateUserBorrowConfigs(borrowConfigs_);
-    }
-
-    /// @notice Action 3: Update wstETH rates
-    function action3() internal {
-        AdminModuleStructs.RateDataV2Params[] memory params_ = new AdminModuleStructs.RateDataV2Params[](1);
-
-        params_[0] = AdminModuleStructs.RateDataV2Params({
-                token: wstETH_ADDRESS, // wstETH
-                kink1: 80 * 1e2, // 80%
-                kink2: 90 * 1e2, // 90%
-                rateAtUtilizationZero: 0, // 0%
-                rateAtUtilizationKink1: 2.8 * 1e2, // 2.8%
-                rateAtUtilizationKink2: 5.6 * 1e2, // 5.6%
-                rateAtUtilizationMax: 100 * 1e2 // 100%
-        });
-
-        LIQUIDITY.updateRateDataV2s(params_);
-    }
-
-    /// @notice Action 4: Transfer 150 stETH to the team’s multisig for the Cantina Competition
-    function action4() internal {
-        string[] memory targets = new string[](1);
-        bytes[] memory encodedSpells = new bytes[](1);
-
-        string memory withdrawSignature = "withdraw(address,uint256,address,uint256,uint256)";
-
-        // Spell 1: Transfer stETH
-        {   
-            address STETH_ADDRESS = 0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84;
-            uint256 STETH_AMOUNT = 150 * 1e18; // 150 stETH
-            targets[0] = "BASIC-A";
-            encodedSpells[0] = abi.encodeWithSignature(withdrawSignature, STETH_ADDRESS, STETH_AMOUNT, TEAM_MULTISIG, 0, 0);
-        }
-
-        IDSAV2(TREASURY).cast(targets, encodedSpells, address(this));
-    }
-
     /// Helpers ///
 
     function getRawAmount(
@@ -638,45 +587,5 @@ contract PayloadIGP38 {
                 (amountInUSD * 1e12 * (10 ** decimals)) /
                 (usdPrice * exchangePrice);
         }
-    }
-
-    function getUserBorrowData(
-        address token_,
-        address vault_
-    )
-        internal
-        view
-        returns (AdminModuleStructs.UserBorrowConfig memory config_)
-    {
-        uint256 userBorrowData_ = LIQUIDITY.readFromStorage(
-            LiquiditySlotsLink.calculateDoubleMappingStorageSlot(
-                LiquiditySlotsLink.LIQUIDITY_USER_BORROW_DOUBLE_MAPPING_SLOT,
-                vault_,
-                token_
-            )
-        );
-
-        config_ = AdminModuleStructs.UserBorrowConfig({
-            user: vault_,
-            token: token_,
-            mode: uint8(userBorrowData_ & 1),
-            expandPercent: (userBorrowData_ >>
-                LiquiditySlotsLink.BITS_USER_BORROW_EXPAND_PERCENT) & X14,
-            expandDuration: (userBorrowData_ >>
-                LiquiditySlotsLink.BITS_USER_BORROW_EXPAND_DURATION) & X24,
-            baseDebtCeiling: BigMathMinified.fromBigNumber(
-                (userBorrowData_ >>
-                    LiquiditySlotsLink.BITS_USER_BORROW_BASE_BORROW_LIMIT) &
-                    X18,
-                DEFAULT_EXPONENT_SIZE,
-                DEFAULT_EXPONENT_MASK
-            ),
-            maxDebtCeiling: BigMathMinified.fromBigNumber(
-                (userBorrowData_ >>
-                    LiquiditySlotsLink.BITS_USER_BORROW_MAX_BORROW_LIMIT) & X18,
-                DEFAULT_EXPONENT_SIZE,
-                DEFAULT_EXPONENT_MASK
-            )
-        });
     }
 }
