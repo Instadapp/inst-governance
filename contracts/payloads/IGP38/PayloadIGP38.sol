@@ -309,6 +309,40 @@ interface IFluidDexFactory {
     function getDexAddress(uint256 dexId_) external view returns (address dex_);
 }
 
+interface IFluidVaultT1Factory {
+    function deployVault(
+        address vaultDeploymentLogic_,
+        bytes calldata vaultDeploymentData_
+    ) external returns (address vault_);
+
+    function setVaultAuth(
+        address vault_,
+        address vaultAuth_,
+        bool allowed_
+    ) external;
+
+    function getVaultAddress(
+        uint256 vaultId_
+    ) external view returns (address vault_);
+
+    function readFromStorage(
+        bytes32 slot_
+    ) external view returns (uint256 result_);
+}
+
+interface IDSAV2 {
+    function cast(
+        string[] memory _targetNames,
+        bytes[] memory _datas,
+        address _origin
+    )
+    external
+    payable 
+    returns (bytes32);
+
+    function isAuth(address user) external view returns (bool);
+}
+
 contract PayloadIGP38 {
     uint256 public constant PROPOSAL_ID = 38;
 
@@ -331,9 +365,13 @@ contract PayloadIGP38 {
 
     IFluidLiquidityAdmin public constant LIQUIDITY =
         IFluidLiquidityAdmin(0x52Aa899454998Be5b000Ad077a46Bbe360F4e497);
+    IFluidVaultT1Factory public constant VAULT_T1_FACTORY =
+        IFluidVaultT1Factory(0x324c5Dc1fC42c7a4D43d92df1eBA58a54d13Bf2d);
     
     IFluidDexFactory public constant FLUID_DEX_FACTORY = 
         IFluidDexFactory(0x93DD426446B5370F094a1e31f19991AAA6Ac0bE0);
+
+    IDSAV2 public constant TREASURY = IDSAV2(0x28849D2b63fA8D361e5fc15cB8aBB13019884d09);
 
     address public immutable ADDRESS_THIS;
 
@@ -345,6 +383,18 @@ contract PayloadIGP38 {
         0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
     address public constant wstETH_ADDRESS =
         0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0;
+
+    uint256 internal constant X8 = 0xff;
+    uint256 internal constant X10 = 0x3ff;
+    uint256 internal constant X14 = 0x3fff;
+    uint256 internal constant X15 = 0x7fff;
+    uint256 internal constant X16 = 0xffff;
+    uint256 internal constant X18 = 0x3ffff;
+    uint256 internal constant X24 = 0xffffff;
+    uint256 internal constant X64 = 0xffffffffffffffff;
+
+    uint256 internal constant DEFAULT_EXPONENT_SIZE = 8;
+    uint256 internal constant DEFAULT_EXPONENT_MASK = 0xff;
 
     constructor() {
         ADDRESS_THIS = address(this);
@@ -388,6 +438,15 @@ contract PayloadIGP38 {
 
         // Action 1: Set user supply and borrow config for the vault on Liquidity Layer.
         action1();
+
+        /// @notice Action 2: Update weETH/wstETH Vault Parameter
+        action2();
+
+        /// @notice Action 3: Update wstETH rates
+        action3();
+
+        /// @notice Action 4: Transfer 150 stETH to the team’s multisig for the Cantina Competition
+        action4();
     }
 
     function verifyProposal() external view {}
@@ -405,7 +464,7 @@ contract PayloadIGP38 {
             AdminModuleStructs.UserSupplyConfig[] memory supplyConfigs_ = new AdminModuleStructs.UserSupplyConfig[](2);
 
             supplyConfigs_[0] = AdminModuleStructs.UserSupplyConfig({
-                user: DEX_WSTETH_ETH_ADDRESS, // Replace with actual user address
+                user: DEX_WSTETH_ETH_ADDRESS,
                 token: ETH_ADDRESS, // ETH address
                 mode: 1,
                 expandPercent: 25 * 1e2,
@@ -419,7 +478,7 @@ contract PayloadIGP38 {
             });
 
             supplyConfigs_[1] = AdminModuleStructs.UserSupplyConfig({
-                user: DEX_WSTETH_ETH_ADDRESS, // Replace with actual user address
+                user: DEX_WSTETH_ETH_ADDRESS,
                 token: wstETH_ADDRESS, // wstETH address
                 mode: 1,
                 expandPercent: 25 * 1e2,
@@ -440,7 +499,7 @@ contract PayloadIGP38 {
             AdminModuleStructs.UserBorrowConfig[] memory borrowConfigs_ = new AdminModuleStructs.UserBorrowConfig[](2);
 
             borrowConfigs_[0] = AdminModuleStructs.UserBorrowConfig({
-                user: DEX_WSTETH_ETH_ADDRESS, // Replace with actual user address
+                user: DEX_WSTETH_ETH_ADDRESS,
                 token: ETH_ADDRESS, // ETH address
                 mode: 1,
                 expandPercent: 20 * 1e2,
@@ -460,7 +519,7 @@ contract PayloadIGP38 {
             });
 
             borrowConfigs_[1] = AdminModuleStructs.UserBorrowConfig({
-                user: DEX_WSTETH_ETH_ADDRESS, // Replace with actual user address
+                user: DEX_WSTETH_ETH_ADDRESS,
                 token: wstETH_ADDRESS, // ETH address
                 mode: 1,
                 expandPercent: 20 * 1e2,
@@ -482,6 +541,59 @@ contract PayloadIGP38 {
             LIQUIDITY.updateUserBorrowConfigs(borrowConfigs_);
         }
     }
+
+    /// @notice Action 2: Update weETH/wstETH Vault Parameter
+    function action2() internal {
+        AdminModuleStructs.UserBorrowConfig[] memory borrowConfigs_ = new AdminModuleStructs.UserBorrowConfig[](1);
+
+        borrowConfigs_[0] = getUserBorrowData(wstETH_ADDRESS, VAULT_T1_FACTORY.getVaultAddress(16));
+
+        borrowConfigs_[0].maxDebtCeiling = getRawAmount(
+            wstETH_ADDRESS,
+            6500 * 1e18,
+            0,
+            false
+        );
+
+        LIQUIDITY.updateUserBorrowConfigs(borrowConfigs_);
+    }
+
+    /// @notice Action 3: Update wstETH rates
+    function action3() internal {
+        AdminModuleStructs.RateDataV2Params[] memory params_ = new AdminModuleStructs.RateDataV2Params[](1);
+
+        params_[0] = AdminModuleStructs.RateDataV2Params({
+                token: wstETH_ADDRESS, // wstETH
+                kink1: 80 * 1e2, // 80%
+                kink2: 90 * 1e2, // 90%
+                rateAtUtilizationZero: 0, // 0%
+                rateAtUtilizationKink1: 2.8 * 1e2, // 2.8%
+                rateAtUtilizationKink2: 5.6 * 1e2, // 5.6%
+                rateAtUtilizationMax: 100 * 1e2 // 100%
+        });
+
+        LIQUIDITY.updateRateDataV2s(params_);
+    }
+
+    /// @notice Action 4: Transfer 150 stETH to the team’s multisig for the Cantina Competition
+    function action4() internal {
+        string[] memory targets = new string[](1);
+        bytes[] memory encodedSpells = new bytes[](1);
+
+        string memory withdrawSignature = "withdraw(address,uint256,address,uint256,uint256)";
+
+        // Spell 1: Transfer stETH
+        {   
+            address STETH_ADDRESS = 0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84;
+            uint256 STETH_AMOUNT = 150 * 1e18; // 150 stETH
+            targets[0] = "BASIC-A";
+            encodedSpells[0] = abi.encodeWithSignature(withdrawSignature, STETH_ADDRESS, STETH_AMOUNT, TEAM_MULTISIG, 0, 0);
+        }
+
+        IDSAV2(TREASURY).cast(targets, encodedSpells, address(this));
+    }
+
+    /// Helpers ///
 
     function getRawAmount(
         address token,
@@ -526,5 +638,45 @@ contract PayloadIGP38 {
                 (amountInUSD * 1e12 * (10 ** decimals)) /
                 (usdPrice * exchangePrice);
         }
+    }
+
+    function getUserBorrowData(
+        address token_,
+        address vault_
+    )
+        internal
+        view
+        returns (AdminModuleStructs.UserBorrowConfig memory config_)
+    {
+        uint256 userBorrowData_ = LIQUIDITY.readFromStorage(
+            LiquiditySlotsLink.calculateDoubleMappingStorageSlot(
+                LiquiditySlotsLink.LIQUIDITY_USER_BORROW_DOUBLE_MAPPING_SLOT,
+                vault_,
+                token_
+            )
+        );
+
+        config_ = AdminModuleStructs.UserBorrowConfig({
+            user: vault_,
+            token: token_,
+            mode: uint8(userBorrowData_ & 1),
+            expandPercent: (userBorrowData_ >>
+                LiquiditySlotsLink.BITS_USER_BORROW_EXPAND_PERCENT) & X14,
+            expandDuration: (userBorrowData_ >>
+                LiquiditySlotsLink.BITS_USER_BORROW_EXPAND_DURATION) & X24,
+            baseDebtCeiling: BigMathMinified.fromBigNumber(
+                (userBorrowData_ >>
+                    LiquiditySlotsLink.BITS_USER_BORROW_BASE_BORROW_LIMIT) &
+                    X18,
+                DEFAULT_EXPONENT_SIZE,
+                DEFAULT_EXPONENT_MASK
+            ),
+            maxDebtCeiling: BigMathMinified.fromBigNumber(
+                (userBorrowData_ >>
+                    LiquiditySlotsLink.BITS_USER_BORROW_MAX_BORROW_LIMIT) & X18,
+                DEFAULT_EXPONENT_SIZE,
+                DEFAULT_EXPONENT_MASK
+            )
+        });
     }
 }
