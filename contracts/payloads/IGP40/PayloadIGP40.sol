@@ -474,7 +474,7 @@ contract PayloadIGP40 {
         /// @notice Action 3: Config cbBTC/USDC and cbBTC/USDT
         action3();
 
-        /// @notice Action 4: Config wstETHcbBTC and weETH/cbBTC
+        /// @notice Action 4: Config wstETH/cbBTC and weETH/cbBTC
         action4();
     }
 
@@ -527,7 +527,7 @@ contract PayloadIGP40 {
             supplyExpandDuration: 12 hours, // 12 hours
             supplyBaseLimitInUSD: 5_000_000, // $5M
             supplyBaseLimit: 0,
-            borrowToken: ETH_ADDRESS,
+            borrowToken: address(0),
             borrowMode: 1, // Mode 1
             borrowExpandPercent: 20 * 1e2, // 20%
             borrowExpandDuration: 12 hours, // 12 hours
@@ -645,7 +645,7 @@ contract PayloadIGP40 {
             supplyExpandDuration: 12 hours, // 12 hours
             supplyBaseLimitInUSD: 5_000_000, // $5M
             supplyBaseLimit: 0,
-            borrowToken: ETH_ADDRESS,
+            borrowToken: cbBTC_ADDRESS,
             borrowMode: 1, // Mode 1
             borrowExpandPercent: 20 * 1e2, // 20%
             borrowExpandDuration: 12 hours, // 12 hours
@@ -668,7 +668,6 @@ contract PayloadIGP40 {
         {
             vaultConfig.vaultId = 100;
             vaultConfig.supplyToken = wstETH_ADDRESS;
-            vaultConfig.borrowToken = cbBTC_ADDRESS;
 
             vaultConfig.collateralFactor = 88 * 1e2;
             vaultConfig.liquidationThreshold = 90 * 1e2;
@@ -687,7 +686,6 @@ contract PayloadIGP40 {
         {
             vaultConfig.vaultId = 100;
             vaultConfig.supplyToken = weETH_ADDRESS;
-            vaultConfig.borrowToken = cbBTC_ADDRESS;
 
             vaultConfig.collateralFactor = 80 * 1e2;
             vaultConfig.liquidationThreshold = 95 * 1e2;
