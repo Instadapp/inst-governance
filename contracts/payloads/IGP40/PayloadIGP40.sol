@@ -365,7 +365,7 @@ contract PayloadIGP40 {
         0xA45f7bD6A5Ff45D31aaCE6bCD3d426D9328cea01;
 
     address public constant PROPOSER_AVO_MULTISIG =
-        0x059A94A72451c0ae1cc1CE4BF0dB52421bbE8210;
+        0x059a94a72451c0ae1Cc1cE4bf0Db52421Bbe8210;
 
     address public constant PROPOSER_AVO_MULTISIG_2 =
         0x9efdE135CA4832AbF0408c44c6f5f370eB0f35e8;
@@ -384,10 +384,6 @@ contract PayloadIGP40 {
         IFluidVaultT1Factory(0x324c5Dc1fC42c7a4D43d92df1eBA58a54d13Bf2d);
     IFluidReserveContract public constant FLUID_RESERVE =
         IFluidReserveContract(0x264786EF916af64a1DB19F513F24a3681734ce92);
-    IFluidVaultT1DeploymentLogic public constant VAULT_T1_DEPLOYMENT_LOGIC =
-        IFluidVaultT1DeploymentLogic(
-            0x2Cc710218F2e3a82CcC77Cc4B3B93Ee6Ba9451CD
-        );
     
     IFluidDexFactory public constant FLUID_DEX_FACTORY = 
         IFluidDexFactory(0x93DD426446B5370F094a1e31f19991AAA6Ac0bE0);
@@ -498,21 +494,7 @@ contract PayloadIGP40 {
                 rateAtUtilizationMax: 100 * 1e2 // 100%
             });
 
-            LIQUIDITY.updateRateDataV2s(params_);
-        }
-
-        {
-            AdminModuleStructs.TokenConfig[]
-                memory params_ = new AdminModuleStructs.TokenConfig[](1);
-
-            params_[0] = AdminModuleStructs.TokenConfig({
-                token: cbBTC_ADDRESS, // cbBTC
-                threshold: 0.3 * 1e2, // 0.3
-                fee: 10 * 1e2, // 10%
-                maxUtilization: 100 * 1e2
-            });
-
-            LIQUIDITY.updateTokenConfigs(params_);
+            LIQUIDITY.updateRateDataV1s(params_);
         }
     }
 
@@ -533,7 +515,7 @@ contract PayloadIGP40 {
             borrowExpandDuration: 12 hours, // 12 hours
             borrowBaseLimitInUSD: 7_500_000, // $7.5M
             borrowBaseLimit: 0,
-            borrowMaxLimitInUSD: 10_000_000, // $10M
+            borrowMaxLimitInUSD: 20_000_000, // $20M
             borrowMaxLimit: 0,
             supplyRateMagnifier: 100 * 1e2, // 1x
             borrowRateMagnifier: 100 * 1e2, // 1x
@@ -541,20 +523,18 @@ contract PayloadIGP40 {
             liquidationThreshold: 91 * 1e2, // 91%
             liquidationMaxLimit: 94 * 1e2, // 94%
             withdrawGap: 5 * 1e2, // 5%
-            liquidationPenalty: 0 * 1e2,
+            liquidationPenalty: 2 * 1e2, // 2%
             borrowFee: 0 * 1e2, // 0%
             oracle: address(0)
         });
 
         // Config cbBTC/ETH vault.
         {
-            vaultConfig.vaultId = 100;
+            vaultConfig.vaultId = 28;
             vaultConfig.supplyToken = cbBTC_ADDRESS;
             vaultConfig.borrowToken = ETH_ADDRESS;
 
-            vaultConfig.liquidationPenalty = 2 * 1e2;
-
-            vaultConfig.oracle = address(0);
+            vaultConfig.oracle = address(0x5D9bF2026dc5C248B785aC760ab6d3CF7A6C93cc);
 
             address vault_ = configVault(vaultConfig);
 
@@ -567,9 +547,7 @@ contract PayloadIGP40 {
             vaultConfig.supplyToken = ETH_ADDRESS;
             vaultConfig.borrowToken = cbBTC_ADDRESS;
 
-            vaultConfig.liquidationPenalty = 3 * 1e2;
-
-            vaultConfig.oracle = address(0);
+            vaultConfig.oracle = address(0xdB94DD822bAaa80f8B339392bed994cdEA72D775);
 
             address vault_ = configVault(vaultConfig);
 
@@ -593,7 +571,7 @@ contract PayloadIGP40 {
             borrowExpandDuration: 12 hours, // 12 hours
             borrowBaseLimitInUSD: 7_500_000, // $7.5M
             borrowBaseLimit: 0,
-            borrowMaxLimitInUSD: 10_000_000, // $10M
+            borrowMaxLimitInUSD: 20_000_000, // $20M
             borrowMaxLimit: 0,
             supplyRateMagnifier: 100 * 1e2, // 1x
             borrowRateMagnifier: 100 * 1e2, // 1x
@@ -608,12 +586,12 @@ contract PayloadIGP40 {
 
         // Config cbBTC/USDC vault.
         {
-            vaultConfig.vaultId = 100;
+            vaultConfig.vaultId = 29;
             vaultConfig.borrowToken = USDC_ADDRESS;
 
             vaultConfig.liquidationPenalty = 3 * 1e2;
 
-            vaultConfig.oracle = address(0);
+            vaultConfig.oracle = address(0x390421d1Fe8e238FFd9Ef86563CBF76F348CdD92);
 
             address vault_ = configVault(vaultConfig);
 
@@ -622,12 +600,12 @@ contract PayloadIGP40 {
 
         // Config cbBTC/USDT vault.
         {
-            vaultConfig.vaultId = 100;
+            vaultConfig.vaultId = 30;
             vaultConfig.borrowToken = USDT_ADDRESS;
 
             vaultConfig.liquidationPenalty = 4 * 1e2;
             
-            vaultConfig.oracle = address(0);
+            vaultConfig.oracle = address(0xF38776BfEf1E2c395f80733045E4D2BCFE98f97a);
 
             address vault_ = configVault(vaultConfig);
 
@@ -651,7 +629,7 @@ contract PayloadIGP40 {
             borrowExpandDuration: 12 hours, // 12 hours
             borrowBaseLimitInUSD: 7_500_000, // $7.5M
             borrowBaseLimit: 0,
-            borrowMaxLimitInUSD: 10_000_000, // $10M
+            borrowMaxLimitInUSD: 20_000_000, // $20M
             borrowMaxLimit: 0,
             supplyRateMagnifier: 100 * 1e2, // 1x
             borrowRateMagnifier: 100 * 1e2, // 1x
@@ -673,9 +651,9 @@ contract PayloadIGP40 {
             vaultConfig.liquidationThreshold = 90 * 1e2;
             vaultConfig.liquidationMaxLimit = 93 * 1e2;
 
-            vaultConfig.liquidationPenalty = 2 * 1e2;
+            vaultConfig.liquidationPenalty = 5 * 1e2;
 
-            vaultConfig.oracle = address(0);
+            vaultConfig.oracle = address(0x922c2d3Ef36CC02d5053645309C924925c03c902);
 
             address vault_ = configVault(vaultConfig);
 
@@ -688,12 +666,12 @@ contract PayloadIGP40 {
             vaultConfig.supplyToken = weETH_ADDRESS;
 
             vaultConfig.collateralFactor = 80 * 1e2;
-            vaultConfig.liquidationThreshold = 95 * 1e2;
+            vaultConfig.liquidationThreshold = 85 * 1e2;
             vaultConfig.liquidationMaxLimit = 90 * 1e2;
 
             vaultConfig.liquidationPenalty = 3 * 1e2;
 
-            vaultConfig.oracle = address(0);
+            vaultConfig.oracle = address(0x5DdC7E208958a9B8DC595e40859E6b611fdC44cA);
 
             address vault_ = configVault(vaultConfig);
 
@@ -736,7 +714,7 @@ contract PayloadIGP40 {
         VaultConfig memory vaultConfig
     ) internal returns (address vault_) {
         // Deploy vault.
-        vault_ = VAULT_T1_FACTORY.getVaultAddress(vaultConfig.vaultI);
+        vault_ = VAULT_T1_FACTORY.getVaultAddress(vaultConfig.vaultId);
 
         // Set user supply config for the vault on Liquidity Layer.
         {
