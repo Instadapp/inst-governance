@@ -586,7 +586,7 @@ contract PayloadIGP40 {
 
         // Config ETH/cbBTC vault.
         {
-            vaultConfig.vaultId = 30;
+            vaultConfig.vaultId = 31;
             vaultConfig.supplyToken = ETH_ADDRESS;
             vaultConfig.borrowToken = cbBTC_ADDRESS;
 
