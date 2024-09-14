@@ -192,6 +192,7 @@ interface IProxy {
         bytes32 slot_
     ) external view returns (uint256 result_);
 }
+
 interface IFluidLiquidityAdmin {
     function readFromStorage(
         bytes32 slot_
@@ -394,7 +395,6 @@ interface IERC20 {
     ) external view returns (uint256);
 }
 
-
 contract PayloadIGP40 {
     uint256 public constant PROPOSAL_ID = 40;
 
@@ -421,8 +421,8 @@ contract PayloadIGP40 {
         IFluidVaultT1Factory(0x324c5Dc1fC42c7a4D43d92df1eBA58a54d13Bf2d);
     IFluidReserveContract public constant FLUID_RESERVE =
         IFluidReserveContract(0x264786EF916af64a1DB19F513F24a3681734ce92);
-    
-    IFluidDexFactory public constant FLUID_DEX_FACTORY = 
+
+    IFluidDexFactory public constant FLUID_DEX_FACTORY =
         IFluidDexFactory(0x93DD426446B5370F094a1e31f19991AAA6Ac0bE0);
 
     address public immutable ADDRESS_THIS;
@@ -430,7 +430,6 @@ contract PayloadIGP40 {
     address public constant TEAM_MULTISIG =
         0x4F6F977aCDD1177DCD81aB83074855EcB9C2D49e;
 
-    
     address public constant ETH_ADDRESS =
         0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
     address public constant wstETH_ADDRESS =
@@ -500,7 +499,7 @@ contract PayloadIGP40 {
 
     function execute() external {
         require(address(this) == address(TIMELOCK), "not-valid-caller");
-        
+
         /// @notice Action 1: Set cbBTC token config and market rate curve on liquidity.
         action1();
 
@@ -541,7 +540,6 @@ contract PayloadIGP40 {
         }
     }
 
-    
     /// @notice Action 2: Config cbBTC/ETH and ETH/cbBTC
     function action2() internal {
         VaultConfig memory vaultConfig = VaultConfig({
@@ -577,7 +575,9 @@ contract PayloadIGP40 {
             vaultConfig.supplyToken = cbBTC_ADDRESS;
             vaultConfig.borrowToken = ETH_ADDRESS;
 
-            vaultConfig.oracle = address(0x5D9bF2026dc5C248B785aC760ab6d3CF7A6C93cc);
+            vaultConfig.oracle = address(
+                0x5D9bF2026dc5C248B785aC760ab6d3CF7A6C93cc
+            );
 
             address vault_ = configVault(vaultConfig);
 
@@ -590,7 +590,9 @@ contract PayloadIGP40 {
             vaultConfig.supplyToken = ETH_ADDRESS;
             vaultConfig.borrowToken = cbBTC_ADDRESS;
 
-            vaultConfig.oracle = address(0xdB94DD822bAaa80f8B339392bed994cdEA72D775);
+            vaultConfig.oracle = address(
+                0xdB94DD822bAaa80f8B339392bed994cdEA72D775
+            );
 
             address vault_ = configVault(vaultConfig);
 
@@ -634,7 +636,9 @@ contract PayloadIGP40 {
 
             vaultConfig.liquidationPenalty = 3 * 1e2;
 
-            vaultConfig.oracle = address(0x390421d1Fe8e238FFd9Ef86563CBF76F348CdD92);
+            vaultConfig.oracle = address(
+                0x390421d1Fe8e238FFd9Ef86563CBF76F348CdD92
+            );
 
             address vault_ = configVault(vaultConfig);
 
@@ -647,8 +651,10 @@ contract PayloadIGP40 {
             vaultConfig.borrowToken = USDT_ADDRESS;
 
             vaultConfig.liquidationPenalty = 4 * 1e2;
-            
-            vaultConfig.oracle = address(0xF38776BfEf1E2c395f80733045E4D2BCFE98f97a);
+
+            vaultConfig.oracle = address(
+                0xF38776BfEf1E2c395f80733045E4D2BCFE98f97a
+            );
 
             address vault_ = configVault(vaultConfig);
 
@@ -658,7 +664,7 @@ contract PayloadIGP40 {
 
     /// @notice Action 4: Config wstETH/cbBTC and weETH/cbBTC.
     function action4() internal {
-       VaultConfig memory vaultConfig = VaultConfig({
+        VaultConfig memory vaultConfig = VaultConfig({
             vaultId: 0,
             supplyToken: address(0),
             supplyMode: 1, // Mode 1
@@ -696,7 +702,9 @@ contract PayloadIGP40 {
 
             vaultConfig.liquidationPenalty = 2 * 1e2;
 
-            vaultConfig.oracle = address(0x922c2d3Ef36CC02d5053645309C924925c03c902);
+            vaultConfig.oracle = address(
+                0x922c2d3Ef36CC02d5053645309C924925c03c902
+            );
 
             address vault_ = configVault(vaultConfig);
 
@@ -714,7 +722,9 @@ contract PayloadIGP40 {
 
             vaultConfig.liquidationPenalty = 5 * 1e2;
 
-            vaultConfig.oracle = address(0x5DdC7E208958a9B8DC595e40859E6b611fdC44cA);
+            vaultConfig.oracle = address(
+                0x5DdC7E208958a9B8DC595e40859E6b611fdC44cA
+            );
 
             address vault_ = configVault(vaultConfig);
 
@@ -728,9 +738,10 @@ contract PayloadIGP40 {
         address[] memory tokens = new address[](2);
         uint256[] memory amounts = new uint256[](2);
 
-        { /// fUSDC
+        {
+            /// fUSDC
             IFTokenAdmin(F_USDC).updateRewards(
-                0x99c1515fa3327B048FCB46483ac0fceB0ED8d471
+                0x6cb89F03c444AF5De1A6d9665BBaAcbFfC3EBE83
             );
 
             uint256 allowance = IERC20(USDC_ADDRESS).allowance(
@@ -743,9 +754,10 @@ contract PayloadIGP40 {
             amounts[0] = allowance + (200_000 * 1e6);
         }
 
-        { /// fUSDT
+        {
+            /// fUSDT
             IFTokenAdmin(F_USDT).updateRewards(
-                0x99c1515fa3327B048FCB46483ac0fceB0ED8d471
+                0x6cb89F03c444AF5De1A6d9665BBaAcbFfC3EBE83
             );
 
             uint256 allowance = IERC20(USDT_ADDRESS).allowance(
