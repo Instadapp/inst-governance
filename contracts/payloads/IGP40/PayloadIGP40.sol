@@ -680,7 +680,7 @@ contract PayloadIGP40 {
             liquidationThreshold: 0 * 1e2, //
             liquidationMaxLimit: 0 * 1e2, //
             withdrawGap: 5 * 1e2, // 5%
-            liquidationPenalty: 0 * 1e2,
+            liquidationPenalty: 0,
             borrowFee: 0 * 1e2, // 0%
             oracle: address(0)
         });
@@ -694,7 +694,7 @@ contract PayloadIGP40 {
             vaultConfig.liquidationThreshold = 90 * 1e2;
             vaultConfig.liquidationMaxLimit = 93 * 1e2;
 
-            vaultConfig.liquidationPenalty = 5 * 1e2;
+            vaultConfig.liquidationPenalty = 2 * 1e2;
 
             vaultConfig.oracle = address(0x922c2d3Ef36CC02d5053645309C924925c03c902);
 
@@ -712,7 +712,7 @@ contract PayloadIGP40 {
             vaultConfig.liquidationThreshold = 85 * 1e2;
             vaultConfig.liquidationMaxLimit = 90 * 1e2;
 
-            vaultConfig.liquidationPenalty = 3 * 1e2;
+            vaultConfig.liquidationPenalty = 5 * 1e2;
 
             vaultConfig.oracle = address(0x5DdC7E208958a9B8DC595e40859E6b611fdC44cA);
 
