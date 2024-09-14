@@ -687,7 +687,7 @@ contract PayloadIGP40 {
 
         // Config wstETH/cbBTC vault.
         {
-            vaultConfig.vaultId = 32;
+            vaultConfig.vaultId = 33;
             vaultConfig.supplyToken = wstETH_ADDRESS;
 
             vaultConfig.collateralFactor = 88 * 1e2;
@@ -705,7 +705,7 @@ contract PayloadIGP40 {
 
         // Config weETH/cbBTC vault.
         {
-            vaultConfig.vaultId = 33;
+            vaultConfig.vaultId = 32;
             vaultConfig.supplyToken = weETH_ADDRESS;
 
             vaultConfig.collateralFactor = 80 * 1e2;
