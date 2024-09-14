@@ -357,6 +357,43 @@ interface IFluidReserveContract {
     ) external;
 }
 
+interface IFTokenAdmin {
+    /// @notice updates the rewards rate model contract.
+    ///         Only callable by LendingFactory auths.
+    /// @param rewardsRateModel_  the new rewards rate model contract address.
+    ///                           can be set to address(0) to set no rewards (to save gas)
+    function updateRewards(address rewardsRateModel_) external;
+
+    /// @notice Balances out the difference between fToken supply at Liquidity vs totalAssets().
+    ///         Deposits underlying from rebalancer address into Liquidity but doesn't mint any shares
+    ///         -> thus making deposit available as rewards.
+    ///         Only callable by rebalancer.
+    /// @return assets_ amount deposited to Liquidity
+    function rebalance() external payable returns (uint256 assets_);
+
+    /// @notice gets the liquidity exchange price of the underlying asset, calculates the updated exchange price (with reward rates)
+    ///         and writes those values to storage.
+    ///         Callable by anyone.
+    /// @return tokenExchangePrice_ exchange price of fToken share to underlying asset
+    /// @return liquidityExchangePrice_ exchange price at Liquidity for the underlying asset
+    function updateRates()
+        external
+        returns (uint256 tokenExchangePrice_, uint256 liquidityExchangePrice_);
+
+    /// @notice sends any potentially stuck funds to Liquidity contract. Only callable by LendingFactory auths.
+    function rescueFunds(address token_) external;
+
+    /// @notice Updates the rebalancer address (ReserveContract). Only callable by LendingFactory auths.
+    function updateRebalancer(address rebalancer_) external;
+}
+
+interface IERC20 {
+    function allowance(
+        address spender,
+        address caller
+    ) external view returns (uint256);
+}
+
 
 contract PayloadIGP40 {
     uint256 public constant PROPOSAL_ID = 40;
@@ -421,6 +458,9 @@ contract PayloadIGP40 {
     uint256 internal constant DEFAULT_EXPONENT_SIZE = 8;
     uint256 internal constant DEFAULT_EXPONENT_MASK = 0xff;
 
+    address public constant F_USDT = 0x5C20B550819128074FD538Edf79791733ccEdd18;
+    address public constant F_USDC = 0x9Fb7b4477576Fe5B32be4C1843aFB1e55F251B33;
+
     constructor() {
         ADDRESS_THIS = address(this);
     }
@@ -472,6 +512,9 @@ contract PayloadIGP40 {
 
         /// @notice Action 4: Config wstETH/cbBTC and weETH/cbBTC
         action4();
+
+        /// @notice Action 5: Add new LendingRewards contracts
+        action5();
     }
 
     function verifyProposal() external view {}
@@ -677,6 +720,45 @@ contract PayloadIGP40 {
 
             require(vault_ != address(0), "vault-not-deployed");
         }
+    }
+
+    /// @notice Action 5: Add new LendingRewards contracts
+    function action5() internal {
+        address[] memory protocols = new address[](2);
+        address[] memory tokens = new address[](2);
+        uint256[] memory amounts = new uint256[](2);
+
+        { /// fUSDC
+            IFTokenAdmin(F_USDC).updateRewards(
+                0x99c1515fa3327B048FCB46483ac0fceB0ED8d471
+            );
+
+            uint256 allowance = IERC20(USDC_ADDRESS).allowance(
+                address(FLUID_RESERVE),
+                F_USDC
+            );
+
+            protocols[0] = F_USDC;
+            tokens[0] = USDC_ADDRESS;
+            amounts[0] = allowance + (200_000 * 1e6);
+        }
+
+        { /// fUSDT
+            IFTokenAdmin(F_USDT).updateRewards(
+                0x99c1515fa3327B048FCB46483ac0fceB0ED8d471
+            );
+
+            uint256 allowance = IERC20(USDT_ADDRESS).allowance(
+                address(FLUID_RESERVE),
+                F_USDT
+            );
+
+            protocols[1] = F_USDT;
+            tokens[1] = USDT_ADDRESS;
+            amounts[1] = allowance + (200_000 * 1e6);
+        }
+
+        FLUID_RESERVE.approve(protocols, tokens, amounts);
     }
 
     /***********************************|
