@@ -166,6 +166,25 @@ interface IFluidVaultT1 {
     function updateBorrowFee(uint borrowFee_) external;
 
     function readFromStorage(bytes32 slot_) external view returns (uint256 result_);
+
+    struct ConstantViews {
+        address liquidity;
+        address factory;
+        address adminImplementation;
+        address secondaryImplementation;
+        address supplyToken;
+        address borrowToken;
+        uint8 supplyDecimals;
+        uint8 borrowDecimals;
+        uint vaultId;
+        bytes32 liquiditySupplyExchangePriceSlot;
+        bytes32 liquidityBorrowExchangePriceSlot;
+        bytes32 liquidityUserSupplySlot;
+        bytes32 liquidityUserBorrowSlot;
+    }
+
+    /// @notice returns all Vault constants
+    function constantsView() external view returns (ConstantViews memory constantsView_);
 }
 
 interface IProxy {
@@ -410,6 +429,10 @@ interface IDSAV2 {
     function isAuth(address user) external view returns (bool);
 }
 
+interface IDSAConnectorsV2 {
+    function toggleChief(address _chiefAddress) external;
+}
+
 contract PayloadIGP41 {
     uint256 public constant PROPOSAL_ID = 41;
 
@@ -456,11 +479,18 @@ contract PayloadIGP41 {
 
     address public constant cbBTC_ADDRESS =
         0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf;
+    address public constant wbBTC_ADDRESS =
+        0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599;
 
     address public constant USDC_ADDRESS =
         0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
     address public constant USDT_ADDRESS =
         0xdAC17F958D2ee523a2206206994597C13D831ec7;
+    address public constant sUSDe_ADDRESS =
+        0x9D39A5DE30e57443BfF2A8307A4256c8797A3497;
+
+    IDSAConnectorsV2 public constant DSA_CONNECTORS_V2 = IDSAConnectorsV2(0x97b0B3A8bDeFE8cB9563a3c610019Ad10DB8aD11);
+        
 
     uint256 internal constant X8 = 0xff;
     uint256 internal constant X10 = 0x3ff;
@@ -531,6 +561,12 @@ contract PayloadIGP41 {
 
         /// @notice Action 5: Clone cbBTC vaults configs from wbBTC vaults
         action5();
+
+        /// @notice Action 6: Reduce borrow limits on old vaults from 1 to 10
+        action6();
+
+        /// @notice Action 7: Add Team and Connector Multisig as chief on DSAv2 connector
+        action7();
     }
 
     function verifyProposal() external view {}
@@ -541,20 +577,14 @@ contract PayloadIGP41 {
 
     /// @notice Action 1: Transfer x stETH to the team’s multisig
     function action1() internal {
-        // string[] memory targets = new string[](1);
-        // bytes[] memory encodedSpells = new bytes[](1);
+        address[] memory tokens_ = new address[](4);
 
-        // string memory withdrawSignature = "withdraw(address,uint256,address,uint256,uint256)";
+        tokens_[0] = ETH_ADDRESS;
+        tokens_[1] = wstETH_ADDRESS;
+        tokens_[2] = USDC_ADDRESS;
+        tokens_[3] = USDT_ADDRESS;
 
-        // // Spell 1: Transfer stETH
-        // {   
-        //     address STETH_ADDRESS = 0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84;
-        //     uint256 STETH_AMOUNT = 150 * 1e18; // 150 stETH
-        //     targets[0] = "BASIC-A";
-        //     encodedSpells[0] = abi.encodeWithSignature(withdrawSignature, STETH_ADDRESS, STETH_AMOUNT, TEAM_MULTISIG, 0, 0);
-        // }
-
-        // IDSAV2(TREASURY).cast(targets, encodedSpells, address(this));
+        LIQUIDITY.collectRevenue((tokens_));
     }
 
     /// @notice Action 2: Remove wstETH/ETH rate handler and Add Withdrawal auth handle at Liquidity
@@ -648,6 +678,26 @@ contract PayloadIGP41 {
         configVault(32, 26); // weETH/cbBTC <= weETH/wbBTC
     }
 
+    /// @notice Action 6: Reduce borrow limits on old vaults from 1 to 10
+    function action6() internal {
+        reduceVaultBorrowLimit(1);
+        reduceVaultBorrowLimit(2);
+        reduceVaultBorrowLimit(3);
+        reduceVaultBorrowLimit(4);
+        reduceVaultBorrowLimit(5);
+        reduceVaultBorrowLimit(6);
+        reduceVaultBorrowLimit(7);
+        reduceVaultBorrowLimit(8);
+        reduceVaultBorrowLimit(9);
+        reduceVaultBorrowLimit(10);
+    }
+
+    /// @notice Action 7: Add Team and Connector Multisig as chief on DSAv2 connector
+    function action7() internal {
+        DSA_CONNECTORS_V2.toggleChief(TEAM_MULTISIG); // Team Multisig
+        DSA_CONNECTORS_V2.toggleChief(0xa6AEC494Aa19Dc910944E2374e9EA159dc919c59); // Connector Multisig
+    }
+
     /***********************************|
     |     Proposal Payload Helpers      |
     |__________________________________*/
@@ -689,6 +739,39 @@ contract PayloadIGP41 {
                 configs_.borrowFee
             );
         }
+
+        // Update borrow limit
+        {
+            address token_ = IFluidVaultT1(vault_).constantsView().borrowToken;
+
+            uint256 userBorrowData_ = LIQUIDITY.readFromStorage(
+                LiquiditySlotsLink.calculateDoubleMappingStorageSlot(
+                    LiquiditySlotsLink.LIQUIDITY_USER_BORROW_DOUBLE_MAPPING_SLOT,
+                    vault_,
+                    token_
+                )
+            );
+
+            AdminModuleStructs.UserBorrowConfig[] memory config_ = new AdminModuleStructs.UserBorrowConfig[](1);
+            config_[0] = AdminModuleStructs.UserBorrowConfig({
+                user: vault_,
+                token: token_,
+                mode: uint8(userBorrowData_ & 1),
+                expandPercent: (userBorrowData_ >>
+                    LiquiditySlotsLink.BITS_USER_BORROW_EXPAND_PERCENT) & X14,
+                expandDuration: (userBorrowData_ >>
+                    LiquiditySlotsLink.BITS_USER_BORROW_EXPAND_DURATION) & X24,
+                baseDebtCeiling: getRawAmount(token_, 0, 7_500_000, false), // $7,500,000
+                maxDebtCeiling: BigMathMinified.fromBigNumber(
+                (userBorrowData_ >>
+                    LiquiditySlotsLink.BITS_USER_BORROW_MAX_BORROW_LIMIT) & X18,
+                DEFAULT_EXPONENT_SIZE,
+                DEFAULT_EXPONENT_MASK
+            )
+            });
+
+            LIQUIDITY.updateUserBorrowConfigs(config_);
+        }
     }
 
     function getVaultConfig(
@@ -703,5 +786,96 @@ contract PayloadIGP41 {
         configs_.withdrawGap = uint16((vaultVariables2_ >> 62) & X10) * 10;
         configs_.liquidationPenalty = uint16((vaultVariables2_ >> 72) & X10);
         configs_.borrowFee = uint16((vaultVariables2_ >> 82) & X10);
+    }
+
+    function reduceVaultBorrowLimit(uint256 vaultId) internal {   
+        address vault_ =  VAULT_T1_FACTORY.getVaultAddress(vaultId);
+        address token_ = IFluidVaultT1(vault_).constantsView().borrowToken;
+
+        uint256 userBorrowData_ = LIQUIDITY.readFromStorage(
+            LiquiditySlotsLink.calculateDoubleMappingStorageSlot(
+                LiquiditySlotsLink.LIQUIDITY_USER_BORROW_DOUBLE_MAPPING_SLOT,
+                vault_,
+                token_
+            )
+        );
+
+        uint256 vaultVariables_ = IFluidVaultT1(vault_).readFromStorage(bytes32(uint256(0)));
+
+        uint256 totalBorrowAmount_ = (vaultVariables_ >> 146) & X64;
+        totalBorrowAmount_ = (totalBorrowAmount_ >> 8) << (totalBorrowAmount_ & X8);
+        totalBorrowAmount_ = totalBorrowAmount_ * 105 / 100; // 5% increase
+
+        AdminModuleStructs.UserBorrowConfig[] memory config_ = new AdminModuleStructs.UserBorrowConfig[](1);
+        config_[0] = AdminModuleStructs.UserBorrowConfig({
+            user: vault_,
+            token: token_,
+            mode: uint8(userBorrowData_ & 1),
+            expandPercent: (userBorrowData_ >>
+                LiquiditySlotsLink.BITS_USER_BORROW_EXPAND_PERCENT) & X14,
+            expandDuration: (userBorrowData_ >>
+                LiquiditySlotsLink.BITS_USER_BORROW_EXPAND_DURATION) & X24,
+            baseDebtCeiling: getRawAmount(token_, 0, 1000, false), // $1000
+            maxDebtCeiling: getRawAmount(token_, totalBorrowAmount_, 0, false)
+        });
+
+        LIQUIDITY.updateUserBorrowConfigs(config_);
+    }
+
+    function getRawAmount(
+        address token,
+        uint256 amount,
+        uint256 amountInUSD,
+        bool isSupply
+    ) public view returns (uint256) {
+        if (amount > 0 && amountInUSD > 0)
+            revert("both usd and amount are not zero");
+        uint256 exchangePriceAndConfig_ = LIQUIDITY.readFromStorage(
+            LiquiditySlotsLink.calculateMappingStorageSlot(
+                LiquiditySlotsLink.LIQUIDITY_EXCHANGE_PRICES_MAPPING_SLOT,
+                token
+            )
+        );
+
+        (
+            uint256 supplyExchangePrice,
+            uint256 borrowExchangePrice
+        ) = LiquidityCalcs.calcExchangePrices(exchangePriceAndConfig_);
+
+        uint256 usdPrice = 0;
+        uint256 decimals = 18;
+        if (token == ETH_ADDRESS) {
+            usdPrice = 2_350;
+            decimals = 18;
+        } else if (token == wstETH_ADDRESS) {
+            usdPrice = 2_750;
+            decimals = 18;
+        } else if (token == weETH_ADDRESS) {
+            usdPrice = 2_450;
+            decimals = 18;
+        } else if (token == cbBTC_ADDRESS || token == wbBTC_ADDRESS) {
+            usdPrice = 60_500;
+            decimals = 8;
+        } else if (token == USDC_ADDRESS || token == USDT_ADDRESS) {
+            usdPrice = 1;
+            decimals = 6;
+        } else if (token == sUSDe_ADDRESS) {
+            usdPrice = 1; // Since can't use decimals, assuming 1 dollar for sUSDe. 
+            decimals = 18;
+        } else {
+            revert("not-found");
+        }
+
+        uint256 exchangePrice = isSupply
+            ? supplyExchangePrice
+            : borrowExchangePrice;
+
+        if (amount > 0) {
+            return (amount * 1e12) / exchangePrice;
+        } else {
+            return
+                (amountInUSD * 1e12 * (10 ** decimals)) /
+                (usdPrice * exchangePrice);
+        }
     }
 }
