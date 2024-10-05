@@ -635,7 +635,7 @@ contract PayloadIGP41 {
         {
             /// fUSDC
             IFTokenAdmin(F_USDC).updateRewards(
-                0x6cc649437B14417E9a1D3ab2afC2F3863fbBE6B1
+                0x512Ac5b6Cf04f042486A198eDB3c28C6F2c6285A
             );
 
             uint256 allowance = IERC20(USDC_ADDRESS).allowance(
@@ -645,13 +645,13 @@ contract PayloadIGP41 {
 
             protocols[0] = F_USDC;
             tokens[0] = USDC_ADDRESS;
-            amounts[0] = allowance + (200_000 * 1e6);
+            amounts[0] = allowance + (250_000 * 1e6);
         }
 
         {
             /// fUSDT
             IFTokenAdmin(F_USDT).updateRewards(
-                0x6cc649437B14417E9a1D3ab2afC2F3863fbBE6B1
+                0x512Ac5b6Cf04f042486A198eDB3c28C6F2c6285A
             );
 
             uint256 allowance = IERC20(USDT_ADDRESS).allowance(
@@ -661,7 +661,7 @@ contract PayloadIGP41 {
 
             protocols[1] = F_USDT;
             tokens[1] = USDT_ADDRESS;
-            amounts[1] = allowance + (200_000 * 1e6);
+            amounts[1] = allowance + (250_000 * 1e6);
         }
 
         FLUID_RESERVE.approve(protocols, tokens, amounts);
