@@ -617,8 +617,8 @@ contract PayloadIGP41 {
             }
 
             { // Spell 2: Transfer wstETH
-                targets[0] = "BASIC-A";
-                encodedSpells[0] = abi.encodeWithSignature(
+                targets[1] = "BASIC-A";
+                encodedSpells[1] = abi.encodeWithSignature(
                     withdrawSignature,
                     wstETH_ADDRESS,
                     type(uint256).max,
@@ -629,8 +629,8 @@ contract PayloadIGP41 {
             }
 
             { // Spell 3: Transfer wBTC
-                targets[0] = "BASIC-A";
-                encodedSpells[0] = abi.encodeWithSignature(
+                targets[2] = "BASIC-A";
+                encodedSpells[2] = abi.encodeWithSignature(
                     withdrawSignature,
                     wBTC_ADDRESS,
                     type(uint256).max,
@@ -641,8 +641,8 @@ contract PayloadIGP41 {
             }
 
             { // Spell 4: Transfer wETH
-                targets[0] = "BASIC-A";
-                encodedSpells[0] = abi.encodeWithSignature(
+                targets[3] = "BASIC-A";
+                encodedSpells[3] = abi.encodeWithSignature(
                     withdrawSignature,
                     WETH_ADDRESS,
                     type(uint256).max,
@@ -876,6 +876,8 @@ contract PayloadIGP41 {
         );
         totalBorrowAmount_ = totalBorrowAmount_ * 105 / 100; // 5% increase
 
+        uint256 baseDebtCeiling_ = getRawAmount(token_, 0, 1000, false); // $1000
+
         AdminModuleStructs.UserBorrowConfig[] memory config_ = new AdminModuleStructs.UserBorrowConfig[](1);
         config_[0] = AdminModuleStructs.UserBorrowConfig({
             user: vault_,
@@ -885,7 +887,7 @@ contract PayloadIGP41 {
                 LiquiditySlotsLink.BITS_USER_BORROW_EXPAND_PERCENT) & X14,
             expandDuration: (userBorrowData_ >>
                 LiquiditySlotsLink.BITS_USER_BORROW_EXPAND_DURATION) & X24,
-            baseDebtCeiling: getRawAmount(token_, 0, 1000, false), // $1000
+            baseDebtCeiling: totalBorrowAmount_ < baseDebtCeiling_ ? totalBorrowAmount_ : baseDebtCeiling_,
             maxDebtCeiling: totalBorrowAmount_
         });
 
