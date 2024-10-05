@@ -414,6 +414,10 @@ interface IERC20 {
         address spender,
         address caller
     ) external view returns (uint256);
+
+    function balanceOf(
+        address account
+    ) external view returns (uint256);
 }
 
 interface IDSAV2 {
@@ -477,10 +481,15 @@ contract PayloadIGP41 {
     address public constant weETH_ADDRESS =
         0xCd5fE23C85820F7B72D0926FC9b05b43E359b7ee;
 
+    address public constant WETH_ADDRESS =
+        0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
+    address public constant stETH_ADDRESS =
+        0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84;
+
+    address public constant wBTC_ADDRESS =
+        0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599;
     address public constant cbBTC_ADDRESS =
         0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf;
-    address public constant wbBTC_ADDRESS =
-        0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599;
 
     address public constant USDC_ADDRESS =
         0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
@@ -575,16 +584,80 @@ contract PayloadIGP41 {
     |     Proposal Payload Actions      |
     |__________________________________*/
 
-    /// @notice Action 1: Transfer x stETH to the team’s multisig
+    /// @notice Action 1: Transfer stETH, wstETH, wBTC to the team’s multisig
     function action1() internal {
-        address[] memory tokens_ = new address[](4);
+        {
+            address[] memory tokens_ = new address[](4);
 
-        tokens_[0] = ETH_ADDRESS;
-        tokens_[1] = wstETH_ADDRESS;
-        tokens_[2] = USDC_ADDRESS;
-        tokens_[3] = USDT_ADDRESS;
+            tokens_[0] = ETH_ADDRESS;
+            tokens_[1] = wstETH_ADDRESS;
+            tokens_[2] = USDC_ADDRESS;
+            tokens_[3] = USDT_ADDRESS;
 
-        LIQUIDITY.collectRevenue((tokens_));
+            LIQUIDITY.collectRevenue((tokens_));
+        }
+
+        
+        {   
+            string[] memory targets = new string[](4);
+            bytes[] memory encodedSpells = new bytes[](4);
+
+            string memory withdrawSignature = "withdraw(address,uint256,address,uint256,uint256)";
+
+            { // Spell 1: Transfer stETH
+                uint256 stETH_AMOUNT = IERC20(stETH_ADDRESS).balanceOf(address(TREASURY));
+                targets[0] = "BASIC-A";
+                encodedSpells[0] = abi.encodeWithSignature(
+                    withdrawSignature,
+                    stETH_ADDRESS,
+                    stETH_AMOUNT,
+                    TEAM_MULTISIG,
+                    0,
+                    0
+                );
+            }
+
+            { // Spell 2: Transfer wstETH
+                uint256 wstETH_AMOUNT = IERC20(wstETH_ADDRESS).balanceOf(address(TREASURY));
+                targets[0] = "BASIC-A";
+                encodedSpells[0] = abi.encodeWithSignature(
+                    withdrawSignature,
+                    wstETH_ADDRESS,
+                    wstETH_AMOUNT,
+                    TEAM_MULTISIG,
+                    0,
+                    0
+                );
+            }
+
+            { // Spell 3: Transfer wBTC
+                uint256 wBTC_AMOUNT = IERC20(wBTC_ADDRESS).balanceOf(address(TREASURY));
+                targets[0] = "BASIC-A";
+                encodedSpells[0] = abi.encodeWithSignature(
+                    withdrawSignature,
+                    wBTC_ADDRESS,
+                    wBTC_AMOUNT,
+                    TEAM_MULTISIG,
+                    0,
+                    0
+                );
+            }
+
+            { // Spell 4: Transfer wETH
+                uint256 wETH_AMOUNT = IERC20(WETH_ADDRESS).balanceOf(address(TREASURY));
+                targets[0] = "BASIC-A";
+                encodedSpells[0] = abi.encodeWithSignature(
+                    withdrawSignature,
+                    WETH_ADDRESS,
+                    wETH_AMOUNT,
+                    TEAM_MULTISIG,
+                    0,
+                    0
+                );
+            }
+
+            IDSAV2(TREASURY).cast(targets, encodedSpells, address(this));
+        }
     }
 
     /// @notice Action 2: Remove wstETH/ETH rate handler and Add Withdrawal auth handle at Liquidity
@@ -853,7 +926,7 @@ contract PayloadIGP41 {
         } else if (token == weETH_ADDRESS) {
             usdPrice = 2_450;
             decimals = 18;
-        } else if (token == cbBTC_ADDRESS || token == wbBTC_ADDRESS) {
+        } else if (token == cbBTC_ADDRESS || token == wBTC_ADDRESS) {
             usdPrice = 60_500;
             decimals = 8;
         } else if (token == USDC_ADDRESS || token == USDT_ADDRESS) {
