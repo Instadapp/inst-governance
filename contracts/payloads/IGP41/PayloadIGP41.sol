@@ -809,37 +809,66 @@ contract PayloadIGP41 {
             );
         }
 
-        // Update borrow limit
+        // Update withdraw base and max debt ceiling
         {
             address token_ = IFluidVaultT1(vault_).constantsView().borrowToken;
 
-            uint256 userBorrowData_ = LIQUIDITY.readFromStorage(
+           
+            {
+
+                uint256 userSupplyData_ = LIQUIDITY.readFromStorage(
                 LiquiditySlotsLink.calculateDoubleMappingStorageSlot(
-                    LiquiditySlotsLink.LIQUIDITY_USER_BORROW_DOUBLE_MAPPING_SLOT,
-                    vault_,
-                    token_
-                )
-            );
+                    LiquiditySlotsLink.LIQUIDITY_USER_SUPPLY_DOUBLE_MAPPING_SLOT,
+                        vault_,
+                        token_
+                    )
+                );
 
-            AdminModuleStructs.UserBorrowConfig[] memory config_ = new AdminModuleStructs.UserBorrowConfig[](1);
-            config_[0] = AdminModuleStructs.UserBorrowConfig({
-                user: vault_,
-                token: token_,
-                mode: uint8(userBorrowData_ & 1),
-                expandPercent: (userBorrowData_ >>
-                    LiquiditySlotsLink.BITS_USER_BORROW_EXPAND_PERCENT) & X14,
-                expandDuration: (userBorrowData_ >>
-                    LiquiditySlotsLink.BITS_USER_BORROW_EXPAND_DURATION) & X24,
-                baseDebtCeiling: getRawAmount(token_, 0, 7_500_000, false), // $7,500,000
-                maxDebtCeiling: BigMathMinified.fromBigNumber(
-                (userBorrowData_ >>
-                    LiquiditySlotsLink.BITS_USER_BORROW_MAX_BORROW_LIMIT) & X18,
-                DEFAULT_EXPONENT_SIZE,
-                DEFAULT_EXPONENT_MASK
-            )
-            });
+                AdminModuleStructs.UserSupplyConfig[] memory config_ = new AdminModuleStructs.UserSupplyConfig[](1);
+                config_[0] = AdminModuleStructs.UserSupplyConfig({
+                    user: vault_,
+                    token: token_,
+                    mode: uint8(userSupplyData_ & 1),
+                    expandPercent: (userSupplyData_ >>
+                        LiquiditySlotsLink.BITS_USER_SUPPLY_EXPAND_PERCENT) & X14,
+                    expandDuration: (userSupplyData_ >>
+                        LiquiditySlotsLink.BITS_USER_SUPPLY_EXPAND_DURATION) & X24,
+                    baseWithdrawalLimit: getRawAmount(token_, 0, 7_500_000, true) // $7,500,000
+                });
 
-            LIQUIDITY.updateUserBorrowConfigs(config_);
+                LIQUIDITY.updateUserSupplyConfigs(config_);
+            }
+
+            {
+                uint256 userBorrowData_ = LIQUIDITY.readFromStorage(
+                    LiquiditySlotsLink.calculateDoubleMappingStorageSlot(
+                        LiquiditySlotsLink.LIQUIDITY_USER_BORROW_DOUBLE_MAPPING_SLOT,
+                        vault_,
+                        token_
+                    )
+                );
+
+                AdminModuleStructs.UserBorrowConfig[] memory config_ = new AdminModuleStructs.UserBorrowConfig[](1);
+                config_[0] = AdminModuleStructs.UserBorrowConfig({
+                    user: vault_,
+                    token: token_,
+                    mode: uint8(userBorrowData_ & 1),
+                    expandPercent: (userBorrowData_ >>
+                        LiquiditySlotsLink.BITS_USER_BORROW_EXPAND_PERCENT) & X14,
+                    expandDuration: (userBorrowData_ >>
+                        LiquiditySlotsLink.BITS_USER_BORROW_EXPAND_DURATION) & X24,
+                    baseDebtCeiling: BigMathMinified.fromBigNumber(
+                        (userBorrowData_ >>
+                            LiquiditySlotsLink.BITS_USER_BORROW_BASE_BORROW_LIMIT) &
+                            X18,
+                        DEFAULT_EXPONENT_SIZE,
+                        DEFAULT_EXPONENT_MASK
+                    ),
+                    maxDebtCeiling: getRawAmount(token_, 0, 200_000_000, false) // $200,000,000
+                });
+
+                LIQUIDITY.updateUserBorrowConfigs(config_);
+            }
         }
     }
 
