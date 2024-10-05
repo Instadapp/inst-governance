@@ -874,7 +874,6 @@ contract PayloadIGP41 {
             DEFAULT_EXPONENT_SIZE,
             DEFAULT_EXPONENT_MASK
         );
-        totalBorrowAmount_ = totalBorrowAmount_ * 105 / 100; // 5% increase
 
         uint256 baseDebtCeiling_ = getRawAmount(token_, 0, 1000, false); // $1000
 
@@ -887,8 +886,8 @@ contract PayloadIGP41 {
                 LiquiditySlotsLink.BITS_USER_BORROW_EXPAND_PERCENT) & X14,
             expandDuration: (userBorrowData_ >>
                 LiquiditySlotsLink.BITS_USER_BORROW_EXPAND_DURATION) & X24,
-            baseDebtCeiling: totalBorrowAmount_ < baseDebtCeiling_ ? totalBorrowAmount_ : baseDebtCeiling_,
-            maxDebtCeiling: totalBorrowAmount_
+            baseDebtCeiling: totalBorrowAmount_ < baseDebtCeiling_ ? (totalBorrowAmount_ * 1001 / 1000) : baseDebtCeiling_,
+            maxDebtCeiling: totalBorrowAmount_  * 105 / 100 // 5% increase
         });
 
         LIQUIDITY.updateUserBorrowConfigs(config_);
