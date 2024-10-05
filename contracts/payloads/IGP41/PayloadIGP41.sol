@@ -605,12 +605,11 @@ contract PayloadIGP41 {
             string memory withdrawSignature = "withdraw(address,uint256,address,uint256,uint256)";
 
             { // Spell 1: Transfer stETH
-                uint256 stETH_AMOUNT = IERC20(stETH_ADDRESS).balanceOf(address(TREASURY));
                 targets[0] = "BASIC-A";
                 encodedSpells[0] = abi.encodeWithSignature(
                     withdrawSignature,
                     stETH_ADDRESS,
-                    stETH_AMOUNT,
+                    type(uint256).max,
                     TEAM_MULTISIG,
                     0,
                     0
@@ -618,12 +617,11 @@ contract PayloadIGP41 {
             }
 
             { // Spell 2: Transfer wstETH
-                uint256 wstETH_AMOUNT = IERC20(wstETH_ADDRESS).balanceOf(address(TREASURY));
                 targets[0] = "BASIC-A";
                 encodedSpells[0] = abi.encodeWithSignature(
                     withdrawSignature,
                     wstETH_ADDRESS,
-                    wstETH_AMOUNT,
+                    type(uint256).max,
                     TEAM_MULTISIG,
                     0,
                     0
@@ -631,12 +629,11 @@ contract PayloadIGP41 {
             }
 
             { // Spell 3: Transfer wBTC
-                uint256 wBTC_AMOUNT = IERC20(wBTC_ADDRESS).balanceOf(address(TREASURY));
                 targets[0] = "BASIC-A";
                 encodedSpells[0] = abi.encodeWithSignature(
                     withdrawSignature,
                     wBTC_ADDRESS,
-                    wBTC_AMOUNT,
+                    type(uint256).max,
                     TEAM_MULTISIG,
                     0,
                     0
@@ -644,12 +641,11 @@ contract PayloadIGP41 {
             }
 
             { // Spell 4: Transfer wETH
-                uint256 wETH_AMOUNT = IERC20(WETH_ADDRESS).balanceOf(address(TREASURY));
                 targets[0] = "BASIC-A";
                 encodedSpells[0] = abi.encodeWithSignature(
                     withdrawSignature,
                     WETH_ADDRESS,
-                    wETH_AMOUNT,
+                    type(uint256).max,
                     TEAM_MULTISIG,
                     0,
                     0
@@ -873,10 +869,11 @@ contract PayloadIGP41 {
             )
         );
 
-        uint256 vaultVariables_ = IFluidVaultT1(vault_).readFromStorage(bytes32(uint256(0)));
-
-        uint256 totalBorrowAmount_ = (vaultVariables_ >> 146) & X64;
-        totalBorrowAmount_ = (totalBorrowAmount_ >> 8) << (totalBorrowAmount_ & X8);
+        uint256 totalBorrowAmount_ = BigMathMinified.fromBigNumber(
+            (userBorrowData_ >> LiquiditySlotsLink.BITS_USER_BORROW_AMOUNT) & X64,
+            DEFAULT_EXPONENT_SIZE,
+            DEFAULT_EXPONENT_MASK
+        );
         totalBorrowAmount_ = totalBorrowAmount_ * 105 / 100; // 5% increase
 
         AdminModuleStructs.UserBorrowConfig[] memory config_ = new AdminModuleStructs.UserBorrowConfig[](1);
@@ -889,7 +886,7 @@ contract PayloadIGP41 {
             expandDuration: (userBorrowData_ >>
                 LiquiditySlotsLink.BITS_USER_BORROW_EXPAND_DURATION) & X24,
             baseDebtCeiling: getRawAmount(token_, 0, 1000, false), // $1000
-            maxDebtCeiling: getRawAmount(token_, totalBorrowAmount_, 0, false)
+            maxDebtCeiling: totalBorrowAmount_
         });
 
         LIQUIDITY.updateUserBorrowConfigs(config_);
