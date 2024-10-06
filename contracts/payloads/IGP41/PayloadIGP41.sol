@@ -811,29 +811,29 @@ contract PayloadIGP41 {
 
         // Update withdraw base and max debt ceiling
         {
-            address token_ = IFluidVaultT1(vault_).constantsView().borrowToken;
+            address supplyToken_ = IFluidVaultT1(vault_).constantsView().supplyToken;
+            address borrowToken_ = IFluidVaultT1(vault_).constantsView().borrowToken;
 
-           
             {
 
                 uint256 userSupplyData_ = LIQUIDITY.readFromStorage(
                 LiquiditySlotsLink.calculateDoubleMappingStorageSlot(
                     LiquiditySlotsLink.LIQUIDITY_USER_SUPPLY_DOUBLE_MAPPING_SLOT,
                         vault_,
-                        token_
+                        supplyToken_
                     )
                 );
 
                 AdminModuleStructs.UserSupplyConfig[] memory config_ = new AdminModuleStructs.UserSupplyConfig[](1);
                 config_[0] = AdminModuleStructs.UserSupplyConfig({
                     user: vault_,
-                    token: token_,
+                    token: supplyToken_,
                     mode: uint8(userSupplyData_ & 1),
                     expandPercent: (userSupplyData_ >>
                         LiquiditySlotsLink.BITS_USER_SUPPLY_EXPAND_PERCENT) & X14,
                     expandDuration: (userSupplyData_ >>
                         LiquiditySlotsLink.BITS_USER_SUPPLY_EXPAND_DURATION) & X24,
-                    baseWithdrawalLimit: getRawAmount(token_, 0, 7_500_000, true) // $7,500,000
+                    baseWithdrawalLimit: getRawAmount(supplyToken_, 0, 7_500_000, true) // $7,500,000
                 });
 
                 LIQUIDITY.updateUserSupplyConfigs(config_);
@@ -844,14 +844,14 @@ contract PayloadIGP41 {
                     LiquiditySlotsLink.calculateDoubleMappingStorageSlot(
                         LiquiditySlotsLink.LIQUIDITY_USER_BORROW_DOUBLE_MAPPING_SLOT,
                         vault_,
-                        token_
+                        borrowToken_
                     )
                 );
 
                 AdminModuleStructs.UserBorrowConfig[] memory config_ = new AdminModuleStructs.UserBorrowConfig[](1);
                 config_[0] = AdminModuleStructs.UserBorrowConfig({
                     user: vault_,
-                    token: token_,
+                    token: borrowToken_,
                     mode: uint8(userBorrowData_ & 1),
                     expandPercent: (userBorrowData_ >>
                         LiquiditySlotsLink.BITS_USER_BORROW_EXPAND_PERCENT) & X14,
@@ -864,7 +864,7 @@ contract PayloadIGP41 {
                         DEFAULT_EXPONENT_SIZE,
                         DEFAULT_EXPONENT_MASK
                     ),
-                    maxDebtCeiling: getRawAmount(token_, 0, 200_000_000, false) // $200,000,000
+                    maxDebtCeiling: getRawAmount(borrowToken_, 0, 200_000_000, false) // $200,000,000
                 });
 
                 LIQUIDITY.updateUserBorrowConfigs(config_);
