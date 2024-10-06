@@ -480,6 +480,8 @@ contract PayloadIGP41 {
         0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0;
     address public constant weETH_ADDRESS =
         0xCd5fE23C85820F7B72D0926FC9b05b43E359b7ee;
+    address public constant cbETH_ADDRESS =
+        0xBe9895146f7AF43049ca1c1AE358B0541Ea49704;
 
     address public constant WETH_ADDRESS =
         0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
@@ -497,6 +499,8 @@ contract PayloadIGP41 {
         0xdAC17F958D2ee523a2206206994597C13D831ec7;
     address public constant sUSDe_ADDRESS =
         0x9D39A5DE30e57443BfF2A8307A4256c8797A3497;
+    address public constant DAI_ADDRESS =
+        0x6B175474E89094C44Da98b954EedeAC495271d0F;
 
     IDSAConnectorsV2 public constant DSA_CONNECTORS_V2 = IDSAConnectorsV2(0x97b0B3A8bDeFE8cB9563a3c610019Ad10DB8aD11);
         
@@ -599,8 +603,8 @@ contract PayloadIGP41 {
 
         
         {   
-            string[] memory targets = new string[](4);
-            bytes[] memory encodedSpells = new bytes[](4);
+            string[] memory targets = new string[](9);
+            bytes[] memory encodedSpells = new bytes[](9);
 
             string memory withdrawSignature = "withdraw(address,uint256,address,uint256,uint256)";
 
@@ -645,6 +649,71 @@ contract PayloadIGP41 {
                 encodedSpells[3] = abi.encodeWithSignature(
                     withdrawSignature,
                     WETH_ADDRESS,
+                    type(uint256).max,
+                    TEAM_MULTISIG,
+                    0,
+                    0
+                );
+            }
+
+            // Spell 5: Transfer weETH
+            {
+                targets[4] = "BASIC-A";
+                encodedSpells[4] = abi.encodeWithSignature(
+                    withdrawSignature,
+                    weETH_ADDRESS,
+                    type(uint256).max,
+                    TEAM_MULTISIG,
+                    0,
+                    0
+                );
+            } 
+
+            // Spell 6: Transfer cbETH
+            {
+                targets[5] = "BASIC-A";
+                encodedSpells[5] = abi.encodeWithSignature(
+                    withdrawSignature,
+                    cbETH_ADDRESS,
+                    type(uint256).max,
+                    TEAM_MULTISIG,
+                    0,
+                    0
+                );
+            }
+
+            // Spell 7: Transfer USDC
+            {
+                targets[6] = "BASIC-A";
+                encodedSpells[6] = abi.encodeWithSignature(
+                    withdrawSignature,
+                    USDC_ADDRESS,
+                    type(uint256).max,
+                    TEAM_MULTISIG,
+                    0,
+                    0
+                );
+            }
+
+            // Spell 8: Transfer USDT
+            {
+                targets[7] = "BASIC-A";
+                encodedSpells[7] = abi.encodeWithSignature(
+                    withdrawSignature,
+                    USDT_ADDRESS,
+                    type(uint256).max,
+                    TEAM_MULTISIG,
+                    0,
+                    0
+                );
+            }
+
+            // Spell 9: Transfer DAI
+            {
+                targets[8] = "BASIC-A";
+                encodedSpells[8] = abi.encodeWithSignature(
+                    withdrawSignature,
+                    DAI_ADDRESS,
                     type(uint256).max,
                     TEAM_MULTISIG,
                     0,
