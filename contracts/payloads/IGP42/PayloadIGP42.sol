@@ -437,20 +437,20 @@ contract PayloadIGP42 {
         borrowParams_[0] = AdminModuleStructs.UserBorrowConfig({
             user: protocol_,
             token: token0_,
-            mode: ,
-            expandPercent: ,
-            expandDuration: ,
-            baseDebtCeiling: ,
-            maxDebtCeiling:
+            mode: false,
+            expandPercent: 20 * 1e2,
+            expandDuration: 12 hours,
+            baseDebtCeiling: 7_500_000,
+            maxDebtCeiling: 20_000_000
         });
         borrowParams_[1] = AdminModuleStructs.UserBorrowConfig({
             user: protocol_,
             token: token1_,
-            mode: ,
-            expandPercent: ,
-            expandDuration: ,
-            baseDebtCeiling: ,
-            maxDebtCeiling: 
+            mode: false,
+            expandPercent: 20 * 1e2,
+            expandDuration: 12 hours,
+            baseDebtCeiling: 7_500_000,
+            maxDebtCeiling: 20_000_000
         });
 
         LIQUIDITY.updateUserBorrowConfigs(borrowParams_);
@@ -460,18 +460,18 @@ contract PayloadIGP42 {
         supplyParams_[0] = AdminModuleStructs.UserSupplyConfig({
             user: protocol_,
             token: token0_,
-            mode,
-            expandPercent,
-            expandDuration,
-            baseWithdrawalLimit
+            mode: false,
+            expandPercent: 20 * 1e2,
+            expandDuration: 12 hours,
+            baseWithdrawalLimit: 7_500_000
         });
         supplyParams_[1] = AdminModuleStructs.UserSupplyConfig({
             user: protocol_,
             token: token1_,
-            mode,
-            expandPercent,
-            expandDuration,
-            baseWithdrawalLimit
+            mode: false,
+            expandPercent: 20 * 1e2,
+            expandDuration: 12 hours,
+            baseWithdrawalLimit: 7_500_000
         });
         
         LIQUIDITY.updateUserSupplyConfigs(supplyParams_);
