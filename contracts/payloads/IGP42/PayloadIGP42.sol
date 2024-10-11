@@ -298,7 +298,7 @@ contract PayloadIGP42 {
     struct TokenConfig {
         uint256 baseDebtCeiling;
         uint256 maxDebtCeiling;
-        uint256 baseWithdrawalLimit
+        uint256 baseWithdrawalLimit;
     }
 
     struct DexConfig {
@@ -393,7 +393,7 @@ contract PayloadIGP42 {
     /// @notice Action 2: Give allowance on Liquidity Layer to initial 2 DEXes
     function action2(DexConfig[] memory dexConfigs_) internal {
 
-        for(uint i; i < dexConfigs_.length; i++)
+        for(uint i; i < dexConfigs_.length; i++){
             Pool memory pool_ = DEX_RESERVES_RESOLVER.getPool(dexConfigs_[i].dexId);
             setBorrowAndSupplyConfigs(pool_.pool, pool_.token0, pool_.token1, dexConfigs_[i].token0Config, dexConfigs_[i].token1Config);
         }
