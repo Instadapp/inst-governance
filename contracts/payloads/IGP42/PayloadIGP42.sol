@@ -4,9 +4,9 @@ pragma experimental ABIEncoderV2;
 interface IGovernorBravo {
     function _acceptAdmin() external;
 
-    function _setVotingDelay(uint newVotingDelay) external;
+    function _setVotingDelay(uint256 newVotingDelay) external;
 
-    function _setVotingPeriod(uint newVotingPeriod) external;
+    function _setVotingPeriod(uint256 newVotingPeriod) external;
 
     function _acceptAdminOnTimelock() external;
 
@@ -14,11 +14,11 @@ interface IGovernorBravo {
 
     function propose(
         address[] memory targets,
-        uint[] memory values,
+        uint256[] memory values,
         string[] memory signatures,
         bytes[] memory calldatas,
         string memory description
-    ) external returns (uint);
+    ) external returns (uint256);
 
     function admin() external view returns (address);
 
@@ -34,25 +34,18 @@ interface IGovernorBravo {
 interface ITimelock {
     function acceptAdmin() external;
 
-    function setDelay(uint delay_) external;
+    function setDelay(uint256 delay_) external;
 
     function setPendingAdmin(address pendingAdmin_) external;
 
-    function queueTransaction(
-        address target,
-        uint value,
-        string memory signature,
-        bytes memory data,
-        uint eta
-    ) external returns (bytes32);
+    function queueTransaction(address target, uint256 value, string memory signature, bytes memory data, uint256 eta)
+        external
+        returns (bytes32);
 
-    function executeTransaction(
-        address target,
-        uint value,
-        string memory signature,
-        bytes memory data,
-        uint eta
-    ) external payable returns (bytes memory);
+    function executeTransaction(address target, uint256 value, string memory signature, bytes memory data, uint256 eta)
+        external
+        payable
+        returns (bytes memory);
 
     function pendingAdmin() external view returns (address);
 
@@ -188,13 +181,12 @@ interface IFluidLiquidityAdmin {
     /// @param tokens_ tokens to update exchange prices for
     /// @return supplyExchangePrices_ new supply rates of overall system for each token
     /// @return borrowExchangePrices_ new borrow rates of overall system for each token
-    function updateExchangePrices(
-        address[] calldata tokens_
-    ) external returns (uint256[] memory supplyExchangePrices_, uint256[] memory borrowExchangePrices_);
+    function updateExchangePrices(address[] calldata tokens_)
+        external
+        returns (uint256[] memory supplyExchangePrices_, uint256[] memory borrowExchangePrices_);
 }
 
 interface FluidDexReservesResolver {
-    
     struct Pool {
         address pool;
         address token0;
@@ -209,24 +201,22 @@ interface FluidDexReservesResolver {
 }
 
 interface FluidVaultT1Resolver {
-    function getTotalVaults() public view returns (uint);
+    function getTotalVaults() public view returns (uint256);
 
-    function getVaultAddress(uint vaultId_) public view returns (address vault_);
+    function getVaultAddress(uint256 vaultId_) public view returns (address vault_);
 
     function getAllVaultsAddresses() public view returns (address[] memory vaults_);
 }
 
 interface FluidVaultFactory {
-    
     /// @notice                         Sets an address as allowed vault deployment logic (`deploymentLogic_`) contract or not.
     ///                                 This function can only be called by the owner.
     /// @param deploymentLogic_         The address of the vault deployment logic contract to be set.
     /// @param allowed_                 A boolean indicating whether the specified address is allowed to deploy new type of vault.
-    function setVaultDeploymentLogic(address deploymentLogic_,bool allowed_) public;
+    function setVaultDeploymentLogic(address deploymentLogic_, bool allowed_) public;
 }
 
 interface FluidVaultResolver {
-
     struct UserSupplyData {
         bool modeWithInterest; // true if mode = with interest, false = without interest
         uint256 supply; // user supply amount
@@ -264,7 +254,7 @@ interface FluidVaultResolver {
         address borrowToken;
         uint8 supplyDecimals;
         uint8 borrowDecimals;
-        uint vaultId;
+        uint256 vaultId;
         bytes32 liquiditySupplyExchangePriceSlot;
         bytes32 liquidityBorrowExchangePriceSlot;
         bytes32 liquidityUserSupplySlot;
@@ -287,50 +277,66 @@ interface FluidVaultResolver {
         UserBorrowData liquidityUserBorrowData;
     }
 
-    function getTotalVaults() public view returns (uint);
+    function getTotalVaults() public view returns (uint256);
 
-    function getVaultAddress(uint vaultId_) public view returns (address vault_);
+    function getVaultAddress(uint256 vaultId_) public view returns (address vault_);
 
     function getVaultEntireData(address vault_) public view returns (VaultEntireData memory vaultData_);
-
 }
 
-
 contract PayloadIGP42 {
+    struct vaultConfig {
+        uint256 vaultId;
+        address supplyToken;
+        uint256 collateralFactor;
+        uint256 liquidationThreshold;
+        uint256 liquidationMaxLimit;
+        uint256 liquidationPenalty;
+        address oracle;
+    }
+
+    struct TokenConfig {
+        uint256 baseDebtCeiling;
+        uint256 maxDebtCeiling;
+        uint256 baseWithdrawalLimit
+    }
+
+    struct DexConfig {
+        uint256 dexId;
+        TokenConfig token0Config;
+        TokenConfig token1Config;
+    }
+
     uint256 public constant PROPOSAL_ID = 42;
 
-    address public constant PROPOSER =
-        0xA45f7bD6A5Ff45D31aaCE6bCD3d426D9328cea01;
+    address public constant PROPOSER = 0xA45f7bD6A5Ff45D31aaCE6bCD3d426D9328cea01;
 
-    IGovernorBravo public constant GOVERNOR =
-        IGovernorBravo(0x0204Cd037B2ec03605CFdFe482D8e257C765fA1B);
-    ITimelock public constant TIMELOCK =
-        ITimelock(0x2386DC45AdDed673317eF068992F19421B481F4c);
+    IGovernorBravo public constant GOVERNOR = IGovernorBravo(0x0204Cd037B2ec03605CFdFe482D8e257C765fA1B);
+    ITimelock public constant TIMELOCK = ITimelock(0x2386DC45AdDed673317eF068992F19421B481F4c);
 
-    address public constant TEAM_MULTISIG = 
-        0x4F6F977aCDD1177DCD81aB83074855EcB9C2D49e;
+    address public constant TEAM_MULTISIG = 0x4F6F977aCDD1177DCD81aB83074855EcB9C2D49e;
 
     address public immutable ADDRESS_THIS;
-    
+
     IFluidLiquidityAdmin public constant LIQUIDITY = IFluidLiquidityAdmin(0x52Aa899454998Be5b000Ad077a46Bbe360F4e497);
 
     address public constant ETH_ADDRESS = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
 
-    FluidDexReservesResolver public constant DEX_RESERVES_RESOLVER= 0x278166A9B88f166EB170d55801bE1b1d1E576330;
+    FluidDexReservesResolver public constant DEX_RESERVES_RESOLVER = 0x278166A9B88f166EB170d55801bE1b1d1E576330;
 
-    FluidVaultT2DeploymentLogic public constant VAULT_T2_LOGIC;    // TODO add address here
+    FluidVaultT2DeploymentLogic public constant VAULT_T2_LOGIC; // TODO add address here
 
-    FluidVaultT3DeploymentLogic public constant VAULT_T3_LOGIC;    // TODO add address here
+    FluidVaultT3DeploymentLogic public constant VAULT_T3_LOGIC; // TODO add address here
 
-    FluidVaultT4DeploymentLogic public constant VAULT_T4_LOGIC;    // TODO add address here
+    FluidVaultT4DeploymentLogic public constant VAULT_T4_LOGIC; // TODO add address here
 
     FluidVaultFactory public constant VAULT_FACTORY = 0x324c5Dc1fC42c7a4D43d92df1eBA58a54d13Bf2d;
 
-    address public constant FluidVaultT2Resolver;    // TODO add address here
+    address public constant FluidVaultT2Resolver; // TODO add address here
 
-    address public constant FluidVaultT3Resolver;    // TODO add address here
+    address public constant FluidVaultT3Resolver; // TODO add address here
 
-    address public constant FluidVaultT4Resolver;    // TODO add address here
+    address public constant FluidVaultT4Resolver; // TODO add address here
 
     constructor() {
         ADDRESS_THIS = address(this);
@@ -351,13 +357,7 @@ contract PayloadIGP42 {
         signatures[0] = "executePayload(address,string,bytes)";
         calldatas[0] = abi.encode(ADDRESS_THIS, "execute()", abi.encode());
 
-        uint256 proposedId = GOVERNOR.propose(
-            targets,
-            values,
-            signatures,
-            calldatas,
-            description
-        );
+        uint256 proposedId = GOVERNOR.propose(targets, values, signatures, calldatas, description);
 
         require(proposedId == PROPOSAL_ID, "PROPOSAL_IS_NOT_SAME");
     }
@@ -377,80 +377,163 @@ contract PayloadIGP42 {
 
     function verifyProposal() external view {}
 
-    /***********************************|
-    |     Proposal Payload Actions      |
-    |__________________________________*/
+    /**
+     * |
+     * |     Proposal Payload Actions      |
+     * |__________________________________
+     */
 
     /// @notice Action 1: List new Vault's logic of Vault type 2, 3 & 4
-    function action1() internal{
+    function action1() internal {
         VAULT_FACTORY.setVaultDeploymentLogic(VAULT_T2_LOGIC, true);
         VAULT_FACTORY.setVaultDeploymentLogic(VAULT_T3_LOGIC, true);
         VAULT_FACTORY.setVaultDeploymentLogic(VAULT_T4_LOGIC, true);
     }
 
     /// @notice Action 2: Give allowance on Liquidity Layer to initial 2 DEXes
-    function action2() internal{
-        Pool memory pool1_ = DEX_RESERVES_RESOLVER.getPool(1);
-        Pool memory pool2_ = DEX_RESERVES_RESOLVER.getPool(2);
+    function action2(DexConfig[] memory dexConfigs_) internal {
 
-        setBorrowAndSupplyConfigs(pool1_.pool, pool1_.token0, pool1_.token1);
-        setBorrowAndSupplyConfigs(pool2_.pool, pool2_.token0, pool2_.token1);
-
-        AdminModuleStructs.UserBorrowConfig[] memory borrowParams_ = new AdminModuleStructs.UserBorrowConfig[](4);
+        for(uint i; i < dexConfigs_.length; i++)
+            Pool memory pool_ = DEX_RESERVES_RESOLVER.getPool(dexConfigs_[i].dexId);
+            setBorrowAndSupplyConfigs(pool_.pool, pool_.token0, pool_.token1, dexConfigs_[i].token0Config, dexConfigs_[i].token1Config);
+        }
     }
-
 
     /// @notice Action 3: Give allowance on Liquidity Layer to new vaults
-    function action3() internal{
+    function action3(vaultConfig[] memory vaultConfigs_) internal {
+        VaultConfig memory vaultConfig = VaultConfig({
+            vaultId: 0,
+            supplyToken: address(0),
+            supplyMode: 1, // Mode 1
+            supplyExpandPercent: 25 * 1e2, // 25%
+            supplyExpandDuration: 12 hours, // 12 hours
+            supplyBaseLimitInUSD: 5_000_000, // $5M
+            supplyBaseLimit: 0,
+            borrowToken: cbBTC_ADDRESS,
+            borrowMode: 1, // Mode 1
+            borrowExpandPercent: 20 * 1e2, // 20%
+            borrowExpandDuration: 12 hours, // 12 hours
+            borrowBaseLimitInUSD: 7_500_000, // $7.5M
+            borrowBaseLimit: 0,
+            borrowMaxLimitInUSD: 20_000_000, // $20M
+            borrowMaxLimit: 0,
+            supplyRateMagnifier: 100 * 1e2, // 1x
+            borrowRateMagnifier: 100 * 1e2, // 1x
+            collateralFactor: 0 * 1e2, //
+            liquidationThreshold: 0 * 1e2,
+            //
+            liquidationMaxLimit: 0 * 1e2,
+            //
+            withdrawGap: 5 * 1e2,
+            // 5%
+            liquidationPenalty: 0,
+            borrowFee: 0 * 1e2, // 0%
+            oracle: address(0)
+        });
 
-        FluidVaultResolver resolverT2_ = FluidVaultResolver(FluidVaultT2Resolver);
-        FluidVaultResolver resolverT3_ = FluidVaultResolver(FluidVaultT3Resolver);
-        FluidVaultResolver resolverT4_ = FluidVaultResolver(FluidVaultT4Resolver);
+        for (uint256 i; i < vaultConfigs_.length; i++) {
+            vaultConfig.vaultId = vaultConfigs_[i].vaultId;
+            vaultConfig.supplyToken = vaultConfigs_[i].supplyToken;
+            vaultConfig.collateralFactor = vaultConfigs_[i].collateralFactor;
+            vaultConfig.liquidationThreshold = vaultConfigs_[i].liquidationThreshold;
+            vaultConfig.liquidationMaxLimit = vaultConfigs_[i].liquidationMaxLimit;
+            vaultConfig.liquidationPenalty = vaultConfigs_[i].liquidationPenalty;
+            vaultConfig.oracle = vaultConfigs_[i].oracle;
 
-        uint totalVaultT2_ = resolverT2_.getTotalVaults();
-        uint totalVaultT3_ = resolverT3_.getTotalVaults();
-        uint totalVaultT4_ = resolverT4_.getTotalVaults();
+            address vault_ = configVault(vaultConfig);
 
-        for(uint i; i < totalVaultT2_; i++){
-            address vault_ = resolverT2_.getVaultAddress(i);
-            FluidVaultResolver.VaultEntireData memory data_ = resolverT2_.getVaultEntireData(vault_);
-            setBorrowAndSupplyConfigs(vault_, data_.constantVariables.supplyToken, data_.constantVariables.borrowToken);
+            require(vault_ != address(0), "vault-not-deployed");
         }
-
-        for(uint i; i < totalVaultT3_; i++){
-            address vault_ = resolverT3_.getVaultAddress(i);
-            FluidVaultResolver.VaultEntireData memory data_ = resolverT3_.getVaultEntireData(vault_);
-            setBorrowAndSupplyConfigs(vault_, data_.constantVariables.supplyToken, data_.constantVariables.borrowToken);
-        }
-
-        for(uint i; i < totalVaultT4_; i++){
-            address vault_ = resolverT4_.getVaultAddress(i);
-            FluidVaultResolver.VaultEntireData memory data_ = resolverT4_.getVaultEntireData(vault_);
-            setBorrowAndSupplyConfigs(vault_, data_.constantVariables.supplyToken, data_.constantVariables.borrowToken);
-        }
-        
     }
 
-    function setBorrowAndSupplyConfigs(address protocol_, address token0_, address token1_) internal {
+    function configVault(VaultConfig memory vaultConfig) internal returns (address vault_) {
+        // Deploy vault.
+        vault_ = VAULT_T1_FACTORY.getVaultAddress(vaultConfig.vaultId);
+
+        // Set user supply config for the vault on Liquidity Layer.
+        {
+            AdminModuleStructs.UserSupplyConfig[] memory configs_ = new AdminModuleStructs.UserSupplyConfig[](1);
+
+            configs_[0] = AdminModuleStructs.UserSupplyConfig({
+                user: address(vault_),
+                token: vaultConfig.supplyToken,
+                mode: vaultConfig.supplyMode,
+                expandPercent: vaultConfig.supplyExpandPercent,
+                expandDuration: vaultConfig.supplyExpandDuration,
+                baseWithdrawalLimit: getRawAmount(
+                    vaultConfig.supplyToken, vaultConfig.supplyBaseLimit, vaultConfig.supplyBaseLimitInUSD, true
+                )
+            });
+
+            LIQUIDITY.updateUserSupplyConfigs(configs_);
+        }
+
+        // Set user borrow config for the vault on Liquidity Layer.
+        {
+            AdminModuleStructs.UserBorrowConfig[] memory configs_ = new AdminModuleStructs.UserBorrowConfig[](1);
+
+            configs_[0] = AdminModuleStructs.UserBorrowConfig({
+                user: address(vault_),
+                token: vaultConfig.borrowToken,
+                mode: vaultConfig.borrowMode,
+                expandPercent: vaultConfig.borrowExpandPercent,
+                expandDuration: vaultConfig.borrowExpandDuration,
+                baseDebtCeiling: getRawAmount(
+                    vaultConfig.borrowToken, vaultConfig.borrowBaseLimit, vaultConfig.borrowBaseLimitInUSD, false
+                ),
+                maxDebtCeiling: getRawAmount(
+                    vaultConfig.borrowToken, vaultConfig.borrowMaxLimit, vaultConfig.borrowMaxLimitInUSD, false
+                )
+            });
+
+            LIQUIDITY.updateUserBorrowConfigs(configs_);
+        }
+
+        // // Update core settings on vault.
+        // {
+        //     IFluidVaultT1(vault_).updateCoreSettings(
+        //         vaultConfig.supplyRateMagnifier,
+        //         vaultConfig.borrowRateMagnifier,
+        //         vaultConfig.collateralFactor,
+        //         vaultConfig.liquidationThreshold,
+        //         vaultConfig.liquidationMaxLimit,
+        //         vaultConfig.withdrawGap,
+        //         vaultConfig.liquidationPenalty,
+        //         vaultConfig.borrowFee
+        //     );
+        // }
+
+        // // Update oracle on vault.
+        // {
+        //     IFluidVaultT1(vault_).updateOracle(vaultConfig.oracle);
+        // }
+
+        // // Update rebalancer on vault.
+        // {
+        //     IFluidVaultT1(vault_).updateRebalancer(address(FLUID_RESERVE));
+        // }
+    }
+
+    function setBorrowAndSupplyConfigs(address dex_, address token0_, address token1_, TokenConfig memory token0Config_, TokenConfig memory token1Config_) internal {
         AdminModuleStructs.UserBorrowConfig[] memory borrowParams_ = new AdminModuleStructs.UserBorrowConfig[](2);
 
         borrowParams_[0] = AdminModuleStructs.UserBorrowConfig({
-            user: protocol_,
+            user: dex_,
             token: token0_,
-            mode: false,
-            expandPercent: 20 * 1e2,
-            expandDuration: 12 hours,
-            baseDebtCeiling: 7_500_000,
-            maxDebtCeiling: 20_000_000
+            mode: false,            // @TODO - to be filled 
+            expandPercent: 20 * 1e2,            // @TODO - to be filled 
+            expandDuration: 12 hours,            // @TODO - to be filled 
+            baseDebtCeiling: token0Config_.baseDebtCeiling,
+            maxDebtCeiling: token0Config_.maxDebtCeiling
         });
         borrowParams_[1] = AdminModuleStructs.UserBorrowConfig({
-            user: protocol_,
+            user: dex_,
             token: token1_,
-            mode: false,
-            expandPercent: 20 * 1e2,
-            expandDuration: 12 hours,
-            baseDebtCeiling: 7_500_000,
-            maxDebtCeiling: 20_000_000
+            mode: false,            // @TODO - to be filled 
+            expandPercent: 20 * 1e2,            // @TODO - to be filled 
+            expandDuration: 12 hours,            // @TODO - to be filled 
+            baseDebtCeiling: token1Config_.baseDebtCeiling,
+            maxDebtCeiling: token1Config_.maxDebtCeiling
         });
 
         LIQUIDITY.updateUserBorrowConfigs(borrowParams_);
@@ -458,22 +541,22 @@ contract PayloadIGP42 {
         AdminModuleStructs.UserSupplyConfig[] memory supplyParams_ = new AdminModuleStructs.UserSupplyConfig[](2);
 
         supplyParams_[0] = AdminModuleStructs.UserSupplyConfig({
-            user: protocol_,
+            user: dex_,
             token: token0_,
-            mode: false,
-            expandPercent: 20 * 1e2,
-            expandDuration: 12 hours,
-            baseWithdrawalLimit: 7_500_000
+            mode: false,            // @TODO - to be filled 
+            expandPercent: 20 * 1e2,            // @TODO - to be filled 
+            expandDuration: 12 hours,            // @TODO - to be filled 
+            baseWithdrawalLimit: token0.baseWithdrawalLimit
         });
         supplyParams_[1] = AdminModuleStructs.UserSupplyConfig({
-            user: protocol_,
+            user: dex_,
             token: token1_,
-            mode: false,
-            expandPercent: 20 * 1e2,
-            expandDuration: 12 hours,
-            baseWithdrawalLimit: 7_500_000
+            mode: false,            // @TODO - to be filled 
+            expandPercent: 20 * 1e2,            // @TODO - to be filled 
+            expandDuration: 12 hours,            // @TODO - to be filled 
+            baseWithdrawalLimit: token1.baseWithdrawalLimit
         });
-        
+
         LIQUIDITY.updateUserSupplyConfigs(supplyParams_);
     }
 }
