@@ -284,7 +284,7 @@ interface FluidVaultResolver {
     function getVaultEntireData(address vault_) public view returns (VaultEntireData memory vaultData_);
 }
 
-contract PayloadIGP42 {
+contract PayloadIGP43 {
     struct vaultConfig {
         uint256 vaultId;
         address supplyToken;
@@ -365,8 +365,11 @@ contract PayloadIGP42 {
     function execute() external {
         require(address(this) == address(TIMELOCK), "not-valid-caller");
 
-        // Action 1: List new Vault's logic of Vault type 2, 3 & 4
+        // Action 1: Give allowance on Liquidity Layer to initial 2 DEXes
         action1();
+
+        // Action 2: Give allowance on Liquidity Layer to new vaults
+        action2();
     }
 
     function verifyProposal() external view {}
@@ -377,10 +380,149 @@ contract PayloadIGP42 {
      * |__________________________________
      */
 
-    /// @notice Action 1: List new Vault's logic of Vault type 2, 3 & 4
-    function action1() internal {
-        VAULT_FACTORY.setVaultDeploymentLogic(VAULT_T2_LOGIC, true);
-        VAULT_FACTORY.setVaultDeploymentLogic(VAULT_T3_LOGIC, true);
-        VAULT_FACTORY.setVaultDeploymentLogic(VAULT_T4_LOGIC, true);
+    /// @notice Action 1: Give allowance on Liquidity Layer to initial 2 DEXes
+    function action1(DexConfig[] memory dexConfigs_) internal {
+
+        for(uint i; i < dexConfigs_.length; i++){
+            Pool memory pool_ = DEX_RESERVES_RESOLVER.getPool(dexConfigs_[i].dexId);
+            setBorrowAndSupplyConfigs(pool_.pool, pool_.token0, pool_.token1, dexConfigs_[i].token0Config, dexConfigs_[i].token1Config);
+        }
+    }
+
+    /// @notice Action 2: Give allowance on Liquidity Layer to new vaults
+    function action2(vaultConfig[] memory vaultConfigs_) internal {
+        VaultConfig memory vaultConfig = VaultConfig({
+            vaultId: 0,
+            supplyToken: address(0),
+            supplyMode: 1, // Mode 1
+            supplyExpandPercent: 25 * 1e2, // 25%
+            supplyExpandDuration: 12 hours, // 12 hours
+            supplyBaseLimitInUSD: 5_000_000, // $5M
+            supplyBaseLimit: 0,
+            borrowToken: cbBTC_ADDRESS,
+            borrowMode: 1, // Mode 1
+            borrowExpandPercent: 20 * 1e2, // 20%
+            borrowExpandDuration: 12 hours, // 12 hours
+            borrowBaseLimitInUSD: 7_500_000, // $7.5M
+            borrowBaseLimit: 0,
+            borrowMaxLimitInUSD: 20_000_000, // $20M
+            borrowMaxLimit: 0,
+            supplyRateMagnifier: 100 * 1e2, // 1x
+            borrowRateMagnifier: 100 * 1e2, // 1x
+            collateralFactor: 0 * 1e2, //
+            liquidationThreshold: 0 * 1e2,
+            //
+            liquidationMaxLimit: 0 * 1e2,
+            //
+            withdrawGap: 5 * 1e2,
+            // 5%
+            liquidationPenalty: 0,
+            borrowFee: 0 * 1e2, // 0%
+            oracle: address(0)
+        });
+
+        for (uint256 i; i < vaultConfigs_.length; i++) {
+            vaultConfig.vaultId = vaultConfigs_[i].vaultId;
+            vaultConfig.supplyToken = vaultConfigs_[i].supplyToken;
+            vaultConfig.collateralFactor = vaultConfigs_[i].collateralFactor;
+            vaultConfig.liquidationThreshold = vaultConfigs_[i].liquidationThreshold;
+            vaultConfig.liquidationMaxLimit = vaultConfigs_[i].liquidationMaxLimit;
+            vaultConfig.liquidationPenalty = vaultConfigs_[i].liquidationPenalty;
+            vaultConfig.oracle = vaultConfigs_[i].oracle;
+
+            address vault_ = configVault(vaultConfig);
+
+            require(vault_ != address(0), "vault-not-deployed");
+        }
+    }
+
+    function configVault(VaultConfig memory vaultConfig) internal returns (address vault_) {
+        // Deploy vault.
+        vault_ = VAULT_T1_FACTORY.getVaultAddress(vaultConfig.vaultId);
+
+        // Set user supply config for the vault on Liquidity Layer.
+        {
+            AdminModuleStructs.UserSupplyConfig[] memory configs_ = new AdminModuleStructs.UserSupplyConfig[](1);
+
+            configs_[0] = AdminModuleStructs.UserSupplyConfig({
+                user: address(vault_),
+                token: vaultConfig.supplyToken,
+                mode: vaultConfig.supplyMode,
+                expandPercent: vaultConfig.supplyExpandPercent,
+                expandDuration: vaultConfig.supplyExpandDuration,
+                baseWithdrawalLimit: getRawAmount(
+                    vaultConfig.supplyToken, vaultConfig.supplyBaseLimit, vaultConfig.supplyBaseLimitInUSD, true
+                )
+            });
+
+            LIQUIDITY.updateUserSupplyConfigs(configs_);
+        }
+
+        // Set user borrow config for the vault on Liquidity Layer.
+        {
+            AdminModuleStructs.UserBorrowConfig[] memory configs_ = new AdminModuleStructs.UserBorrowConfig[](1);
+
+            configs_[0] = AdminModuleStructs.UserBorrowConfig({
+                user: address(vault_),
+                token: vaultConfig.borrowToken,
+                mode: vaultConfig.borrowMode,
+                expandPercent: vaultConfig.borrowExpandPercent,
+                expandDuration: vaultConfig.borrowExpandDuration,
+                baseDebtCeiling: getRawAmount(
+                    vaultConfig.borrowToken, vaultConfig.borrowBaseLimit, vaultConfig.borrowBaseLimitInUSD, false
+                ),
+                maxDebtCeiling: getRawAmount(
+                    vaultConfig.borrowToken, vaultConfig.borrowMaxLimit, vaultConfig.borrowMaxLimitInUSD, false
+                )
+            });
+
+            LIQUIDITY.updateUserBorrowConfigs(configs_);
+        }
+    }
+
+    function setBorrowAndSupplyConfigs(address dex_, address token0_, address token1_, TokenConfig memory token0Config_, TokenConfig memory token1Config_) internal {
+        AdminModuleStructs.UserBorrowConfig[] memory borrowParams_ = new AdminModuleStructs.UserBorrowConfig[](2);
+
+        borrowParams_[0] = AdminModuleStructs.UserBorrowConfig({
+            user: dex_,
+            token: token0_,
+            mode: false,            // @TODO - to be filled 
+            expandPercent: 20 * 1e2,            // @TODO - to be filled 
+            expandDuration: 12 hours,            // @TODO - to be filled 
+            baseDebtCeiling: token0Config_.baseDebtCeiling,
+            maxDebtCeiling: token0Config_.maxDebtCeiling
+        });
+        borrowParams_[1] = AdminModuleStructs.UserBorrowConfig({
+            user: dex_,
+            token: token1_,
+            mode: false,            // @TODO - to be filled 
+            expandPercent: 20 * 1e2,            // @TODO - to be filled 
+            expandDuration: 12 hours,            // @TODO - to be filled 
+            baseDebtCeiling: token1Config_.baseDebtCeiling,
+            maxDebtCeiling: token1Config_.maxDebtCeiling
+        });
+
+        LIQUIDITY.updateUserBorrowConfigs(borrowParams_);
+
+        AdminModuleStructs.UserSupplyConfig[] memory supplyParams_ = new AdminModuleStructs.UserSupplyConfig[](2);
+
+        supplyParams_[0] = AdminModuleStructs.UserSupplyConfig({
+            user: dex_,
+            token: token0_,
+            mode: false,            // @TODO - to be filled 
+            expandPercent: 20 * 1e2,            // @TODO - to be filled 
+            expandDuration: 12 hours,            // @TODO - to be filled 
+            baseWithdrawalLimit: token0.baseWithdrawalLimit
+        });
+        supplyParams_[1] = AdminModuleStructs.UserSupplyConfig({
+            user: dex_,
+            token: token1_,
+            mode: false,            // @TODO - to be filled 
+            expandPercent: 20 * 1e2,            // @TODO - to be filled 
+            expandDuration: 12 hours,            // @TODO - to be filled 
+            baseWithdrawalLimit: token1.baseWithdrawalLimit
+        });
+
+        LIQUIDITY.updateUserSupplyConfigs(supplyParams_);
     }
 }
