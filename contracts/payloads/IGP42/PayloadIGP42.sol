@@ -296,25 +296,25 @@ contract PayloadIGP42 {
         VAULT_FACTORY.setVaultAuth(
             getVaultAddress(21), // VAULT_WBTC_USDC
             0x5E5768B6b42c12dA8e75eb0AA6fD47Be33a5b24e, // Rewards_WBTC_USDC
-            false
+            true
         );
 
         VAULT_FACTORY.setVaultAuth(
             getVaultAddress(22), // VAULT_WBTC_USDT
             0x6D90d460929b921f6C74838a9d25CC69B486D605, // Rewards_WBTC_USDT
-            false
+            true
         );
 
          VAULT_FACTORY.setVaultAuth(
             getVaultAddress(29), // VAULT_cbBTC_USDC
             0x7110cED08f0E26c14a2eF7A980c4F17C70aBa7c0, // Rewards_cbBTC_USDC
-            false
+            true
         );
 
         VAULT_FACTORY.setVaultAuth(
             getVaultAddress(30), // VAULT_cbBTC_USDT
             0xf5fD6c6f936689018215CB10d7a5b99A43a39D28, // Rewards_cbBTC_USDT
-            false
+            true
         );
     }
 
