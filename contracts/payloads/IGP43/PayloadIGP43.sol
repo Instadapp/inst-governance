@@ -41,14 +41,21 @@ interface ITimelock {
 
     function setPendingAdmin(address pendingAdmin_) external;
 
-    function queueTransaction(address target, uint256 value, string memory signature, bytes memory data, uint256 eta)
-        external
-        returns (bytes32);
+    function queueTransaction(
+        address target,
+        uint256 value,
+        string memory signature,
+        bytes memory data,
+        uint256 eta
+    ) external returns (bytes32);
 
-    function executeTransaction(address target, uint256 value, string memory signature, bytes memory data, uint256 eta)
-        external
-        payable
-        returns (bytes memory);
+    function executeTransaction(
+        address target,
+        uint256 value,
+        string memory signature,
+        bytes memory data,
+        uint256 eta
+    ) external payable returns (bytes memory);
 
     function pendingAdmin() external view returns (address);
 
@@ -117,12 +124,16 @@ interface IFluidLiquidityAdmin {
     ///         auths can be helpful in reducing governance overhead where it's not needed.
     /// @param authsStatus_ array of structs setting allowed status for an address.
     ///                     status true => add auth, false => remove auth
-    function updateAuths(AdminModuleStructs.AddressBool[] calldata authsStatus_) external;
+    function updateAuths(
+        AdminModuleStructs.AddressBool[] calldata authsStatus_
+    ) external;
 
     /// @notice adds/removes guardians. Only callable by Governance.
     /// @param guardiansStatus_ array of structs setting allowed status for an address.
     ///                         status true => add guardian, false => remove guardian
-    function updateGuardians(AdminModuleStructs.AddressBool[] calldata guardiansStatus_) external;
+    function updateGuardians(
+        AdminModuleStructs.AddressBool[] calldata guardiansStatus_
+    ) external;
 
     /// @notice changes the revenue collector address (contract that is sent revenue). Only callable by Governance.
     /// @param revenueCollector_  new revenue collector address
@@ -135,45 +146,65 @@ interface IFluidLiquidityAdmin {
 
     /// @notice                  update tokens rate data version 1. Only callable by Auths.
     /// @param tokensRateData_   array of RateDataV1Params with rate data to set for each token
-    function updateRateDataV1s(AdminModuleStructs.RateDataV1Params[] calldata tokensRateData_) external;
+    function updateRateDataV1s(
+        AdminModuleStructs.RateDataV1Params[] calldata tokensRateData_
+    ) external;
 
     /// @notice                  update tokens rate data version 2. Only callable by Auths.
     /// @param tokensRateData_   array of RateDataV2Params with rate data to set for each token
-    function updateRateDataV2s(AdminModuleStructs.RateDataV2Params[] calldata tokensRateData_) external;
+    function updateRateDataV2s(
+        AdminModuleStructs.RateDataV2Params[] calldata tokensRateData_
+    ) external;
 
     /// @notice updates token configs: fee charge on borrowers interest & storage update utilization threshold.
     ///         Only callable by Auths.
     /// @param tokenConfigs_ contains token address, fee & utilization threshold
-    function updateTokenConfigs(AdminModuleStructs.TokenConfig[] calldata tokenConfigs_) external;
+    function updateTokenConfigs(
+        AdminModuleStructs.TokenConfig[] calldata tokenConfigs_
+    ) external;
 
     /// @notice updates user classes: 0 is for new protocols, 1 is for established protocols.
     ///         Only callable by Auths.
     /// @param userClasses_ struct array of uint256 value to assign for each user address
-    function updateUserClasses(AdminModuleStructs.AddressUint256[] calldata userClasses_) external;
+    function updateUserClasses(
+        AdminModuleStructs.AddressUint256[] calldata userClasses_
+    ) external;
 
     /// @notice sets user supply configs per token basis. Eg: with interest or interest-free and automated limits.
     ///         Only callable by Auths.
     /// @param userSupplyConfigs_ struct array containing user supply config, see `UserSupplyConfig` struct for more info
-    function updateUserSupplyConfigs(AdminModuleStructs.UserSupplyConfig[] memory userSupplyConfigs_) external;
+    function updateUserSupplyConfigs(
+        AdminModuleStructs.UserSupplyConfig[] memory userSupplyConfigs_
+    ) external;
 
     /// @notice setting user borrow configs per token basis. Eg: with interest or interest-free and automated limits.
     ///         Only callable by Auths.
     /// @param userBorrowConfigs_ struct array containing user borrow config, see `UserBorrowConfig` struct for more info
-    function updateUserBorrowConfigs(AdminModuleStructs.UserBorrowConfig[] memory userBorrowConfigs_) external;
+    function updateUserBorrowConfigs(
+        AdminModuleStructs.UserBorrowConfig[] memory userBorrowConfigs_
+    ) external;
 
     /// @notice pause operations for a particular user in class 0 (class 1 users can't be paused by guardians).
     /// Only callable by Guardians.
     /// @param user_          address of user to pause operations for
     /// @param supplyTokens_  token addresses to pause withdrawals for
     /// @param borrowTokens_  token addresses to pause borrowings for
-    function pauseUser(address user_, address[] calldata supplyTokens_, address[] calldata borrowTokens_) external;
+    function pauseUser(
+        address user_,
+        address[] calldata supplyTokens_,
+        address[] calldata borrowTokens_
+    ) external;
 
     /// @notice unpause operations for a particular user in class 0 (class 1 users can't be paused by guardians).
     /// Only callable by Guardians.
     /// @param user_          address of user to unpause operations for
     /// @param supplyTokens_  token addresses to unpause withdrawals for
     /// @param borrowTokens_  token addresses to unpause borrowings for
-    function unpauseUser(address user_, address[] calldata supplyTokens_, address[] calldata borrowTokens_) external;
+    function unpauseUser(
+        address user_,
+        address[] calldata supplyTokens_,
+        address[] calldata borrowTokens_
+    ) external;
 
     /// @notice         collects revenue for tokens to configured revenueCollector address.
     /// @param tokens_  array of tokens to collect revenue for
@@ -184,29 +215,40 @@ interface IFluidLiquidityAdmin {
     /// @param tokens_ tokens to update exchange prices for
     /// @return supplyExchangePrices_ new supply rates of overall system for each token
     /// @return borrowExchangePrices_ new borrow rates of overall system for each token
-    function updateExchangePrices(address[] calldata tokens_)
+    function updateExchangePrices(
+        address[] calldata tokens_
+    )
         external
-        returns (uint256[] memory supplyExchangePrices_, uint256[] memory borrowExchangePrices_);
+        returns (
+            uint256[] memory supplyExchangePrices_,
+            uint256[] memory borrowExchangePrices_
+        );
 
     function readFromStorage(
         bytes32 slot_
     ) external view returns (uint256 result_);
 }
 
-
 interface FluidVaultFactory {
     /// @notice                         Sets an address as allowed vault deployment logic (`deploymentLogic_`) contract or not.
     ///                                 This function can only be called by the owner.
     /// @param deploymentLogic_         The address of the vault deployment logic contract to be set.
     /// @param allowed_                 A boolean indicating whether the specified address is allowed to deploy new type of vault.
-    function setVaultDeploymentLogic(address deploymentLogic_, bool allowed_) external;
+    function setVaultDeploymentLogic(
+        address deploymentLogic_,
+        bool allowed_
+    ) external;
 
     /// @notice                         Sets an address (`vaultAuth_`) as allowed vault authorization or not for a specific vault (`vault_`).
     ///                                 This function can only be called by the owner.
     /// @param vault_                   The address of the vault for which the authorization is being set.
     /// @param vaultAuth_               The address to be set as vault authorization.
     /// @param allowed_                 A boolean indicating whether the specified address is allowed to update the specific vault config.
-    function setVaultAuth(address vault_, address vaultAuth_, bool allowed_) external;
+    function setVaultAuth(
+        address vault_,
+        address vaultAuth_,
+        bool allowed_
+    ) external;
 
     /// @notice                         Computes the address of a vault based on its given ID (`vaultId_`).
     /// @param vaultId_                 The ID of the vault.
@@ -224,7 +266,6 @@ interface FluidDexFactory {
 }
 
 contract PayloadIGP43 {
-
     uint256 public constant PROPOSAL_ID = 43;
 
     address public constant PROPOSER =
@@ -236,34 +277,48 @@ contract PayloadIGP43 {
     address public constant PROPOSER_AVO_MULTISIG_3 =
         0x5C43AAC965ff230AC1cF63e924D0153291D78BaD;
 
-    IGovernorBravo public constant GOVERNOR = IGovernorBravo(0x0204Cd037B2ec03605CFdFe482D8e257C765fA1B);
-    ITimelock public constant TIMELOCK = ITimelock(0x2386DC45AdDed673317eF068992F19421B481F4c);
+    IGovernorBravo public constant GOVERNOR =
+        IGovernorBravo(0x0204Cd037B2ec03605CFdFe482D8e257C765fA1B);
+    ITimelock public constant TIMELOCK =
+        ITimelock(0x2386DC45AdDed673317eF068992F19421B481F4c);
 
-    address public constant TEAM_MULTISIG = 0x4F6F977aCDD1177DCD81aB83074855EcB9C2D49e;
+    address public constant TEAM_MULTISIG =
+        0x4F6F977aCDD1177DCD81aB83074855EcB9C2D49e;
 
     address public immutable ADDRESS_THIS;
 
-    IFluidLiquidityAdmin public constant LIQUIDITY = IFluidLiquidityAdmin(0x52Aa899454998Be5b000Ad077a46Bbe360F4e497);
+    IFluidLiquidityAdmin public constant LIQUIDITY =
+        IFluidLiquidityAdmin(0x52Aa899454998Be5b000Ad077a46Bbe360F4e497);
 
-    FluidVaultFactory public constant VAULT_FACTORY = FluidVaultFactory(0x324c5Dc1fC42c7a4D43d92df1eBA58a54d13Bf2d);
-    FluidDexFactory public constant DEX_FACTORY = FluidDexFactory(0xF9b539Cd37Fc81bBEA1F078240d16b988BBae073);
+    FluidVaultFactory public constant VAULT_FACTORY =
+        FluidVaultFactory(0x324c5Dc1fC42c7a4D43d92df1eBA58a54d13Bf2d);
+    FluidDexFactory public constant DEX_FACTORY =
+        FluidDexFactory(0xF9b539Cd37Fc81bBEA1F078240d16b988BBae073);
 
-    address internal constant ETH_ADDRESS = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
-    address internal constant wstETH_ADDRESS = 0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0;
-    address internal constant weETH_ADDRESS = 0xCd5fE23C85820F7B72D0926FC9b05b43E359b7ee;
+    address internal constant ETH_ADDRESS =
+        0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
+    address internal constant wstETH_ADDRESS =
+        0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0;
+    address internal constant weETH_ADDRESS =
+        0xCd5fE23C85820F7B72D0926FC9b05b43E359b7ee;
 
-    address internal constant USDC_ADDRESS = 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
-    address internal constant USDT_ADDRESS = 0xdAC17F958D2ee523a2206206994597C13D831ec7;
-    address internal constant sUSDe_ADDRESS = 0x9D39A5DE30e57443BfF2A8307A4256c8797A3497;
+    address internal constant USDC_ADDRESS =
+        0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
+    address internal constant USDT_ADDRESS =
+        0xdAC17F958D2ee523a2206206994597C13D831ec7;
+    address internal constant sUSDe_ADDRESS =
+        0x9D39A5DE30e57443BfF2A8307A4256c8797A3497;
 
-    address internal constant WBTC_ADDRESS = 0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599;
-    address internal constant cbBTC_ADDRESS = 0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf;
+    address internal constant WBTC_ADDRESS =
+        0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599;
+    address internal constant cbBTC_ADDRESS =
+        0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf;
 
     struct Dex {
         address dex;
         address tokenA;
         address tokenB;
-        bool smartCollateral;   
+        bool smartCollateral;
         bool smartDebt;
     }
 
@@ -305,7 +360,13 @@ contract PayloadIGP43 {
         signatures[0] = "executePayload(address,string,bytes)";
         calldatas[0] = abi.encode(ADDRESS_THIS, "execute()", abi.encode());
 
-        uint256 proposedId = GOVERNOR.propose(targets, values, signatures, calldatas, description);
+        uint256 proposedId = GOVERNOR.propose(
+            targets,
+            values,
+            signatures,
+            calldatas,
+            description
+        );
 
         require(proposedId == PROPOSAL_ID, "PROPOSAL_IS_NOT_SAME");
     }
@@ -358,7 +419,8 @@ contract PayloadIGP43 {
 
     /// @notice Action 2: Set Vault limits on liquidity layer and auth on vaultFactory
     function action2() internal {
-        {   // [TYPE 4] wstETH-ETH  | wstETH-ETH | Smart collateral & smart debt
+        {
+            // [TYPE 4] wstETH-ETH  | wstETH-ETH | Smart collateral & smart debt
             Vault memory VAULT_wstETH_ETH_AND_wsETH_ETH = Vault({
                 vault: getVaultAddress(34),
                 vaultType: TYPE.TYPE_4,
@@ -368,7 +430,8 @@ contract PayloadIGP43 {
             setVaultLimitsAndAuth(VAULT_wstETH_ETH_AND_wsETH_ETH); // TYPE_4 => 34
         }
 
-        {   // [TYPE 3] ETH | USDC-USDT | Smart Debt only
+        {
+            // [TYPE 3] ETH | USDC-USDT | Smart Debt only
             Vault memory VAULT_ETH_AND_USDC_USDT = Vault({
                 vault: getVaultAddress(35),
                 vaultType: TYPE.TYPE_3,
@@ -378,7 +441,8 @@ contract PayloadIGP43 {
             setVaultLimitsAndAuth(VAULT_ETH_AND_USDC_USDT); // TYPE_3 => 35
         }
 
-        {   // [TYPE 3] wstETH | USDC-USDT | Smart Debt only
+        {
+            // [TYPE 3] wstETH | USDC-USDT | Smart Debt only
             Vault memory VAULT_wstETH_AND_USDC_USDT = Vault({
                 vault: getVaultAddress(36),
                 vaultType: TYPE.TYPE_3,
@@ -388,7 +452,8 @@ contract PayloadIGP43 {
             setVaultLimitsAndAuth(VAULT_wstETH_AND_USDC_USDT); // TYPE_3 => 36
         }
 
-        {   // [TYPE 3] weETH | USDC-USDT | Smart Debt only
+        {
+            // [TYPE 3] weETH | USDC-USDT | Smart Debt only
             Vault memory VAULT_weETH_AND_USDC_USDT = Vault({
                 vault: getVaultAddress(37),
                 vaultType: TYPE.TYPE_3,
@@ -398,7 +463,8 @@ contract PayloadIGP43 {
             setVaultLimitsAndAuth(VAULT_weETH_AND_USDC_USDT); // TYPE_3 => 37
         }
 
-        {   // [TYPE 3] WBTC | USDC-USDT | Smart Debt only
+        {
+            // [TYPE 3] WBTC | USDC-USDT | Smart Debt only
             Vault memory VAULT_WBTC_AND_USDC_USDT = Vault({
                 vault: getVaultAddress(38),
                 vaultType: TYPE.TYPE_3,
@@ -408,7 +474,8 @@ contract PayloadIGP43 {
             setVaultLimitsAndAuth(VAULT_WBTC_AND_USDC_USDT); // TYPE_3 => 38
         }
 
-        {   // [TYPE 3] cbBTC-USDC | USDC-USDT | Smart Debt only
+        {
+            // [TYPE 3] cbBTC | USDC-USDT | Smart Debt only
             Vault memory VAULT_cbBTC_AND_USDC_USDT = Vault({
                 vault: getVaultAddress(39),
                 vaultType: TYPE.TYPE_3,
@@ -418,7 +485,8 @@ contract PayloadIGP43 {
             setVaultLimitsAndAuth(VAULT_cbBTC_AND_USDC_USDT); // TYPE_3 => 39
         }
 
-        {   // [TYPE 3] sUSDe | USDC-USDT | Smart Debt only
+        {
+            // [TYPE 3] sUSDe | USDC-USDT | Smart Debt only
             Vault memory VAULT_sUSDe_AND_USDC_USDT = Vault({
                 vault: getVaultAddress(40),
                 vaultType: TYPE.TYPE_3,
@@ -428,7 +496,8 @@ contract PayloadIGP43 {
             setVaultLimitsAndAuth(VAULT_sUSDe_AND_USDC_USDT); // TYPE_3 => 40
         }
 
-        {   // [TYPE 4] cbBTC-WBTC | cbBTC-WBTC | Smart collateral & smart debt
+        {
+            // [TYPE 4] cbBTC-WBTC | cbBTC-WBTC | Smart collateral & smart debt
             Vault memory VAULT_cbBTC_WBTC_AND_cbBTC_WBTC = Vault({
                 vault: getVaultAddress(41),
                 vaultType: TYPE.TYPE_4,
@@ -438,7 +507,8 @@ contract PayloadIGP43 {
             setVaultLimitsAndAuth(VAULT_cbBTC_WBTC_AND_cbBTC_WBTC); // TYPE_4 => 41
         }
 
-        {   // [TYPE 2] cbBTC-WBTC | USDC | Smart Collateral only
+        {
+            // [TYPE 2] cbBTC-WBTC | USDC | Smart Collateral only
             Vault memory VAULT_cbBTC_WBTC_AND_USDC = Vault({
                 vault: getVaultAddress(42),
                 vaultType: TYPE.TYPE_2,
@@ -448,7 +518,8 @@ contract PayloadIGP43 {
             setVaultLimitsAndAuth(VAULT_cbBTC_WBTC_AND_USDC); // TYPE_2 => 42
         }
 
-        {   // [TYPE 2] cbBTC-WBTC | USDT | Smart Collateral only
+        {
+            // [TYPE 2] cbBTC-WBTC | USDT | Smart Collateral only
             Vault memory VAULT_cbBTC_WBTC_AND_USDT = Vault({
                 vault: getVaultAddress(43),
                 vaultType: TYPE.TYPE_2,
@@ -457,7 +528,7 @@ contract PayloadIGP43 {
             });
             setVaultLimitsAndAuth(VAULT_cbBTC_WBTC_AND_USDT); // TYPE_2 => 43
         }
-    }   
+    }
 
     /***********************************|
     |     Proposal Payload Helpers      |
@@ -474,7 +545,7 @@ contract PayloadIGP43 {
     function setDexLimits(Dex memory dex_) internal {
         // Smart Collateral
         if (dex_.smartCollateral) {
-            SupplyProtocolConfig memory protocolConfigTokenA_ = SupplyProtocolConfig({  
+            SupplyProtocolConfig memory protocolConfigTokenA_ = SupplyProtocolConfig({
                 protocol: dex_.dex,
                 supplyToken: dex_.tokenA,
                 baseWithdrawalLimitInUSD: 50_000 // $50k
@@ -482,7 +553,7 @@ contract PayloadIGP43 {
 
             setSupplyProtocolLimits(protocolConfigTokenA_);
 
-            SupplyProtocolConfig memory protocolConfigTokenB_ = SupplyProtocolConfig({  
+            SupplyProtocolConfig memory protocolConfigTokenB_ = SupplyProtocolConfig({
                 protocol: dex_.dex,
                 supplyToken: dex_.tokenB,
                 baseWithdrawalLimitInUSD: 50_000 // $50k
@@ -493,19 +564,19 @@ contract PayloadIGP43 {
 
         // Smart Debt
         if (dex_.smartDebt) {
-            BorrowProtocolConfig memory protocolConfigTokenA_ = BorrowProtocolConfig({  
+            BorrowProtocolConfig memory protocolConfigTokenA_ = BorrowProtocolConfig({
                 protocol: dex_.dex,
                 borrowToken: dex_.tokenA,
-                baseBorrowLimitInUSD: 10_000, // $10k
+                baseBorrowLimitInUSD: 40_000, // $40k
                 maxBorrowLimitInUSD: 50_000 // $50k
             });
 
             setBorrowProtocolLimits(protocolConfigTokenA_);
-    
-            BorrowProtocolConfig memory protocolConfigTokenB_ = BorrowProtocolConfig({  
+
+            BorrowProtocolConfig memory protocolConfigTokenB_ = BorrowProtocolConfig({
                 protocol: dex_.dex,
                 borrowToken: dex_.tokenB,
-                baseBorrowLimitInUSD: 10_000, // $10k
+                baseBorrowLimitInUSD: 40_000, // $40k
                 maxBorrowLimitInUSD: 50_000 // $50k
             });
 
@@ -515,7 +586,7 @@ contract PayloadIGP43 {
 
     function setVaultLimitsAndAuth(Vault memory vault_) internal {
         if (vault_.vaultType == TYPE.TYPE_3) {
-            SupplyProtocolConfig memory protocolConfig_ = SupplyProtocolConfig({  
+            SupplyProtocolConfig memory protocolConfig_ = SupplyProtocolConfig({
                 protocol: vault_.vault,
                 supplyToken: vault_.supplyToken,
                 baseWithdrawalLimitInUSD: 40_000 // $40k
@@ -525,7 +596,7 @@ contract PayloadIGP43 {
         }
 
         if (vault_.vaultType == TYPE.TYPE_2) {
-            BorrowProtocolConfig memory protocolConfig_ = BorrowProtocolConfig({  
+            BorrowProtocolConfig memory protocolConfig_ = BorrowProtocolConfig({
                 protocol: vault_.vault,
                 borrowToken: vault_.borrowToken,
                 baseBorrowLimitInUSD: 20_000, // $20k
@@ -544,15 +615,19 @@ contract PayloadIGP43 {
         uint256 baseWithdrawalLimitInUSD;
     }
     struct BorrowProtocolConfig {
-        address protocol;   
+        address protocol;
         address borrowToken;
         uint256 baseBorrowLimitInUSD;
         uint256 maxBorrowLimitInUSD;
     }
 
-    function setSupplyProtocolLimits(SupplyProtocolConfig memory protocolConfig_) internal {
-        { // Supply Limits
-            AdminModuleStructs.UserSupplyConfig[] memory configs_ = new AdminModuleStructs.UserSupplyConfig[](1);
+    function setSupplyProtocolLimits(
+        SupplyProtocolConfig memory protocolConfig_
+    ) internal {
+        {
+            // Supply Limits
+            AdminModuleStructs.UserSupplyConfig[]
+                memory configs_ = new AdminModuleStructs.UserSupplyConfig[](1);
 
             configs_[0] = AdminModuleStructs.UserSupplyConfig({
                 user: address(protocolConfig_.protocol),
@@ -561,7 +636,10 @@ contract PayloadIGP43 {
                 expandPercent: 25 * 1e2,
                 expandDuration: 12 hours,
                 baseWithdrawalLimit: getRawAmount(
-                    protocolConfig_.supplyToken, 0, protocolConfig_.baseWithdrawalLimitInUSD, true
+                    protocolConfig_.supplyToken,
+                    0,
+                    protocolConfig_.baseWithdrawalLimitInUSD,
+                    true
                 )
             });
 
@@ -569,9 +647,13 @@ contract PayloadIGP43 {
         }
     }
 
-    function setBorrowProtocolLimits(BorrowProtocolConfig memory protocolConfig_) internal {
-        { // Borrow Limits
-            AdminModuleStructs.UserBorrowConfig[] memory configs_ = new AdminModuleStructs.UserBorrowConfig[](1);
+    function setBorrowProtocolLimits(
+        BorrowProtocolConfig memory protocolConfig_
+    ) internal {
+        {
+            // Borrow Limits
+            AdminModuleStructs.UserBorrowConfig[]
+                memory configs_ = new AdminModuleStructs.UserBorrowConfig[](1);
 
             configs_[0] = AdminModuleStructs.UserBorrowConfig({
                 user: address(protocolConfig_.protocol),
@@ -580,10 +662,16 @@ contract PayloadIGP43 {
                 expandPercent: 20 * 1e2,
                 expandDuration: 12 hours,
                 baseDebtCeiling: getRawAmount(
-                    protocolConfig_.borrowToken, 0, protocolConfig_.baseBorrowLimitInUSD, false
+                    protocolConfig_.borrowToken,
+                    0,
+                    protocolConfig_.baseBorrowLimitInUSD,
+                    false
                 ),
                 maxDebtCeiling: getRawAmount(
-                    protocolConfig_.borrowToken, 0, protocolConfig_.maxBorrowLimitInUSD, false
+                    protocolConfig_.borrowToken,
+                    0,
+                    protocolConfig_.maxBorrowLimitInUSD,
+                    false
                 )
             });
 
@@ -591,22 +679,26 @@ contract PayloadIGP43 {
         }
     }
 
-    function getRawAmount(address token, uint256 amount, uint256 amountInUSD, bool isSupply)
-        public
-        view
-        returns (uint256)
-    {
+    function getRawAmount(
+        address token,
+        uint256 amount,
+        uint256 amountInUSD,
+        bool isSupply
+    ) public view returns (uint256) {
         if (amount > 0 && amountInUSD > 0) {
             revert("both usd and amount are not zero");
         }
         uint256 exchangePriceAndConfig_ = LIQUIDITY.readFromStorage(
             LiquiditySlotsLink.calculateMappingStorageSlot(
-                LiquiditySlotsLink.LIQUIDITY_EXCHANGE_PRICES_MAPPING_SLOT, token
+                LiquiditySlotsLink.LIQUIDITY_EXCHANGE_PRICES_MAPPING_SLOT,
+                token
             )
         );
 
-        (uint256 supplyExchangePrice, uint256 borrowExchangePrice) =
-            LiquidityCalcs.calcExchangePrices(exchangePriceAndConfig_);
+        (
+            uint256 supplyExchangePrice,
+            uint256 borrowExchangePrice
+        ) = LiquidityCalcs.calcExchangePrices(exchangePriceAndConfig_);
 
         uint256 usdPrice = 0;
         uint256 decimals = 18;
@@ -632,12 +724,16 @@ contract PayloadIGP43 {
             revert("not-found");
         }
 
-        uint256 exchangePrice = isSupply ? supplyExchangePrice : borrowExchangePrice;
+        uint256 exchangePrice = isSupply
+            ? supplyExchangePrice
+            : borrowExchangePrice;
 
         if (amount > 0) {
             return (amount * 1e12) / exchangePrice;
         } else {
-            return (amountInUSD * 1e12 * (10 ** decimals)) / ((usdPrice * exchangePrice) / 1e2);
+            return
+                (amountInUSD * 1e12 * (10 ** decimals)) /
+                ((usdPrice * exchangePrice) / 1e2);
         }
     }
 }
