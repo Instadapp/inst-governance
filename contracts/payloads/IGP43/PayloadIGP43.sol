@@ -358,7 +358,7 @@ contract PayloadIGP43 {
 
     /// @notice Action 2: Set Vault limits on liquidity layer and auth on vaultFactory
     function action2() internal {
-        {   // [TYPE 4] wstETH-ETH | Smart collateral & smart debt
+        {   // [TYPE 4] wstETH-ETH  | wstETH-ETH | Smart collateral & smart debt
             Vault memory VAULT_wstETH_ETH_AND_wsETH_ETH = Vault({
                 vault: getVaultAddress(34),
                 vaultType: TYPE.TYPE_4,
