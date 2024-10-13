@@ -214,6 +214,13 @@ interface FluidVaultFactory {
     /// @param deploymentLogic_         The address of the vault deployment logic contract to be set.
     /// @param allowed_                 A boolean indicating whether the specified address is allowed to deploy new type of vault.
     function setVaultDeploymentLogic(address deploymentLogic_, bool allowed_) public;
+
+    /// @notice                         Sets an address (`vaultAuth_`) as allowed vault authorization or not for a specific vault (`vault_`).
+    ///                                 This function can only be called by the owner.
+    /// @param vault_                   The address of the vault for which the authorization is being set.
+    /// @param vaultAuth_               The address to be set as vault authorization.
+    /// @param allowed_                 A boolean indicating whether the specified address is allowed to update the specific vault config.
+    function setVaultAuth(address vault_, address vaultAuth_, bool allowed_) external;
 }
 
 interface FluidVaultResolver {
@@ -338,6 +345,21 @@ contract PayloadIGP43 {
 
     address public constant FluidVaultT4Resolver; // TODO add address here
 
+    uint256 public constant wstETH_ETH_Dex; // TODO add address here
+    uint256 public constant USDC_USDT_Dex; // TODO add address here
+    uint256 public constant cbBTC_WBTC_Dex; // TODO add address here
+
+    address public constant wstETH_ETH_Smart; // TODO add address here
+    address public constant ETH_USDC_USDT; // TODO add address here
+    address public constant wstETH_USDC_USDT; // TODO add address here
+    address public constant weETH_USDC_USDT; // TODO add address here
+    address public constant WBTC_USDC_USDT; // TODO add address here
+    address public constant cbBTC_USDC_USDT; // TODO add address here
+    address public constant sUSDe_USDC_USDT; // TODO add address here
+    address public constant cbBTC_WBTC_Smart; // TODO add address here
+    address public constant cbBTC_WBTC_USDC; // TODO add address here
+    address public constant cbBTC_WBTC_USDT; // TODO add address here
+
     constructor() {
         ADDRESS_THIS = address(this);
     }
@@ -380,14 +402,44 @@ contract PayloadIGP43 {
      * |__________________________________
      */
 
-    /// @notice Action 1: Give allowance on Liquidity Layer to initial 2 DEXes
-    function action1(DexConfig[] memory dexConfigs_) internal {
+    /// @notice Action 1: Setting supply and borrow limit for Dexes
+    function action1() internal {
+        Pool memory pool1_ = DEX_RESERVES_RESOLVER.getPool(wstETH_ETH_Dex);
+            setSupplyConfigforDex(
+                pool1_.pool, pool1_.token0, pool1_.token1, dexConfigs_[i].token0Config, dexConfigs_[i].token1Config
+            );
+            setBorrowConfigforDex(
+                pool1_.pool, pool1_.token0, pool1_.token1, dexConfigs_[i].token0Config, dexConfigs_[i].token1Config
+            );
 
-        for(uint i; i < dexConfigs_.length; i++){
-            Pool memory pool_ = DEX_RESERVES_RESOLVER.getPool(dexConfigs_[i].dexId);
-            setBorrowAndSupplyConfigs(pool_.pool, pool_.token0, pool_.token1, dexConfigs_[i].token0Config, dexConfigs_[i].token1Config);
-        }
+        Pool memory pool1_ = DEX_RESERVES_RESOLVER.getPool(USDC_USDT_Dex);
+            setBorrowConfigforDex(
+                pool1_.pool, pool1_.token0, pool1_.token1, dexConfigs_[i].token0Config, dexConfigs_[i].token1Config
+            );
+            
+        Pool memory pool1_ = DEX_RESERVES_RESOLVER.getPool(cbBTC_WBTC_Dex);
+            setSupplyConfigforDex(
+                pool1_.pool, pool1_.token0, pool1_.token1, dexConfigs_[i].token0Config, dexConfigs_[i].token1Config
+            );
+            setBorrowConfigforDex(
+                pool1_.pool, pool1_.token0, pool1_.token1, dexConfigs_[i].token0Config, dexConfigs_[i].token1Config
+            );
     }
+
+    /// @notice Action 2: Setting team multisig as vault auth in 10 vaults
+    function action2() internal {
+        VAULT_FACTORY.setVaultAuth(wstETH_ETH_Smart, TEAM_MULTISIG, true);
+        VAULT_FACTORY.setVaultAuth(ETH_USDC_USDT, TEAM_MULTISIG, true);
+        VAULT_FACTORY.setVaultAuth(wstETH_USDC_USDT, TEAM_MULTISIG, true);
+        VAULT_FACTORY.setVaultAuth(weETH_USDC_USDT, TEAM_MULTISIG, true);
+        VAULT_FACTORY.setVaultAuth(WBTC_USDC_USDT, TEAM_MULTISIG, true);
+        VAULT_FACTORY.setVaultAuth(cbBTC_USDC_USDT, TEAM_MULTISIG, true);
+        VAULT_FACTORY.setVaultAuth(sUSDe_USDC_USDT, TEAM_MULTISIG, true);
+        VAULT_FACTORY.setVaultAuth(cbBTC_WBTC_Smart, TEAM_MULTISIG, true);
+        VAULT_FACTORY.setVaultAuth(cbBTC_WBTC_USDC, TEAM_MULTISIG, true);
+        VAULT_FACTORY.setVaultAuth(cbBTC_WBTC_USDT, TEAM_MULTISIG, true);
+    }
+
 
     /// @notice Action 2: Give allowance on Liquidity Layer to new vaults
     function action2(vaultConfig[] memory vaultConfigs_) internal {
@@ -480,49 +532,65 @@ contract PayloadIGP43 {
         }
     }
 
-    function setBorrowAndSupplyConfigs(address dex_, address token0_, address token1_, TokenConfig memory token0Config_, TokenConfig memory token1Config_) internal {
+
+
+    function setSupplyConfigforDex(
+        address dex_,
+        address token0_,
+        address token1_,
+        TokenConfig memory token0Config_,
+        TokenConfig memory token1Config_
+    ) internal {
+        AdminModuleStructs.UserSupplyConfig[] memory supplyParams_ = new AdminModuleStructs.UserSupplyConfig[](2);
+
+        supplyParams_[0] = AdminModuleStructs.UserSupplyConfig({
+            user: dex_,
+            token: token0_,
+            mode: false, // @TODO - to be filled
+            expandPercent: 20 * 1e2, // @TODO - to be filled
+            expandDuration: 12 hours, // @TODO - to be filled
+            baseWithdrawalLimit: token0Config_.baseWithdrawalLimit
+        });
+        supplyParams_[1] = AdminModuleStructs.UserSupplyConfig({
+            user: dex_,
+            token: token1_,
+            mode: false, // @TODO - to be filled
+            expandPercent: 20 * 1e2, // @TODO - to be filled
+            expandDuration: 12 hours, // @TODO - to be filled
+            baseWithdrawalLimit: token1Config_.baseWithdrawalLimit
+        });
+
+        LIQUIDITY.updateUserSupplyConfigs(supplyParams_);
+    }
+
+    function setBorrowConfigforDex(
+        address dex_,
+        address token0_,
+        address token1_,
+        TokenConfig memory token0Config_,
+        TokenConfig memory token1Config_
+    ) internal {
         AdminModuleStructs.UserBorrowConfig[] memory borrowParams_ = new AdminModuleStructs.UserBorrowConfig[](2);
 
         borrowParams_[0] = AdminModuleStructs.UserBorrowConfig({
             user: dex_,
             token: token0_,
-            mode: false,            // @TODO - to be filled 
-            expandPercent: 20 * 1e2,            // @TODO - to be filled 
-            expandDuration: 12 hours,            // @TODO - to be filled 
+            mode: false, // @TODO - to be filled
+            expandPercent: 20 * 1e2, // @TODO - to be filled
+            expandDuration: 12 hours, // @TODO - to be filled
             baseDebtCeiling: token0Config_.baseDebtCeiling,
             maxDebtCeiling: token0Config_.maxDebtCeiling
         });
         borrowParams_[1] = AdminModuleStructs.UserBorrowConfig({
             user: dex_,
             token: token1_,
-            mode: false,            // @TODO - to be filled 
-            expandPercent: 20 * 1e2,            // @TODO - to be filled 
-            expandDuration: 12 hours,            // @TODO - to be filled 
+            mode: false, // @TODO - to be filled
+            expandPercent: 20 * 1e2, // @TODO - to be filled
+            expandDuration: 12 hours, // @TODO - to be filled
             baseDebtCeiling: token1Config_.baseDebtCeiling,
             maxDebtCeiling: token1Config_.maxDebtCeiling
         });
 
         LIQUIDITY.updateUserBorrowConfigs(borrowParams_);
-
-        AdminModuleStructs.UserSupplyConfig[] memory supplyParams_ = new AdminModuleStructs.UserSupplyConfig[](2);
-
-        supplyParams_[0] = AdminModuleStructs.UserSupplyConfig({
-            user: dex_,
-            token: token0_,
-            mode: false,            // @TODO - to be filled 
-            expandPercent: 20 * 1e2,            // @TODO - to be filled 
-            expandDuration: 12 hours,            // @TODO - to be filled 
-            baseWithdrawalLimit: token0.baseWithdrawalLimit
-        });
-        supplyParams_[1] = AdminModuleStructs.UserSupplyConfig({
-            user: dex_,
-            token: token1_,
-            mode: false,            // @TODO - to be filled 
-            expandPercent: 20 * 1e2,            // @TODO - to be filled 
-            expandDuration: 12 hours,            // @TODO - to be filled 
-            baseWithdrawalLimit: token1.baseWithdrawalLimit
-        });
-
-        LIQUIDITY.updateUserSupplyConfigs(supplyParams_);
     }
 }
