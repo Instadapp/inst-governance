@@ -1,5 +1,8 @@
-pragma solidity ^0.7.0;
+pragma solidity ^0.8.21;
 pragma experimental ABIEncoderV2;
+
+import {LiquiditySlotsLink} from "./libraries/liquiditySlotsLink.sol";
+import {LiquidityCalcs} from "./libraries/liquidityCalcs.sol";
 
 interface IGovernorBravo {
     function _acceptAdmin() external;
@@ -184,6 +187,10 @@ interface IFluidLiquidityAdmin {
     function updateExchangePrices(address[] calldata tokens_)
         external
         returns (uint256[] memory supplyExchangePrices_, uint256[] memory borrowExchangePrices_);
+
+    function readFromStorage(
+        bytes32 slot_
+    ) external view returns (uint256 result_);
 }
 
 interface FluidDexReservesResolver {
@@ -197,15 +204,7 @@ interface FluidDexReservesResolver {
     /// @notice Get a Pool's address and its token addresses
     /// @param poolId_ The ID of the Pool
     /// @return pool_ The Pool data
-    function getPool(uint256 poolId_) public view returns (Pool memory pool_);
-}
-
-interface FluidVaultT1Resolver {
-    function getTotalVaults() public view returns (uint256);
-
-    function getVaultAddress(uint256 vaultId_) public view returns (address vault_);
-
-    function getAllVaultsAddresses() public view returns (address[] memory vaults_);
+    function getPool(uint256 poolId_) external view returns (Pool memory pool_);
 }
 
 interface FluidVaultFactory {
@@ -213,7 +212,7 @@ interface FluidVaultFactory {
     ///                                 This function can only be called by the owner.
     /// @param deploymentLogic_         The address of the vault deployment logic contract to be set.
     /// @param allowed_                 A boolean indicating whether the specified address is allowed to deploy new type of vault.
-    function setVaultDeploymentLogic(address deploymentLogic_, bool allowed_) public;
+    function setVaultDeploymentLogic(address deploymentLogic_, bool allowed_) external;
 
     /// @notice                         Sets an address (`vaultAuth_`) as allowed vault authorization or not for a specific vault (`vault_`).
     ///                                 This function can only be called by the owner.
@@ -223,35 +222,8 @@ interface FluidVaultFactory {
     function setVaultAuth(address vault_, address vaultAuth_, bool allowed_) external;
 }
 
-interface FluidVaultResolver {
-    struct UserSupplyData {
-        bool modeWithInterest; // true if mode = with interest, false = without interest
-        uint256 supply; // user supply amount
-        // the withdrawal limit (e.g. if 10% is the limit, and 100M is supplied, it would be 90M)
-        uint256 withdrawalLimit;
-        uint256 lastUpdateTimestamp;
-        uint256 expandPercent; // withdrawal limit expand percent in 1e2
-        uint256 expandDuration; // withdrawal limit expand duration in seconds
-        uint256 baseWithdrawalLimit;
-        // the current actual max withdrawable amount (e.g. if 10% is the limit, and 100M is supplied, it would be 10M)
-        uint256 withdrawableUntilLimit;
-        uint256 withdrawable; // actual currently withdrawable amount (supply - withdrawal Limit) & considering balance
-    }
-
-    struct UserBorrowData {
-        bool modeWithInterest; // true if mode = with interest, false = without interest
-        uint256 borrow; // user borrow amount
-        uint256 borrowLimit;
-        uint256 lastUpdateTimestamp;
-        uint256 expandPercent;
-        uint256 expandDuration;
-        uint256 baseBorrowLimit;
-        uint256 maxBorrowLimit;
-        uint256 borrowableUntilLimit; // borrowable amount until any borrow limit (incl. max utilization limit)
-        uint256 borrowable; // actual currently borrowable amount (borrow limit - already borrowed) & considering balance, max utilization
-        uint256 borrowLimitUtilization; // borrow limit for `maxUtilization`
-    }
-
+interface FluidVault {
+    
     struct ConstantViews {
         address liquidity;
         address factory;
@@ -268,38 +240,26 @@ interface FluidVaultResolver {
         bytes32 liquidityUserBorrowSlot;
     }
 
-    struct VaultEntireData {
-        address vault;
-        ConstantViews constantVariables;
-        Configs configs;
-        ExchangePricesAndRates exchangePricesAndRates;
-        TotalSupplyAndBorrow totalSupplyAndBorrow;
-        LimitsAndAvailability limitsAndAvailability;
-        VaultState vaultState;
-        // liquidity related data such as supply amount, limits, expansion etc.
-        // only set if not smart col!
-        UserSupplyData liquidityUserSupplyData;
-        // liquidity related data such as borrow amount, limits, expansion etc.
-        // only set if not smart debt!
-        UserBorrowData liquidityUserBorrowData;
-    }
-
-    function getTotalVaults() public view returns (uint256);
-
-    function getVaultAddress(uint256 vaultId_) public view returns (address vault_);
-
-    function getVaultEntireData(address vault_) public view returns (VaultEntireData memory vaultData_);
+    function constantsView() external view returns (ConstantViews memory constantsView_);
 }
 
 contract PayloadIGP43 {
-    struct vaultConfig {
+    struct VaultConfig {
         uint256 vaultId;
         address supplyToken;
-        uint256 collateralFactor;
-        uint256 liquidationThreshold;
-        uint256 liquidationMaxLimit;
-        uint256 liquidationPenalty;
-        address oracle;
+        address borrowToken;
+        uint8 supplyMode;
+        uint256 supplyExpandPercent;
+        uint256 supplyExpandDuration;
+        uint256 supplyBaseLimitInUSD;
+        uint256 supplyBaseLimit;
+        uint8 borrowMode;
+        uint256 borrowExpandPercent;
+        uint256 borrowExpandDuration;
+        uint256 borrowBaseLimitInUSD;
+        uint256 borrowBaseLimit;
+        uint256 borrowMaxLimitInUSD;
+        uint256 borrowMaxLimit;
     }
 
     struct TokenConfig {
@@ -329,28 +289,29 @@ contract PayloadIGP43 {
 
     address public constant ETH_ADDRESS = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
 
-    FluidDexReservesResolver public constant DEX_RESERVES_RESOLVER = 0x278166A9B88f166EB170d55801bE1b1d1E576330;
+    FluidDexReservesResolver public constant DEX_RESERVES_RESOLVER = FluidDexReservesResolver(0x278166A9B88f166EB170d55801bE1b1d1E576330);
 
-    FluidVaultFactory public constant VAULT_FACTORY = 0x324c5Dc1fC42c7a4D43d92df1eBA58a54d13Bf2d;
+    FluidVaultFactory public constant VAULT_FACTORY = FluidVaultFactory(0x324c5Dc1fC42c7a4D43d92df1eBA58a54d13Bf2d);
 
-    FluidVaultResolver public constant FluidVaultT2Resolver; // TODO add address here
+    address internal constant wstETH_ADDRESS = 0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0;
+    address internal constant USDT_ADDRESS = 0xdAC17F958D2ee523a2206206994597C13D831ec7;
+    address internal constant USDC_ADDRESS = 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
+    address internal constant weETH_ADDRESS = 0xCd5fE23C85820F7B72D0926FC9b05b43E359b7ee;
+    address internal constant cbBTC_ADDRESS = 0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf;
 
-    FluidVaultResolver public constant FluidVaultT3Resolver; // TODO add address here
-
-    FluidVaultResolver public constant FluidVaultT4Resolver; // TODO add address here
 
     uint256 public constant wstETH_ETH_Dex; // TODO add address here
     uint256 public constant USDC_USDT_Dex; // TODO add address here
     uint256 public constant cbBTC_WBTC_Dex; // TODO add address here
 
-    address public constant wstETH_ETH_Smart; // TODO add address here
+    address public constant wstETH_ETH_SMART_COL_DEBT; // TODO add address here
     address public constant ETH_USDC_USDT; // TODO add address here
     address public constant wstETH_USDC_USDT; // TODO add address here
     address public constant weETH_USDC_USDT; // TODO add address here
     address public constant WBTC_USDC_USDT; // TODO add address here
     address public constant cbBTC_USDC_USDT; // TODO add address here
     address public constant sUSDe_USDC_USDT; // TODO add address here
-    address public constant cbBTC_WBTC_Smart; // TODO add address here
+    address public constant cbBTC_WBTC_SMART_COL_DEBT; // TODO add address here
     address public constant cbBTC_WBTC_USDC; // TODO add address here
     address public constant cbBTC_WBTC_USDT; // TODO add address here
 
@@ -382,7 +343,7 @@ contract PayloadIGP43 {
         require(address(this) == address(TIMELOCK), "not-valid-caller");
 
         // Action 1: Give allowance on Liquidity Layer to initial 2 DEXes
-        action1();
+        // action1();  // TODO
 
         // Action 2: Give allowance on Liquidity Layer to new vaults
         action2();
@@ -397,39 +358,39 @@ contract PayloadIGP43 {
      */
 
     /// @notice Action 1: Setting supply and borrow limit for Dexes
-    function action1() internal {
-        Pool memory pool1_ = DEX_RESERVES_RESOLVER.getPool(wstETH_ETH_Dex);
+    function action1(TokenConfig memory token0Config_, TokenConfig memory token1Config_) internal {
+        FluidDexReservesResolver.Pool memory pool1_ = DEX_RESERVES_RESOLVER.getPool(wstETH_ETH_Dex);
         setSupplyConfigforDex(
-            pool1_.pool, pool1_.token0, pool1_.token1, dexConfigs_[i].token0Config, dexConfigs_[i].token1Config
+            pool1_.pool, pool1_.token0, pool1_.token1, token0Config_, token1Config_
         );
         setBorrowConfigforDex(
-            pool1_.pool, pool1_.token0, pool1_.token1, dexConfigs_[i].token0Config, dexConfigs_[i].token1Config
+            pool1_.pool, pool1_.token0, pool1_.token1, token0Config_, token1Config_
         );
 
-        Pool memory pool1_ = DEX_RESERVES_RESOLVER.getPool(USDC_USDT_Dex);
+        FluidDexReservesResolver.Pool memory pool2_ = DEX_RESERVES_RESOLVER.getPool(USDC_USDT_Dex);
         setBorrowConfigforDex(
-            pool1_.pool, pool1_.token0, pool1_.token1, dexConfigs_[i].token0Config, dexConfigs_[i].token1Config
+            pool2_.pool, pool2_.token0, pool2_.token1, token0Config_, token1Config_
         );
 
-        Pool memory pool1_ = DEX_RESERVES_RESOLVER.getPool(cbBTC_WBTC_Dex);
+        FluidDexReservesResolver.Pool memory pool3_ = DEX_RESERVES_RESOLVER.getPool(cbBTC_WBTC_Dex);
         setSupplyConfigforDex(
-            pool1_.pool, pool1_.token0, pool1_.token1, dexConfigs_[i].token0Config, dexConfigs_[i].token1Config
+            pool3_.pool, pool3_.token0, pool3_.token1, token0Config_, token1Config_
         );
         setBorrowConfigforDex(
-            pool1_.pool, pool1_.token0, pool1_.token1, dexConfigs_[i].token0Config, dexConfigs_[i].token1Config
+            pool3_.pool, pool3_.token0, pool3_.token1, token0Config_, token1Config_
         );
     }
 
     /// @notice Action 2: Setting team multisig as vault auth in 10 vaults
     function action2() internal {
-        VAULT_FACTORY.setVaultAuth(wstETH_ETH_Smart, TEAM_MULTISIG, true);
+        VAULT_FACTORY.setVaultAuth(wstETH_ETH_SMART_COL_DEBT, TEAM_MULTISIG, true);
         VAULT_FACTORY.setVaultAuth(ETH_USDC_USDT, TEAM_MULTISIG, true);
         VAULT_FACTORY.setVaultAuth(wstETH_USDC_USDT, TEAM_MULTISIG, true);
         VAULT_FACTORY.setVaultAuth(weETH_USDC_USDT, TEAM_MULTISIG, true);
         VAULT_FACTORY.setVaultAuth(WBTC_USDC_USDT, TEAM_MULTISIG, true);
         VAULT_FACTORY.setVaultAuth(cbBTC_USDC_USDT, TEAM_MULTISIG, true);
         VAULT_FACTORY.setVaultAuth(sUSDe_USDC_USDT, TEAM_MULTISIG, true);
-        VAULT_FACTORY.setVaultAuth(cbBTC_WBTC_Smart, TEAM_MULTISIG, true);
+        VAULT_FACTORY.setVaultAuth(cbBTC_WBTC_SMART_COL_DEBT, TEAM_MULTISIG, true);
         VAULT_FACTORY.setVaultAuth(cbBTC_WBTC_USDC, TEAM_MULTISIG, true);
         VAULT_FACTORY.setVaultAuth(cbBTC_WBTC_USDT, TEAM_MULTISIG, true);
     }
@@ -439,118 +400,101 @@ contract PayloadIGP43 {
         VaultConfig memory vaultConfig = VaultConfig({
             vaultId: 0,
             supplyToken: address(0),
+            borrowToken: address(0),
             supplyMode: 1, // Mode 1
             supplyExpandPercent: 25 * 1e2, // 25%
             supplyExpandDuration: 12 hours, // 12 hours
             supplyBaseLimitInUSD: 5_000_000, // $5M
             supplyBaseLimit: 0,
-            borrowToken: address(0),
             borrowMode: 1, // Mode 1
             borrowExpandPercent: 20 * 1e2, // 20%
             borrowExpandDuration: 12 hours, // 12 hours
             borrowBaseLimitInUSD: 7_500_000, // $7.5M
             borrowBaseLimit: 0,
             borrowMaxLimitInUSD: 20_000_000, // $20M
-            borrowMaxLimit: 0,
-            supplyRateMagnifier: 100 * 1e2, // 1x
-            borrowRateMagnifier: 100 * 1e2, // 1x
-            collateralFactor: 0 * 1e2, //
-            liquidationThreshold: 0 * 1e2,
-            //
-            liquidationMaxLimit: 0 * 1e2,
-            //
-            withdrawGap: 5 * 1e2,
-            // 5%
-            liquidationPenalty: 0,
-            borrowFee: 0 * 1e2, // 0%
-            oracle: address(0)
+            borrowMaxLimit: 0
         });
 
         // ETH | USDC-USDT - Only withdrawal limit on Liquidity Layer.
         {
-            VaultEntireData memory data_ = FluidVaultT3Resolver.getVaultEntireData(ETH_USDC_USDT);
-            vaultConfig.vaultId = data_.constantVariables.vaultId;
-            vaultConfig.supplyToken = data_.constantVariables.supplyToken;
-            vaultConfig.borrowToken = data_.constantVariables.borrowToken;
-            setVaultSupplyConfig(vaultConfig);
+            FluidVault.ConstantViews memory data_ = FluidVault(ETH_USDC_USDT).constantsView();
+            vaultConfig.vaultId = data_.vaultId;
+            vaultConfig.supplyToken = data_.supplyToken;
+            vaultConfig.borrowToken = data_.borrowToken;
+            setVaultSupplyConfig(vaultConfig, ETH_USDC_USDT);
         }
 
         // wstETH | USDC-USDT - Only withdrawal limit on Liquidity Layer.
         {
-            VaultEntireData memory data_ = FluidVaultT3Resolver.getVaultEntireData(wstETH_USDC_USDT);
-            vaultConfig.vaultId = data_.constantVariables.vaultId;
-            vaultConfig.supplyToken = data_.constantVariables.supplyToken;
-            vaultConfig.borrowToken = data_.constantVariables.borrowToken;
-            setVaultSupplyConfig(vaultConfig);
-
+            FluidVault.ConstantViews memory data_ = FluidVault(wstETH_USDC_USDT).constantsView();
+            vaultConfig.vaultId = data_.vaultId;
+            vaultConfig.supplyToken = data_.supplyToken;
+            vaultConfig.borrowToken = data_.borrowToken;
+            setVaultSupplyConfig(vaultConfig, wstETH_USDC_USDT);
         }
 
         // weETH | USDC-USDT - Only withdrawal limit on Liquidity Layer.
         {
-            VaultEntireData memory data_ = FluidVaultT3Resolver.getVaultEntireData(weETH_USDC_USDT);
-            vaultConfig.vaultId = data_.constantVariables.vaultId;
-            vaultConfig.supplyToken = data_.constantVariables.supplyToken;
-            vaultConfig.borrowToken = data_.constantVariables.borrowToken;
-            setVaultSupplyConfig(vaultConfig);
-
+            FluidVault.ConstantViews memory data_ = FluidVault(weETH_USDC_USDT).constantsView();
+            vaultConfig.vaultId = data_.vaultId;
+            vaultConfig.supplyToken = data_.supplyToken;
+            vaultConfig.borrowToken = data_.borrowToken;
+            setVaultSupplyConfig(vaultConfig, weETH_USDC_USDT);
         }
 
         // WBTC | USDC-USDT - Only withdrawal limit on Liquidity Layer.
-                {
-            VaultEntireData memory data_ = FluidVaultT3Resolver.getVaultEntireData(WBTC_USDC_USDT);
-            vaultConfig.vaultId = data_.constantVariables.vaultId;
-            vaultConfig.supplyToken = data_.constantVariables.supplyToken;
-            vaultConfig.borrowToken = data_.constantVariables.borrowToken;
-            setVaultSupplyConfig(vaultConfig);
-
+        {
+            FluidVault.ConstantViews memory data_ = FluidVault(WBTC_USDC_USDT).constantsView();
+            vaultConfig.vaultId = data_.vaultId;
+            vaultConfig.supplyToken = data_.supplyToken;
+            vaultConfig.borrowToken = data_.borrowToken;
+            setVaultSupplyConfig(vaultConfig, WBTC_USDC_USDT);
         }
 
         // cbBTC | USDC-USDT - Only withdrawal limit on Liquidity Layer.
-                {
-            VaultEntireData memory data_ = FluidVaultT3Resolver.getVaultEntireData(cbBTC_USDC_USDT);
-            vaultConfig.vaultId = data_.constantVariables.vaultId;
-            vaultConfig.supplyToken = data_.constantVariables.supplyToken;
-            vaultConfig.borrowToken = data_.constantVariables.borrowToken;
-            setVaultSupplyConfig(vaultConfig);
-
+        {
+            FluidVault.ConstantViews memory data_ = FluidVault(cbBTC_USDC_USDT).constantsView();
+            vaultConfig.vaultId = data_.vaultId;
+            vaultConfig.supplyToken = data_.supplyToken;
+            vaultConfig.borrowToken = data_.borrowToken;
+            setVaultSupplyConfig(vaultConfig, cbBTC_USDC_USDT);
         }
 
         // sUSDe | USDC-USDT - Only withdrawal limit on Liquidity Layer.
-                {
-            VaultEntireData memory data_ = FluidVaultT3Resolver.getVaultEntireData(sUSDe_USDC_USDT);
-            vaultConfig.vaultId = data_.constantVariables.vaultId;
-            vaultConfig.supplyToken = data_.constantVariables.supplyToken;
-            vaultConfig.borrowToken = data_.constantVariables.borrowToken;
-            setVaultSupplyConfig(vaultConfig);
-
+        {
+            FluidVault.ConstantViews memory data_ = FluidVault(sUSDe_USDC_USDT).constantsView();
+            vaultConfig.vaultId = data_.vaultId;
+            vaultConfig.supplyToken = data_.supplyToken;
+            vaultConfig.borrowToken = data_.borrowToken;
+            setVaultSupplyConfig(vaultConfig, sUSDe_USDC_USDT);
         }
 
         // cbBTC-WBTC | USDC - Only borrow limit on Liquidity Layer.
-                {
-            VaultEntireData memory data_ = FluidVaultT3Resolver.getVaultEntireData(cbBTC_WBTC_USDC);
-            vaultConfig.vaultId = data_.constantVariables.vaultId;
-            vaultConfig.supplyToken = data_.constantVariables.supplyToken;
-            vaultConfig.borrowToken = data_.constantVariables.borrowToken;
+        {
+            FluidVault.ConstantViews memory data_ = FluidVault(cbBTC_WBTC_USDC).constantsView();
+            vaultConfig.vaultId = data_.vaultId;
+            vaultConfig.supplyToken = data_.supplyToken;
+            vaultConfig.borrowToken = data_.borrowToken;
 
-            setVaultBorrowConfig(vaultConfig);
+            setVaultBorrowConfig(vaultConfig, cbBTC_WBTC_USDC);
         }
 
         // cbBTC-WBTC | USDT - Only borrow limit on Liquidity Layer.
-                {
-            VaultEntireData memory data_ = FluidVaultT3Resolver.getVaultEntireData(cbBTC_WBTC_USDT);
-            vaultConfig.vaultId = data_.constantVariables.vaultId;
-            vaultConfig.supplyToken = data_.constantVariables.supplyToken;
-            vaultConfig.borrowToken = data_.constantVariables.borrowToken;
+        {
+            FluidVault.ConstantViews memory data_ = FluidVault(cbBTC_WBTC_USDT).constantsView();
+            vaultConfig.vaultId = data_.vaultId;
+            vaultConfig.supplyToken = data_.supplyToken;
+            vaultConfig.borrowToken = data_.borrowToken;
 
-            setVaultBorrowConfig(vaultConfig);
+            setVaultBorrowConfig(vaultConfig, cbBTC_WBTC_USDT);
         }
     }
 
-    function setVaultBorrowConfig(VaultConfig memory vaultConfig) internal {
+    function setVaultBorrowConfig(VaultConfig memory vaultConfig, address vaultAddress) internal {
         AdminModuleStructs.UserBorrowConfig[] memory configs_ = new AdminModuleStructs.UserBorrowConfig[](1);
 
         configs_[0] = AdminModuleStructs.UserBorrowConfig({
-            user: address(vault_),
+            user: address(vaultAddress),
             token: vaultConfig.borrowToken,
             mode: vaultConfig.borrowMode,
             expandPercent: vaultConfig.borrowExpandPercent,
@@ -566,17 +510,17 @@ contract PayloadIGP43 {
         LIQUIDITY.updateUserBorrowConfigs(configs_);
     }
 
-    function setVaultSupplyConfig() internal {
+    function setVaultSupplyConfig(VaultConfig memory vaultConfig_, address vaultAddress) internal {
         AdminModuleStructs.UserSupplyConfig[] memory configs_ = new AdminModuleStructs.UserSupplyConfig[](1);
 
         configs_[0] = AdminModuleStructs.UserSupplyConfig({
-            user: address(vault_),
-            token: vaultConfig.supplyToken,
-            mode: vaultConfig.supplyMode,
-            expandPercent: vaultConfig.supplyExpandPercent,
-            expandDuration: vaultConfig.supplyExpandDuration,
+            user: address(vaultAddress),
+            token: vaultConfig_.supplyToken,
+            mode: vaultConfig_.supplyMode,
+            expandPercent: vaultConfig_.supplyExpandPercent,
+            expandDuration: vaultConfig_.supplyExpandDuration,
             baseWithdrawalLimit: getRawAmount(
-                vaultConfig.supplyToken, vaultConfig.supplyBaseLimit, vaultConfig.supplyBaseLimitInUSD, true
+                vaultConfig_.supplyToken, vaultConfig_.supplyBaseLimit, vaultConfig_.supplyBaseLimitInUSD, true
             )
         });
 
@@ -642,7 +586,7 @@ contract PayloadIGP43 {
         supplyParams_[0] = AdminModuleStructs.UserSupplyConfig({
             user: dex_,
             token: token0_,
-            mode: false, // @TODO - to be filled
+            mode: 0, // @TODO - to be filled
             expandPercent: 20 * 1e2, // @TODO - to be filled
             expandDuration: 12 hours, // @TODO - to be filled
             baseWithdrawalLimit: token0Config_.baseWithdrawalLimit
@@ -650,7 +594,7 @@ contract PayloadIGP43 {
         supplyParams_[1] = AdminModuleStructs.UserSupplyConfig({
             user: dex_,
             token: token1_,
-            mode: false, // @TODO - to be filled
+            mode: 0, // @TODO - to be filled
             expandPercent: 20 * 1e2, // @TODO - to be filled
             expandDuration: 12 hours, // @TODO - to be filled
             baseWithdrawalLimit: token1Config_.baseWithdrawalLimit
@@ -671,7 +615,7 @@ contract PayloadIGP43 {
         borrowParams_[0] = AdminModuleStructs.UserBorrowConfig({
             user: dex_,
             token: token0_,
-            mode: false, // @TODO - to be filled
+            mode: 0, // @TODO - to be filled
             expandPercent: 20 * 1e2, // @TODO - to be filled
             expandDuration: 12 hours, // @TODO - to be filled
             baseDebtCeiling: token0Config_.baseDebtCeiling,
@@ -680,7 +624,7 @@ contract PayloadIGP43 {
         borrowParams_[1] = AdminModuleStructs.UserBorrowConfig({
             user: dex_,
             token: token1_,
-            mode: false, // @TODO - to be filled
+            mode: 0, // @TODO - to be filled
             expandPercent: 20 * 1e2, // @TODO - to be filled
             expandDuration: 12 hours, // @TODO - to be filled
             baseDebtCeiling: token1Config_.baseDebtCeiling,
