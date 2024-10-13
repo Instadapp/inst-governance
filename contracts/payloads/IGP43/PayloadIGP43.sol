@@ -477,8 +477,7 @@ contract PayloadIGP43 {
             SupplyProtocolConfig memory protocolConfigTokenA_ = SupplyProtocolConfig({  
                 protocol: dex_.dex,
                 supplyToken: dex_.tokenA,
-                baseWithdrawalLimitInUSD: 10_000, // $10k
-                maxWithdrawalLimitInUSD: 50_000 // $50k
+                baseWithdrawalLimitInUSD: 50_000 // $50k
             });
 
             setSupplyProtocolLimits(protocolConfigTokenA_);
@@ -486,8 +485,7 @@ contract PayloadIGP43 {
             SupplyProtocolConfig memory protocolConfigTokenB_ = SupplyProtocolConfig({  
                 protocol: dex_.dex,
                 supplyToken: dex_.tokenB,
-                baseWithdrawalLimitInUSD: 10_000, // $10k
-                maxWithdrawalLimitInUSD: 50_000 // $50k
+                baseWithdrawalLimitInUSD: 50_000 // $50k
             });
 
             setSupplyProtocolLimits(protocolConfigTokenB_);
@@ -520,8 +518,7 @@ contract PayloadIGP43 {
             SupplyProtocolConfig memory protocolConfig_ = SupplyProtocolConfig({  
                 protocol: vault_.vault,
                 supplyToken: vault_.supplyToken,
-                baseWithdrawalLimitInUSD: 10_000, // $10k
-                maxWithdrawalLimitInUSD: 50_000 // $50k
+                baseWithdrawalLimitInUSD: 40_000 // $40k
             });
 
             setSupplyProtocolLimits(protocolConfig_);
@@ -531,8 +528,8 @@ contract PayloadIGP43 {
             BorrowProtocolConfig memory protocolConfig_ = BorrowProtocolConfig({  
                 protocol: vault_.vault,
                 borrowToken: vault_.borrowToken,
-                baseBorrowLimitInUSD: 10_000, // $10k
-                maxBorrowLimitInUSD: 50_000 // $50k
+                baseBorrowLimitInUSD: 20_000, // $20k
+                maxBorrowLimitInUSD: 25_000 // $25k
             });
 
             setBorrowProtocolLimits(protocolConfig_);
@@ -545,7 +542,6 @@ contract PayloadIGP43 {
         address protocol;
         address supplyToken;
         uint256 baseWithdrawalLimitInUSD;
-        uint256 maxWithdrawalLimitInUSD;
     }
     struct BorrowProtocolConfig {
         address protocol;   
@@ -566,9 +562,6 @@ contract PayloadIGP43 {
                 expandDuration: 12 hours,
                 baseWithdrawalLimit: getRawAmount(
                     protocolConfig_.supplyToken, 0, protocolConfig_.baseWithdrawalLimitInUSD, true
-                ),
-                maxDebtCeiling: getRawAmount(
-                    protocolConfig_.supplyToken, 0, protocolConfig_.maxWithdrawalLimitInUSD, true
                 )
             });
 
