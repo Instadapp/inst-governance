@@ -670,7 +670,7 @@ contract PayloadIGP40 {
             supplyMode: 1, // Mode 1
             supplyExpandPercent: 25 * 1e2, // 25%
             supplyExpandDuration: 12 hours, // 12 hours
-            supplyBaseLimitInUSD: 5_000_000, // $5M
+            supplyBaseLimitInUSD: 20_000, // $5M
             supplyBaseLimit: 0,
             borrowToken: cbBTC_ADDRESS,
             borrowMode: 1, // Mode 1
