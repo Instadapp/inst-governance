@@ -246,7 +246,7 @@ contract PayloadIGP43 {
     IFluidLiquidityAdmin public constant LIQUIDITY = IFluidLiquidityAdmin(0x52Aa899454998Be5b000Ad077a46Bbe360F4e497);
 
     FluidVaultFactory public constant VAULT_FACTORY = FluidVaultFactory(0x324c5Dc1fC42c7a4D43d92df1eBA58a54d13Bf2d);
-    FluidDexFactory public constant DEX_FACTORY = FluidDexFactory(0x324c5Dc1fC42c7a4D43d92df1eBA58a54d13Bf2d);
+    FluidDexFactory public constant DEX_FACTORY = FluidDexFactory(0x93DD426446B5370F094a1e31f19991AAA6Ac0bE0);
 
     address internal constant ETH_ADDRESS = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
     address internal constant wstETH_ADDRESS = 0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0;
@@ -611,16 +611,16 @@ contract PayloadIGP43 {
         uint256 usdPrice = 0;
         uint256 decimals = 18;
         if (token == ETH_ADDRESS) {
-            usdPrice = 2_350 * 1e2;
-            decimals = 18;
-        } else if (token == wstETH_ADDRESS) {
-            usdPrice = 2_750 * 1e2;
-            decimals = 18;
-        } else if (token == weETH_ADDRESS) {
             usdPrice = 2_450 * 1e2;
             decimals = 18;
-        } else if (token == cbBTC_ADDRESS) {
-            usdPrice = 58_500 * 1e2;
+        } else if (token == wstETH_ADDRESS) {
+            usdPrice = 2_900 * 1e2;
+            decimals = 18;
+        } else if (token == weETH_ADDRESS) {
+            usdPrice = 2_570 * 1e2;
+            decimals = 18;
+        } else if (token == cbBTC_ADDRESS || token == WBTC_ADDRESS) {
+            usdPrice = 62_500 * 1e2;
             decimals = 8;
         } else if (token == USDC_ADDRESS || token == USDT_ADDRESS) {
             usdPrice = 1 * 1e2;
