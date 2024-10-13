@@ -300,7 +300,7 @@ contract PayloadIGP43 {
     address internal constant cbBTC_ADDRESS = 0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf;
 
 
-    uint256 public constant wstETH_ETH_Dex; // TODO add address here
+    uint256 public constant wstETH_ETH_Dex = 1; // TODO add address here
     uint256 public constant USDC_USDT_Dex; // TODO add address here
     uint256 public constant cbBTC_WBTC_Dex; // TODO add address here
 
