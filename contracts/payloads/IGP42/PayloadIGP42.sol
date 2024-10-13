@@ -186,130 +186,41 @@ interface IFluidLiquidityAdmin {
         returns (uint256[] memory supplyExchangePrices_, uint256[] memory borrowExchangePrices_);
 }
 
-interface FluidDexReservesResolver {
-    struct Pool {
-        address pool;
-        address token0;
-        address token1;
-        uint256 fee;
-    }
-
-    /// @notice Get a Pool's address and its token addresses
-    /// @param poolId_ The ID of the Pool
-    /// @return pool_ The Pool data
-    function getPool(uint256 poolId_) public view returns (Pool memory pool_);
-}
-
-interface FluidVaultT1Resolver {
-    function getTotalVaults() public view returns (uint256);
-
-    function getVaultAddress(uint256 vaultId_) public view returns (address vault_);
-
-    function getAllVaultsAddresses() public view returns (address[] memory vaults_);
-}
-
 interface FluidVaultFactory {
     /// @notice                         Sets an address as allowed vault deployment logic (`deploymentLogic_`) contract or not.
     ///                                 This function can only be called by the owner.
     /// @param deploymentLogic_         The address of the vault deployment logic contract to be set.
     /// @param allowed_                 A boolean indicating whether the specified address is allowed to deploy new type of vault.
-    function setVaultDeploymentLogic(address deploymentLogic_, bool allowed_) public;
-}
+    function setVaultDeploymentLogic(address deploymentLogic_, bool allowed_) external;
 
-interface FluidVaultResolver {
-    struct UserSupplyData {
-        bool modeWithInterest; // true if mode = with interest, false = without interest
-        uint256 supply; // user supply amount
-        // the withdrawal limit (e.g. if 10% is the limit, and 100M is supplied, it would be 90M)
-        uint256 withdrawalLimit;
-        uint256 lastUpdateTimestamp;
-        uint256 expandPercent; // withdrawal limit expand percent in 1e2
-        uint256 expandDuration; // withdrawal limit expand duration in seconds
-        uint256 baseWithdrawalLimit;
-        // the current actual max withdrawable amount (e.g. if 10% is the limit, and 100M is supplied, it would be 10M)
-        uint256 withdrawableUntilLimit;
-        uint256 withdrawable; // actual currently withdrawable amount (supply - withdrawal Limit) & considering balance
-    }
+    function setVaultAuth(
+        address vault_,
+        address vaultAuth_,
+        bool allowed_
+    ) external;
 
-    struct UserBorrowData {
-        bool modeWithInterest; // true if mode = with interest, false = without interest
-        uint256 borrow; // user borrow amount
-        uint256 borrowLimit;
-        uint256 lastUpdateTimestamp;
-        uint256 expandPercent;
-        uint256 expandDuration;
-        uint256 baseBorrowLimit;
-        uint256 maxBorrowLimit;
-        uint256 borrowableUntilLimit; // borrowable amount until any borrow limit (incl. max utilization limit)
-        uint256 borrowable; // actual currently borrowable amount (borrow limit - already borrowed) & considering balance, max utilization
-        uint256 borrowLimitUtilization; // borrow limit for `maxUtilization`
-    }
-
-    struct ConstantViews {
-        address liquidity;
-        address factory;
-        address adminImplementation;
-        address secondaryImplementation;
-        address supplyToken;
-        address borrowToken;
-        uint8 supplyDecimals;
-        uint8 borrowDecimals;
-        uint256 vaultId;
-        bytes32 liquiditySupplyExchangePriceSlot;
-        bytes32 liquidityBorrowExchangePriceSlot;
-        bytes32 liquidityUserSupplySlot;
-        bytes32 liquidityUserBorrowSlot;
-    }
-
-    struct VaultEntireData {
-        address vault;
-        ConstantViews constantVariables;
-        Configs configs;
-        ExchangePricesAndRates exchangePricesAndRates;
-        TotalSupplyAndBorrow totalSupplyAndBorrow;
-        LimitsAndAvailability limitsAndAvailability;
-        VaultState vaultState;
-        // liquidity related data such as supply amount, limits, expansion etc.
-        // only set if not smart col!
-        UserSupplyData liquidityUserSupplyData;
-        // liquidity related data such as borrow amount, limits, expansion etc.
-        // only set if not smart debt!
-        UserBorrowData liquidityUserBorrowData;
-    }
-
-    function getTotalVaults() public view returns (uint256);
-
-    function getVaultAddress(uint256 vaultId_) public view returns (address vault_);
-
-    function getVaultEntireData(address vault_) public view returns (VaultEntireData memory vaultData_);
+    /// @notice                         Computes the address of a vault based on its given ID (`vaultId_`).
+    /// @param vaultId_                 The ID of the vault.
+    /// @return vault_                  Returns the computed address of the vault.
+    function getVaultAddress(
+        uint256 vaultId_
+    ) external view returns (address vault_);
 }
 
 contract PayloadIGP42 {
-    struct vaultConfig {
-        uint256 vaultId;
-        address supplyToken;
-        uint256 collateralFactor;
-        uint256 liquidationThreshold;
-        uint256 liquidationMaxLimit;
-        uint256 liquidationPenalty;
-        address oracle;
-    }
+   uint256 public constant PROPOSAL_ID = 42;
 
-    struct TokenConfig {
-        uint256 baseDebtCeiling;
-        uint256 maxDebtCeiling;
-        uint256 baseWithdrawalLimit;
-    }
+    address public constant PROPOSER =
+        0xA45f7bD6A5Ff45D31aaCE6bCD3d426D9328cea01;
 
-    struct DexConfig {
-        uint256 dexId;
-        TokenConfig token0Config;
-        TokenConfig token1Config;
-    }
+    address public constant PROPOSER_AVO_MULTISIG =
+        0x059a94a72451c0ae1Cc1cE4bf0Db52421Bbe8210;
 
-    uint256 public constant PROPOSAL_ID = 42;
+    address public constant PROPOSER_AVO_MULTISIG_2 =
+        0x9efdE135CA4832AbF0408c44c6f5f370eB0f35e8;
 
-    address public constant PROPOSER = 0xA45f7bD6A5Ff45D31aaCE6bCD3d426D9328cea01;
+    address public constant PROPOSER_AVO_MULTISIG_3 =
+        0x5C43AAC965ff230AC1cF63e924D0153291D78BaD;
 
     IGovernorBravo public constant GOVERNOR = IGovernorBravo(0x0204Cd037B2ec03605CFdFe482D8e257C765fA1B);
     ITimelock public constant TIMELOCK = ITimelock(0x2386DC45AdDed673317eF068992F19421B481F4c);
@@ -322,28 +233,21 @@ contract PayloadIGP42 {
 
     address public constant ETH_ADDRESS = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
 
-    FluidDexReservesResolver public constant DEX_RESERVES_RESOLVER = 0x278166A9B88f166EB170d55801bE1b1d1E576330;
-
-    FluidVaultT2DeploymentLogic public constant VAULT_T2_LOGIC; // TODO add address here
-
-    FluidVaultT3DeploymentLogic public constant VAULT_T3_LOGIC; // TODO add address here
-
-    FluidVaultT4DeploymentLogic public constant VAULT_T4_LOGIC; // TODO add address here
-
-    FluidVaultFactory public constant VAULT_FACTORY = 0x324c5Dc1fC42c7a4D43d92df1eBA58a54d13Bf2d;
-
-    address public constant FluidVaultT2Resolver; // TODO add address here
-
-    address public constant FluidVaultT3Resolver; // TODO add address here
-
-    address public constant FluidVaultT4Resolver; // TODO add address here
+    FluidVaultFactory public constant VAULT_FACTORY = FluidVaultFactory(0x324c5Dc1fC42c7a4D43d92df1eBA58a54d13Bf2d);
 
     constructor() {
         ADDRESS_THIS = address(this);
     }
 
     function propose(string memory description) external {
-        require(msg.sender == PROPOSER || msg.sender == TEAM_MULTISIG, "msg.sender-not-proposer-or-multisig");
+        require(
+            msg.sender == PROPOSER ||
+                msg.sender == TEAM_MULTISIG ||
+                address(this) == PROPOSER_AVO_MULTISIG ||
+                address(this) == PROPOSER_AVO_MULTISIG_2 ||
+                address(PROPOSER_AVO_MULTISIG_3) == PROPOSER_AVO_MULTISIG_3,
+            "msg.sender-not-allowed"
+        );
 
         uint256 totalActions = 1;
         address[] memory targets = new address[](totalActions);
@@ -365,8 +269,11 @@ contract PayloadIGP42 {
     function execute() external {
         require(address(this) == address(TIMELOCK), "not-valid-caller");
 
-        // Action 1: List new Vault's logic of Vault type 2, 3 & 4
+        // Action 1: List new vault deployment logic of vault type T2, T3 & T4
         action1();
+
+        // Action 2: Set wBTC and cbBTC rewards auth
+        action2();
     }
 
     function verifyProposal() external view {}
@@ -377,10 +284,42 @@ contract PayloadIGP42 {
      * |__________________________________
      */
 
-    /// @notice Action 1: List new Vault's logic of Vault type 2, 3 & 4
+    /// @notice Action 1: List new vault deployment logic of vault type T2, T3 & T4
     function action1() internal {
-        VAULT_FACTORY.setVaultDeploymentLogic(VAULT_T2_LOGIC, true);
-        VAULT_FACTORY.setVaultDeploymentLogic(VAULT_T3_LOGIC, true);
-        VAULT_FACTORY.setVaultDeploymentLogic(VAULT_T4_LOGIC, true);
+        VAULT_FACTORY.setVaultDeploymentLogic(0xD4d748356D1C82A5565a15a1670D13FB505b018E, true); // T2
+        VAULT_FACTORY.setVaultDeploymentLogic(0x84b2A41339ef51FFAc89Ffe69cAd53CD92b82A28, true); // T3
+        VAULT_FACTORY.setVaultDeploymentLogic(0x13472F00A43B59b644B301fEd48651c0C889bdB4, true); // T4
+    }
+
+    /// @notice Action 2: Set wBTC and cbBTC rewards auth
+    function action2() internal {
+        VAULT_FACTORY.setVaultAuth(
+            getVaultAddress(21), // VAULT_WBTC_USDC
+            0x5E5768B6b42c12dA8e75eb0AA6fD47Be33a5b24e, // Rewards_WBTC_USDC
+            true
+        );
+
+        VAULT_FACTORY.setVaultAuth(
+            getVaultAddress(22), // VAULT_WBTC_USDT
+            0x6D90d460929b921f6C74838a9d25CC69B486D605, // Rewards_WBTC_USDT
+            true
+        );
+
+         VAULT_FACTORY.setVaultAuth(
+            getVaultAddress(29), // VAULT_cbBTC_USDC
+            0x7110cED08f0E26c14a2eF7A980c4F17C70aBa7c0, // Rewards_cbBTC_USDC
+            true
+        );
+
+        VAULT_FACTORY.setVaultAuth(
+            getVaultAddress(30), // VAULT_cbBTC_USDT
+            0xf5fD6c6f936689018215CB10d7a5b99A43a39D28, // Rewards_cbBTC_USDT
+            true
+        );
+    }
+
+    // Helpers
+    function getVaultAddress(uint256 vaultId_) public view returns (address) {
+        return VAULT_FACTORY.getVaultAddress(vaultId_);
     }
 }
