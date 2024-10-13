@@ -300,20 +300,20 @@ contract PayloadIGP43 {
     address internal constant cbBTC_ADDRESS = 0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf;
 
 
-    uint256 public constant wstETH_ETH_Dex = 1; // TODO add address here
-    uint256 public constant USDC_USDT_Dex; // TODO add address here
-    uint256 public constant cbBTC_WBTC_Dex; // TODO add address here
+    address public constant wstETH_ETH_Dex = 0x6d83f60eEac0e50A1250760151E81Db2a278e03a;
+    address public constant USDC_USDT_Dex = 0x5014E47Ca35eC6963985736846a4bCcd68Fab2F2;
+    address public constant cbBTC_WBTC_Dex = 0x77545D43dFb6F12f5c19034E2a3167e18265F392;
 
-    address public constant wstETH_ETH_SMART_COL_DEBT; // TODO add address here
-    address public constant ETH_USDC_USDT; // TODO add address here
-    address public constant wstETH_USDC_USDT; // TODO add address here
-    address public constant weETH_USDC_USDT; // TODO add address here
-    address public constant WBTC_USDC_USDT; // TODO add address here
-    address public constant cbBTC_USDC_USDT; // TODO add address here
-    address public constant sUSDe_USDC_USDT; // TODO add address here
-    address public constant cbBTC_WBTC_SMART_COL_DEBT; // TODO add address here
-    address public constant cbBTC_WBTC_USDC; // TODO add address here
-    address public constant cbBTC_WBTC_USDT; // TODO add address here
+    address public constant wstETH_ETH_SMART_COL_DEBT = 0x57fed7c9b3c763999c519264931790cBcA331417;
+    address public constant ETH_USDC_USDT = 0xB58634A962A579bD01c392451a718cB5d74DfB53;
+    address public constant wstETH_USDC_USDT = 0xA9FF23CfF9439c418DA08CE7954a92E46311761e;
+    address public constant weETH_USDC_USDT = 0xB9Bb0b2354884B4B9dBDDaeb01feEcf507695e33;
+    address public constant WBTC_USDC_USDT = 0x2d38ca861aC948BF90cC682fC1455138173c1923;
+    address public constant cbBTC_USDC_USDT = 0x5896d226882CEdd99eA30d25DbC5025B5706144b;
+    address public constant sUSDe_USDC_USDT = 0x274D1171F06E976a4f545E6d4bf017bEDC51F752;
+    address public constant cbBTC_WBTC_SMART_COL_DEBT =  0x97950bF81f5605d2d0be37f28a33A752D6f16BDF;
+    address public constant cbBTC_WBTC_USDC = 0x5eb4ba0C320B59f825cc8D2291f672247Aa5D06F;
+    address public constant cbBTC_WBTC_USDT = 0xD173A445Fa0584eC76ac4abab50FfA39ABa5448C;
 
     constructor() {
         ADDRESS_THIS = address(this);
@@ -359,25 +359,25 @@ contract PayloadIGP43 {
 
     /// @notice Action 1: Setting supply and borrow limit for Dexes
     function action1(TokenConfig memory token0Config_, TokenConfig memory token1Config_) internal {
-        FluidDexReservesResolver.Pool memory pool1_ = DEX_RESERVES_RESOLVER.getPool(wstETH_ETH_Dex);
+        FluidDexReservesResolver.Pool memory pool1_ = DEX_RESERVES_RESOLVER.getPool(1);
         setSupplyConfigforDex(
-            pool1_.pool, pool1_.token0, pool1_.token1, token0Config_, token1Config_
+            wstETH_ETH_Dex, pool1_.token0, pool1_.token1, token0Config_, token1Config_
         );
         setBorrowConfigforDex(
-            pool1_.pool, pool1_.token0, pool1_.token1, token0Config_, token1Config_
+            wstETH_ETH_Dex, pool1_.token0, pool1_.token1, token0Config_, token1Config_
         );
 
-        FluidDexReservesResolver.Pool memory pool2_ = DEX_RESERVES_RESOLVER.getPool(USDC_USDT_Dex);
+        FluidDexReservesResolver.Pool memory pool2_ = DEX_RESERVES_RESOLVER.getPool(2);
         setBorrowConfigforDex(
-            pool2_.pool, pool2_.token0, pool2_.token1, token0Config_, token1Config_
+            USDC_USDT_Dex, pool2_.token0, pool2_.token1, token0Config_, token1Config_
         );
 
-        FluidDexReservesResolver.Pool memory pool3_ = DEX_RESERVES_RESOLVER.getPool(cbBTC_WBTC_Dex);
+        FluidDexReservesResolver.Pool memory pool3_ = DEX_RESERVES_RESOLVER.getPool(3);
         setSupplyConfigforDex(
-            pool3_.pool, pool3_.token0, pool3_.token1, token0Config_, token1Config_
+            cbBTC_WBTC_Dex, pool3_.token0, pool3_.token1, token0Config_, token1Config_
         );
         setBorrowConfigforDex(
-            pool3_.pool, pool3_.token0, pool3_.token1, token0Config_, token1Config_
+            cbBTC_WBTC_Dex, pool3_.token0, pool3_.token1, token0Config_, token1Config_
         );
     }
 
