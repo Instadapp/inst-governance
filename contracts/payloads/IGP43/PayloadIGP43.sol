@@ -1,8 +1,8 @@
 pragma solidity ^0.8.21;
 pragma experimental ABIEncoderV2;
 
-import {LiquiditySlotsLink} from "./libraries/liquiditySlotsLink.sol";
-import {LiquidityCalcs} from "./libraries/liquidityCalcs.sol";
+import {LiquidityCalcs} from "../libraries/liquidityCalcs.sol";
+import {LiquiditySlotsLink} from "../libraries/liquiditySlotsLink.sol";
 
 interface IGovernorBravo {
     function _acceptAdmin() external;
@@ -193,19 +193,6 @@ interface IFluidLiquidityAdmin {
     ) external view returns (uint256 result_);
 }
 
-interface FluidDexReservesResolver {
-    struct Pool {
-        address pool;
-        address token0;
-        address token1;
-        uint256 fee;
-    }
-
-    /// @notice Get a Pool's address and its token addresses
-    /// @param poolId_ The ID of the Pool
-    /// @return pool_ The Pool data
-    function getPool(uint256 poolId_) external view returns (Pool memory pool_);
-}
 
 interface FluidVaultFactory {
     /// @notice                         Sets an address as allowed vault deployment logic (`deploymentLogic_`) contract or not.
@@ -220,27 +207,20 @@ interface FluidVaultFactory {
     /// @param vaultAuth_               The address to be set as vault authorization.
     /// @param allowed_                 A boolean indicating whether the specified address is allowed to update the specific vault config.
     function setVaultAuth(address vault_, address vaultAuth_, bool allowed_) external;
+
+    /// @notice                         Computes the address of a vault based on its given ID (`vaultId_`).
+    /// @param vaultId_                 The ID of the vault.
+    /// @return vault_                  Returns the computed address of the vault.
+    function getVaultAddress(
+        uint256 vaultId_
+    ) external view returns (address vault_);
 }
 
-interface FluidVault {
-    
-    struct ConstantViews {
-        address liquidity;
-        address factory;
-        address adminImplementation;
-        address secondaryImplementation;
-        address supplyToken;
-        address borrowToken;
-        uint8 supplyDecimals;
-        uint8 borrowDecimals;
-        uint256 vaultId;
-        bytes32 liquiditySupplyExchangePriceSlot;
-        bytes32 liquidityBorrowExchangePriceSlot;
-        bytes32 liquidityUserSupplySlot;
-        bytes32 liquidityUserBorrowSlot;
-    }
-
-    function constantsView() external view returns (ConstantViews memory constantsView_);
+interface FluidDexFactory {
+    /// @notice                         Computes the address of a dex based on its given ID (`dexId_`).
+    /// @param dexId_                   The ID of the dex.
+    /// @return dex_                    Returns the computed address of the dex.
+    function getDexAddress(uint256 dexId_) external view returns (address dex_);
 }
 
 contract PayloadIGP43 {
@@ -299,91 +279,6 @@ contract PayloadIGP43 {
         address borrowToken;
     }
 
-    // Dex Configs
-    Dex public constant DEX_wstETH_ETH = Dex({
-        dex: getDexAddress(1),
-        tokenA: wstETH_ADDRESS,
-        tokenB: ETH_ADDRESS,
-        smartCollateral: true,
-        smartDebt: true
-    });
-    Dex public constant DEX_USDC_USDT = Dex({
-        dex: getDexAddress(2),
-        tokenA: USDC_ADDRESS,
-        tokenB: USDT_ADDRESS,
-        smartCollateral: false,
-        smartDebt: true
-    });
-    Dex public constant DEX_cbBTC_WBTC = Dex({
-        dex: getDexAddress(3),
-        tokenA: cbBTC_ADDRESS,
-        tokenB: WBTC_ADDRESS,
-        smartCollateral: true,
-        smartDebt: true
-    });
-
-    // Vault Configs
-    address public constant VAULT_wstETH_ETH_AND_wsETH_ETH = Vault({
-        vault: getVaultAddress(34),
-        vaultType: TYPE.TYPE_4,
-        supplyToken: DEX_wstETH_ETH.dex,
-        borrowToken: DEX_wstETH_ETH.dex
-    });
-    address public constant VAULT_ETH_AND_USDC_USDT = Vault({
-        vault: getVaultAddress(35),
-        vaultType: TYPE.TYPE_3,
-        supplyToken: ETH_ADDRESS,
-        borrowToken: DEX_USDC_USDT.dex
-    });
-    address public constant VAULT_wstETH_AND_USDC_USDT = Vault({
-        vault: getVaultAddress(36),
-        vaultType: TYPE.TYPE_3,
-        supplyToken: wstETH_ADDRESS,
-        borrowToken: DEX_USDC_USDT.dex
-    });
-    address public constant VAULT_weETH_AND_USDC_USDT = Vault({
-        vault: getVaultAddress(37),
-        vaultType: TYPE.TYPE_3,
-        supplyToken: weETH_ADDRESS,
-        borrowToken: DEX_USDC_USDT.dex
-    });
-    address public constant VAULT_WBTC_AND_USDC_USDT = Vault({
-        vault: getVaultAddress(38),
-        vaultType: TYPE.TYPE_3,
-        supplyToken: WBTC_ADDRESS,
-        borrowToken: DEX_USDC_USDT.dex
-    });
-    address public constant VAULT_cbBTC_AND_USDC_USDT = Vault({
-        vault: getVaultAddress(39),
-        vaultType: TYPE.TYPE_3,
-        supplyToken: cbBTC_ADDRESS,
-        borrowToken: DEX_USDC_USDT.dex
-    });
-    address public constant VAULT_sUSDe_AND_USDC_USDT = Vault({
-        vault: getVaultAddress(40),
-        vaultType: TYPE.TYPE_3,
-        supplyToken: sUSDe_ADDRESS,
-        borrowToken: DEX_USDC_USDT.dex
-    });
-    address public constant VAULT_cbBTC_WBTC_AND_cbBTC_WBTC = Vault({
-        vault: getVaultAddress(41),
-        vaultType: TYPE.TYPE_4,
-        supplyToken: cbBTC_ADDRESS,
-        borrowToken: DEX_cbBTC_WBTC.dex
-    });
-    address public constant VAULT_cbBTC_WBTC_AND_USDC = Vault({
-        vault: getVaultAddress(42),
-        vaultType: TYPE.TYPE_2,
-        supplyToken: cbBTC_ADDRESS,
-        borrowToken: DEX_cbBTC_WBTC.dex
-    });
-    address public constant VAULT_cbBTC_WBTC_AND_USDT = Vault({
-        vault: getVaultAddress(43),
-        vaultType: TYPE.TYPE_2,
-        supplyToken: cbBTC_ADDRESS,
-        borrowToken: DEX_cbBTC_WBTC.dex
-    });
-
     constructor() {
         ADDRESS_THIS = address(this);
     }
@@ -433,22 +328,135 @@ contract PayloadIGP43 {
 
     /// @notice Action 1: Set supply and borrow limit for Dexes on Liquidity Layer
     function action1() internal {
-       setDexLimits(DEX_wstETH_ETH); // Smart Collateral & Smart Debt
-       setDexLimits(DEX_USDC_USDT); // Smart Debt
-       setDexLimits(DEX_cbBTC_WBTC); // Smart Collateral & Smart Debt
+        Dex memory DEX_wstETH_ETH = Dex({
+            dex: getDexAddress(1),
+            tokenA: wstETH_ADDRESS,
+            tokenB: ETH_ADDRESS,
+            smartCollateral: true,
+            smartDebt: true
+        });
+        setDexLimits(DEX_wstETH_ETH); // Smart Collateral & Smart Debt
+
+        Dex memory DEX_USDC_USDT = Dex({
+            dex: getDexAddress(2),
+            tokenA: USDC_ADDRESS,
+            tokenB: USDT_ADDRESS,
+            smartCollateral: false,
+            smartDebt: true
+        });
+        setDexLimits(DEX_USDC_USDT); // Smart Debt
+
+        Dex memory DEX_cbBTC_WBTC = Dex({
+            dex: getDexAddress(3),
+            tokenA: cbBTC_ADDRESS,
+            tokenB: WBTC_ADDRESS,
+            smartCollateral: true,
+            smartDebt: true
+        });
+        setDexLimits(DEX_cbBTC_WBTC); // Smart Collateral & Smart Debt
     }
 
     /// @notice Action 2: Set Vault limits on liquidity layer and auth on vaultFactory
     function action2() internal {
-        setVaultLimitsAndAuth(VAULT_wstETH_ETH_AND_wsETH_ETH); // TYPE_4 => 34
-        setVaultLimitsAndAuth(VAULT_ETH_AND_USDC_USDT); // TYPE_3 => 35
-        setVaultLimitsAndAuth(VAULT_wstETH_AND_USDC_USDT); // TYPE_3 => 36
-        setVaultLimitsAndAuth(VAULT_weETH_AND_USDC_USDT); // TYPE_3 => 37
-        setVaultLimitsAndAuth(VAULT_WBTC_AND_USDC_USDT); // TYPE_3 => 38
-        setVaultLimitsAndAuth(VAULT_cbBTC_AND_USDC_USDT); // TYPE_3 => 39
-        setVaultLimitsAndAuth(VAULT_cbBTC_WBTC_AND_cbBTC_WBTC); // TYPE_3 => 41
-        setVaultLimitsAndAuth(VAULT_cbBTC_WBTC_AND_USDC); // TYPE_2 => 42
-        setVaultLimitsAndAuth(VAULT_cbBTC_WBTC_AND_USDT); // TYPE_2 => 43
+        {   // [TYPE 4] wstETH-ETH | Smart collateral & smart debt
+            Vault memory VAULT_wstETH_ETH_AND_wsETH_ETH = Vault({
+                vault: getVaultAddress(34),
+                vaultType: TYPE.TYPE_4,
+                supplyToken: address(0),
+                borrowToken: address(0)
+            });
+            setVaultLimitsAndAuth(VAULT_wstETH_ETH_AND_wsETH_ETH); // TYPE_4 => 34
+        }
+
+        {   // [TYPE 3] ETH | USDC-USDT | Smart Debt only
+            Vault memory VAULT_ETH_AND_USDC_USDT = Vault({
+                vault: getVaultAddress(35),
+                vaultType: TYPE.TYPE_3,
+                supplyToken: ETH_ADDRESS,
+                borrowToken: address(0)
+            });
+            setVaultLimitsAndAuth(VAULT_ETH_AND_USDC_USDT); // TYPE_3 => 35
+        }
+
+        {   // [TYPE 3] wstETH | USDC-USDT | Smart Debt only
+            Vault memory VAULT_wstETH_AND_USDC_USDT = Vault({
+                vault: getVaultAddress(36),
+                vaultType: TYPE.TYPE_3,
+                supplyToken: wstETH_ADDRESS,
+                borrowToken: address(0)
+            });
+            setVaultLimitsAndAuth(VAULT_wstETH_AND_USDC_USDT); // TYPE_3 => 36
+        }
+
+        {   // [TYPE 3] weETH | USDC-USDT | Smart Debt only
+            Vault memory VAULT_weETH_AND_USDC_USDT = Vault({
+                vault: getVaultAddress(37),
+                vaultType: TYPE.TYPE_3,
+                supplyToken: weETH_ADDRESS,
+                borrowToken: address(0)
+            });
+            setVaultLimitsAndAuth(VAULT_weETH_AND_USDC_USDT); // TYPE_3 => 37
+        }
+
+        {   // [TYPE 3] WBTC | USDC-USDT | Smart Debt only
+            Vault memory VAULT_WBTC_AND_USDC_USDT = Vault({
+                vault: getVaultAddress(38),
+                vaultType: TYPE.TYPE_3,
+                supplyToken: WBTC_ADDRESS,
+                borrowToken: address(0)
+            });
+            setVaultLimitsAndAuth(VAULT_WBTC_AND_USDC_USDT); // TYPE_3 => 38
+        }
+
+        {   // [TYPE 3] cbBTC-USDC | USDC-USDT | Smart Debt only
+            Vault memory VAULT_cbBTC_AND_USDC_USDT = Vault({
+                vault: getVaultAddress(39),
+                vaultType: TYPE.TYPE_3,
+                supplyToken: cbBTC_ADDRESS,
+                borrowToken: address(0)
+            });
+            setVaultLimitsAndAuth(VAULT_cbBTC_AND_USDC_USDT); // TYPE_3 => 39
+        }
+
+        {   // [TYPE 3] sUSDe | USDC-USDT | Smart Debt only
+            Vault memory VAULT_sUSDe_AND_USDC_USDT = Vault({
+                vault: getVaultAddress(40),
+                vaultType: TYPE.TYPE_3,
+                supplyToken: sUSDe_ADDRESS,
+                borrowToken: address(0)
+            });
+            setVaultLimitsAndAuth(VAULT_sUSDe_AND_USDC_USDT); // TYPE_3 => 40
+        }
+
+        {   // [TYPE 4] cbBTC-WBTC | cbBTC-WBTC | Smart collateral & smart debt
+            Vault memory VAULT_cbBTC_WBTC_AND_cbBTC_WBTC = Vault({
+                vault: getVaultAddress(41),
+                vaultType: TYPE.TYPE_4,
+                supplyToken: address(0),
+                borrowToken: address(0)
+            });
+            setVaultLimitsAndAuth(VAULT_cbBTC_WBTC_AND_cbBTC_WBTC); // TYPE_4 => 41
+        }
+
+        {   // [TYPE 2] cbBTC-WBTC | USDC | Smart Collateral only
+            Vault memory VAULT_cbBTC_WBTC_AND_USDC = Vault({
+                vault: getVaultAddress(42),
+                vaultType: TYPE.TYPE_2,
+                supplyToken: address(0),
+                borrowToken: USDC_ADDRESS
+            });
+            setVaultLimitsAndAuth(VAULT_cbBTC_WBTC_AND_USDC); // TYPE_2 => 42
+        }
+
+        {   // [TYPE 2] cbBTC-WBTC | USDT | Smart Collateral only
+            Vault memory VAULT_cbBTC_WBTC_AND_USDT = Vault({
+                vault: getVaultAddress(43),
+                vaultType: TYPE.TYPE_2,
+                supplyToken: address(0),
+                borrowToken: USDT_ADDRESS
+            });
+            setVaultLimitsAndAuth(VAULT_cbBTC_WBTC_AND_USDT); // TYPE_2 => 43
+        }
     }   
 
     /***********************************|
@@ -470,7 +478,7 @@ contract PayloadIGP43 {
                 protocol: dex_.dex,
                 supplyToken: dex_.tokenA,
                 baseWithdrawalLimitInUSD: 10_000, // $10k
-                maxWithdrawalLimitInUSD: 50_000, // $50k
+                maxWithdrawalLimitInUSD: 50_000 // $50k
             });
 
             setSupplyProtocolLimits(protocolConfigTokenA_);
@@ -479,7 +487,7 @@ contract PayloadIGP43 {
                 protocol: dex_.dex,
                 supplyToken: dex_.tokenB,
                 baseWithdrawalLimitInUSD: 10_000, // $10k
-                maxWithdrawalLimitInUSD: 50_000, // $50k
+                maxWithdrawalLimitInUSD: 50_000 // $50k
             });
 
             setSupplyProtocolLimits(protocolConfigTokenB_);
@@ -508,18 +516,18 @@ contract PayloadIGP43 {
     }
 
     function setVaultLimitsAndAuth(Vault memory vault_) internal {
-        if (vault_.vaultType == TYPE.TYPE_2 || vault_.vaultType == TYPE.TYPE_4) {
+        if (vault_.vaultType == TYPE.TYPE_3) {
             SupplyProtocolConfig memory protocolConfig_ = SupplyProtocolConfig({  
                 protocol: vault_.vault,
                 supplyToken: vault_.supplyToken,
                 baseWithdrawalLimitInUSD: 10_000, // $10k
-                maxWithdrawalLimitInUSD: 50_000, // $50k
+                maxWithdrawalLimitInUSD: 50_000 // $50k
             });
 
             setSupplyProtocolLimits(protocolConfig_);
         }
 
-        if (vault_.vaultType == TYPE.TYPE_3 || vault_.vaultType == TYPE.TYPE_4) {
+        if (vault_.vaultType == TYPE.TYPE_2) {
             BorrowProtocolConfig memory protocolConfig_ = BorrowProtocolConfig({  
                 protocol: vault_.vault,
                 borrowToken: vault_.borrowToken,
