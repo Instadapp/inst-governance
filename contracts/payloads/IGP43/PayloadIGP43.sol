@@ -246,7 +246,7 @@ contract PayloadIGP43 {
     IFluidLiquidityAdmin public constant LIQUIDITY = IFluidLiquidityAdmin(0x52Aa899454998Be5b000Ad077a46Bbe360F4e497);
 
     FluidVaultFactory public constant VAULT_FACTORY = FluidVaultFactory(0x324c5Dc1fC42c7a4D43d92df1eBA58a54d13Bf2d);
-    FluidDexFactory public constant DEX_FACTORY = FluidDexFactory(0x93DD426446B5370F094a1e31f19991AAA6Ac0bE0);
+    FluidDexFactory public constant DEX_FACTORY = FluidDexFactory(0xF9b539Cd37Fc81bBEA1F078240d16b988BBae073);
 
     address internal constant ETH_ADDRESS = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
     address internal constant wstETH_ADDRESS = 0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0;
@@ -557,8 +557,8 @@ contract PayloadIGP43 {
             configs_[0] = AdminModuleStructs.UserSupplyConfig({
                 user: address(protocolConfig_.protocol),
                 token: protocolConfig_.supplyToken,
-                mode: 0,
-                expandPercent: 20 * 1e2,
+                mode: 1,
+                expandPercent: 25 * 1e2,
                 expandDuration: 12 hours,
                 baseWithdrawalLimit: getRawAmount(
                     protocolConfig_.supplyToken, 0, protocolConfig_.baseWithdrawalLimitInUSD, true
