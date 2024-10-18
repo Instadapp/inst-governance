@@ -332,6 +332,10 @@ contract PayloadIGP44 {
         TYPE vaultType;
         address supplyToken;
         address borrowToken;
+        uint256 baseWithdrawalLimitInUSD;
+        uint256 baseBorrowLimitInUSD;
+        uint256 maxBorrowLimitInUSD;
+
     }
 
     constructor() {
@@ -395,7 +399,10 @@ contract PayloadIGP44 {
                 vault: getVaultAddress(34),
                 vaultType: TYPE.TYPE_4,
                 supplyToken: address(0),
-                borrowToken: address(0)
+                borrowToken: address(0),
+                baseWithdrawalLimitInUSD: 40_000,   // to be set later
+                baseBorrowLimitInUSD: 20_000,   // to be set later
+                maxBorrowLimitInUSD: 25_000     // to be set later
             });
             setVaultLimitsAndAuth(VAULT_wstETH_ETH_AND_wsETH_ETH); // TYPE_4 => 34
         }
@@ -406,7 +413,10 @@ contract PayloadIGP44 {
                 vault: getVaultAddress(35),
                 vaultType: TYPE.TYPE_3,
                 supplyToken: ETH_ADDRESS,
-                borrowToken: address(0)
+                borrowToken: address(0),
+                baseWithdrawalLimitInUSD: 40_000,   // to be set later
+                baseBorrowLimitInUSD: 20_000,   // to be set later
+                maxBorrowLimitInUSD: 25_000     // to be set later
             });
             setVaultLimitsAndAuth(VAULT_ETH_AND_USDC_USDT); // TYPE_3 => 35
         }
@@ -417,7 +427,10 @@ contract PayloadIGP44 {
                 vault: getVaultAddress(36),
                 vaultType: TYPE.TYPE_3,
                 supplyToken: wstETH_ADDRESS,
-                borrowToken: address(0)
+                borrowToken: address(0),
+                baseWithdrawalLimitInUSD: 40_000,   // to be set later
+                baseBorrowLimitInUSD: 20_000,   // to be set later
+                maxBorrowLimitInUSD: 25_000     // to be set later
             });
             setVaultLimitsAndAuth(VAULT_wstETH_AND_USDC_USDT); // TYPE_3 => 36
         }
@@ -428,7 +441,10 @@ contract PayloadIGP44 {
                 vault: getVaultAddress(37),
                 vaultType: TYPE.TYPE_3,
                 supplyToken: weETH_ADDRESS,
-                borrowToken: address(0)
+                borrowToken: address(0),
+                baseWithdrawalLimitInUSD: 40_000,   // to be set later
+                baseBorrowLimitInUSD: 20_000,   // to be set later
+                maxBorrowLimitInUSD: 25_000     // to be set later
             });
             setVaultLimitsAndAuth(VAULT_weETH_AND_USDC_USDT); // TYPE_3 => 37
         }
@@ -439,7 +455,10 @@ contract PayloadIGP44 {
                 vault: getVaultAddress(38),
                 vaultType: TYPE.TYPE_3,
                 supplyToken: WBTC_ADDRESS,
-                borrowToken: address(0)
+                borrowToken: address(0),
+                baseWithdrawalLimitInUSD: 40_000,   // to be set later
+                baseBorrowLimitInUSD: 20_000,   // to be set later
+                maxBorrowLimitInUSD: 25_000     // to be set later
             });
             setVaultLimitsAndAuth(VAULT_WBTC_AND_USDC_USDT); // TYPE_3 => 38
         }
@@ -450,7 +469,10 @@ contract PayloadIGP44 {
                 vault: getVaultAddress(39),
                 vaultType: TYPE.TYPE_3,
                 supplyToken: cbBTC_ADDRESS,
-                borrowToken: address(0)
+                borrowToken: address(0),
+                baseWithdrawalLimitInUSD: 40_000,   // to be set later
+                baseBorrowLimitInUSD: 20_000,   // to be set later
+                maxBorrowLimitInUSD: 25_000     // to be set later
             });
             setVaultLimitsAndAuth(VAULT_cbBTC_AND_USDC_USDT); // TYPE_3 => 39
         }
@@ -461,7 +483,10 @@ contract PayloadIGP44 {
                 vault: getVaultAddress(40),
                 vaultType: TYPE.TYPE_3,
                 supplyToken: sUSDe_ADDRESS,
-                borrowToken: address(0)
+                borrowToken: address(0),
+                baseWithdrawalLimitInUSD: 40_000,   // to be set later
+                baseBorrowLimitInUSD: 20_000,   // to be set later
+                maxBorrowLimitInUSD: 25_000     // to be set later
             });
             setVaultLimitsAndAuth(VAULT_sUSDe_AND_USDC_USDT); // TYPE_3 => 40
         }
@@ -472,7 +497,10 @@ contract PayloadIGP44 {
                 vault: getVaultAddress(41),
                 vaultType: TYPE.TYPE_4,
                 supplyToken: address(0),
-                borrowToken: address(0)
+                borrowToken: address(0),
+                baseWithdrawalLimitInUSD: 40_000,   // to be set later
+                baseBorrowLimitInUSD: 20_000,   // to be set later
+                maxBorrowLimitInUSD: 25_000     // to be set later
             });
             setVaultLimitsAndAuth(VAULT_cbBTC_WBTC_AND_cbBTC_WBTC); // TYPE_4 => 41
         }
@@ -483,7 +511,10 @@ contract PayloadIGP44 {
                 vault: getVaultAddress(42),
                 vaultType: TYPE.TYPE_2,
                 supplyToken: address(0),
-                borrowToken: USDC_ADDRESS
+                borrowToken: USDC_ADDRESS,
+                baseWithdrawalLimitInUSD: 40_000,   // to be set later
+                baseBorrowLimitInUSD: 20_000,   // to be set later
+                maxBorrowLimitInUSD: 25_000     // to be set later
             });
             setVaultLimitsAndAuth(VAULT_cbBTC_WBTC_AND_USDC); // TYPE_2 => 42
         }
@@ -494,7 +525,10 @@ contract PayloadIGP44 {
                 vault: getVaultAddress(43),
                 vaultType: TYPE.TYPE_2,
                 supplyToken: address(0),
-                borrowToken: USDT_ADDRESS
+                borrowToken: USDT_ADDRESS,
+                baseWithdrawalLimitInUSD: 40_000,   // to be set later
+                baseBorrowLimitInUSD: 20_000,   // to be set later
+                maxBorrowLimitInUSD: 25_000     // to be set later
             });
             setVaultLimitsAndAuth(VAULT_cbBTC_WBTC_AND_USDT); // TYPE_2 => 43
         }
@@ -513,7 +547,7 @@ contract PayloadIGP44 {
             SupplyProtocolConfig memory protocolConfig_ = SupplyProtocolConfig({
                 protocol: vault_.vault,
                 supplyToken: vault_.supplyToken,
-                baseWithdrawalLimitInUSD: 40_000 // $40k
+                baseWithdrawalLimitInUSD: vault_.baseWithdrawalLimitInUSD
             });
 
             setSupplyProtocolLimits(protocolConfig_);
@@ -523,8 +557,8 @@ contract PayloadIGP44 {
             BorrowProtocolConfig memory protocolConfig_ = BorrowProtocolConfig({ 
                 protocol: vault_.vault,
                 borrowToken: vault_.borrowToken,
-                baseBorrowLimitInUSD: 20_000, // $20k
-                maxBorrowLimitInUSD: 25_000 // $25k
+                baseBorrowLimitInUSD: vault_.baseBorrowLimitInUSD,
+                maxBorrowLimitInUSD: vault_.maxBorrowLimitInUSD
             });
 
             setBorrowProtocolLimits(protocolConfig_);
