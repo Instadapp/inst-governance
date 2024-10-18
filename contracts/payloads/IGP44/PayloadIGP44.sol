@@ -1,8 +1,12 @@
 pragma solidity ^0.8.21;
 pragma experimental ABIEncoderV2;
 
-import {LiquidityCalcs} from "../libraries/liquidityCalcs.sol";
-import {LiquiditySlotsLink} from "../libraries/liquiditySlotsLink.sol";
+import {
+    LiquidityCalcs
+} from "../libraries/liquidityCalcs.sol";
+import {
+    LiquiditySlotsLink
+} from "../libraries/liquiditySlotsLink.sol";
 
 interface IGovernorBravo {
     function _acceptAdmin() external;
@@ -32,6 +36,76 @@ interface IGovernorBravo {
     function votingDelay() external view returns (uint256);
 
     function votingPeriod() external view returns (uint256);
+}
+
+interface ILite {
+    function setAdmin(address newAdmin) external;
+
+    function getAdmin() external view returns (address);
+
+    function removeImplementation(address implementation_) external;
+
+    function addImplementation(
+        address implementation_,
+        bytes4[] calldata sigs_
+    ) external;
+
+    function setDummyImplementation(address newDummyImplementation_) external;
+
+    function updateMaxRiskRatio(
+        uint8[] memory protocolId_,
+        uint256[] memory newRiskRatio_
+    ) external;
+
+    function updateAggrMaxVaultRatio(uint256 newAggrMaxVaultRatio_) external;
+
+    function getImplementationSigs(
+        address impl_
+    ) external view returns (bytes4[] memory);
+}
+
+interface ILiteSigs {
+    // Leverage Module
+    function leverage(
+        uint8 protocolId_,
+        uint256 route_,
+        uint256 wstETHflashAmount_,
+        uint256 wETHBorrowAmount_,
+        address[] memory vaults_,
+        uint256[] memory vaultAmounts_,
+        uint256 swapMode_,
+        string[] memory _swapConnectors,
+        bytes[] memory _swapDatas,
+        uint256 unitAmount_
+    ) external;
+
+    // Admin Module
+    function enableAaveV3LidoEMode() external;
+
+    // View Module
+    function getRatioFluidNew(
+        uint256 stEthPerWsteth_
+    )
+    external
+    view
+    returns (
+        uint256 wstEthAmount_,
+        uint256 stEthAmount_,
+        uint256 ethAmount_,
+        uint256 ratio_
+    );
+
+    function getRatioAaveV3Lido(
+        uint256 stEthPerWsteth_
+    )
+    external
+    view
+    returns (
+        uint256 wstEthAmount_,
+        uint256 stEthAmount_,
+        uint256 ethAmount_,
+        uint256 ratio_
+    );
 }
 
 interface ITimelock {
@@ -218,11 +292,11 @@ interface IFluidLiquidityAdmin {
     function updateExchangePrices(
         address[] calldata tokens_
     )
-        external
-        returns (
-            uint256[] memory supplyExchangePrices_,
-            uint256[] memory borrowExchangePrices_
-        );
+    external
+    returns (
+        uint256[] memory supplyExchangePrices_,
+        uint256[] memory borrowExchangePrices_
+    );
 
     function readFromStorage(
         bytes32 slot_
@@ -269,50 +343,53 @@ contract PayloadIGP44 {
     uint256 public constant PROPOSAL_ID = 44;
 
     address public constant PROPOSER =
-        0xA45f7bD6A5Ff45D31aaCE6bCD3d426D9328cea01;
+    0xA45f7bD6A5Ff45D31aaCE6bCD3d426D9328cea01;
     address public constant PROPOSER_AVO_MULTISIG =
-        0x059a94a72451c0ae1Cc1cE4bf0Db52421Bbe8210;
+    0x059a94a72451c0ae1Cc1cE4bf0Db52421Bbe8210;
     address public constant PROPOSER_AVO_MULTISIG_2 =
-        0x9efdE135CA4832AbF0408c44c6f5f370eB0f35e8;
+    0x9efdE135CA4832AbF0408c44c6f5f370eB0f35e8;
     address public constant PROPOSER_AVO_MULTISIG_3 =
-        0x5C43AAC965ff230AC1cF63e924D0153291D78BaD;
+    0x5C43AAC965ff230AC1cF63e924D0153291D78BaD;
 
     IGovernorBravo public constant GOVERNOR =
-        IGovernorBravo(0x0204Cd037B2ec03605CFdFe482D8e257C765fA1B);
+    IGovernorBravo(0x0204Cd037B2ec03605CFdFe482D8e257C765fA1B);
     ITimelock public constant TIMELOCK =
-        ITimelock(0x2386DC45AdDed673317eF068992F19421B481F4c);
+    ITimelock(0x2386DC45AdDed673317eF068992F19421B481F4c);
 
     address public constant TEAM_MULTISIG =
-        0x4F6F977aCDD1177DCD81aB83074855EcB9C2D49e;
+    0x4F6F977aCDD1177DCD81aB83074855EcB9C2D49e;
 
     address public immutable ADDRESS_THIS;
 
     IFluidLiquidityAdmin public constant LIQUIDITY =
-        IFluidLiquidityAdmin(0x52Aa899454998Be5b000Ad077a46Bbe360F4e497);
+    IFluidLiquidityAdmin(0x52Aa899454998Be5b000Ad077a46Bbe360F4e497);
 
     FluidVaultFactory public constant VAULT_FACTORY =
-        FluidVaultFactory(0x324c5Dc1fC42c7a4D43d92df1eBA58a54d13Bf2d);
+    FluidVaultFactory(0x324c5Dc1fC42c7a4D43d92df1eBA58a54d13Bf2d);
     FluidDexFactory public constant DEX_FACTORY =
-        FluidDexFactory(0xF9b539Cd37Fc81bBEA1F078240d16b988BBae073);
+    FluidDexFactory(0xF9b539Cd37Fc81bBEA1F078240d16b988BBae073);
+
+    ILite public constant LITE =
+    ILite(0xA0D3707c569ff8C87FA923d3823eC5D81c98Be78);
 
     address internal constant ETH_ADDRESS =
-        0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
+    0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
     address internal constant wstETH_ADDRESS =
-        0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0;
+    0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0;
     address internal constant weETH_ADDRESS =
-        0xCd5fE23C85820F7B72D0926FC9b05b43E359b7ee;
+    0xCd5fE23C85820F7B72D0926FC9b05b43E359b7ee;
 
     address internal constant USDC_ADDRESS =
-        0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
+    0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
     address internal constant USDT_ADDRESS =
-        0xdAC17F958D2ee523a2206206994597C13D831ec7;
+    0xdAC17F958D2ee523a2206206994597C13D831ec7;
     address internal constant sUSDe_ADDRESS =
-        0x9D39A5DE30e57443BfF2A8307A4256c8797A3497;
+    0x9D39A5DE30e57443BfF2A8307A4256c8797A3497;
 
     address internal constant WBTC_ADDRESS =
-        0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599;
+    0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599;
     address internal constant cbBTC_ADDRESS =
-        0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf;
+    0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf;
 
     struct Dex {
         address dex;
@@ -345,10 +422,10 @@ contract PayloadIGP44 {
     function propose(string memory description) external {
         require(
             msg.sender == PROPOSER ||
-                msg.sender == TEAM_MULTISIG ||
-                address(this) == PROPOSER_AVO_MULTISIG ||
-                address(this) == PROPOSER_AVO_MULTISIG_2 ||
-                address(PROPOSER_AVO_MULTISIG_3) == PROPOSER_AVO_MULTISIG_3,
+            msg.sender == TEAM_MULTISIG ||
+            address(this) == PROPOSER_AVO_MULTISIG ||
+            address(this) == PROPOSER_AVO_MULTISIG_2 ||
+            address(PROPOSER_AVO_MULTISIG_3) == PROPOSER_AVO_MULTISIG_3,
             "msg.sender-not-allowed"
         );
 
@@ -400,9 +477,9 @@ contract PayloadIGP44 {
                 vaultType: TYPE.TYPE_4,
                 supplyToken: address(0),
                 borrowToken: address(0),
-                baseWithdrawalLimitInUSD: 40_000,   // to be set later
-                baseBorrowLimitInUSD: 20_000,   // to be set later
-                maxBorrowLimitInUSD: 25_000     // to be set later
+                baseWithdrawalLimitInUSD: 40_000, // to be set later
+                baseBorrowLimitInUSD: 20_000, // to be set later
+                maxBorrowLimitInUSD: 25_000 // to be set later
             });
             setVaultLimitsAndAuth(VAULT_wstETH_ETH_AND_wsETH_ETH); // TYPE_4 => 34
         }
@@ -414,9 +491,9 @@ contract PayloadIGP44 {
                 vaultType: TYPE.TYPE_3,
                 supplyToken: ETH_ADDRESS,
                 borrowToken: address(0),
-                baseWithdrawalLimitInUSD: 40_000,   // to be set later
-                baseBorrowLimitInUSD: 20_000,   // to be set later
-                maxBorrowLimitInUSD: 25_000     // to be set later
+                baseWithdrawalLimitInUSD: 40_000, // to be set later
+                baseBorrowLimitInUSD: 20_000, // to be set later
+                maxBorrowLimitInUSD: 25_000 // to be set later
             });
             setVaultLimitsAndAuth(VAULT_ETH_AND_USDC_USDT); // TYPE_3 => 35
         }
@@ -428,9 +505,9 @@ contract PayloadIGP44 {
                 vaultType: TYPE.TYPE_3,
                 supplyToken: wstETH_ADDRESS,
                 borrowToken: address(0),
-                baseWithdrawalLimitInUSD: 40_000,   // to be set later
-                baseBorrowLimitInUSD: 20_000,   // to be set later
-                maxBorrowLimitInUSD: 25_000     // to be set later
+                baseWithdrawalLimitInUSD: 40_000, // to be set later
+                baseBorrowLimitInUSD: 20_000, // to be set later
+                maxBorrowLimitInUSD: 25_000 // to be set later
             });
             setVaultLimitsAndAuth(VAULT_wstETH_AND_USDC_USDT); // TYPE_3 => 36
         }
@@ -442,9 +519,9 @@ contract PayloadIGP44 {
                 vaultType: TYPE.TYPE_3,
                 supplyToken: weETH_ADDRESS,
                 borrowToken: address(0),
-                baseWithdrawalLimitInUSD: 40_000,   // to be set later
-                baseBorrowLimitInUSD: 20_000,   // to be set later
-                maxBorrowLimitInUSD: 25_000     // to be set later
+                baseWithdrawalLimitInUSD: 40_000, // to be set later
+                baseBorrowLimitInUSD: 20_000, // to be set later
+                maxBorrowLimitInUSD: 25_000 // to be set later
             });
             setVaultLimitsAndAuth(VAULT_weETH_AND_USDC_USDT); // TYPE_3 => 37
         }
@@ -456,9 +533,9 @@ contract PayloadIGP44 {
                 vaultType: TYPE.TYPE_3,
                 supplyToken: WBTC_ADDRESS,
                 borrowToken: address(0),
-                baseWithdrawalLimitInUSD: 40_000,   // to be set later
-                baseBorrowLimitInUSD: 20_000,   // to be set later
-                maxBorrowLimitInUSD: 25_000     // to be set later
+                baseWithdrawalLimitInUSD: 40_000, // to be set later
+                baseBorrowLimitInUSD: 20_000, // to be set later
+                maxBorrowLimitInUSD: 25_000 // to be set later
             });
             setVaultLimitsAndAuth(VAULT_WBTC_AND_USDC_USDT); // TYPE_3 => 38
         }
@@ -470,9 +547,9 @@ contract PayloadIGP44 {
                 vaultType: TYPE.TYPE_3,
                 supplyToken: cbBTC_ADDRESS,
                 borrowToken: address(0),
-                baseWithdrawalLimitInUSD: 40_000,   // to be set later
-                baseBorrowLimitInUSD: 20_000,   // to be set later
-                maxBorrowLimitInUSD: 25_000     // to be set later
+                baseWithdrawalLimitInUSD: 40_000, // to be set later
+                baseBorrowLimitInUSD: 20_000, // to be set later
+                maxBorrowLimitInUSD: 25_000 // to be set later
             });
             setVaultLimitsAndAuth(VAULT_cbBTC_AND_USDC_USDT); // TYPE_3 => 39
         }
@@ -484,9 +561,9 @@ contract PayloadIGP44 {
                 vaultType: TYPE.TYPE_3,
                 supplyToken: sUSDe_ADDRESS,
                 borrowToken: address(0),
-                baseWithdrawalLimitInUSD: 40_000,   // to be set later
-                baseBorrowLimitInUSD: 20_000,   // to be set later
-                maxBorrowLimitInUSD: 25_000     // to be set later
+                baseWithdrawalLimitInUSD: 40_000, // to be set later
+                baseBorrowLimitInUSD: 20_000, // to be set later
+                maxBorrowLimitInUSD: 25_000 // to be set later
             });
             setVaultLimitsAndAuth(VAULT_sUSDe_AND_USDC_USDT); // TYPE_3 => 40
         }
@@ -498,9 +575,9 @@ contract PayloadIGP44 {
                 vaultType: TYPE.TYPE_4,
                 supplyToken: address(0),
                 borrowToken: address(0),
-                baseWithdrawalLimitInUSD: 40_000,   // to be set later
-                baseBorrowLimitInUSD: 20_000,   // to be set later
-                maxBorrowLimitInUSD: 25_000     // to be set later
+                baseWithdrawalLimitInUSD: 40_000, // to be set later
+                baseBorrowLimitInUSD: 20_000, // to be set later
+                maxBorrowLimitInUSD: 25_000 // to be set later
             });
             setVaultLimitsAndAuth(VAULT_cbBTC_WBTC_AND_cbBTC_WBTC); // TYPE_4 => 41
         }
@@ -512,9 +589,9 @@ contract PayloadIGP44 {
                 vaultType: TYPE.TYPE_2,
                 supplyToken: address(0),
                 borrowToken: USDC_ADDRESS,
-                baseWithdrawalLimitInUSD: 40_000,   // to be set later
-                baseBorrowLimitInUSD: 20_000,   // to be set later
-                maxBorrowLimitInUSD: 25_000     // to be set later
+                baseWithdrawalLimitInUSD: 40_000, // to be set later
+                baseBorrowLimitInUSD: 20_000, // to be set later
+                maxBorrowLimitInUSD: 25_000 // to be set later
             });
             setVaultLimitsAndAuth(VAULT_cbBTC_WBTC_AND_USDC); // TYPE_2 => 42
         }
@@ -526,12 +603,16 @@ contract PayloadIGP44 {
                 vaultType: TYPE.TYPE_2,
                 supplyToken: address(0),
                 borrowToken: USDT_ADDRESS,
-                baseWithdrawalLimitInUSD: 40_000,   // to be set later
-                baseBorrowLimitInUSD: 20_000,   // to be set later
-                maxBorrowLimitInUSD: 25_000     // to be set later
+                baseWithdrawalLimitInUSD: 40_000, // to be set later
+                baseBorrowLimitInUSD: 20_000, // to be set later
+                maxBorrowLimitInUSD: 25_000 // to be set later
             });
             setVaultLimitsAndAuth(VAULT_cbBTC_WBTC_AND_USDT); // TYPE_2 => 43
         }
+    }
+
+    function action2() public {
+        // TODO
     }
 
     /***********************************|
@@ -554,7 +635,7 @@ contract PayloadIGP44 {
         }
 
         if (vault_.vaultType == TYPE.TYPE_2) {
-            BorrowProtocolConfig memory protocolConfig_ = BorrowProtocolConfig({ 
+            BorrowProtocolConfig memory protocolConfig_ = BorrowProtocolConfig({
                 protocol: vault_.vault,
                 borrowToken: vault_.borrowToken,
                 baseBorrowLimitInUSD: vault_.baseBorrowLimitInUSD,
@@ -585,7 +666,7 @@ contract PayloadIGP44 {
         {
             // Supply Limits
             AdminModuleStructs.UserSupplyConfig[]
-                memory configs_ = new AdminModuleStructs.UserSupplyConfig[](1);
+            memory configs_ = new AdminModuleStructs.UserSupplyConfig[](1);
 
             configs_[0] = AdminModuleStructs.UserSupplyConfig({
                 user: address(protocolConfig_.protocol),
@@ -611,7 +692,7 @@ contract PayloadIGP44 {
         {
             // Borrow Limits
             AdminModuleStructs.UserBorrowConfig[]
-                memory configs_ = new AdminModuleStructs.UserBorrowConfig[](1);
+            memory configs_ = new AdminModuleStructs.UserBorrowConfig[](1);
 
             configs_[0] = AdminModuleStructs.UserBorrowConfig({
                 user: address(protocolConfig_.protocol),
@@ -683,15 +764,40 @@ contract PayloadIGP44 {
         }
 
         uint256 exchangePrice = isSupply
-            ? supplyExchangePrice
-            : borrowExchangePrice;
+        ? supplyExchangePrice: borrowExchangePrice;
 
         if (amount > 0) {
             return (amount * 1e12) / exchangePrice;
         } else {
             return
-                (amountInUSD * 1e12 * (10 ** decimals)) /
-                ((usdPrice * exchangePrice) / 1e2);
+            (amountInUSD * 1e12 * (10 ** decimals)) /
+            ((usdPrice * exchangePrice) / 1e2);
+        }
+
+        function _updateLiteImplementation(
+            address oldImplementation_,
+            address newImplementation_,
+            bytes4[] memory newSigs_,
+            bool replace_
+        ) internal {
+            bytes4[] memory oldSigs_;
+
+            if (oldImplementation_ != address(0) && !replace_)
+                oldSigs_ = LITE.getImplementationSigs(oldImplementation_);
+
+            bytes4[] memory allSigs_ = new bytes4[](
+                oldSigs_.length + newSigs_.length
+            );
+            uint256 j_;
+            for (uint i = 0; i < oldSigs_.length; i++) {
+                allSigs_[j_++] = oldSigs_[i];
+            }
+
+            for (uint i = 0; i < newSigs_.length; i++) {
+                allSigs_[j_++] = newSigs_[i];
+            }
+
+            LITE.removeImplementation(oldImplementation_);
+            LITE.addImplementation(newImplementation_, allSigs_);
         }
     }
-}
