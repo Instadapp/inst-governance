@@ -236,6 +236,26 @@ interface ILite {
     function getImplementationSigs(address impl_) external view returns (bytes4[] memory);
 }
 
+interface IProxy {
+    function setAdmin(address newAdmin_) external;
+
+    function setDummyImplementation(address newDummyImplementation_) external;
+
+    function addImplementation(address implementation_, bytes4[] calldata sigs_) external;
+
+    function removeImplementation(address implementation_) external;
+
+    function getAdmin() external view returns (address);
+
+    function getDummyImplementation() external view returns (address);
+
+    function getImplementationSigs(address impl_) external view returns (bytes4[] memory);
+
+    function getSigsImplementation(bytes4 sig_) external view returns (address);
+
+    function readFromStorage(bytes32 slot_) external view returns (uint256 result_);
+}
+
 interface ILiteSigs {
     // Leverage Module
     function leverage(
@@ -520,16 +540,12 @@ contract PayloadIGP44 {
     /// @notice Action 3: Updating Liquidity User Module
     function action3() internal {
         {
-            bytes4[] memory sigs_ = IProxy(address(LIQUIDITY))
-                .getImplementationSigs(
-                    0x8eC5e29eA39b2f64B21e32cB9Ff11D5059982F8C
-                );
-            IProxy(address(LIQUIDITY)).removeImplementation(
-                0x8eC5e29eA39b2f64B21e32cB9Ff11D5059982F8C,
-            );
+            bytes4[] memory sigs_ =
+                IProxy(address(LIQUIDITY)).getImplementationSigs(0x8eC5e29eA39b2f64B21e32cB9Ff11D5059982F8C);
+            IProxy(address(LIQUIDITY)).removeImplementation(0x8eC5e29eA39b2f64B21e32cB9Ff11D5059982F8C);
 
             IProxy(address(LIQUIDITY)).addImplementation(
-                //@TODO ,
+                address(0xdead), //@TODO 
                 sigs_
             );
         }
@@ -537,9 +553,9 @@ contract PayloadIGP44 {
 
     /// @notice Action 4: Adjusting rates for wstETH, WBTC & cbBTC
     function action4() internal {
-    AdminModuleStructs.RateDataV2Params[] memory params_ = new AdminModuleStructs.RateDataV2Params[](3);
+        AdminModuleStructs.RateDataV2Params[] memory params_ = new AdminModuleStructs.RateDataV2Params[](3);
 
-       params_[0] = AdminModuleStructs.RateDataV2Params({
+        params_[0] = AdminModuleStructs.RateDataV2Params({
             token: 0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0, // wstETH
             kink1: 80 * 1e2, // 80%
             kink2: 90 * 1e2, // 90%
@@ -547,8 +563,8 @@ contract PayloadIGP44 {
             rateAtUtilizationKink1: 1 * 1e2, // 1%
             rateAtUtilizationKink2: 5 * 1e2, // 5%
             rateAtUtilizationMax: 100 * 1e2 // 100%
-       });
-       params_[1] = AdminModuleStructs.RateDataV2Params({
+        });
+        params_[1] = AdminModuleStructs.RateDataV2Params({
             token: 0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf, // cbBTC
             kink1: 80 * 1e2, // 80%
             kink2: 90 * 1e2, // 90%
@@ -556,8 +572,8 @@ contract PayloadIGP44 {
             rateAtUtilizationKink1: 3 * 1e2, // 3%
             rateAtUtilizationKink2: 10 * 1e2, // 10%
             rateAtUtilizationMax: 100 * 1e2 // 100%
-       });
-       params_[2] = AdminModuleStructs.RateDataV2Params({
+        });
+        params_[2] = AdminModuleStructs.RateDataV2Params({
             token: 0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599, // WBTC
             kink1: 80 * 1e2, // 80%
             kink2: 90 * 1e2, // 90%
@@ -565,9 +581,9 @@ contract PayloadIGP44 {
             rateAtUtilizationKink1: 3 * 1e2, // 3%
             rateAtUtilizationKink2: 10 * 1e2, // 10%
             rateAtUtilizationMax: 100 * 1e2 // 100%
-       });
+        });
 
-       LIQUIDITY.updateRateDataV2s(params_);   
+        LIQUIDITY.updateRateDataV2s(params_);
     }
 
     /**
