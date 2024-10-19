@@ -692,7 +692,7 @@ contract PayloadIGP44 {
             kink1: 80 * 1e2, // 80%
             kink2: 90 * 1e2, // 90%
             rateAtUtilizationZero: 1 * 1e2, // 1%
-            rateAtUtilizationKink1: 2 * 1e2, // 2%
+            rateAtUtilizationKink1: 3 * 1e2, // 3%
             rateAtUtilizationKink2: 10 * 1e2, // 10%
             rateAtUtilizationMax: 100 * 1e2 // 100%
         });
@@ -702,7 +702,7 @@ contract PayloadIGP44 {
             kink1: 80 * 1e2, // 80%
             kink2: 90 * 1e2, // 90%
             rateAtUtilizationZero: 1 * 1e2, // 1%
-            rateAtUtilizationKink1: 2 * 1e2, // 2%
+            rateAtUtilizationKink1: 3 * 1e2, // 3%
             rateAtUtilizationKink2: 10 * 1e2, // 10%
             rateAtUtilizationMax: 100 * 1e2 // 100%
         });
