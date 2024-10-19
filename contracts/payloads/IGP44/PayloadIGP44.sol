@@ -360,7 +360,7 @@ contract PayloadIGP44 {
         string[] memory signatures = new string[](totalActions);
         bytes[] memory calldatas = new bytes[](totalActions);
 
-        // Action 1: call executePayload on timelock contract to execute payload related to Fluid
+        // Action 1: call executePayload on timelock contract to execute payload related to Fluid and Lite
         targets[0] = address(TIMELOCK);
         values[0] = 0;
         signatures[0] = "executePayload(address,string,bytes)";
@@ -377,17 +377,17 @@ contract PayloadIGP44 {
         // Action 1: Set supply and borrow limit for Dexes on Liquidity Layer
         action1();
 
-        // Action 2: Set Vault limits on liquidity layer and auth on vaultFactory
+        // Action 2: Set Vault limits on liquidity layer and remove team multisig as auth on vaultFactory
         action2();
 
-        // Action 3: Updating Liquidity User Module
+        // Action 3: Update Liquidity User Module Implementation
         action3();
 
-        // Action 4: Adjusting rates for wstETH, WBTC & cbBTC
+        // Action 4: Adjust market rates for wstETH, WBTC & cbBTC
         action4();
 
-        // Action 5: Set supply and borrow limit for Dexes on Liquidity Layer
-        action5(); 
+        // Action 5: Update iETHv2 Lite Vault to Support wstETH-ETH dex
+        action5();
     }
 
     function verifyProposal() external view {}
@@ -398,8 +398,53 @@ contract PayloadIGP44 {
      * |__________________________________
      */
 
-    /// @notice Action 1: Set Vault limits on liquidity layer and auth on vaultFactory
+    /// @notice Action 1: Set supply and borrow limit for Dexes on Liquidity Layer
     function action1() internal {
+        {
+            Dex memory DEX_wstETH_ETH = Dex({
+                dex: getDexAddress(1),
+                tokenA: wstETH_ADDRESS,
+                tokenB: ETH_ADDRESS,
+                smartCollateral: true,
+                smartDebt: true,
+                baseWithdrawalLimitInUSD: 12_000_000, // $12M
+                baseBorrowLimitInUSD: 12_000_000, // $12M
+                maxBorrowLimitInUSD: 25_000_000 // $25M
+            });
+            setDexLimits(DEX_wstETH_ETH); // Smart Collateral & Smart Debt
+        }
+
+        {
+            Dex memory DEX_USDC_USDT = Dex({
+                dex: getDexAddress(2),
+                tokenA: USDC_ADDRESS,
+                tokenB: USDT_ADDRESS,
+                smartCollateral: false,
+                smartDebt: true,
+                baseWithdrawalLimitInUSD: 0, // $0
+                baseBorrowLimitInUSD: 7_500_000, // $7.5M
+                maxBorrowLimitInUSD: 15_000_000 // $15M
+            });
+            setDexLimits(DEX_USDC_USDT); // Smart Debt
+        }
+
+        {
+            Dex memory DEX_cbBTC_WBTC = Dex({
+                dex: getDexAddress(3),
+                tokenA: cbBTC_ADDRESS,
+                tokenB: WBTC_ADDRESS,
+                smartCollateral: true,
+                smartDebt: true,
+                baseWithdrawalLimitInUSD: 5_000_000, // $5M
+                baseBorrowLimitInUSD: 5_000_000, // $5M
+                maxBorrowLimitInUSD: 10_000_000 // $10M
+            });
+            setDexLimits(DEX_cbBTC_WBTC); // Smart Collateral & Smart Debt
+        }
+    }
+
+    /// @notice Action 2: Set Vault limits on liquidity layer and Remove Team Multisig as auth on vaultFactory
+    function action2() internal {
         {
             // [TYPE 4] wstETH-ETH  | wstETH-ETH | Smart collateral & smart debt
             Vault memory VAULT_wstETH_ETH_AND_wsETH_ETH = Vault({
@@ -511,23 +556,18 @@ contract PayloadIGP44 {
         }
     }
 
-    /// @notice Action 2: Adding new lite implementation
-    function action2() internal {
-        // @TODO
-    }
-
     /// @notice Action 3: Updating Liquidity User Module
     function action3() internal {
-        {
-            bytes4[] memory sigs_ =
-                IProxy(address(LIQUIDITY)).getImplementationSigs(0x8eC5e29eA39b2f64B21e32cB9Ff11D5059982F8C);
-            IProxy(address(LIQUIDITY)).removeImplementation(0x8eC5e29eA39b2f64B21e32cB9Ff11D5059982F8C);
+        address oldImplementation_ = 0x8eC5e29eA39b2f64B21e32cB9Ff11D5059982F8C; // Old User Module Implementation Address
+        address newImplementation_ = 0x6967e68F7f9b3921181f27E66Aa9c3ac7e13dBc0; // New User Module Implementation Address
 
-            IProxy(address(LIQUIDITY)).addImplementation(0x6967e68F7f9b3921181f27E66Aa9c3ac7e13dBc0, sigs_);
-        }
+        bytes4[] memory sigs_ = IProxy(address(LIQUIDITY)).getImplementationSigs(oldImplementation_);
+        IProxy(address(LIQUIDITY)).removeImplementation(oldImplementation_);
+
+        IProxy(address(LIQUIDITY)).addImplementation(newImplementation_, sigs_);
     }
 
-    /// @notice Action 4: Adjusting rates for wstETH, WBTC & cbBTC
+    /// @notice Action 4: Adjust market rates for wstETH, WBTC & cbBTC
     function action4() internal {
         AdminModuleStructs.RateDataV2Params[] memory params_ = new AdminModuleStructs.RateDataV2Params[](3);
 
@@ -540,6 +580,7 @@ contract PayloadIGP44 {
             rateAtUtilizationKink2: 5 * 1e2, // 5%
             rateAtUtilizationMax: 100 * 1e2 // 100%
         });
+
         params_[1] = AdminModuleStructs.RateDataV2Params({
             token: cbBTC_ADDRESS,
             kink1: 80 * 1e2, // 80%
@@ -549,6 +590,7 @@ contract PayloadIGP44 {
             rateAtUtilizationKink2: 10 * 1e2, // 10%
             rateAtUtilizationMax: 100 * 1e2 // 100%
         });
+
         params_[2] = AdminModuleStructs.RateDataV2Params({
             token: WBTC_ADDRESS,
             kink1: 80 * 1e2, // 80%
@@ -562,44 +604,11 @@ contract PayloadIGP44 {
         LIQUIDITY.updateRateDataV2s(params_);
     }
 
-    /// @notice Action 5: Set supply and borrow limit for Dexes on Liquidity Layer
+    /// @notice Action 5: Adding new lite implementation
     function action5() internal {
-        Dex memory DEX_wstETH_ETH = Dex({
-            dex: getDexAddress(1),
-            tokenA: wstETH_ADDRESS,
-            tokenB: ETH_ADDRESS,
-            smartCollateral: true,
-            smartDebt: true,
-            baseWithdrawalLimitInUSD: 12 * 1e6, // $12M
-            baseBorrowLimitInUSD: 12 * 1e6, // $12M
-            maxBorrowLimitInUSD: 25 * 1e6 // $25M
-        });
-        setDexLimits(DEX_wstETH_ETH); // Smart Collateral & Smart Debt
-
-        Dex memory DEX_USDC_USDT = Dex({
-            dex: getDexAddress(2),
-            tokenA: USDC_ADDRESS,
-            tokenB: USDT_ADDRESS,
-            smartCollateral: false,
-            smartDebt: true,
-            baseWithdrawalLimitInUSD: 12 * 1e6, // $12M
-            baseBorrowLimitInUSD: 7.5 * 1e6, // $7.5M
-            maxBorrowLimitInUSD: 15 * 1e6 // $15M
-        });
-        setDexLimits(DEX_USDC_USDT); // Smart Debt
-
-        Dex memory DEX_cbBTC_WBTC = Dex({
-            dex: getDexAddress(3),
-            tokenA: cbBTC_ADDRESS,
-            tokenB: WBTC_ADDRESS,
-            smartCollateral: true,
-            smartDebt: true,
-            baseWithdrawalLimitInUSD: 5 * 1e6, // $5M
-            baseBorrowLimitInUSD: 5 * 1e6, // $5M
-            maxBorrowLimitInUSD: 10 * 1e6 // $10M
-        });
-        setDexLimits(DEX_cbBTC_WBTC); // Smart Collateral & Smart Debt
+        // @TODO
     }
+
 
     /**
      * |
@@ -620,8 +629,8 @@ contract PayloadIGP44 {
             SupplyProtocolConfig memory protocolConfigTokenA_ = SupplyProtocolConfig({
                 protocol: dex_.dex,
                 supplyToken: dex_.tokenA,
-                expandPercent: 50 * 1e2,
-                expandDuration: 1 hours,
+                expandPercent: 50 * 1e2, // 50%
+                expandDuration: 1 hours, // 1 hour
                 baseWithdrawalLimitInUSD: dex_.baseWithdrawalLimitInUSD
             });
 
@@ -630,8 +639,8 @@ contract PayloadIGP44 {
             SupplyProtocolConfig memory protocolConfigTokenB_ = SupplyProtocolConfig({
                 protocol: dex_.dex,
                 supplyToken: dex_.tokenB,
-                expandPercent: 50 * 1e2,
-                expandDuration: 1 hours,
+                expandPercent: 50 * 1e2, // 50%
+                expandDuration: 1 hours, // 1 hour
                 baseWithdrawalLimitInUSD: dex_.baseWithdrawalLimitInUSD
             });
 
@@ -643,8 +652,8 @@ contract PayloadIGP44 {
             BorrowProtocolConfig memory protocolConfigTokenA_ = BorrowProtocolConfig({
                 protocol: dex_.dex,
                 borrowToken: dex_.tokenA,
-                expandPercent: 50 * 1e2,
-                expandDuration: 1 hours,
+                expandPercent: 50 * 1e2, // 50%
+                expandDuration: 1 hours, // 1 hour
                 baseBorrowLimitInUSD: dex_.baseBorrowLimitInUSD,
                 maxBorrowLimitInUSD: dex_.maxBorrowLimitInUSD
             });
@@ -654,8 +663,8 @@ contract PayloadIGP44 {
             BorrowProtocolConfig memory protocolConfigTokenB_ = BorrowProtocolConfig({
                 protocol: dex_.dex,
                 borrowToken: dex_.tokenB,
-                expandPercent: 50 * 1e2,
-                expandDuration: 1 hours,
+                expandPercent: 50 * 1e2, // 50%
+                expandDuration: 1 hours, // 1 hour
                 baseBorrowLimitInUSD: dex_.baseBorrowLimitInUSD,
                 maxBorrowLimitInUSD: dex_.maxBorrowLimitInUSD
             });
@@ -669,9 +678,9 @@ contract PayloadIGP44 {
             SupplyProtocolConfig memory protocolConfig_ = SupplyProtocolConfig({
                 protocol: vault_.vault,
                 supplyToken: vault_.supplyToken,
-                expandPercent: 25 * 1e2,
-                expandDuration: 12 hours,
-                baseWithdrawalLimitInUSD: 7.5 * 1e6 // $7.5M
+                expandPercent: 25 * 1e2, // 25%
+                expandDuration: 12 hours, // 12 hours
+                baseWithdrawalLimitInUSD: 7_500_000 // $7.5M
             });
 
             setSupplyProtocolLimits(protocolConfig_);
@@ -683,8 +692,8 @@ contract PayloadIGP44 {
                 borrowToken: vault_.borrowToken,
                 expandPercent: 20 * 1e2,
                 expandDuration: 12 hours,
-                baseBorrowLimitInUSD: 7.5 * 1e6, // $7.5M
-                maxBorrowLimitInUSD: 20 * 1e6 // $20M
+                baseBorrowLimitInUSD: 7_500_000, // $7.5M
+                maxBorrowLimitInUSD: 20_000_000 // $20M
             });
 
             setBorrowProtocolLimits(protocolConfig_);
@@ -719,8 +728,8 @@ contract PayloadIGP44 {
                 user: address(protocolConfig_.protocol),
                 token: protocolConfig_.supplyToken,
                 mode: 1,
-                expandPercent: 25 * 1e2,
-                expandDuration: 12 hours,
+                expandPercent: protocolConfig_.expandPercent,
+                expandDuration: protocolConfig_.expandDuration,
                 baseWithdrawalLimit: getRawAmount(
                     protocolConfig_.supplyToken, 0, protocolConfig_.baseWithdrawalLimitInUSD, true
                 )
@@ -739,8 +748,8 @@ contract PayloadIGP44 {
                 user: address(protocolConfig_.protocol),
                 token: protocolConfig_.borrowToken,
                 mode: 1,
-                expandPercent: 20 * 1e2,
-                expandDuration: 12 hours,
+                expandPercent: protocolConfig_.expandPercent,
+                expandDuration: protocolConfig_.expandDuration,
                 baseDebtCeiling: getRawAmount(protocolConfig_.borrowToken, 0, protocolConfig_.baseBorrowLimitInUSD, false),
                 maxDebtCeiling: getRawAmount(protocolConfig_.borrowToken, 0, protocolConfig_.maxBorrowLimitInUSD, false)
             });
@@ -769,16 +778,16 @@ contract PayloadIGP44 {
         uint256 usdPrice = 0;
         uint256 decimals = 18;
         if (token == ETH_ADDRESS) {
-            usdPrice = 2_450 * 1e2;
+            usdPrice = 2_650 * 1e2;
             decimals = 18;
         } else if (token == wstETH_ADDRESS) {
-            usdPrice = 2_900 * 1e2;
+            usdPrice = 3_150 * 1e2;
             decimals = 18;
         } else if (token == weETH_ADDRESS) {
-            usdPrice = 2_570 * 1e2;
+            usdPrice = 2_775 * 1e2;
             decimals = 18;
         } else if (token == cbBTC_ADDRESS || token == WBTC_ADDRESS) {
-            usdPrice = 62_500 * 1e2;
+            usdPrice = 68_100 * 1e2;
             decimals = 8;
         } else if (token == USDC_ADDRESS || token == USDT_ADDRESS) {
             usdPrice = 1 * 1e2;
