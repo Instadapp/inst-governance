@@ -319,45 +319,56 @@ interface IProxy {
 }
 
 interface ILiteSigs {
-    // Leverage Module
-    function leverage(
+    // Claim Module
+    function claimFromAaveV3Lido() external;
+
+    // Leverage Dex Module 
+    function leverageDexRefinance(
         uint8 protocolId_,
         uint256 route_,
         uint256 wstETHflashAmount_,
         uint256 wETHBorrowAmount_,
-        address[] memory vaults_,
-        uint256[] memory vaultAmounts_,
-        uint256 swapMode_,
-        string[] memory _swapConnectors,
-        bytes[] memory _swapDatas,
-        uint256 unitAmount_
-    ) external;
+        uint256 withdrawAmount_,
+        int256 perfectColShares_,
+        int256 colToken0MinMax_, // if +, max to deposit, if -, min to withdraw
+        int256 colToken1MinMax_, // if +, max to deposit, if -, min to withdraw
+        int256 perfectDebtShares_,
+        int256 debtToken0MinMax_, // if +, min to borrow, if -, max to payback
+        int256 debtToken1MinMax_ // if +, min to borrow, if -, max to payback
+    )
+        external
+        returns (uint256 ratioFromProtocol_, uint256 ratioToProtocol_);
 
-    // Admin Module
-    function enableAaveV3LidoEMode() external;
+    // Unwind Dex Module
+    function unwindDexRefinance(
+        uint8 protocolId_,
+        uint256 route_,
+        uint256 wstETHflashAmount_,
+        uint256 wETHPaybackAmount_,
+        uint256 withdrawAmount_,
+        int256 perfectColShares_,
+        int256 colToken0MinMax_, // if +, max to deposit, if -, min to withdraw
+        int256 colToken1MinMax_, // if +, max to deposit, if -, min to withdraw
+        int256 perfectDebtShares_,
+        int256 debtToken0MinMax_, // if +, min to borrow, if -, max to payback
+        int256 debtToken1MinMax_ // if +, min to borrow, if -, max to payback
+    )
+        external
+        returns (uint256 ratioFromProtocol_, uint256 ratioToProtocol_);
 
     // View Module
-    function getRatioFluidNew(
+    function getRatioFluidDex(
         uint256 stEthPerWsteth_
     )
         external
         view
         returns (
-            uint256 wstEthAmount_,
-            uint256 stEthAmount_,
-            uint256 ethAmount_,
-            uint256 ratio_
-        );
-
-    function getRatioAaveV3Lido(
-        uint256 stEthPerWsteth_
-    )
-        external
-        view
-        returns (
-            uint256 wstEthAmount_,
-            uint256 stEthAmount_,
-            uint256 ethAmount_,
+            uint256 wstEthColAmount_,
+            uint256 stEthColAmount_,
+            uint256 ethColAmount_,
+            uint256 wstEthDebtAmount_,
+            uint256 stEthDebtAmount_,
+            uint256 ethDebtAmount_,
             uint256 ratio_
         );
 }
@@ -712,7 +723,89 @@ contract PayloadIGP44 {
 
     /// @notice Action 5: Adding new lite implementation
     function action5() internal {
-        // @TODO
+        {
+            // Admin Module
+            bytes4[] memory newSigs_ = new bytes4[](0);
+
+            _updateLiteImplementation(
+                0xe8620e95b52ec1CD29dA337519a43D8fFB07e82C,
+                address(0),
+                newSigs_,
+                false
+            );
+        }
+
+        {
+            // Claim Module
+            bytes4[] memory newSigs_ = new bytes4[](1);
+
+            newSigs_[0] = ILiteSigs.claimFromAaveV3Lido.selector;
+
+            _updateLiteImplementation(
+                0xc10A855055Eb3939FCaA512253Ec3f671C4Ab839,
+                0xB00df786d3611acE29D19De744B4147f378715f4,
+                newSigs_,
+                false
+            );
+        }
+
+        {
+            // LeverageDex Module
+            bytes4[] memory newSigs_ = new bytes4[](1);
+
+            newSigs_[0] = ILiteSigs.leverageDexRefinance.selector;
+
+            _updateLiteImplementation(
+                address(0),
+                0x88eBAD0F40AE93EA196B0094362525FAe28Ae326,
+                newSigs_,
+                false
+            );
+        }
+
+        {
+            // UnwindDex Module
+            bytes4[] memory newSigs_ = new bytes4[](1);
+
+            newSigs_[0] = ILiteSigs.unwindDexRefinance.selector;
+
+            _updateLiteImplementation(
+                address(0),
+                0xa82BD4a64644054D85fA0D7A7643CAF5A15f534B,
+                newSigs_,
+                false
+            );
+        }
+
+        {
+            // View Module
+            bytes4[] memory newSigs_ = new bytes4[](1);
+
+            newSigs_[0] = ILiteSigs.getRatioFluidDex.selector;
+
+            _updateLiteImplementation(
+                address(0x24d58FcFA6d74c5aCc1E4b6814BF5703e1CDd8a8),
+                0x952Cf2869Dc2c59aAAF2311ec6C7c0A43f9CB6cf,
+                newSigs_,
+                false
+            );
+        }
+
+        // Update Dummy Implementation
+        LITE.setDummyImplementation(0xbA15A31c8F9Cc3CB1b6E08755D8b22A6AF18d83d);
+
+        // Set Max Risk Ratio for Fluid Dex
+        {
+            uint8[] memory protocolId_ = new uint8[](1);
+            uint256[] memory newRiskRatio_ = new uint256[](1);
+
+            {
+                protocolId_[0] = 11;
+                newRiskRatio_[0] = 95_0000;
+            }
+
+            LITE.updateMaxRiskRatio(protocolId_, newRiskRatio_);
+        }
     }
 
     /**
@@ -795,8 +888,8 @@ contract PayloadIGP44 {
             BorrowProtocolConfig memory protocolConfig_ = BorrowProtocolConfig({
                 protocol: vault_.vault,
                 borrowToken: vault_.borrowToken,
-                expandPercent: 20 * 1e2,
-                expandDuration: 12 hours,
+                expandPercent: 20 * 1e2, // 20%
+                expandDuration: 12 hours, // 12 hours
                 baseBorrowLimitInUSD: 7_500_000, // $7.5M
                 maxBorrowLimitInUSD: 20_000_000 // $20M
             });
@@ -964,7 +1057,9 @@ contract PayloadIGP44 {
             allSigs_[j_++] = newSigs_[i];
         }
 
-        LITE.removeImplementation(oldImplementation_);
+        if (oldImplementation_ != address(0)) {
+            LITE.removeImplementation(oldImplementation_);
+        }
         LITE.addImplementation(newImplementation_, allSigs_);
     }
 }
