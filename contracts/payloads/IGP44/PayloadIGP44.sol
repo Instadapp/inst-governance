@@ -721,7 +721,7 @@ contract PayloadIGP44 {
         LIQUIDITY.updateRateDataV2s(params_);
     }
 
-    /// @notice Action 5: Adding new lite implementation
+    /// @notice Action 5: Update iETHv2 Lite Vault to Support wstETH-ETH dex
     function action5() internal {
         {
             // Claim Module
@@ -772,7 +772,7 @@ contract PayloadIGP44 {
             newSigs_[0] = ILiteSigs.getRatioFluidDex.selector;
 
             _updateLiteImplementation(
-                address(0x24d58FcFA6d74c5aCc1E4b6814BF5703e1CDd8a8),
+                0x24d58FcFA6d74c5aCc1E4b6814BF5703e1CDd8a8,
                 0x952Cf2869Dc2c59aAAF2311ec6C7c0A43f9CB6cf,
                 newSigs_,
                 false
