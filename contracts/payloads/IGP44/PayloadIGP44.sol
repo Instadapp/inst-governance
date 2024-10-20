@@ -289,6 +289,13 @@ interface ILite {
     function getImplementationSigs(
         address impl_
     ) external view returns (bytes4[] memory);
+
+    function updateSecondaryAuth(address secondaryAuth_) external;
+
+    function updateRebalancer(
+        address rebalancer_,
+        bool isRebalancer_
+    ) external;
 }
 
 interface IProxy {
@@ -793,6 +800,11 @@ contract PayloadIGP44 {
             }
 
             LITE.updateMaxRiskRatio(protocolId_, newRiskRatio_);
+        }
+
+        { // Set Team Multisig as Secondary Auth and Rebalancer for iETHv2 Lite Vault
+            LITE.updateSecondaryAuth(TEAM_MULTISIG);
+            LITE.updateRebalancer(TEAM_MULTISIG, true);
         }
     }
 
