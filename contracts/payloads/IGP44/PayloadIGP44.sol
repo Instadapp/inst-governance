@@ -724,18 +724,6 @@ contract PayloadIGP44 {
     /// @notice Action 5: Adding new lite implementation
     function action5() internal {
         {
-            // Admin Module
-            bytes4[] memory newSigs_ = new bytes4[](0);
-
-            _updateLiteImplementation(
-                0xe8620e95b52ec1CD29dA337519a43D8fFB07e82C,
-                address(0),
-                newSigs_,
-                false
-            );
-        }
-
-        {
             // Claim Module
             bytes4[] memory newSigs_ = new bytes4[](1);
 
