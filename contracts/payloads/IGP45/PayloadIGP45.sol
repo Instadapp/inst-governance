@@ -296,7 +296,7 @@ contract PayloadIGP45 {
         FluidDexFactory(0xF9b539Cd37Fc81bBEA1F078240d16b988BBae073);
 
     FluidDexFactory public constant NEW_DEX_FACTORY =
-        FluidDexFactory(0xF9b539Cd37Fc81bBEA1F078240d16b988BBae073);
+        FluidDexFactory(0x91716C4EDA1Fb55e84Bf8b4c7085f84285c19085);
 
     address internal constant ETH_ADDRESS =
         0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
