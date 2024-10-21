@@ -386,8 +386,14 @@ contract PayloadIGP45 {
         // Action 3: Set supply and borrow limit for new Dexes on Liquidity Layer
         action3();
 
-        // Action 2: Set new Vault limits on liquidity layer and auth on vaultFactory
+        // Action 4: Set new Vault limits on liquidity layer and auth on vaultFactory
         action4();
+
+        // Action 5: Update Liquidity User Module Implementation
+        action5();
+
+        // Action 6: Adjust market rates for wstETH, WBTC & cbBTC
+        action6();
     }
 
     function verifyProposal() external view {}
@@ -681,6 +687,57 @@ contract PayloadIGP45 {
             setVaultLimitsAndAuth(VAULT_cbBTC_WBTC_AND_USDT); // TYPE_2 => 53
         }
     }
+
+        /// @notice Action 5: Updating Liquidity User Module
+    function action5() internal {
+        address oldImplementation_ = 0x8eC5e29eA39b2f64B21e32cB9Ff11D5059982F8C; // Old User Module Implementation Address
+        address newImplementation_ = 0x6967e68F7f9b3921181f27E66Aa9c3ac7e13dBc0; // New User Module Implementation Address
+
+        bytes4[] memory sigs_ = IProxy(address(LIQUIDITY))
+            .getImplementationSigs(oldImplementation_);
+        IProxy(address(LIQUIDITY)).removeImplementation(oldImplementation_);
+
+        IProxy(address(LIQUIDITY)).addImplementation(newImplementation_, sigs_);
+    }
+
+    /// @notice Action 6: Adjust market rates for wstETH, WBTC & cbBTC
+    function action6() internal {
+        AdminModuleStructs.RateDataV2Params[]
+            memory params_ = new AdminModuleStructs.RateDataV2Params[](3);
+
+        params_[0] = AdminModuleStructs.RateDataV2Params({
+            token: wstETH_ADDRESS,
+            kink1: 80 * 1e2, // 80%
+            kink2: 90 * 1e2, // 90%
+            rateAtUtilizationZero: 0.5 * 1e2, // 0.5%
+            rateAtUtilizationKink1: 1 * 1e2, // 1%
+            rateAtUtilizationKink2: 5 * 1e2, // 5%
+            rateAtUtilizationMax: 100 * 1e2 // 100%
+        });
+
+        params_[1] = AdminModuleStructs.RateDataV2Params({
+            token: cbBTC_ADDRESS,
+            kink1: 80 * 1e2, // 80%
+            kink2: 90 * 1e2, // 90%
+            rateAtUtilizationZero: 1 * 1e2, // 1%
+            rateAtUtilizationKink1: 3 * 1e2, // 3%
+            rateAtUtilizationKink2: 10 * 1e2, // 10%
+            rateAtUtilizationMax: 100 * 1e2 // 100%
+        });
+
+        params_[2] = AdminModuleStructs.RateDataV2Params({
+            token: WBTC_ADDRESS,
+            kink1: 80 * 1e2, // 80%
+            kink2: 90 * 1e2, // 90%
+            rateAtUtilizationZero: 1 * 1e2, // 1%
+            rateAtUtilizationKink1: 3 * 1e2, // 3%
+            rateAtUtilizationKink2: 10 * 1e2, // 10%
+            rateAtUtilizationMax: 100 * 1e2 // 100%
+        });
+
+        LIQUIDITY.updateRateDataV2s(params_);
+    }
+
 
 
 
