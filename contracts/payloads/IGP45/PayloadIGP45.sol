@@ -798,7 +798,7 @@ contract PayloadIGP45 {
         {
             // [TYPE 2] cbBTC-WBTC | USDT | Smart Collateral only
             Vault memory VAULT_cbBTC_WBTC_AND_USDT = Vault({
-                vault: getVaultAddress(43),
+                vault: getVaultAddress(53),
                 vaultType: TYPE.TYPE_2,
                 supplyToken: address(0),
                 borrowToken: USDT_ADDRESS
