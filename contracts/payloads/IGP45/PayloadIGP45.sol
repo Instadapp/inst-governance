@@ -229,6 +229,39 @@ interface IFluidLiquidityAdmin {
     ) external view returns (uint256 result_);
 }
 
+interface ILite {
+    function setAdmin(address newAdmin) external;
+
+    function getAdmin() external view returns (address);
+
+    function removeImplementation(address implementation_) external;
+
+    function addImplementation(
+        address implementation_,
+        bytes4[] calldata sigs_
+    ) external;
+
+    function setDummyImplementation(address newDummyImplementation_) external;
+
+    function updateMaxRiskRatio(
+        uint8[] memory protocolId_,
+        uint256[] memory newRiskRatio_
+    ) external;
+
+    function updateAggrMaxVaultRatio(uint256 newAggrMaxVaultRatio_) external;
+
+    function getImplementationSigs(
+        address impl_
+    ) external view returns (bytes4[] memory);
+
+    function updateSecondaryAuth(address secondaryAuth_) external;
+
+    function updateRebalancer(
+        address rebalancer_,
+        bool isRebalancer_
+    ) external;
+}
+
 interface IProxy {
     function setAdmin(address newAdmin_) external;
 
@@ -254,6 +287,66 @@ interface IProxy {
     function readFromStorage(
         bytes32 slot_
     ) external view returns (uint256 result_);
+}
+
+interface ILiteSigs {
+    // Claim Module
+    function claimFromAaveV3Lido() external;
+
+    // Leverage Dex Module 
+    function leverageDexRefinance(
+        uint8 protocolId_,
+        uint256 route_,
+        uint256 wstETHflashAmount_,
+        uint256 wETHBorrowAmount_,
+        uint256 withdrawAmount_,
+        int256 perfectColShares_,
+        int256 colToken0MinMax_, // if +, max to deposit, if -, min to withdraw
+        int256 colToken1MinMax_, // if +, max to deposit, if -, min to withdraw
+        int256 perfectDebtShares_,
+        int256 debtToken0MinMax_, // if +, min to borrow, if -, max to payback
+        int256 debtToken1MinMax_ // if +, min to borrow, if -, max to payback
+    )
+        external
+        returns (uint256 ratioFromProtocol_, uint256 ratioToProtocol_);
+
+    // Unwind Dex Module
+    function unwindDexRefinance(
+        uint8 protocolId_,
+        uint256 route_,
+        uint256 wstETHflashAmount_,
+        uint256 wETHPaybackAmount_,
+        uint256 withdrawAmount_,
+        int256 perfectColShares_,
+        int256 colToken0MinMax_, // if +, max to deposit, if -, min to withdraw
+        int256 colToken1MinMax_, // if +, max to deposit, if -, min to withdraw
+        int256 perfectDebtShares_,
+        int256 debtToken0MinMax_, // if +, min to borrow, if -, max to payback
+        int256 debtToken1MinMax_ // if +, min to borrow, if -, max to payback
+    )
+        external
+        returns (uint256 ratioFromProtocol_, uint256 ratioToProtocol_);
+
+    // View Module
+    function getRatioFluidDex(
+        uint256 stEthPerWsteth_
+    )
+        external
+        view
+        returns (
+            uint256 wstEthColAmount_,
+            uint256 stEthColAmount_,
+            uint256 ethColAmount_,
+            uint256 wstEthDebtAmount_,
+            uint256 stEthDebtAmount_,
+            uint256 ethDebtAmount_,
+            uint256 ratio_
+        );
+
+    function fluidDexNFT() external view returns (address);
+
+    // Admin Module
+    function setFluidDexNftId(uint256 nftId_) external;
 }
 
 interface FluidVaultFactory {
@@ -319,9 +412,9 @@ contract PayloadIGP45 {
 
     FluidVaultFactory public constant VAULT_FACTORY =
         FluidVaultFactory(0x324c5Dc1fC42c7a4D43d92df1eBA58a54d13Bf2d);
+    
     FluidDexFactory public constant OLD_DEX_FACTORY =
         FluidDexFactory(0xF9b539Cd37Fc81bBEA1F078240d16b988BBae073);
-
     FluidDexFactory public constant NEW_DEX_FACTORY =
         FluidDexFactory(0x91716C4EDA1Fb55e84Bf8b4c7085f84285c19085);
 
@@ -343,6 +436,9 @@ contract PayloadIGP45 {
         0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599;
     address internal constant cbBTC_ADDRESS =
         0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf;
+
+    ILite public constant LITE =
+        ILite(0xA0D3707c569ff8C87FA923d3823eC5D81c98Be78);
 
     struct Dex {
         address dex;
@@ -404,10 +500,10 @@ contract PayloadIGP45 {
     function execute() external {
         require(address(this) == address(TIMELOCK), "not-valid-caller");
 
-        // Action 1: Set supply and borrow limit for old Dexes on Liquidity Layer
+        // Action 1: Remove supply and borrow limit for old Dexes on Liquidity Layer
         action1();
 
-        // Action 2: Set old Vault limits on liquidity layer and auth on vaultFactory
+        // Action 2: Remove old dex's Vault limits on liquidity layer and auth on vaultFactory
         action2();
 
         // Action 3: Set supply and borrow limit for new Dexes on Liquidity Layer
@@ -421,6 +517,9 @@ contract PayloadIGP45 {
 
         // Action 6: Adjust market rates for wstETH, WBTC & cbBTC
         action6();
+
+        // Action 7: Update iETHv2 Lite Vault to Support wstETH-ETH dex
+        action7();
     }
 
     function verifyProposal() external view {}
@@ -429,7 +528,7 @@ contract PayloadIGP45 {
     |     Proposal Payload Actions      |
     |__________________________________*/
 
-    /// @notice Action 1: Set supply and borrow limit for Old Dexes on Liquidity Layer
+    /// @notice Action 1: Remove supply and borrow limit for Old Dexes on Liquidity Layer
     function action1() internal {
         Dex memory DEX_wstETH_ETH = Dex({
             dex: getOldDexAddress(1),
@@ -459,7 +558,7 @@ contract PayloadIGP45 {
         removeDexLimits(DEX_cbBTC_WBTC); // Smart Collateral & Smart Debt
     }
 
-    /// @notice Action 2: Set Vault limits on liquidity layer and auth on vaultFactory
+    /// @notice Action 2: Remove old dex's Vault limits on liquidity layer and auth on vaultFactory
     function action2() internal {
         {
             // [TYPE 4] wstETH-ETH  | wstETH-ETH | Smart collateral & smart debt
@@ -765,6 +864,101 @@ contract PayloadIGP45 {
         LIQUIDITY.updateRateDataV2s(params_);
     }
 
+    /// @notice Action 7: Update iETHv2 Lite Vault to Support wstETH-ETH dex
+    function action7() internal {
+        {
+            // Claim Module
+            bytes4[] memory newSigs_ = new bytes4[](1);
+
+            newSigs_[0] = ILiteSigs.claimFromAaveV3Lido.selector;
+
+            _updateLiteImplementation(
+                0xc10A855055Eb3939FCaA512253Ec3f671C4Ab839,
+                0xB00df786d3611acE29D19De744B4147f378715f4,
+                newSigs_,
+                false
+            );
+        }
+
+        {
+            // LeverageDex Module
+            bytes4[] memory newSigs_ = new bytes4[](1);
+
+            newSigs_[0] = ILiteSigs.leverageDexRefinance.selector;
+
+            _updateLiteImplementation(
+                address(0),
+                0xbeE5CDBd7Ae69b31CeAEB16485e43F3Bbc1b6983,
+                newSigs_,
+                false
+            );
+        }
+
+        {
+            // UnwindDex Module
+            bytes4[] memory newSigs_ = new bytes4[](1);
+
+            newSigs_[0] = ILiteSigs.unwindDexRefinance.selector;
+
+            _updateLiteImplementation(
+                address(0),
+                0x635D70Fab1B1c3f7E9F3d30Bd1DeB738Daf87725,
+                newSigs_,
+                false
+            );
+        }
+
+        {
+            // View Module
+            bytes4[] memory newSigs_ = new bytes4[](2);
+
+            newSigs_[0] = ILiteSigs.getRatioFluidDex.selector;
+            newSigs_[1] = ILiteSigs.fluidDexNFT.selector;
+
+            _updateLiteImplementation(
+                0x24d58FcFA6d74c5aCc1E4b6814BF5703e1CDd8a8,
+                0x038c28580A22E2b74bfb13E00e9c0a75CD732342,
+                newSigs_,
+                false
+            );
+        }
+
+        {
+            // Admin Module
+            bytes4[] memory newSigs_ = new bytes4[](1);
+
+            newSigs_[0] = ILiteSigs.setFluidDexNftId.selector;
+
+            _updateLiteImplementation(
+                0xe8620e95b52ec1CD29dA337519a43D8fFB07e82C,
+                0x1BF97Df3D9eFa7036e96fB58F6c4CCfB2a2fDa21,
+                newSigs_,
+                false
+            );
+        }
+
+        // Update Dummy Implementation
+        LITE.setDummyImplementation(0x41C4cB513C98717a91F591C17bf127e8cc7F5d2F);
+
+        // Set Max Risk Ratio for Fluid Dex
+        {
+            uint8[] memory protocolId_ = new uint8[](1);
+            uint256[] memory newRiskRatio_ = new uint256[](1);
+
+            {
+                protocolId_[0] = 11;
+                newRiskRatio_[0] = 95_0000;
+            }
+
+            LITE.updateMaxRiskRatio(protocolId_, newRiskRatio_);
+        }
+
+        { // Set Team Multisig as Secondary Auth and Rebalancer for iETHv2 Lite Vault
+            LITE.updateSecondaryAuth(TEAM_MULTISIG);
+            LITE.updateRebalancer(TEAM_MULTISIG, true);
+        }
+    }
+
 
 
 
@@ -785,32 +979,14 @@ contract PayloadIGP45 {
     }
 
     function removeDexLimits(Dex memory dex_) internal {
-        // Smart Collateral
-        if (dex_.smartCollateral) {
-            SupplyProtocolConfig memory protocolConfigTokenA_ = SupplyProtocolConfig({
-                protocol: dex_.dex,
-                supplyToken: dex_.tokenA,
-                baseWithdrawalLimitInUSD: 0
-            });
-
-            setSupplyProtocolLimits(protocolConfigTokenA_);
-
-            SupplyProtocolConfig memory protocolConfigTokenB_ = SupplyProtocolConfig({
-                protocol: dex_.dex,
-                supplyToken: dex_.tokenB,
-                baseWithdrawalLimitInUSD: 0
-            });
-
-            setSupplyProtocolLimits(protocolConfigTokenB_);
-        }
 
         // Smart Debt
         if (dex_.smartDebt) {
             BorrowProtocolConfig memory protocolConfigTokenA_ = BorrowProtocolConfig({
                 protocol: dex_.dex,
                 borrowToken: dex_.tokenA,
-                baseBorrowLimitInUSD: 0,
-                maxBorrowLimitInUSD: 0
+                baseBorrowLimitInUSD: 10,
+                maxBorrowLimitInUSD: 11
             });
 
             setBorrowProtocolLimits(protocolConfigTokenA_);
@@ -818,8 +994,8 @@ contract PayloadIGP45 {
             BorrowProtocolConfig memory protocolConfigTokenB_ = BorrowProtocolConfig({
                 protocol: dex_.dex,
                 borrowToken: dex_.tokenB,
-                baseBorrowLimitInUSD: 0,
-                maxBorrowLimitInUSD: 0
+                baseBorrowLimitInUSD: 10,
+                maxBorrowLimitInUSD: 11
             });
 
             setBorrowProtocolLimits(protocolConfigTokenB_);
@@ -869,22 +1045,13 @@ contract PayloadIGP45 {
     }
 
     function removeVaultLimitsAndAuth(Vault memory vault_) internal {
-        if (vault_.vaultType == TYPE.TYPE_3) {
-            SupplyProtocolConfig memory protocolConfig_ = SupplyProtocolConfig({
-                protocol: vault_.vault,
-                supplyToken: vault_.supplyToken,
-                baseWithdrawalLimitInUSD: 0
-            });
-
-            setSupplyProtocolLimits(protocolConfig_);
-        }
 
         if (vault_.vaultType == TYPE.TYPE_2) {
             BorrowProtocolConfig memory protocolConfig_ = BorrowProtocolConfig({
                 protocol: vault_.vault,
                 borrowToken: vault_.borrowToken,
-                baseBorrowLimitInUSD: 0,
-                maxBorrowLimitInUSD: 0
+                baseBorrowLimitInUSD: 10,
+                maxBorrowLimitInUSD: 11
             });
 
             setBorrowProtocolLimits(protocolConfig_);
@@ -1012,16 +1179,16 @@ contract PayloadIGP45 {
         uint256 usdPrice = 0;
         uint256 decimals = 18;
         if (token == ETH_ADDRESS) {
-            usdPrice = 2_450 * 1e2;
+            usdPrice = 2_650 * 1e2;
             decimals = 18;
         } else if (token == wstETH_ADDRESS) {
-            usdPrice = 2_900 * 1e2;
+            usdPrice = 3_150 * 1e2;
             decimals = 18;
         } else if (token == weETH_ADDRESS) {
-            usdPrice = 2_570 * 1e2;
+            usdPrice = 2_775 * 1e2;
             decimals = 18;
         } else if (token == cbBTC_ADDRESS || token == WBTC_ADDRESS) {
-            usdPrice = 62_500 * 1e2;
+            usdPrice = 67_100 * 1e2;
             decimals = 8;
         } else if (token == USDC_ADDRESS || token == USDT_ADDRESS) {
             usdPrice = 1 * 1e2;
@@ -1044,5 +1211,35 @@ contract PayloadIGP45 {
                 (amountInUSD * 1e12 * (10 ** decimals)) /
                 ((usdPrice * exchangePrice) / 1e2);
         }
+    }
+
+    function _updateLiteImplementation(
+        address oldImplementation_,
+        address newImplementation_,
+        bytes4[] memory newSigs_,
+        bool replace_
+    ) internal {
+        bytes4[] memory oldSigs_;
+
+        if (oldImplementation_ != address(0) && !replace_) {
+            oldSigs_ = LITE.getImplementationSigs(oldImplementation_);
+        }
+
+        bytes4[] memory allSigs_ = new bytes4[](
+            oldSigs_.length + newSigs_.length
+        );
+        uint256 j_;
+        for (uint256 i = 0; i < oldSigs_.length; i++) {
+            allSigs_[j_++] = oldSigs_[i];
+        }
+
+        for (uint256 i = 0; i < newSigs_.length; i++) {
+            allSigs_[j_++] = newSigs_[i];
+        }
+
+        if (oldImplementation_ != address(0)) {
+            LITE.removeImplementation(oldImplementation_);
+        }
+        LITE.addImplementation(newImplementation_, allSigs_);
     }
 }
