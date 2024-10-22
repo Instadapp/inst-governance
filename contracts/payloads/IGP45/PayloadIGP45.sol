@@ -256,10 +256,7 @@ interface ILite {
 
     function updateSecondaryAuth(address secondaryAuth_) external;
 
-    function updateRebalancer(
-        address rebalancer_,
-        bool isRebalancer_
-    ) external;
+    function updateRebalancer(address rebalancer_, bool isRebalancer_) external;
 }
 
 interface IProxy {
@@ -293,7 +290,7 @@ interface ILiteSigs {
     // Claim Module
     function claimFromAaveV3Lido() external;
 
-    // Leverage Dex Module 
+    // Leverage Dex Module
     function leverageDexRefinance(
         uint8 protocolId_,
         uint256 route_,
@@ -306,9 +303,7 @@ interface ILiteSigs {
         int256 perfectDebtShares_,
         int256 debtToken0MinMax_, // if +, min to borrow, if -, max to payback
         int256 debtToken1MinMax_ // if +, min to borrow, if -, max to payback
-    )
-        external
-        returns (uint256 ratioFromProtocol_, uint256 ratioToProtocol_);
+    ) external returns (uint256 ratioFromProtocol_, uint256 ratioToProtocol_);
 
     // Unwind Dex Module
     function unwindDexRefinance(
@@ -323,9 +318,7 @@ interface ILiteSigs {
         int256 perfectDebtShares_,
         int256 debtToken0MinMax_, // if +, min to borrow, if -, max to payback
         int256 debtToken1MinMax_ // if +, min to borrow, if -, max to payback
-    )
-        external
-        returns (uint256 ratioFromProtocol_, uint256 ratioToProtocol_);
+    ) external returns (uint256 ratioFromProtocol_, uint256 ratioToProtocol_);
 
     // View Module
     function getRatioFluidDex(
@@ -412,7 +405,7 @@ contract PayloadIGP45 {
 
     FluidVaultFactory public constant VAULT_FACTORY =
         FluidVaultFactory(0x324c5Dc1fC42c7a4D43d92df1eBA58a54d13Bf2d);
-    
+
     FluidDexFactory public constant OLD_DEX_FACTORY =
         FluidDexFactory(0xF9b539Cd37Fc81bBEA1F078240d16b988BBae073);
     FluidDexFactory public constant NEW_DEX_FACTORY =
@@ -814,7 +807,7 @@ contract PayloadIGP45 {
         }
     }
 
-        /// @notice Action 5: Updating Liquidity User Module
+    /// @notice Action 5: Updating Liquidity User Module
     function action5() internal {
         address oldImplementation_ = 0x8eC5e29eA39b2f64B21e32cB9Ff11D5059982F8C; // Old User Module Implementation Address
         address newImplementation_ = 0x6967e68F7f9b3921181f27E66Aa9c3ac7e13dBc0; // New User Module Implementation Address
@@ -953,14 +946,12 @@ contract PayloadIGP45 {
             LITE.updateMaxRiskRatio(protocolId_, newRiskRatio_);
         }
 
-        { // Set Team Multisig as Secondary Auth and Rebalancer for iETHv2 Lite Vault
+        {
+            // Set Team Multisig as Secondary Auth and Rebalancer for iETHv2 Lite Vault
             LITE.updateSecondaryAuth(TEAM_MULTISIG);
             LITE.updateRebalancer(TEAM_MULTISIG, true);
         }
     }
-
-
-
 
     /***********************************|
     |     Proposal Payload Helpers      |
@@ -979,24 +970,25 @@ contract PayloadIGP45 {
     }
 
     function removeDexLimits(Dex memory dex_) internal {
-
         // Smart Debt
         if (dex_.smartDebt) {
-            BorrowProtocolConfig memory protocolConfigTokenA_ = BorrowProtocolConfig({
-                protocol: dex_.dex,
-                borrowToken: dex_.tokenA,
-                baseBorrowLimitInUSD: 10,
-                maxBorrowLimitInUSD: 11
-            });
+            BorrowProtocolConfig
+                memory protocolConfigTokenA_ = BorrowProtocolConfig({
+                    protocol: dex_.dex,
+                    borrowToken: dex_.tokenA,
+                    baseBorrowLimitInUSD: 10,
+                    maxBorrowLimitInUSD: 11
+                });
 
             setBorrowProtocolLimits(protocolConfigTokenA_);
 
-            BorrowProtocolConfig memory protocolConfigTokenB_ = BorrowProtocolConfig({
-                protocol: dex_.dex,
-                borrowToken: dex_.tokenB,
-                baseBorrowLimitInUSD: 10,
-                maxBorrowLimitInUSD: 11
-            });
+            BorrowProtocolConfig
+                memory protocolConfigTokenB_ = BorrowProtocolConfig({
+                    protocol: dex_.dex,
+                    borrowToken: dex_.tokenB,
+                    baseBorrowLimitInUSD: 10,
+                    maxBorrowLimitInUSD: 11
+                });
 
             setBorrowProtocolLimits(protocolConfigTokenB_);
         }
@@ -1045,7 +1037,6 @@ contract PayloadIGP45 {
     }
 
     function removeVaultLimitsAndAuth(Vault memory vault_) internal {
-
         if (vault_.vaultType == TYPE.TYPE_2) {
             BorrowProtocolConfig memory protocolConfig_ = BorrowProtocolConfig({
                 protocol: vault_.vault,
