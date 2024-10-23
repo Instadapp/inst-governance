@@ -536,28 +536,6 @@ contract PayloadIGP46 {
             });
             setVaultLimitsAndAuth(VAULT_cbBTC_WBTC_AND_cbBTC_WBTC); // TYPE_4 => 51
         }
-
-        {
-            // [TYPE 2] cbBTC-WBTC | USDC | Smart Collateral only
-            Vault memory VAULT_cbBTC_WBTC_AND_USDC = Vault({
-                vault: getVaultAddress(52),
-                vaultType: TYPE.TYPE_2,
-                supplyToken: address(0),
-                borrowToken: USDC_ADDRESS
-            });
-            setVaultLimitsAndAuth(VAULT_cbBTC_WBTC_AND_USDC); // TYPE_2 => 52
-        }
-
-        {
-            // [TYPE 2] cbBTC-WBTC | USDT | Smart Collateral only
-            Vault memory VAULT_cbBTC_WBTC_AND_USDT = Vault({
-                vault: getVaultAddress(53),
-                vaultType: TYPE.TYPE_2,
-                supplyToken: address(0),
-                borrowToken: USDT_ADDRESS
-            });
-            setVaultLimitsAndAuth(VAULT_cbBTC_WBTC_AND_USDT); // TYPE_2 => 53
-        }
     }
 
     /// @notice Action 3: Set limits for fGHO and GHO-USDC dex
