@@ -309,10 +309,16 @@ contract PayloadIGP46 {
     address internal constant sUSDe_ADDRESS =
         0x9D39A5DE30e57443BfF2A8307A4256c8797A3497;
 
+    address internal constant GHO_ADDRESS =
+        0x40D16FC0246aD3160Ccc09B8D0D3A2cD28aE6C2f;
+
     address internal constant WBTC_ADDRESS =
         0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599;
     address internal constant cbBTC_ADDRESS =
         0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf;
+
+    address internal constant fGHO_ADDRESS =
+        0x6A29A46E21C730DcA1d8b23d637c101cec605C5B;
 
     struct Dex {
         address dex;
@@ -383,6 +389,9 @@ contract PayloadIGP46 {
 
         // Action 2: Set Vault limits on liquidity layer and remove team multisig as auth on vaultFactory
         action2();
+
+        // Action 3: Set limits for fGHO and GHO-USDC dex
+        action3();
     }
 
     function verifyProposal() external view {}
@@ -548,6 +557,35 @@ contract PayloadIGP46 {
                 borrowToken: USDT_ADDRESS
             });
             setVaultLimitsAndAuth(VAULT_cbBTC_WBTC_AND_USDT); // TYPE_2 => 53
+        }
+    }
+
+    /// @notice Action 3: Set limits for fGHO and GHO-USDC dex
+    function action3() internal {
+        { // fGHO
+             SupplyProtocolConfig memory config_ = SupplyProtocolConfig({
+                protocol: fGHO_ADDRESS,
+                supplyToken: GHO_ADDRESS,
+                expandPercent: 25 * 1e2, // 25%
+                expandDuration: 12 hours, // 12 hours
+                baseWithdrawalLimitInUSD: 7_500_000 // $7.5M
+            });
+
+            setSupplyProtocolLimits(config_);
+        }
+
+        {
+            Dex memory DEX_GHO_USDC = Dex({
+                dex: getDexAddress(4),
+                tokenA: GHO_ADDRESS,
+                tokenB: USDC_ADDRESS,
+                smartCollateral: true,
+                smartDebt: true,
+                baseWithdrawalLimitInUSD: 50_000, // $50k
+                baseBorrowLimitInUSD: 40_000, // $40k
+                maxBorrowLimitInUSD: 50_000 // $50k
+            });
+            setDexLimits(DEX_GHO_USDC); // Smart Collateral & Smart Debt
         }
     }
 
