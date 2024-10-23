@@ -791,11 +791,14 @@ contract PayloadIGP46 {
         } else if (token == cbBTC_ADDRESS || token == WBTC_ADDRESS) {
             usdPrice = 66_500 * 1e2;
             decimals = 8;
-        } else if (token == USDC_ADDRESS || token == USDT_ADDRESS || token == GHO_ADDRESS) {
+        } else if (token == USDC_ADDRESS || token == USDT_ADDRESS) {
             usdPrice = 1 * 1e2;
             decimals = 6;
         } else if (token == sUSDe_ADDRESS) {
             usdPrice = 1.1 * 1e2;
+            decimals = 18;
+        } else if (token == GHO_ADDRESS) {
+            usdPrice = 1 * 1e2;
             decimals = 18;
         } else {
             revert("not-found");
