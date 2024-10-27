@@ -656,6 +656,11 @@ contract PayloadIGP47 {
 
             require(vault_ != address(0), "vault-not-deployed");
         }
+
+        // Set Team Multisig as auth for USDC/GHO Vault.
+        { 
+            VAULT_FACTORY.setVaultAuth(getVaultAddress(61), TEAM_MULTISIG, true);
+        }
     }
 
     /**
