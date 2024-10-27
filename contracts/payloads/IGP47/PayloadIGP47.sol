@@ -330,7 +330,6 @@ interface IFluidReserveContract {
     ) external;
 }
 
-
 contract PayloadIGP47 {
     uint256 public constant PROPOSAL_ID = 47;
 
@@ -475,7 +474,7 @@ contract PayloadIGP47 {
                 kink: 93 * 1e2, // 93%
                 rateAtUtilizationZero: 0, // 0%
                 rateAtUtilizationKink: 7.5 * 1e2, // 7.5%
-                rateAtUtilizationMax: 100 * 1e2 // 100%
+                rateAtUtilizationMax: 25 * 1e2 // 25%
             });
 
             LIQUIDITY.updateRateDataV1s(params_);
@@ -502,7 +501,7 @@ contract PayloadIGP47 {
             borrowMaxLimit: 0,
             supplyRateMagnifier: 100 * 1e2, // 1x
             borrowRateMagnifier: 100 * 1e2, // 1x
-            collateralFactor: 0, 
+            collateralFactor: 0,
             liquidationThreshold: 0,
             liquidationMaxLimit: 0,
             withdrawGap: 0,
@@ -519,9 +518,9 @@ contract PayloadIGP47 {
 
             vaultConfig.collateralFactor = 85 * 1e2; // 85%
             vaultConfig.liquidationThreshold = 90 * 1e2; // 90%
-            vaultConfig.liquidationMaxLimit = 93 * 1e2; // 95%
+            vaultConfig.liquidationMaxLimit = 93 * 1e2; // 93%
             vaultConfig.withdrawGap = 5 * 1e2; // 5%
-            vaultConfig.liquidationPenalty = 2.5 * 1e2; // 5%
+            vaultConfig.liquidationPenalty = 2.5 * 1e2; // 2.5%
 
             vaultConfig.oracle = address(
                 0x39f6447ca8Ac3c6aa841B4C0D1fFb5D4DDb0FdE7
