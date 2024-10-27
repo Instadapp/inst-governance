@@ -258,12 +258,78 @@ interface FluidVaultFactory {
     ) external view returns (address vault_);
 }
 
-interface FluidDexFactory {
-    /// @notice                         Computes the address of a dex based on its given ID (`dexId_`).
-    /// @param dexId_                   The ID of the dex.
-    /// @return dex_                    Returns the computed address of the dex.
-    function getDexAddress(uint256 dexId_) external view returns (address dex_);
+interface IFluidVaultT1 {
+    /// @notice updates the Vault oracle to `newOracle_`. Must implement the FluidOracle interface.
+    function updateOracle(address newOracle_) external;
+
+    /// @notice updates the all Vault core settings according to input params.
+    /// All input values are expected in 1e2 (1% = 100, 100% = 10_000).
+    function updateCoreSettings(
+        uint256 supplyRateMagnifier_,
+        uint256 borrowRateMagnifier_,
+        uint256 collateralFactor_,
+        uint256 liquidationThreshold_,
+        uint256 liquidationMaxLimit_,
+        uint256 withdrawGap_,
+        uint256 liquidationPenalty_,
+        uint256 borrowFee_
+    ) external;
+
+    /// @notice updates the allowed rebalancer to `newRebalancer_`.
+    function updateRebalancer(address newRebalancer_) external;
+
+    /// @notice updates the supply rate magnifier to `supplyRateMagnifier_`. Input in 1e2 (1% = 100, 100% = 10_000).
+    function updateSupplyRateMagnifier(uint supplyRateMagnifier_) external;
+
+    /// @notice updates the borrow rate magnifier to `borrowRateMagnifier_`. Input in 1e2 (1% = 100, 100% = 10_000).
+    function updateBorrowRateMagnifier(uint borrowRateMagnifier_) external;
+
+    /// @notice updates the collateral factor to `collateralFactor_`. Input in 1e2 (1% = 100, 100% = 10_000).
+    function updateCollateralFactor(uint collateralFactor_) external;
+
+    /// @notice updates the liquidation threshold to `liquidationThreshold_`. Input in 1e2 (1% = 100, 100% = 10_000).
+    function updateLiquidationThreshold(uint liquidationThreshold_) external;
+
+    /// @notice updates the liquidation max limit to `liquidationMaxLimit_`. Input in 1e2 (1% = 100, 100% = 10_000).
+    function updateLiquidationMaxLimit(uint liquidationMaxLimit_) external;
+
+    /// @notice updates the withdrawal gap to `withdrawGap_`. Input in 1e2 (1% = 100, 100% = 10_000).
+    function updateWithdrawGap(uint withdrawGap_) external;
+
+    /// @notice updates the liquidation penalty to `liquidationPenalty_`. Input in 1e2 (1% = 100, 100% = 10_000).
+    function updateLiquidationPenalty(uint liquidationPenalty_) external;
+
+    /// @notice updates the borrow fee to `borrowFee_`. Input in 1e2 (1% = 100, 100% = 10_000).
+    function updateBorrowFee(uint borrowFee_) external;
 }
+
+interface IFluidReserveContract {
+    function isRebalancer(address user) external returns (bool);
+
+    function rebalanceFToken(address protocol_) external;
+
+    function rebalanceVault(address protocol_) external;
+
+    function transferFunds(address token_) external;
+
+    function getProtocolTokens(address protocol_) external;
+
+    function updateAuth(address auth_, bool isAuth_) external;
+
+    function updateRebalancer(address rebalancer_, bool isRebalancer_) external;
+
+    function approve(
+        address[] memory protocols_,
+        address[] memory tokens_,
+        uint256[] memory amounts_
+    ) external;
+
+    function revoke(
+        address[] memory protocols_,
+        address[] memory tokens_
+    ) external;
+}
+
 
 contract PayloadIGP47 {
     uint256 public constant PROPOSAL_ID = 47;
@@ -289,11 +355,11 @@ contract PayloadIGP47 {
 
     IFluidLiquidityAdmin public constant LIQUIDITY =
         IFluidLiquidityAdmin(0x52Aa899454998Be5b000Ad077a46Bbe360F4e497);
+    IFluidReserveContract public constant FLUID_RESERVE =
+        IFluidReserveContract(0x264786EF916af64a1DB19F513F24a3681734ce92);
 
     FluidVaultFactory public constant VAULT_FACTORY =
         FluidVaultFactory(0x324c5Dc1fC42c7a4D43d92df1eBA58a54d13Bf2d);
-    FluidDexFactory public constant DEX_FACTORY =
-        FluidDexFactory(0x91716C4EDA1Fb55e84Bf8b4c7085f84285c19085);
 
     address internal constant ETH_ADDRESS =
         0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
@@ -424,7 +490,7 @@ contract PayloadIGP47 {
             supplyMode: 1, // Mode 1
             supplyExpandPercent: 25 * 1e2, // 25%
             supplyExpandDuration: 12 hours, // 12 hours
-            supplyBaseLimitInUSD: 5_000_000, // $5M
+            supplyBaseLimitInUSD: 7_500_000, // $7.5M
             supplyBaseLimit: 0,
             borrowToken: GHO_ADDRESS,
             borrowMode: 1, // Mode 1
