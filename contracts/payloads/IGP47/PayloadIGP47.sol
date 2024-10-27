@@ -308,6 +308,8 @@ contract PayloadIGP47 {
         0xdAC17F958D2ee523a2206206994597C13D831ec7;
     address internal constant sUSDe_ADDRESS =
         0x9D39A5DE30e57443BfF2A8307A4256c8797A3497;
+    address internal constant sUSDs_ADDRESS =
+        0xa3931d71877C0E7a3148CB7Eb4463524FEc27fbD;
 
     address internal constant GHO_ADDRESS =
         0x40D16FC0246aD3160Ccc09B8D0D3A2cD28aE6C2f;
@@ -316,9 +318,6 @@ contract PayloadIGP47 {
         0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599;
     address internal constant cbBTC_ADDRESS =
         0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf;
-
-    address internal constant fGHO_ADDRESS =
-        0x6A29A46E21C730DcA1d8b23d637c101cec605C5B;
 
     struct Dex {
         address dex;
@@ -384,10 +383,10 @@ contract PayloadIGP47 {
     function execute() external {
         require(address(this) == address(TIMELOCK), "not-valid-caller");
 
-        // Action 1: Set supply and borrow limit for Dexes on Liquidity Layer
+        // Action 1: Set GHO token config and market rate curve on liquidity.
         action1();
 
-        // Action 2: Set Vault limits on liquidity layer and remove team multisig as auth on vaultFactory
+        // Action 2: Set GHO based vaults limits.
         action2();
     }
 
@@ -407,9 +406,9 @@ contract PayloadIGP47 {
 
             params_[0] = AdminModuleStructs.RateDataV1Params({
                 token: GHO_ADDRESS, // GHO
-                kink: 80 * 1e2, // 80%
+                kink: 93 * 1e2, // 93%
                 rateAtUtilizationZero: 0, // 0%
-                rateAtUtilizationKink: 5 * 1e2, // 5%
+                rateAtUtilizationKink: 7.5 * 1e2, // 7.5%
                 rateAtUtilizationMax: 100 * 1e2 // 100%
             });
 
@@ -417,7 +416,7 @@ contract PayloadIGP47 {
         }
     }
 
-    /// @notice Action 2: Config ETH/GHO, wstETH/GHO and weETH/GHO
+    /// @notice Action 2: Set GHO based vaults limits.
     function action2() internal {
         VaultConfig memory vaultConfig = VaultConfig({
             vaultId: 0,
@@ -437,12 +436,12 @@ contract PayloadIGP47 {
             borrowMaxLimit: 0,
             supplyRateMagnifier: 100 * 1e2, // 1x
             borrowRateMagnifier: 100 * 1e2, // 1x
-            collateralFactor: 88 * 1e2, // 88%
-            liquidationThreshold: 91 * 1e2, // 91%
-            liquidationMaxLimit: 94 * 1e2, // 94%
-            withdrawGap: 5 * 1e2, // 5%
-            liquidationPenalty: 2 * 1e2, // 2%
-            borrowFee: 0 * 1e2, // 0%
+            collateralFactor: 0, 
+            liquidationThreshold: 0,
+            liquidationMaxLimit: 0,
+            withdrawGap: 0,
+            liquidationPenalty: 0,
+            borrowFee: 0, // 0%
             oracle: address(0)
         });
 
@@ -452,8 +451,14 @@ contract PayloadIGP47 {
             vaultConfig.supplyToken = ETH_ADDRESS;
             vaultConfig.borrowToken = GHO_ADDRESS;
 
+            vaultConfig.collateralFactor = 85 * 1e2; // 85%
+            vaultConfig.liquidationThreshold = 90 * 1e2; // 90%
+            vaultConfig.liquidationMaxLimit = 93 * 1e2; // 95%
+            vaultConfig.withdrawGap = 5 * 1e2; // 5%
+            vaultConfig.liquidationPenalty = 2.5 * 1e2; // 5%
+
             vaultConfig.oracle = address(
-                0x5D9bF2026dc5C248B785aC760ab6d3CF7A6C93cc
+                0x39f6447ca8Ac3c6aa841B4C0D1fFb5D4DDb0FdE7
             );
 
             address vault_ = configVault(vaultConfig);
@@ -467,8 +472,35 @@ contract PayloadIGP47 {
             vaultConfig.supplyToken = wstETH_ADDRESS;
             vaultConfig.borrowToken = GHO_ADDRESS;
 
+            vaultConfig.collateralFactor = 82 * 1e2; // 82%
+            vaultConfig.liquidationThreshold = 88 * 1e2; // 88%
+            vaultConfig.liquidationMaxLimit = 92.5 * 1e2; // 92.5%
+            vaultConfig.withdrawGap = 5 * 1e2; // 5%
+            vaultConfig.liquidationPenalty = 3 * 1e2; // 3%
+
             vaultConfig.oracle = address(
-                0xdB94DD822bAaa80f8B339392bed994cdEA72D775
+                0xbEeCb9e594D008194c438f9e7234e17926c5070f
+            );
+
+            address vault_ = configVault(vaultConfig);
+
+            require(vault_ != address(0), "vault-not-deployed");
+        }
+
+        // Config sUSDe/GHO vault.
+        {
+            vaultConfig.vaultId = 56;
+            vaultConfig.supplyToken = sUSDe_ADDRESS;
+            vaultConfig.borrowToken = GHO_ADDRESS;
+
+            vaultConfig.collateralFactor = 88 * 1e2; // 88%
+            vaultConfig.liquidationThreshold = 90 * 1e2; // 90%
+            vaultConfig.liquidationMaxLimit = 95 * 1e2; // 95%
+            vaultConfig.withdrawGap = 5 * 1e2; // 5%
+            vaultConfig.liquidationPenalty = 2 * 1e2; // 2%
+
+            vaultConfig.oracle = address(
+                0x887d0aFb83949dd2d379e55E122c3c234D68F8BF
             );
 
             address vault_ = configVault(vaultConfig);
@@ -478,12 +510,81 @@ contract PayloadIGP47 {
 
         // Config weETH/GHO vault.
         {
-            vaultConfig.vaultId = 56;
+            vaultConfig.vaultId = 57;
             vaultConfig.supplyToken = weETH_ADDRESS;
             vaultConfig.borrowToken = GHO_ADDRESS;
 
+            vaultConfig.collateralFactor = 77 * 1e2; // 77%
+            vaultConfig.liquidationThreshold = 82 * 1e2; // 82%
+            vaultConfig.liquidationMaxLimit = 90 * 1e2; // 90%
+            vaultConfig.withdrawGap = 5 * 1e2; // 5%
+            vaultConfig.liquidationPenalty = 3 * 1e2; // 3%
+
             vaultConfig.oracle = address(
-                0xdB94DD822bAaa80f8B339392bed994cdEA72D775
+                0x8d675657712C3621Fb5Ea57E6fE83F6799224C98
+            );
+
+            address vault_ = configVault(vaultConfig);
+
+            require(vault_ != address(0), "vault-not-deployed");
+        }
+
+        // Config sUSDs/GHO vault.
+        {
+            vaultConfig.vaultId = 58;
+            vaultConfig.supplyToken = sUSDs_ADDRESS;
+            vaultConfig.borrowToken = GHO_ADDRESS;
+
+            vaultConfig.collateralFactor = 90 * 1e2; // 90%
+            vaultConfig.liquidationThreshold = 92 * 1e2; // 92%
+            vaultConfig.liquidationMaxLimit = 95 * 1e2; // 95%
+            vaultConfig.withdrawGap = 5 * 1e2; // 5%
+            vaultConfig.liquidationPenalty = 2 * 1e2; // 2%
+
+            vaultConfig.oracle = address(
+                0xCac98B078aC63432d77dfd4DCFDB39D3033C9D11
+            );
+
+            address vault_ = configVault(vaultConfig);
+
+            require(vault_ != address(0), "vault-not-deployed");
+        }
+
+        // Config wBTC/GHO vault.
+        {
+            vaultConfig.vaultId = 59;
+            vaultConfig.supplyToken = WBTC_ADDRESS;
+            vaultConfig.borrowToken = GHO_ADDRESS;
+
+            vaultConfig.collateralFactor = 85 * 1e2; // 85%
+            vaultConfig.liquidationThreshold = 88 * 1e2; // 88%
+            vaultConfig.liquidationMaxLimit = 92.5 * 1e2; // 92.5%
+            vaultConfig.withdrawGap = 5 * 1e2; // 5%
+            vaultConfig.liquidationPenalty = 3 * 1e2; // 3%
+
+            vaultConfig.oracle = address(
+                0x687351DF42715Dd0F2ebfdeAc2C73D374E66bD90
+            );
+
+            address vault_ = configVault(vaultConfig);
+
+            require(vault_ != address(0), "vault-not-deployed");
+        }
+
+        // Config cbBTC/GHO vault.
+        {
+            vaultConfig.vaultId = 60;
+            vaultConfig.supplyToken = cbBTC_ADDRESS;
+            vaultConfig.borrowToken = GHO_ADDRESS;
+
+            vaultConfig.collateralFactor = 85 * 1e2; // 85%
+            vaultConfig.liquidationThreshold = 88 * 1e2; // 88%
+            vaultConfig.liquidationMaxLimit = 92.5 * 1e2; // 92.5%
+            vaultConfig.withdrawGap = 5 * 1e2; // 5%
+            vaultConfig.liquidationPenalty = 3 * 1e2; // 3%
+
+            vaultConfig.oracle = address(
+                0x8Ae43Ebc63d0C49C2478066bFf097Dc3FE05B5ac
             );
 
             address vault_ = configVault(vaultConfig);
