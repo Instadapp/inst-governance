@@ -573,7 +573,7 @@ contract PayloadIGP48 {
                 smartCollateral: true,
                 smartDebt: true,
                 baseWithdrawalLimitInUSD: 50_000, // $50k
-                baseBorrowLimitInUSD: 40_000, // $50k
+                baseBorrowLimitInUSD: 40_000, // $40k
                 maxBorrowLimitInUSD: 50_000 // $50k
             });
             setDexLimits(DEX_ETH_USDC); // Smart Collateral & Smart Debt
