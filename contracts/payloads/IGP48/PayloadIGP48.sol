@@ -425,6 +425,8 @@ contract PayloadIGP48 {
         0x9D39A5DE30e57443BfF2A8307A4256c8797A3497;
     address internal constant sUSDs_ADDRESS =
         0xa3931d71877C0E7a3148CB7Eb4463524FEc27fbD;
+    address internal constant USDe_ADDRESS = 
+        0x4c9EDD5852cd905f086C759E8383e09bff1E68B3;
 
     address internal constant GHO_ADDRESS =
         0x40D16FC0246aD3160Ccc09B8D0D3A2cD28aE6C2f;
@@ -501,14 +503,18 @@ contract PayloadIGP48 {
     function execute() external {
         require(address(this) == address(TIMELOCK), "not-valid-caller");
 
-        // Action 1: Set GHO-USDC Dex pool allowance.
+        // Action 1: Set USDe token config and market rate curve on liquidity.
         action1();
 
-        // Action 2: Set Other Dex pools dust allowance.
+        // Action 2: Set GHO-USDC Dex pool allowance.
         action2();
 
-        // Action 3: set fGHO rewards handler
+        // Action 3: Set Other Dex pools dust allowance.
         action3();
+
+        // Action 4: set fGHO rewards handler
+        action3();
+        
     }
 
     function verifyProposal() external view {}
@@ -519,8 +525,27 @@ contract PayloadIGP48 {
      * |__________________________________
      */
 
-    /// @notice Action 1: Set GHO-USDC Dex pool allowance.
+
+    /// @notice Action 1: Set USDe token config and market rate curve on liquidity.
     function action1() internal {
+        {
+            AdminModuleStructs.RateDataV1Params[]
+                memory params_ = new AdminModuleStructs.RateDataV1Params[](1);
+
+            params_[0] = AdminModuleStructs.RateDataV1Params({
+                token: USDe_ADDRESS, // USDe
+                kink: 93 * 1e2, // 93%
+                rateAtUtilizationZero: 0, // 0%
+                rateAtUtilizationKink: 7.5 * 1e2, // 7.5%
+                rateAtUtilizationMax: 25 * 1e2 // 25%
+            });
+
+            LIQUIDITY.updateRateDataV1s(params_);
+        }
+    }
+
+    /// @notice Action 2: Set GHO-USDC Dex pool allowance.
+    function action2() internal {
         {
             // GHO-USDC
             Dex memory DEX_GHO_USDC = Dex({
@@ -537,8 +562,8 @@ contract PayloadIGP48 {
         }
     }
 
-    /// @notice Action 2:  Set Other Dex pools dust allowance.
-    function action2() internal {
+    /// @notice Action 3:  Set Other Dex pools dust allowance.
+    function action3() internal {
         {
             // ETH-USDC
             Dex memory DEX_ETH_USDC = Dex({
@@ -585,10 +610,10 @@ contract PayloadIGP48 {
         }
 
         {
-            // sUSDe-USDC
-            Dex memory DEX_sUSDe_USDC = Dex({
+            // USDe-USDC
+            Dex memory DEX_USDe_USDC = Dex({
                 dex: getDexAddress(8),
-                tokenA: sUSDe_ADDRESS,
+                tokenA: USDe_ADDRESS,
                 tokenB: USDC_ADDRESS,
                 smartCollateral: true,
                 smartDebt: true,
@@ -596,12 +621,12 @@ contract PayloadIGP48 {
                 baseBorrowLimitInUSD: 40_000, // $40k
                 maxBorrowLimitInUSD: 50_000 // $50k
             });
-            setDexLimits(DEX_sUSDe_USDC); // Smart Collateral & Smart Debt
+            setDexLimits(DEX_USDe_USDC); // Smart Collateral & Smart Debt
         }
     }
 
-    // Action 3: set fGHO rewards handler
-    function action3() internal {
+    // Action 4: set fGHO rewards handler
+    function action4() internal {
          address[] memory protocols = new address[](1);
         address[] memory tokens = new address[](1);
         uint256[] memory amounts = new uint256[](1);
