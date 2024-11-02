@@ -513,7 +513,7 @@ contract PayloadIGP48 {
         action3();
 
         // Action 4: set fGHO rewards handler
-        action3();
+        action4();
         
     }
 
