@@ -555,7 +555,7 @@ contract PayloadIGP48 {
             VAULT_FACTORY.setVaultAuth(getVaultAddress(61), TEAM_MULTISIG, false);
 
             // Remove Team Multisig as auth for GHO-USDC Dex pool.
-            DEX_FACTORY.setDexAuth(getDexAddress(4), address(VAULT_FACTORY), false);
+            DEX_FACTORY.setDexAuth(getDexAddress(4), TEAM_MULTISIG, false);
         }
     }
 
@@ -739,10 +739,10 @@ contract PayloadIGP48 {
 
     /// @notice Action 6: Add Team Multisig as auth for newly deployed Vaults
     function action6() internal {
+        VAULT_FACTORY.setVaultAuth(getVaultAddress(62), TEAM_MULTISIG, true);
         VAULT_FACTORY.setVaultAuth(getVaultAddress(63), TEAM_MULTISIG, true);
         VAULT_FACTORY.setVaultAuth(getVaultAddress(64), TEAM_MULTISIG, true);
         VAULT_FACTORY.setVaultAuth(getVaultAddress(65), TEAM_MULTISIG, true);
-        VAULT_FACTORY.setVaultAuth(getVaultAddress(66), TEAM_MULTISIG, true);
     }
 
     /**
