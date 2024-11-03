@@ -516,7 +516,9 @@ contract PayloadIGP48 {
 
         // Action 4: set fGHO rewards handler
         action4();
-        
+
+        // Action 5: Adjust Reserve allowances on wBTC/stables vaults
+        action5();
     }
 
     function verifyProposal() external view {}
@@ -659,6 +661,55 @@ contract PayloadIGP48 {
 
         FLUID_RESERVE.approve(protocols, tokens, amounts);
     }
+
+    /// @notice Action 5: Adjust Reserve allowances on wBTC/stables vaults
+    function action5() internal {
+         address[] memory protocols = new address[](4);
+        address[] memory tokens = new address[](4);
+        uint256[] memory amounts = new uint256[](4);
+
+        address wBTC_USDC_VAULT = getVaultAddress(21);
+        address wBTC_USDT_VAULT = getVaultAddress(22);
+
+        { // Supply Side wBTC-USDC
+
+            protocols[0] = wBTC_USDC_VAULT;
+            tokens[0] = WBTC_ADDRESS;
+            amounts[0] = 0.0015 * 1e8;
+        }
+
+        { // Supply Side wBTC-USDT
+
+            protocols[1] = wBTC_USDT_VAULT;
+            tokens[1] = WBTC_ADDRESS;
+            amounts[1] = 0.0015 * 1e8;
+        }
+
+        { // Borrow Side wBTC-USDC
+            uint256 allowance = IERC20(USDC_ADDRESS).allowance(
+                address(FLUID_RESERVE), 
+                wBTC_USDC_VAULT
+            );
+
+            protocols[2] = wBTC_USDC_VAULT;
+            tokens[2] = USDC_ADDRESS;
+            amounts[2] = allowance + (26_000 * 1e6);
+        }
+
+        { // Borrow Side wBTC-USDT
+            uint256 allowance = IERC20(USDT_ADDRESS).allowance(
+                address(FLUID_RESERVE), 
+                wBTC_USDT_VAULT
+            );
+
+            protocols[3] = wBTC_USDT_VAULT;
+            tokens[3] = USDT_ADDRESS;
+            amounts[3] = allowance + (26_000 * 1e6);
+        }
+
+        FLUID_RESERVE.approve(protocols, tokens, amounts);
+    }
+
     /**
      * |
      * |     Proposal Payload Helpers      |
