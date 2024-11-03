@@ -519,6 +519,9 @@ contract PayloadIGP48 {
 
         // Action 5: Adjust Reserve allowances on wBTC/stables vaults
         action5();
+
+        // Action 6: Add Team Multisig as auth for newly deployed Vaults
+        action6();
     }
 
     function verifyProposal() external view {}
@@ -708,6 +711,14 @@ contract PayloadIGP48 {
         }
 
         FLUID_RESERVE.approve(protocols, tokens, amounts);
+    }
+
+    /// @notice Action 6: Add Team Multisig as auth for newly deployed Vaults
+    function action6() internal {
+        VAULT_FACTORY.setVaultAuth(getVaultAddress(63), TEAM_MULTISIG, true);
+        VAULT_FACTORY.setVaultAuth(getVaultAddress(64), TEAM_MULTISIG, true);
+        VAULT_FACTORY.setVaultAuth(getVaultAddress(65), TEAM_MULTISIG, true);
+        VAULT_FACTORY.setVaultAuth(getVaultAddress(66), TEAM_MULTISIG, true);
     }
 
     /**
