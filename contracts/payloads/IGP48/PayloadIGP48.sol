@@ -554,8 +554,8 @@ contract PayloadIGP48 {
             // Remove Team Multisig as auth for GHO-USDC Vault.
             VAULT_FACTORY.setVaultAuth(getVaultAddress(61), TEAM_MULTISIG, false);
 
-            // Remove Team Multisig as auth for GHO-USDC Dex pool.
-            DEX_FACTORY.setDexAuth(getDexAddress(4), TEAM_MULTISIG, false);
+            // // Remove Team Multisig as auth for GHO-USDC Dex pool.
+            // DEX_FACTORY.setDexAuth(getDexAddress(4), TEAM_MULTISIG, false);
         }
     }
 
@@ -922,9 +922,12 @@ contract PayloadIGP48 {
             usdPrice = 1 * 1e2;
             decimals = 6;
         } else if (token == sUSDe_ADDRESS) {
-            usdPrice = 1.1 * 1e2;
+            usdPrice = 1.11 * 1e2;
             decimals = 18;
-        } else if (token == GHO_ADDRESS || token == sUSDs_ADDRESS) {
+        } else if (token == sUSDs_ADDRESS) {
+            usdPrice = 1.12 * 1e2;
+            decimals = 18;
+        } else if (token == GHO_ADDRESS || token == USDe_ADDRESS) {
             usdPrice = 1 * 1e2;
             decimals = 18;
         } else {
