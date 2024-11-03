@@ -366,9 +366,7 @@ interface IERC20 {
         address caller
     ) external view returns (uint256);
 
-    function balanceOf(
-        address account
-    ) external view returns (uint256);
+    function balanceOf(address account) external view returns (uint256);
 }
 
 interface FluidDexFactory {
@@ -427,7 +425,7 @@ contract PayloadIGP48 {
         0x9D39A5DE30e57443BfF2A8307A4256c8797A3497;
     address internal constant sUSDs_ADDRESS =
         0xa3931d71877C0E7a3148CB7Eb4463524FEc27fbD;
-    address internal constant USDe_ADDRESS = 
+    address internal constant USDe_ADDRESS =
         0x4c9EDD5852cd905f086C759E8383e09bff1E68B3;
 
     address internal constant GHO_ADDRESS =
@@ -532,7 +530,6 @@ contract PayloadIGP48 {
      * |__________________________________
      */
 
-
     /// @notice Action 1: Set USDe token config and market rate curve on liquidity.
     function action1() internal {
         {
@@ -550,9 +547,13 @@ contract PayloadIGP48 {
             LIQUIDITY.updateRateDataV1s(params_);
         }
 
-        {   
+        {
             // Remove Team Multisig as auth for GHO-USDC Vault.
-            VAULT_FACTORY.setVaultAuth(getVaultAddress(61), TEAM_MULTISIG, false);
+            VAULT_FACTORY.setVaultAuth(
+                getVaultAddress(61),
+                TEAM_MULTISIG,
+                false
+            );
 
             // // Remove Team Multisig as auth for GHO-USDC Dex pool.
             // DEX_FACTORY.setDexAuth(getDexAddress(4), TEAM_MULTISIG, false);
@@ -569,9 +570,9 @@ contract PayloadIGP48 {
                 tokenB: USDC_ADDRESS,
                 smartCollateral: true,
                 smartDebt: true,
-                baseWithdrawalLimitInUSD: 12_000_000, // $12M
-                baseBorrowLimitInUSD: 12_000_000, // $12M
-                maxBorrowLimitInUSD: 25_000_000 // $25M
+                baseWithdrawalLimitInUSD: 7_500_000, // $7.5M
+                baseBorrowLimitInUSD: 5_000_000, // $5M
+                maxBorrowLimitInUSD: 6_000_000 // $6M
             });
             setDexLimits(DEX_GHO_USDC); // Smart Collateral & Smart Debt
         }
@@ -642,7 +643,7 @@ contract PayloadIGP48 {
 
     /// @notice Action 4: set fGHO rewards handler
     function action4() internal {
-         address[] memory protocols = new address[](1);
+        address[] memory protocols = new address[](1);
         address[] memory tokens = new address[](1);
         uint256[] memory amounts = new uint256[](1);
 
@@ -667,7 +668,7 @@ contract PayloadIGP48 {
 
     /// @notice Action 5: Adjust Reserve allowances on wBTC/stables and cbBTC/stables vaults
     function action5() internal {
-         address[] memory protocols = new address[](6);
+        address[] memory protocols = new address[](6);
         address[] memory tokens = new address[](6);
         uint256[] memory amounts = new uint256[](6);
 
@@ -676,23 +677,26 @@ contract PayloadIGP48 {
         address cbBTC_USDC_VAULT = getVaultAddress(29);
         address cbBTC_USDT_VAULT = getVaultAddress(30);
 
-        { // Supply Side wBTC-USDC
+        {
+            // Supply Side wBTC-USDC
 
             protocols[0] = wBTC_USDC_VAULT;
             tokens[0] = WBTC_ADDRESS;
             amounts[0] = 0.0015 * 1e8;
         }
 
-        { // Supply Side wBTC-USDT
+        {
+            // Supply Side wBTC-USDT
 
             protocols[1] = wBTC_USDT_VAULT;
             tokens[1] = WBTC_ADDRESS;
             amounts[1] = 0.0015 * 1e8;
         }
 
-        { // Borrow Side wBTC-USDC
+        {
+            // Borrow Side wBTC-USDC
             uint256 allowance = IERC20(USDC_ADDRESS).allowance(
-                address(FLUID_RESERVE), 
+                address(FLUID_RESERVE),
                 wBTC_USDC_VAULT
             );
 
@@ -701,9 +705,10 @@ contract PayloadIGP48 {
             amounts[2] = allowance + (26_000 * 1e6);
         }
 
-        { // Borrow Side wBTC-USDT
+        {
+            // Borrow Side wBTC-USDT
             uint256 allowance = IERC20(USDT_ADDRESS).allowance(
-                address(FLUID_RESERVE), 
+                address(FLUID_RESERVE),
                 wBTC_USDT_VAULT
             );
 
@@ -712,9 +717,10 @@ contract PayloadIGP48 {
             amounts[3] = allowance + (26_000 * 1e6);
         }
 
-        { // Borrow Side cbBTC-USDC
+        {
+            // Borrow Side cbBTC-USDC
             uint256 allowance = IERC20(USDC_ADDRESS).allowance(
-                address(FLUID_RESERVE), 
+                address(FLUID_RESERVE),
                 cbBTC_USDC_VAULT
             );
 
@@ -723,9 +729,10 @@ contract PayloadIGP48 {
             amounts[4] = allowance + (26_000 * 1e6);
         }
 
-        { // Borrow Side cbBTC-USDT
+        {
+            // Borrow Side cbBTC-USDT
             uint256 allowance = IERC20(USDT_ADDRESS).allowance(
-                address(FLUID_RESERVE), 
+                address(FLUID_RESERVE),
                 cbBTC_USDT_VAULT
             );
 
