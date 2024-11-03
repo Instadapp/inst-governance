@@ -376,6 +376,8 @@ interface FluidDexFactory {
     /// @param dexId_                   The ID of the dex.
     /// @return dex_                    Returns the computed address of the dex.
     function getDexAddress(uint256 dexId_) external view returns (address dex_);
+
+    function setDexAuth(address dex_, address dexAuth_, bool allowed_) external;
 }
 
 contract PayloadIGP48 {
@@ -542,6 +544,14 @@ contract PayloadIGP48 {
 
             LIQUIDITY.updateRateDataV1s(params_);
         }
+
+        {   
+            // Remove Team Multisig as auth for GHO-USDC Vault.
+            VAULT_FACTORY.setVaultAuth(getVaultAddress(61), TEAM_MULTISIG, false);
+
+            // Remove Team Multisig as auth for GHO-USDC Dex pool.
+            DEX_FACTORY.setDexAuth(getDexAddress(4), address(VAULT_FACTORY), false);
+        }
     }
 
     /// @notice Action 2: Set GHO-USDC Dex pool allowance.
@@ -625,7 +635,7 @@ contract PayloadIGP48 {
         }
     }
 
-    // Action 4: set fGHO rewards handler
+    /// @notice Action 4: set fGHO rewards handler
     function action4() internal {
          address[] memory protocols = new address[](1);
         address[] memory tokens = new address[](1);
@@ -634,7 +644,7 @@ contract PayloadIGP48 {
         {
             /// fGHO
             IFTokenAdmin(F_GHO_ADDRESS).updateRewards(
-                address(0) // TODO: set rewards handler
+                address(0xE85eb0acB7281fAf00810d167C7dE14bB070B480)
             );
 
             uint256 allowance = IERC20(GHO_ADDRESS).allowance(
@@ -644,7 +654,7 @@ contract PayloadIGP48 {
 
             protocols[0] = F_GHO_ADDRESS;
             tokens[0] = GHO_ADDRESS;
-            amounts[0] = allowance + (250_000 * 1e6);
+            amounts[0] = allowance + (73_000 * 1e6);
         }
 
         FLUID_RESERVE.approve(protocols, tokens, amounts);
