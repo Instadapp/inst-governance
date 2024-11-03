@@ -376,6 +376,8 @@ interface FluidDexFactory {
     function getDexAddress(uint256 dexId_) external view returns (address dex_);
 
     function setDexAuth(address dex_, address dexAuth_, bool allowed_) external;
+
+    function owner() external view returns (address);
 }
 
 contract PayloadIGP48 {
@@ -555,8 +557,10 @@ contract PayloadIGP48 {
                 false
             );
 
-            // // Remove Team Multisig as auth for GHO-USDC Dex pool.
-            // DEX_FACTORY.setDexAuth(getDexAddress(4), TEAM_MULTISIG, false);
+            // Remove Team Multisig as auth for GHO-USDC Dex pool.
+            if (DEX_FACTORY.owner() == address(this)) {
+                DEX_FACTORY.setDexAuth(getDexAddress(4), TEAM_MULTISIG, false);
+            }
         }
     }
 
