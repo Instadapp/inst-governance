@@ -660,7 +660,7 @@ contract PayloadIGP48 {
 
             protocols[0] = F_GHO_ADDRESS;
             tokens[0] = GHO_ADDRESS;
-            amounts[0] = allowance + (73_000 * 1e6);
+            amounts[0] = allowance + (73_000 * 1e18);
         }
 
         FLUID_RESERVE.approve(protocols, tokens, amounts);
