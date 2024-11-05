@@ -625,7 +625,7 @@ contract PayloadIGP49 {
             vaultConfig.withdrawGap = 0 * 1e2; // 0
             vaultConfig.liquidationPenalty = 0 * 1e2; // 0
 
-            vaultConfig.oracle = address(0);
+            vaultConfig.oracle = address(0x8E5FA052eE010BCbAc7d00D859100B48a6A40967);
 
             address vault_ = configVault(vaultConfig);
 
@@ -644,7 +644,7 @@ contract PayloadIGP49 {
             vaultConfig.withdrawGap = 0 * 1e2; // 0
             vaultConfig.liquidationPenalty = 0 * 1e2; // 0
 
-            vaultConfig.oracle = address(0);
+            vaultConfig.oracle = address(0x8E5FA052eE010BCbAc7d00D859100B48a6A40967);
 
             address vault_ = configVault(vaultConfig);
 
@@ -663,7 +663,7 @@ contract PayloadIGP49 {
             vaultConfig.withdrawGap = 0 * 1e2; // 0
             vaultConfig.liquidationPenalty = 0 * 1e2; // 0
 
-            vaultConfig.oracle = address(0);
+            vaultConfig.oracle = address(0xAd3fEaE8c608681E989D393b48FaEE71e664050A);
 
             address vault_ = configVault(vaultConfig);
 
@@ -682,7 +682,7 @@ contract PayloadIGP49 {
             vaultConfig.withdrawGap = 5 * 1e2; // 5%
             vaultConfig.liquidationPenalty = 2.5 * 1e2; // 2.5%
 
-            vaultConfig.oracle = address(0);
+            vaultConfig.oracle = address(0x4A67E941Ccd89806Ba2397BA336d791759D512ca);
 
             address vault_ = configVault(vaultConfig);
 
@@ -701,7 +701,7 @@ contract PayloadIGP49 {
             vaultConfig.withdrawGap = 5 * 1e2; // 5%
             vaultConfig.liquidationPenalty = 3 * 1e2; // 3%
 
-            vaultConfig.oracle = address(0);
+            vaultConfig.oracle = address(0x4908422a87111394c05751dFfaE4A64BE18B05E3);
 
             address vault_ = configVault(vaultConfig);
 
@@ -720,7 +720,7 @@ contract PayloadIGP49 {
             vaultConfig.withdrawGap = 5 * 1e2; // 5%
             vaultConfig.liquidationPenalty = 3 * 1e2; // 3%
 
-            vaultConfig.oracle = address(0);
+            vaultConfig.oracle = address(0x743FB38FD621fc836F3383531Fb576e8a35059E1);
 
             address vault_ = configVault(vaultConfig);
 
@@ -739,7 +739,7 @@ contract PayloadIGP49 {
             vaultConfig.withdrawGap = 5 * 1e2; // 5%
             vaultConfig.liquidationPenalty = 3 * 1e2; // 3%
 
-            vaultConfig.oracle = address(0);
+            vaultConfig.oracle = address(0x538fec4B539ad20B55Ba2F08b58bc28bC669Adc3);
 
             address vault_ = configVault(vaultConfig);
 
@@ -758,7 +758,7 @@ contract PayloadIGP49 {
             vaultConfig.withdrawGap = 5 * 1e2; // 5%
             vaultConfig.liquidationPenalty = 3 * 1e2; // 3%
 
-            vaultConfig.oracle = address(0);
+            vaultConfig.oracle = address(0x0e701AFc1feF3E963a42cC1Ccf81BEAE0fEbf20A);
 
             address vault_ = configVault(vaultConfig);
 
