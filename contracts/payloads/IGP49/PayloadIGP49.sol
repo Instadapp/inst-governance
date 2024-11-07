@@ -1092,16 +1092,16 @@ contract PayloadIGP49 {
         uint256 usdPrice = 0;
         uint256 decimals = 18;
         if (token == ETH_ADDRESS) {
-            usdPrice = 2_500 * 1e2;
+            usdPrice = 2_850 * 1e2;
             decimals = 18;
         } else if (token == wstETH_ADDRESS) {
-            usdPrice = 2_970 * 1e2;
+            usdPrice = 3_375 * 1e2;
             decimals = 18;
         } else if (token == weETH_ADDRESS) {
-            usdPrice = 2_650 * 1e2;
+            usdPrice = 3_000 * 1e2;
             decimals = 18;
         } else if (token == cbBTC_ADDRESS || token == WBTC_ADDRESS) {
-            usdPrice = 67_750 * 1e2;
+            usdPrice = 76_000 * 1e2;
             decimals = 8;
         } else if (token == USDC_ADDRESS || token == USDT_ADDRESS) {
             usdPrice = 1 * 1e2;
