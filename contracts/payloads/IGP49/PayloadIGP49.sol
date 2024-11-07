@@ -392,7 +392,10 @@ interface IFluidDex {
         uint shiftTime_
     ) external;
 
-    function updateCenterPriceLimits(uint maxCenterPrice_, uint minCenterPrice_) external;
+    function updateCenterPriceLimits(
+        uint maxCenterPrice_,
+        uint minCenterPrice_
+    ) external;
 
     function readFromStorage(
         bytes32 slot_
@@ -486,7 +489,6 @@ contract PayloadIGP49 {
     address internal constant F_GHO_ADDRESS =
         0x6A29A46E21C730DcA1d8b23d637c101cec605C5B;
 
-
     IFluidDexResolver public constant FLUID_DEX_RESOLVER =
         IFluidDexResolver(0x0000000000000000000000000000000000000000); // TODO: Update this
 
@@ -575,15 +577,20 @@ contract PayloadIGP49 {
     /// @notice Action 1: Update USDC-USDT Pool min price and threshold percent.
     function action1() internal {
         address USDC_USDT_POOL = getDexAddress(2);
-        IFluidDexResolver.Configs memory configs_ = FLUID_DEX_RESOLVER.getDexConfigs(USDC_USDT_POOL);
+        IFluidDexResolver.Configs memory configs_ = FLUID_DEX_RESOLVER
+            .getDexConfigs(USDC_USDT_POOL);
 
         {
             uint256 minCenterPrice_ = 0.9995 * 1e27;
-            IFluidDex(USDC_USDT_POOL).updateCenterPriceLimits(configs_.maxCenterPrice, minCenterPrice_);
+            uint256 maxCenterPrice_ = 1e27 / 0.9995;
+            IFluidDex(USDC_USDT_POOL).updateCenterPriceLimits(
+                maxCenterPrice_,
+                minCenterPrice_
+            );
         }
 
         {
-            uint256 threshold_ = 80 * 1e12;
+            uint256 threshold_ = 80 * 1e4;
             IFluidDex(USDC_USDT_POOL).updateThresholdPercent(
                 threshold_,
                 threshold_,
