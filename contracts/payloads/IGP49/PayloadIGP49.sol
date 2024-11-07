@@ -559,7 +559,7 @@ contract PayloadIGP49 {
         // Action 1: Update USDC-USDT Pool min price and threshold percent.
         action1();
 
-        // Action 2: Increase ETH-USDC, wBTC-ETH, cbBTC-ETH, USDe-USDC Dex pools allowance on Liquidity.
+        // Action 2: Increase ETH-USDC Dex pool allowance on Liquidity and remove Team Multisig as Auth on Vault 62
         action2();
 
         // Action 3: Config USDe vaults
@@ -598,7 +598,7 @@ contract PayloadIGP49 {
         }
     }
 
-    /// @notice Action 2: Increase ETH-USDC, wBTC-ETH, cbBTC-ETH, USDe-USDC Dex pools allowance on Liquidity.
+    /// @notice Action 2: Increase ETH-USDC Dex pools allowance on Liquidity and remove Team Multisig as Auth on Vault 62.
     function action2() internal {
         {
             // ETH-USDC
@@ -613,6 +613,12 @@ contract PayloadIGP49 {
                 maxBorrowLimitInUSD: 12_000_000 // $12M
             });
             setDexLimits(DEX_ETH_USDC); // Smart Collateral & Smart Debt
+
+        }
+
+        // Remove Team Multisig as Auth on Vault 62
+        {
+            VAULT_FACTORY.setVaultAuth(getVaultAddress(62), TEAM_MULTISIG, false);
         }
     }
 
