@@ -380,6 +380,51 @@ interface FluidDexFactory {
     function owner() external view returns (address);
 }
 
+interface IFluidDex {
+    /// @param upperThresholdPercent_ in 4 decimals, 10000 = 1%
+    /// @param lowerThresholdPercent_ in 4 decimals, 10000 = 1%
+    /// @param thresholdShiftTime_ in secs, in how much time the threshold percent should take to shift the ranges
+    /// @param shiftTime_ in secs, in how much time the upper config changes should be fully done.
+    function updateThresholdPercent(
+        uint upperThresholdPercent_,
+        uint lowerThresholdPercent_,
+        uint thresholdShiftTime_,
+        uint shiftTime_
+    ) external;
+
+    function updateCenterPriceLimits(uint maxCenterPrice_, uint minCenterPrice_) external;
+
+    function readFromStorage(
+        bytes32 slot_
+    ) external view returns (uint256 result_);
+}
+
+interface IFluidDexResolver {
+    struct Configs {
+        bool isSmartCollateralEnabled;
+        bool isSmartDebtEnabled;
+        uint256 fee;
+        uint256 revenueCut;
+        uint256 upperRange;
+        uint256 lowerRange;
+        uint256 upperShiftThreshold;
+        uint256 lowerShiftThreshold;
+        uint256 shiftingTime;
+        address centerPriceAddress;
+        address hookAddress;
+        uint256 maxCenterPrice;
+        uint256 minCenterPrice;
+        uint256 utilizationLimitToken0;
+        uint256 utilizationLimitToken1;
+        uint256 maxSupplyShares;
+        uint256 maxBorrowShares;
+    }
+
+    function getDexConfigs(
+        address dex_
+    ) external view returns (Configs memory configs_);
+}
+
 contract PayloadIGP49 {
     uint256 public constant PROPOSAL_ID = 49;
 
@@ -441,6 +486,10 @@ contract PayloadIGP49 {
     address internal constant F_GHO_ADDRESS =
         0x6A29A46E21C730DcA1d8b23d637c101cec605C5B;
 
+
+    IFluidDexResolver public constant FLUID_DEX_RESOLVER =
+        IFluidDexResolver(0x0000000000000000000000000000000000000000); // TODO: Update this
+
     struct Dex {
         address dex;
         address tokenA;
@@ -485,7 +534,7 @@ contract PayloadIGP49 {
         string[] memory signatures = new string[](totalActions);
         bytes[] memory calldatas = new bytes[](totalActions);
 
-        // Action 1: call executePayload on timelock contract to execute payload related to Fluid and Lite
+        // Action 1: call executePayload on timelock contract to execute payload related to Fluid.
         targets[0] = address(TIMELOCK);
         values[0] = 0;
         signatures[0] = "executePayload(address,string,bytes)";
@@ -505,11 +554,14 @@ contract PayloadIGP49 {
     function execute() external {
         require(address(this) == address(TIMELOCK), "not-valid-caller");
 
-        // Action 1: Increase ETH-USDC, wBTC-ETH, cbBTC-ETH, USDe-USDC Dex pools allowance on Liquidity.
+        // Action 1: Update USDC-USDT Pool min price and threshold percent.
         action1();
 
-        // Action 2: Config USDe vaults
+        // Action 2: Increase ETH-USDC, wBTC-ETH, cbBTC-ETH, USDe-USDC Dex pools allowance on Liquidity.
         action2();
+
+        // Action 3: Config USDe vaults
+        action3();
     }
 
     function verifyProposal() external view {}
@@ -520,9 +572,29 @@ contract PayloadIGP49 {
      * |__________________________________
      */
 
-
-    /// @notice Action 1: Increase ETH-USDC, wBTC-ETH, cbBTC-ETH, USDe-USDC Dex pools allowance on Liquidity.
+    /// @notice Action 1: Update USDC-USDT Pool min price and threshold percent.
     function action1() internal {
+        address USDC_USDT_POOL = getDexAddress(2);
+        IFluidDexResolver.Configs memory configs_ = FLUID_DEX_RESOLVER.getDexConfigs(USDC_USDT_POOL);
+
+        {
+            uint256 minCenterPrice_ = 0.9995 * 1e27;
+            IFluidDex(USDC_USDT_POOL).updateCenterPriceLimits(configs_.maxCenterPrice, minCenterPrice_);
+        }
+
+        {
+            uint256 threshold_ = 80 * 1e12;
+            IFluidDex(USDC_USDT_POOL).updateThresholdPercent(
+                threshold_,
+                threshold_,
+                configs_.shiftingTime,
+                configs_.shiftingTime
+            );
+        }
+    }
+
+    /// @notice Action 2: Increase ETH-USDC, wBTC-ETH, cbBTC-ETH, USDe-USDC Dex pools allowance on Liquidity.
+    function action2() internal {
         {
             // ETH-USDC
             Dex memory DEX_ETH_USDC = Dex({
@@ -584,8 +656,8 @@ contract PayloadIGP49 {
         }
     }
 
-    /// @notice Action 2: Config USDe vaults
-    function action2() internal {
+    /// @notice Action 3: Config USDe vaults
+    function action3() internal {
         VaultConfig memory vaultConfig = VaultConfig({
             vaultId: 0,
             supplyToken: address(0),
@@ -844,6 +916,8 @@ contract PayloadIGP49 {
 
             setBorrowProtocolLimits(protocolConfigTokenB_);
         }
+
+        DEX_FACTORY.setDexAuth(dex_.dex, TEAM_MULTISIG, false);
     }
 
     function setSupplyProtocolLimits(
