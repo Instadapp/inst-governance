@@ -490,7 +490,7 @@ contract PayloadIGP49 {
         0x6A29A46E21C730DcA1d8b23d637c101cec605C5B;
 
     IFluidDexResolver public constant FLUID_DEX_RESOLVER =
-        IFluidDexResolver(0x0000000000000000000000000000000000000000); // TODO: Update this
+        IFluidDexResolver(0x7af0C11F5c787632e567e6418D74e5832d8FFd4c);
 
     struct Dex {
         address dex;
@@ -577,12 +577,10 @@ contract PayloadIGP49 {
     /// @notice Action 1: Update USDC-USDT Pool min price and threshold percent.
     function action1() internal {
         address USDC_USDT_POOL = getDexAddress(2);
-        IFluidDexResolver.Configs memory configs_ = FLUID_DEX_RESOLVER
-            .getDexConfigs(USDC_USDT_POOL);
 
         {
             uint256 minCenterPrice_ = 0.9995 * 1e27;
-            uint256 maxCenterPrice_ = 1e27 / 0.9995;
+            uint256 maxCenterPrice_ = uint256(1e31) / 9995;
             IFluidDex(USDC_USDT_POOL).updateCenterPriceLimits(
                 maxCenterPrice_,
                 minCenterPrice_
@@ -594,8 +592,8 @@ contract PayloadIGP49 {
             IFluidDex(USDC_USDT_POOL).updateThresholdPercent(
                 threshold_,
                 threshold_,
-                configs_.shiftingTime,
-                configs_.shiftingTime
+                3 hours,
+                3 hours
             );
         }
     }
@@ -615,51 +613,6 @@ contract PayloadIGP49 {
                 maxBorrowLimitInUSD: 12_000_000 // $12M
             });
             setDexLimits(DEX_ETH_USDC); // Smart Collateral & Smart Debt
-        }
-
-        {
-            // WBTC-ETH
-            Dex memory DEX_WBTC_ETH = Dex({
-                dex: getDexAddress(6),
-                tokenA: WBTC_ADDRESS,
-                tokenB: ETH_ADDRESS,
-                smartCollateral: true,
-                smartDebt: true,
-                baseWithdrawalLimitInUSD: 7_500_000, // $7.5M
-                baseBorrowLimitInUSD: 5_000_000, // $5M
-                maxBorrowLimitInUSD: 6_000_000 // $6M
-            });
-            setDexLimits(DEX_WBTC_ETH); // Smart Collateral & Smart Debt
-        }
-
-        {
-            // cbBTC-ETH
-            Dex memory DEX_cbBTC_ETH = Dex({
-                dex: getDexAddress(7),
-                tokenA: cbBTC_ADDRESS,
-                tokenB: ETH_ADDRESS,
-                smartCollateral: true,
-                smartDebt: true,
-                baseWithdrawalLimitInUSD: 7_500_000, // $7.5M
-                baseBorrowLimitInUSD: 5_000_000, // $5M
-                maxBorrowLimitInUSD: 6_000_000 // $6M
-            });
-            setDexLimits(DEX_cbBTC_ETH); // Smart Collateral & Smart Debt
-        }
-
-        {
-            // USDe-USDC
-            Dex memory DEX_USDe_USDC = Dex({
-                dex: getDexAddress(8),
-                tokenA: USDe_ADDRESS,
-                tokenB: USDC_ADDRESS,
-                smartCollateral: true,
-                smartDebt: true,
-                baseWithdrawalLimitInUSD: 7_500_000, // $7.5M
-                baseBorrowLimitInUSD: 5_000_000, // $5M
-                maxBorrowLimitInUSD: 6_000_000 // $6M
-            });
-            setDexLimits(DEX_USDe_USDC); // Smart Collateral & Smart Debt
         }
     }
 
@@ -698,11 +651,11 @@ contract PayloadIGP49 {
             vaultConfig.supplyToken = USDe_ADDRESS;
             vaultConfig.borrowToken = USDC_ADDRESS;
 
-            vaultConfig.collateralFactor = 0 * 1e2; // 0
-            vaultConfig.liquidationThreshold = 0 * 1e2; // 0
-            vaultConfig.liquidationMaxLimit = 0 * 1e2; // 0
-            vaultConfig.withdrawGap = 0 * 1e2; // 0
-            vaultConfig.liquidationPenalty = 0 * 1e2; // 0
+            vaultConfig.collateralFactor = 90 * 1e2; // 90%
+            vaultConfig.liquidationThreshold = 92 * 1e2; // 92%
+            vaultConfig.liquidationMaxLimit = 95 * 1e2; // 95%
+            vaultConfig.withdrawGap = 5 * 1e2; // 5%
+            vaultConfig.liquidationPenalty = 2 * 1e2; // 2%
 
             vaultConfig.oracle = address(
                 0x8E5FA052eE010BCbAc7d00D859100B48a6A40967
@@ -719,11 +672,11 @@ contract PayloadIGP49 {
             vaultConfig.supplyToken = USDe_ADDRESS;
             vaultConfig.borrowToken = USDT_ADDRESS;
 
-            vaultConfig.collateralFactor = 0 * 1e2; // 0
-            vaultConfig.liquidationThreshold = 0 * 1e2; // 0
-            vaultConfig.liquidationMaxLimit = 0 * 1e2; // 0
-            vaultConfig.withdrawGap = 0 * 1e2; // 0
-            vaultConfig.liquidationPenalty = 0 * 1e2; // 0
+            vaultConfig.collateralFactor = 90 * 1e2; // 90%
+            vaultConfig.liquidationThreshold = 92 * 1e2; // 92%
+            vaultConfig.liquidationMaxLimit = 95 * 1e2; // 95%
+            vaultConfig.withdrawGap = 5 * 1e2; // 5%
+            vaultConfig.liquidationPenalty = 2 * 1e2; // 2%
 
             vaultConfig.oracle = address(
                 0x8E5FA052eE010BCbAc7d00D859100B48a6A40967
@@ -740,11 +693,11 @@ contract PayloadIGP49 {
             vaultConfig.supplyToken = USDe_ADDRESS;
             vaultConfig.borrowToken = GHO_ADDRESS;
 
-            vaultConfig.collateralFactor = 0 * 1e2; // 0
-            vaultConfig.liquidationThreshold = 0 * 1e2; // 0
-            vaultConfig.liquidationMaxLimit = 0 * 1e2; // 0
-            vaultConfig.withdrawGap = 0 * 1e2; // 0
-            vaultConfig.liquidationPenalty = 0 * 1e2; // 0
+            vaultConfig.collateralFactor = 90 * 1e2; // 90%
+            vaultConfig.liquidationThreshold = 92 * 1e2; // 92%
+            vaultConfig.liquidationMaxLimit = 95 * 1e2; // 95%
+            vaultConfig.withdrawGap = 5 * 1e2; // 5%
+            vaultConfig.liquidationPenalty = 2 * 1e2; // 2%
 
             vaultConfig.oracle = address(
                 0xAd3fEaE8c608681E989D393b48FaEE71e664050A
