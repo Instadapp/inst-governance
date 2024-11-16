@@ -664,13 +664,23 @@ contract PayloadIGP52 {
 
     /// @notice Action 3: Set USDe and sUSDe handler
     function action3() internal {
-        // TODO: update
+        VAULT_FACTORY.setVaultAuth(
+            getVaultAddress(17),
+            0xa7C805988f04f0e841504761E5aa8387600e430b, // Vault_SUSDE_USDC
+            false
+        );
+
+        VAULT_FACTORY.setVaultAuth(
+            getVaultAddress(18),
+            0x7607968F40d7Ac4Ef39E809F29fADDe34C00A0A6, // Vault_SUSDE_USDT
+            false
+        );
     }
 
     /// @notice Action 4: Update GHO, USDC and USDT market rate curve on liquidity.
     function action4() internal {
         AdminModuleStructs.RateDataV1Params[]
-            memory params_ = new AdminModuleStructs.RateDataV1Params[](3);
+            memory params_ = new AdminModuleStructs.RateDataV1Params[](1);
         { // GHO
             params_[0] = AdminModuleStructs.RateDataV1Params({
                 token: GHO_ADDRESS, // GHO
@@ -682,28 +692,19 @@ contract PayloadIGP52 {
 
         }
 
-        { // USDC
-            params_[1] = AdminModuleStructs.RateDataV1Params({
-                token: USDC_ADDRESS, // USDC
-                kink: 93 * 1e2, // 93%
-                rateAtUtilizationZero: 0, // 0%
-                rateAtUtilizationKink: 7.5 * 1e2, // 7.5%
-                rateAtUtilizationMax: 25 * 1e2 // 25%
-            });
-
-        }
-
-        { // USDT
-            params_[2] = AdminModuleStructs.RateDataV1Params({
-                token: USDT_ADDRESS, // USDT
-                kink: 93 * 1e2, // 93%
-                rateAtUtilizationZero: 0, // 0%
-                rateAtUtilizationKink: 7.5 * 1e2, // 7.5%
-                rateAtUtilizationMax: 25 * 1e2 // 25%
-            });
-        }
-
         LIQUIDITY.updateRateDataV1s(params_);
+    }
+
+    /// @notice Action 5: Set GHO-USDC pool min and max center price.
+    function action5() internal {
+        address GHO_USDC_POOL = getDexAddress(4);
+
+        uint256 minCenterPrice_ = 1002000000000000000000000000;
+        uint256 maxCenterPrice_ = 998000000000000000000000000;
+        IFluidDex(GHO_USDC_POOL).updateCenterPriceLimits(
+            maxCenterPrice_,
+            minCenterPrice_
+        );
     }
 
     /**
