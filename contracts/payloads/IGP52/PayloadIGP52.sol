@@ -574,9 +574,6 @@ contract PayloadIGP52 {
 
         // Action 4: Update GHO, USDC and USDT market rate curve on liquidity.
         action4();
-
-        // Action 5: Set GHO-USDC pool min and max center price.
-        action5();
     }
 
     function verifyProposal() external view {}
@@ -732,18 +729,6 @@ contract PayloadIGP52 {
         }
 
         LIQUIDITY.updateRateDataV2s(params_);
-    }
-
-    /// @notice Action 5: Set GHO-USDC pool min and max center price.
-    function action5() internal {
-        address GHO_USDC_POOL = getDexAddress(4);
-
-        uint256 minCenterPrice_ = 1002000000000000000000000000;
-        uint256 maxCenterPrice_ = 998000000000000000000000000;
-        IFluidDex(GHO_USDC_POOL).updateCenterPriceLimits(
-            maxCenterPrice_,
-            minCenterPrice_
-        );
     }
 
     /**
