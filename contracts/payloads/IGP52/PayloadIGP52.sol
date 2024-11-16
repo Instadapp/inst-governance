@@ -574,6 +574,9 @@ contract PayloadIGP52 {
 
         // Action 4: Update GHO, USDC and USDT market rate curve on liquidity.
         action4();
+
+        // Action 5: Set GHO-USDC pool min and max center price.
+        action5();
     }
 
     function verifyProposal() external view {}
