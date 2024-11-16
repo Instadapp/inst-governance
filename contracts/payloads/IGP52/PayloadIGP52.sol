@@ -592,7 +592,8 @@ contract PayloadIGP52 {
 
         address REWARDS_ADDRESS = address(0); // TODO: update
 
-        { /// fUSDC
+        {
+            /// fUSDC
             IFTokenAdmin(F_USDC).updateRewards(REWARDS_ADDRESS);
 
             uint256 allowance = IERC20(USDC_ADDRESS).allowance(
@@ -605,7 +606,8 @@ contract PayloadIGP52 {
             amounts[0] = allowance + (300_000 * 1e6);
         }
 
-        { /// fUSDT
+        {
+            /// fUSDT
             IFTokenAdmin(F_USDT).updateRewards(REWARDS_ADDRESS);
 
             uint256 allowance = IERC20(USDT_ADDRESS).allowance(
@@ -634,10 +636,10 @@ contract PayloadIGP52 {
                 tokenA: ETH_ADDRESS,
                 tokenB: weETH_ADDRESS,
                 smartCollateral: true,
-                smartDebt: true,
+                smartDebt: false,
                 baseWithdrawalLimitInUSD: 50_000, // $50k
-                baseBorrowLimitInUSD: 40_000, // $40k
-                maxBorrowLimitInUSD: 50_000 // $50k
+                baseBorrowLimitInUSD: 0, // $0
+                maxBorrowLimitInUSD: 0 // $0
             });
             setDexLimits(DEX_ETH_WEETH); // Smart Collateral & Smart Debt
 
@@ -658,7 +660,11 @@ contract PayloadIGP52 {
 
             setVaultLimits(VAULT_wstETH_ETH_AND_wsETH); // TYPE_2 => 74
 
-            VAULT_FACTORY.setVaultAuth(getVaultAddress(74), TEAM_MULTISIG, true);
+            VAULT_FACTORY.setVaultAuth(
+                getVaultAddress(74),
+                TEAM_MULTISIG,
+                true
+            );
         }
     }
 
@@ -668,7 +674,8 @@ contract PayloadIGP52 {
         address USDT_RATE_HANDLER = address(0); // TODO: update
         address GHO_RATE_HANDLER = address(0); // TODO: update
 
-        { // USDC
+        {
+            // USDC
             VAULT_FACTORY.setVaultAuth(
                 getVaultAddress(17), // Vault_SUSDE_USDC
                 USDC_RATE_HANDLER,
@@ -682,7 +689,8 @@ contract PayloadIGP52 {
             );
         }
 
-        { // USDT
+        {
+            // USDT
             VAULT_FACTORY.setVaultAuth(
                 getVaultAddress(18), // Vault_SUSDE_USDT
                 USDT_RATE_HANDLER,
@@ -696,7 +704,8 @@ contract PayloadIGP52 {
             );
         }
 
-        { // GHO
+        {
+            // GHO
             VAULT_FACTORY.setVaultAuth(
                 getVaultAddress(56), // Vault_USDe_GHO
                 GHO_RATE_HANDLER,
@@ -716,15 +725,16 @@ contract PayloadIGP52 {
         AdminModuleStructs.RateDataV2Params[]
             memory params_ = new AdminModuleStructs.RateDataV2Params[](1);
 
-        { // GHO
-           params_[0] = AdminModuleStructs.RateDataV2Params({
-            token: GHO_ADDRESS, // GHO
-            kink1: 85 * 1e2, // 85%
-            kink2: 93 * 1e2, // 93%
-            rateAtUtilizationZero: 0, // 0%
-            rateAtUtilizationKink1: 8 * 1e2, // 8%
-            rateAtUtilizationKink2: 10 * 1e2, // 10%
-            rateAtUtilizationMax: 33 * 1e2 // 33%
+        {
+            // GHO
+            params_[0] = AdminModuleStructs.RateDataV2Params({
+                token: GHO_ADDRESS, // GHO
+                kink1: 85 * 1e2, // 85%
+                kink2: 93 * 1e2, // 93%
+                rateAtUtilizationZero: 0, // 0%
+                rateAtUtilizationKink1: 8 * 1e2, // 8%
+                rateAtUtilizationKink2: 10 * 1e2, // 10%
+                rateAtUtilizationMax: 33 * 1e2 // 33%
             });
         }
 
