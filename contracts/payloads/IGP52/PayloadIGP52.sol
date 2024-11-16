@@ -569,12 +569,8 @@ contract PayloadIGP52 {
         // Action 2: Set ETH-weETH dex pool and vault initial limits.
         action2();
 
-        // Action 3: Set USDe and sUSDe handler
-        // TODO: We will do this in the next proposal.
-        // action3();
-
-        // Action 4: Update GHO, USDC and USDT market rate curve on liquidity.
-        action4();
+        // Action 3: Update GHO, USDC and USDT market rate curve on liquidity.
+        action3();
     }
 
     function verifyProposal() external view {}
@@ -671,60 +667,8 @@ contract PayloadIGP52 {
         }
     }
 
-    /// @notice Action 3: Set USDe and sUSDe handler
-    // function action3() internal {
-    //     address USDC_RATE_HANDLER = address(0); // TODO: update
-    //     address USDT_RATE_HANDLER = address(0); // TODO: update
-    //     address GHO_RATE_HANDLER = address(0); // TODO: update
-
-    //     {
-    //         // USDC
-    //         VAULT_FACTORY.setVaultAuth(
-    //             getVaultAddress(17), // Vault_SUSDE_USDC
-    //             USDC_RATE_HANDLER,
-    //             true
-    //         );
-
-    //         VAULT_FACTORY.setVaultAuth(
-    //             getVaultAddress(66), // Vault_USDe_USDC
-    //             USDC_RATE_HANDLER,
-    //             true
-    //         );
-    //     }
-
-    //     {
-    //         // USDT
-    //         VAULT_FACTORY.setVaultAuth(
-    //             getVaultAddress(18), // Vault_SUSDE_USDT
-    //             USDT_RATE_HANDLER,
-    //             true
-    //         );
-
-    //         VAULT_FACTORY.setVaultAuth(
-    //             getVaultAddress(67), // Vault_USDe_USDT
-    //             USDT_RATE_HANDLER,
-    //             true
-    //         );
-    //     }
-
-    //     {
-    //         // GHO
-    //         VAULT_FACTORY.setVaultAuth(
-    //             getVaultAddress(56), // Vault_USDe_GHO
-    //             GHO_RATE_HANDLER,
-    //             true
-    //         );
-
-    //         VAULT_FACTORY.setVaultAuth(
-    //             getVaultAddress(68), // Vault_SUSDe_GHO
-    //             GHO_RATE_HANDLER,
-    //             true
-    //         );
-    //     }
-    // }
-
-    /// @notice Action 4: Update GHO market rate curve on liquidity.
-    function action4() internal {
+    /// @notice Action 3: Update GHO market rate curve on liquidity.
+    function action3() internal {
         AdminModuleStructs.RateDataV2Params[]
             memory params_ = new AdminModuleStructs.RateDataV2Params[](1);
 
