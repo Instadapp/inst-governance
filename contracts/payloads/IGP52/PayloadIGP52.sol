@@ -879,22 +879,22 @@ contract PayloadIGP52 {
         uint256 usdPrice = 0;
         uint256 decimals = 18;
         if (token == ETH_ADDRESS) {
-            usdPrice = 2_850 * 1e2;
+            usdPrice = 3_150 * 1e2;
             decimals = 18;
         } else if (token == wstETH_ADDRESS) {
-            usdPrice = 3_375 * 1e2;
+            usdPrice = 3_750 * 1e2;
             decimals = 18;
         } else if (token == weETH_ADDRESS) {
-            usdPrice = 3_000 * 1e2;
+            usdPrice = 3_300 * 1e2;
             decimals = 18;
         } else if (token == cbBTC_ADDRESS || token == WBTC_ADDRESS) {
-            usdPrice = 76_000 * 1e2;
+            usdPrice = 90_000 * 1e2;
             decimals = 8;
         } else if (token == USDC_ADDRESS || token == USDT_ADDRESS) {
             usdPrice = 1 * 1e2;
             decimals = 6;
         } else if (token == sUSDe_ADDRESS) {
-            usdPrice = 1.11 * 1e2;
+            usdPrice = 1.12 * 1e2;
             decimals = 18;
         } else if (token == sUSDs_ADDRESS) {
             usdPrice = 1.12 * 1e2;
