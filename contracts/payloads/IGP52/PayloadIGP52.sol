@@ -725,9 +725,9 @@ contract PayloadIGP52 {
             kink1: 85 * 1e2, // 85%
             kink2: 93 * 1e2, // 93%
             rateAtUtilizationZero: 0, // 0%
-            rateAtUtilizationKink1: 7 * 1e2, // 7%
+            rateAtUtilizationKink1: 8 * 1e2, // 8%
             rateAtUtilizationKink2: 10 * 1e2, // 10%
-                rateAtUtilizationMax: 33 * 1e2 // 33%
+            rateAtUtilizationMax: 33 * 1e2 // 33%
             });
         }
 
