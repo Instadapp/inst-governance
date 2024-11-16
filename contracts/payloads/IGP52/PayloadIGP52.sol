@@ -682,20 +682,22 @@ contract PayloadIGP52 {
 
     /// @notice Action 4: Update GHO, USDC and USDT market rate curve on liquidity.
     function action4() internal {
-        AdminModuleStructs.RateDataV1Params[]
-            memory params_ = new AdminModuleStructs.RateDataV1Params[](1);
-        { // GHO
-            params_[0] = AdminModuleStructs.RateDataV1Params({
-                token: GHO_ADDRESS, // GHO
-                kink: 93 * 1e2, // 93%
-                rateAtUtilizationZero: 0, // 0%
-                rateAtUtilizationKink: 7.5 * 1e2, // 7.5%
-                rateAtUtilizationMax: 25 * 1e2 // 25%
-            });
+        AdminModuleStructs.RateDataV2Params[]
+            memory params_ = new AdminModuleStructs.RateDataV2Params[](1);
 
+        { // GHO
+           params_[0] = AdminModuleStructs.RateDataV2Params({
+            token: GHO_ADDRESS, // GHO
+            kink1: 85 * 1e2, // 85%
+            kink2: 93 * 1e2, // 93%
+            rateAtUtilizationZero: 0, // 0%
+            rateAtUtilizationKink1: 7 * 1e2, // 7%
+            rateAtUtilizationKink2: 10 * 1e2, // 10%
+                rateAtUtilizationMax: 33 * 1e2 // 33%
+            });
         }
 
-        LIQUIDITY.updateRateDataV1s(params_);
+        LIQUIDITY.updateRateDataV2s(params_);
     }
 
     /// @notice Action 5: Set GHO-USDC pool min and max center price.
