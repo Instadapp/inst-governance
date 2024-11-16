@@ -605,7 +605,7 @@ contract PayloadIGP52 {
 
             protocols[0] = F_USDC;
             tokens[0] = USDC_ADDRESS;
-            amounts[0] = allowance + (500_000 * 1e6);
+            amounts[0] = allowance + (300_000 * 1e6);
         }
 
         { /// fUSDT
@@ -618,7 +618,7 @@ contract PayloadIGP52 {
 
             protocols[1] = F_USDT;
             tokens[1] = USDT_ADDRESS;
-            amounts[1] = allowance + (500_000 * 1e6);
+            amounts[1] = allowance + (300_000 * 1e6);
         }
 
         FLUID_RESERVE.approve(protocols, tokens, amounts);
@@ -648,10 +648,10 @@ contract PayloadIGP52 {
         }
 
         {
-            // [TYPE 3] ETH-weETH  | wstETH | Smart collateral & debt
+            // [TYPE 2] ETH-weETH  | wstETH | Smart collateral & debt
             Vault memory VAULT_wstETH_ETH_AND_wsETH = Vault({
                 vault: getVaultAddress(74),
-                vaultType: TYPE.TYPE_3,
+                vaultType: TYPE.TYPE_2,
                 supplyToken: address(0),
                 borrowToken: wstETH_ADDRESS,
                 baseWithdrawalLimitInUSD: 50_000, // $50k
@@ -659,7 +659,7 @@ contract PayloadIGP52 {
                 maxBorrowLimitInUSD: 50_000 // $50k
             });
 
-            setVaultLimits(VAULT_wstETH_ETH_AND_wsETH); // TYPE_3 => 74
+            setVaultLimits(VAULT_wstETH_ETH_AND_wsETH); // TYPE_2 => 74
 
             VAULT_FACTORY.setVaultAuth(getVaultAddress(74), TEAM_MULTISIG, true);
         }
