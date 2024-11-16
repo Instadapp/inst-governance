@@ -766,8 +766,6 @@ contract PayloadIGP52 {
 
             setBorrowProtocolLimits(protocolConfigTokenB_);
         }
-
-        DEX_FACTORY.setDexAuth(dex_.dex, TEAM_MULTISIG, false);
     }
 
     function setSupplyProtocolLimits(
