@@ -667,17 +667,51 @@ contract PayloadIGP52 {
 
     /// @notice Action 3: Set USDe and sUSDe handler
     function action3() internal {
-        VAULT_FACTORY.setVaultAuth(
-            getVaultAddress(17),
-            0xa7C805988f04f0e841504761E5aa8387600e430b, // Vault_SUSDE_USDC
-            false
-        );
+        address USDC_RATE_HANDLER = address(0); // TODO: update
+        address USDT_RATE_HANDLER = address(0); // TODO: update
+        address GHO_RATE_HANDLER = address(0); // TODO: update
 
-        VAULT_FACTORY.setVaultAuth(
-            getVaultAddress(18),
-            0x7607968F40d7Ac4Ef39E809F29fADDe34C00A0A6, // Vault_SUSDE_USDT
-            false
-        );
+        { // USDC
+            VAULT_FACTORY.setVaultAuth(
+                getVaultAddress(17), // Vault_SUSDE_USDC
+                USDC_RATE_HANDLER,
+                true
+            );
+
+            VAULT_FACTORY.setVaultAuth(
+                getVaultAddress(66), // Vault_USDe_USDC
+                USDC_RATE_HANDLER,
+                true
+            );
+        }
+
+        { // USDT
+            VAULT_FACTORY.setVaultAuth(
+                getVaultAddress(18), // Vault_SUSDE_USDT
+                USDT_RATE_HANDLER,
+                true
+            );
+
+            VAULT_FACTORY.setVaultAuth(
+                getVaultAddress(67), // Vault_USDe_USDT
+                USDT_RATE_HANDLER,
+                true
+            );
+        }
+
+        { // GHO
+            VAULT_FACTORY.setVaultAuth(
+                getVaultAddress(56), // Vault_USDe_GHO
+                GHO_RATE_HANDLER,
+                true
+            );
+
+            VAULT_FACTORY.setVaultAuth(
+                getVaultAddress(68), // Vault_SUSDe_GHO
+                GHO_RATE_HANDLER,
+                true
+            );
+        }
     }
 
     /// @notice Action 4: Update GHO, USDC and USDT market rate curve on liquidity.
