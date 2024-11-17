@@ -1,6 +1,7 @@
 pragma solidity ^0.8.21;
 pragma experimental ABIEncoderV2;
 
+import {BigMathMinified} from "../libraries/bigMathMinified.sol";
 import {LiquidityCalcs} from "../libraries/liquidityCalcs.sol";
 import {LiquiditySlotsLink} from "../libraries/liquiditySlotsLink.sol";
 
@@ -258,51 +259,6 @@ interface FluidVaultFactory {
     ) external view returns (address vault_);
 }
 
-interface IFluidVaultT1 {
-    /// @notice updates the Vault oracle to `newOracle_`. Must implement the FluidOracle interface.
-    function updateOracle(address newOracle_) external;
-
-    /// @notice updates the all Vault core settings according to input params.
-    /// All input values are expected in 1e2 (1% = 100, 100% = 10_000).
-    function updateCoreSettings(
-        uint256 supplyRateMagnifier_,
-        uint256 borrowRateMagnifier_,
-        uint256 collateralFactor_,
-        uint256 liquidationThreshold_,
-        uint256 liquidationMaxLimit_,
-        uint256 withdrawGap_,
-        uint256 liquidationPenalty_,
-        uint256 borrowFee_
-    ) external;
-
-    /// @notice updates the allowed rebalancer to `newRebalancer_`.
-    function updateRebalancer(address newRebalancer_) external;
-
-    /// @notice updates the supply rate magnifier to `supplyRateMagnifier_`. Input in 1e2 (1% = 100, 100% = 10_000).
-    function updateSupplyRateMagnifier(uint supplyRateMagnifier_) external;
-
-    /// @notice updates the borrow rate magnifier to `borrowRateMagnifier_`. Input in 1e2 (1% = 100, 100% = 10_000).
-    function updateBorrowRateMagnifier(uint borrowRateMagnifier_) external;
-
-    /// @notice updates the collateral factor to `collateralFactor_`. Input in 1e2 (1% = 100, 100% = 10_000).
-    function updateCollateralFactor(uint collateralFactor_) external;
-
-    /// @notice updates the liquidation threshold to `liquidationThreshold_`. Input in 1e2 (1% = 100, 100% = 10_000).
-    function updateLiquidationThreshold(uint liquidationThreshold_) external;
-
-    /// @notice updates the liquidation max limit to `liquidationMaxLimit_`. Input in 1e2 (1% = 100, 100% = 10_000).
-    function updateLiquidationMaxLimit(uint liquidationMaxLimit_) external;
-
-    /// @notice updates the withdrawal gap to `withdrawGap_`. Input in 1e2 (1% = 100, 100% = 10_000).
-    function updateWithdrawGap(uint withdrawGap_) external;
-
-    /// @notice updates the liquidation penalty to `liquidationPenalty_`. Input in 1e2 (1% = 100, 100% = 10_000).
-    function updateLiquidationPenalty(uint liquidationPenalty_) external;
-
-    /// @notice updates the borrow fee to `borrowFee_`. Input in 1e2 (1% = 100, 100% = 10_000).
-    function updateBorrowFee(uint borrowFee_) external;
-}
-
 interface IFluidReserveContract {
     function isRebalancer(address user) external returns (bool);
 
@@ -397,6 +353,12 @@ interface IFluidDex {
         uint minCenterPrice_
     ) external;
 
+    function updateCenterPriceAddress(
+        uint centerPriceAddress_,
+        uint percent_,
+        uint time_
+    ) external;
+
     function readFromStorage(
         bytes32 slot_
     ) external view returns (uint256 result_);
@@ -428,8 +390,78 @@ interface IFluidDexResolver {
     ) external view returns (Configs memory configs_);
 }
 
+interface IFluidVaultT1 {
+    /// @notice updates the Vault oracle to `newOracle_`. Must implement the FluidOracle interface.
+    function updateOracle(address newOracle_) external;
+
+    /// @notice updates the all Vault core settings according to input params.
+    /// All input values are expected in 1e2 (1% = 100, 100% = 10_000).
+    function updateCoreSettings(
+        uint256 supplyRateMagnifier_,
+        uint256 borrowRateMagnifier_,
+        uint256 collateralFactor_,
+        uint256 liquidationThreshold_,
+        uint256 liquidationMaxLimit_,
+        uint256 withdrawGap_,
+        uint256 liquidationPenalty_,
+        uint256 borrowFee_
+    ) external;
+
+    /// @notice updates the allowed rebalancer to `newRebalancer_`.
+    function updateRebalancer(address newRebalancer_) external;
+
+    /// @notice updates the supply rate magnifier to `supplyRateMagnifier_`. Input in 1e2 (1% = 100, 100% = 10_000).
+    function updateSupplyRateMagnifier(uint supplyRateMagnifier_) external;
+
+    /// @notice updates the borrow rate magnifier to `borrowRateMagnifier_`. Input in 1e2 (1% = 100, 100% = 10_000).
+    function updateBorrowRateMagnifier(uint borrowRateMagnifier_) external;
+
+    /// @notice updates the collateral factor to `collateralFactor_`. Input in 1e2 (1% = 100, 100% = 10_000).
+    function updateCollateralFactor(uint collateralFactor_) external;
+
+    /// @notice updates the liquidation threshold to `liquidationThreshold_`. Input in 1e2 (1% = 100, 100% = 10_000).
+    function updateLiquidationThreshold(uint liquidationThreshold_) external;
+
+    /// @notice updates the liquidation max limit to `liquidationMaxLimit_`. Input in 1e2 (1% = 100, 100% = 10_000).
+    function updateLiquidationMaxLimit(uint liquidationMaxLimit_) external;
+
+    /// @notice updates the withdrawal gap to `withdrawGap_`. Input in 1e2 (1% = 100, 100% = 10_000).
+    function updateWithdrawGap(uint withdrawGap_) external;
+
+    /// @notice updates the liquidation penalty to `liquidationPenalty_`. Input in 1e2 (1% = 100, 100% = 10_000).
+    function updateLiquidationPenalty(uint liquidationPenalty_) external;
+
+    /// @notice updates the borrow fee to `borrowFee_`. Input in 1e2 (1% = 100, 100% = 10_000).
+    function updateBorrowFee(uint borrowFee_) external;
+
+    function readFromStorage(bytes32 slot_) external view returns (uint256 result_);
+
+    struct ConstantViews {
+        address liquidity;
+        address factory;
+        address adminImplementation;
+        address secondaryImplementation;
+        address supplyToken;
+        address borrowToken;
+        uint8 supplyDecimals;
+        uint8 borrowDecimals;
+        uint vaultId;
+        bytes32 liquiditySupplyExchangePriceSlot;
+        bytes32 liquidityBorrowExchangePriceSlot;
+        bytes32 liquidityUserSupplySlot;
+        bytes32 liquidityUserBorrowSlot;
+    }
+
+    /// @notice returns all Vault constants
+    function constantsView() external view returns (ConstantViews memory constantsView_);
+}
+
 interface ILendingRewards {
     function start() external;
+}
+
+interface IFluidVault {
+    function updateOracle(uint256 newOracle_) external;
 }
 
 contract PayloadIGP53 {
@@ -492,6 +524,20 @@ contract PayloadIGP53 {
 
     address public constant F_USDT = 0x5C20B550819128074FD538Edf79791733ccEdd18;
     address public constant F_USDC = 0x9Fb7b4477576Fe5B32be4C1843aFB1e55F251B33;
+
+
+    uint256 internal constant X8 = 0xff;
+    uint256 internal constant X10 = 0x3ff;
+    uint256 internal constant X14 = 0x3fff;
+    uint256 internal constant X15 = 0x7fff;
+    uint256 internal constant X16 = 0xffff;
+    uint256 internal constant X18 = 0x3ffff;
+    uint256 internal constant X24 = 0xffffff;
+    uint256 internal constant X64 = 0xffffffffffffffff;
+
+    uint256 internal constant DEFAULT_EXPONENT_SIZE = 8;
+    uint256 internal constant DEFAULT_EXPONENT_MASK = 0xff;
+
 
     IFluidDexResolver public constant FLUID_DEX_RESOLVER =
         IFluidDexResolver(0x7af0C11F5c787632e567e6418D74e5832d8FFd4c);
@@ -571,6 +617,9 @@ contract PayloadIGP53 {
 
         // Action 3: Set USDe and sUSDe rate handlers
         action3();
+
+        // Action 4: Reduce Borrow And Withdrawal limits on old vaults from 1 to 10
+        action4();
     }
 
     function verifyProposal() external view {}
@@ -683,6 +732,44 @@ contract PayloadIGP53 {
                 GHO_RATE_HANDLER,
                 true
             );
+        }
+    }
+
+    /// @notice Action 4: Reduce Borrow And Withdrawal limits on old vaults from 1 to 10
+    function action4() internal {
+        reduceVaultLimit(1);
+        reduceVaultLimit(2);
+        reduceVaultLimit(3);
+        reduceVaultLimit(4);
+        reduceVaultLimit(5);
+        reduceVaultLimit(6);
+        reduceVaultLimit(7);
+        reduceVaultLimit(8);
+        reduceVaultLimit(9);
+        reduceVaultLimit(10);
+    }
+
+    /// @notice Action 5: Update wstETH-ETH dex center price address
+    function action5() internal {
+        IFluidDex(getDexAddress(9)).updateCenterPriceAddress(0, 1, 100 * 1e4);
+    }
+
+    /// @notice Action 6: Update Oracles
+    function action6() internal {
+        { // T1 wstETH / GHO, id 55
+            IFluidVaultT1(getVaultAddress(55)).updateOracle(address(0));
+        }
+
+        { // T1 wstETH / USDE, id 70
+            IFluidVaultT1(getVaultAddress(70)).updateOracle(address(0));
+        }
+
+        { // T4 vault wstETH-ETH, id 44
+            IFluidVault(getVaultAddress(44)).updateOracle(0);
+        }
+
+        { // T3 wstETH / USDC-USDT, id 46
+            IFluidVault(getVaultAddress(46)).updateOracle(0);
         }
     }
 
@@ -849,6 +936,78 @@ contract PayloadIGP53 {
 
             setBorrowProtocolLimits(protocolConfig_);
         }
+    }
+
+    function reduceVaultLimit(uint256 vaultId) internal {
+        reduceVaultWithdrawalLimit(vaultId);
+        reduceVaultBorrowLimit(vaultId);
+    }
+
+    function reduceVaultBorrowLimit(uint256 vaultId) internal {   
+        address vault_ =  VAULT_FACTORY.getVaultAddress(vaultId);
+        address token_ = IFluidVaultT1(vault_).constantsView().borrowToken;
+
+        uint256 userBorrowData_ = LIQUIDITY.readFromStorage(
+            LiquiditySlotsLink.calculateDoubleMappingStorageSlot(
+                LiquiditySlotsLink.LIQUIDITY_USER_BORROW_DOUBLE_MAPPING_SLOT,
+                vault_,
+                token_
+            )
+        );
+
+        uint256 totalBorrowAmount_ = BigMathMinified.fromBigNumber(
+            (userBorrowData_ >> LiquiditySlotsLink.BITS_USER_BORROW_AMOUNT) & X64,
+            DEFAULT_EXPONENT_SIZE,
+            DEFAULT_EXPONENT_MASK
+        );
+
+        uint256 baseDebtCeiling_ = getRawAmount(token_, 0, 1000, false); // $1000
+
+        AdminModuleStructs.UserBorrowConfig[] memory config_ = new AdminModuleStructs.UserBorrowConfig[](1);
+        config_[0] = AdminModuleStructs.UserBorrowConfig({
+            user: vault_,
+            token: token_,
+            mode: uint8(userBorrowData_ & 1),
+            expandPercent: 1 * 1e2, // 1%
+            expandDuration: 30 days, // 30 days
+            baseDebtCeiling: totalBorrowAmount_ < baseDebtCeiling_ ? (totalBorrowAmount_ * 1001 / 1000) : baseDebtCeiling_,
+            maxDebtCeiling: totalBorrowAmount_  * 105 / 100 // 5% increase
+        });
+
+        LIQUIDITY.updateUserBorrowConfigs(config_);
+    }
+
+    function reduceVaultWithdrawalLimit(uint256 vaultId) internal {   
+        address vault_ = VAULT_FACTORY.getVaultAddress(vaultId);
+        address token_ = IFluidVaultT1(vault_).constantsView().borrowToken;
+
+        uint256 userSupplyData_ = LIQUIDITY.readFromStorage(
+            LiquiditySlotsLink.calculateDoubleMappingStorageSlot(
+                LiquiditySlotsLink.LIQUIDITY_USER_SUPPLY_DOUBLE_MAPPING_SLOT,
+                vault_,
+                token_
+            )
+        );
+
+        uint256 totalSupplyAmount_ = BigMathMinified.fromBigNumber(
+            (userSupplyData_ >> LiquiditySlotsLink.BITS_USER_SUPPLY_AMOUNT) & X64,
+            DEFAULT_EXPONENT_SIZE,
+            DEFAULT_EXPONENT_MASK
+        );
+
+        uint256 baseWithdrawalLimit_ = getRawAmount(token_, 0, 1000, true); // $1000
+
+        AdminModuleStructs.UserSupplyConfig[] memory config_ = new AdminModuleStructs.UserSupplyConfig[](1);
+        config_[0] = AdminModuleStructs.UserSupplyConfig({
+            user: vault_,
+            token: token_,
+            mode: uint8(userSupplyData_ & 1),
+            expandPercent: 1 * 1e2, // 1%
+            expandDuration: 30 days, // 30 days
+            baseWithdrawalLimit: totalSupplyAmount_ < baseWithdrawalLimit_ ? (totalSupplyAmount_ * 1001 / 1000) : baseWithdrawalLimit_
+        });
+
+        LIQUIDITY.updateUserSupplyConfigs(config_);
     }
 
     function getRawAmount(
