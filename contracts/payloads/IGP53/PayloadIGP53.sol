@@ -672,7 +672,7 @@ contract PayloadIGP53 {
 
         {
             // [TYPE 2] ETH-weETH  | wstETH | Smart collateral & debt
-            Vault memory VAULT_wstETH_ETH_AND_wsETH = Vault({
+            Vault memory VAULT_weETH_ETH_AND_wsETH = Vault({
                 vault: getVaultAddress(74),
                 vaultType: TYPE.TYPE_2,
                 supplyToken: address(0),
