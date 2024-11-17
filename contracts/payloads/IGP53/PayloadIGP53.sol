@@ -1009,7 +1009,7 @@ contract PayloadIGP53 {
 
     function reduceVaultWithdrawalLimit(uint256 vaultId) internal {
         address vault_ = VAULT_FACTORY.getVaultAddress(vaultId);
-        address token_ = IFluidVaultT1(vault_).constantsView().withdrawToken;
+        address token_ = IFluidVaultT1(vault_).constantsView().supplyToken;
 
         uint256 userSupplyData_ = LIQUIDITY.readFromStorage(
             LiquiditySlotsLink.calculateDoubleMappingStorageSlot(
