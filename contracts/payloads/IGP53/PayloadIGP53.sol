@@ -769,7 +769,7 @@ contract PayloadIGP53 {
 
     /// @notice Action 5: Update wstETH-ETH dex center price address
     function action5() internal {
-        IFluidDex(getDexAddress(1)).updateCenterPriceAddress(48, 1, 1);
+        IFluidDex(getDexAddress(1)).updateCenterPriceAddress(48, 50 * 1e4, 1);
     }
 
     /// @notice Action 6: Update Oracles
