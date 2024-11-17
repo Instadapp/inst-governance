@@ -677,7 +677,7 @@ contract PayloadIGP53 {
                 vaultType: TYPE.TYPE_2,
                 supplyToken: address(0),
                 borrowToken: wstETH_ADDRESS,
-                baseWithdrawalLimitInUSD: 7_500_000, // $7.5M
+                baseWithdrawalLimitInUSD: 0, // set at Dex
                 baseBorrowLimitInUSD: 7_500_000, // $7.5M
                 maxBorrowLimitInUSD: 10_000_000 // $10M
             });
