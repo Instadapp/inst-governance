@@ -682,7 +682,7 @@ contract PayloadIGP53 {
                 maxBorrowLimitInUSD: 10_000_000 // $10M
             });
 
-            setVaultLimits(VAULT_wstETH_ETH_AND_wsETH); // TYPE_2 => 74
+            setVaultLimits(VAULT_weETH_ETH_AND_wsETH); // TYPE_2 => 74
 
             VAULT_FACTORY.setVaultAuth(
                 getVaultAddress(74),
