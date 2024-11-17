@@ -620,6 +620,12 @@ contract PayloadIGP53 {
 
         // Action 4: Reduce Borrow And Withdrawal limits on old vaults from 1 to 10
         action4();
+
+        // Action 5: Update wstETH-ETH dex center price address
+        action5();
+
+        // Action 6: Update Oracles
+        action6();
     }
 
     function verifyProposal() external view {}
