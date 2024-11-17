@@ -434,7 +434,9 @@ interface IFluidVaultT1 {
     /// @notice updates the borrow fee to `borrowFee_`. Input in 1e2 (1% = 100, 100% = 10_000).
     function updateBorrowFee(uint borrowFee_) external;
 
-    function readFromStorage(bytes32 slot_) external view returns (uint256 result_);
+    function readFromStorage(
+        bytes32 slot_
+    ) external view returns (uint256 result_);
 
     struct ConstantViews {
         address liquidity;
@@ -453,7 +455,10 @@ interface IFluidVaultT1 {
     }
 
     /// @notice returns all Vault constants
-    function constantsView() external view returns (ConstantViews memory constantsView_);
+    function constantsView()
+        external
+        view
+        returns (ConstantViews memory constantsView_);
 }
 
 interface ILendingRewards {
@@ -525,7 +530,6 @@ contract PayloadIGP53 {
     address public constant F_USDT = 0x5C20B550819128074FD538Edf79791733ccEdd18;
     address public constant F_USDC = 0x9Fb7b4477576Fe5B32be4C1843aFB1e55F251B33;
 
-
     uint256 internal constant X8 = 0xff;
     uint256 internal constant X10 = 0x3ff;
     uint256 internal constant X14 = 0x3fff;
@@ -537,7 +541,6 @@ contract PayloadIGP53 {
 
     uint256 internal constant DEFAULT_EXPONENT_SIZE = 8;
     uint256 internal constant DEFAULT_EXPONENT_MASK = 0xff;
-
 
     IFluidDexResolver public constant FLUID_DEX_RESOLVER =
         IFluidDexResolver(0x7af0C11F5c787632e567e6418D74e5832d8FFd4c);
@@ -661,7 +664,7 @@ contract PayloadIGP53 {
                 tokenB: weETH_ADDRESS,
                 smartCollateral: true,
                 smartDebt: false,
-                baseWithdrawalLimitInUSD: 10_000_000, // $10M
+                baseWithdrawalLimitInUSD: 30_000_000, // $30M
                 baseBorrowLimitInUSD: 0, // $0
                 maxBorrowLimitInUSD: 0 // $0
             });
@@ -678,8 +681,8 @@ contract PayloadIGP53 {
                 supplyToken: address(0),
                 borrowToken: wstETH_ADDRESS,
                 baseWithdrawalLimitInUSD: 0, // set at Dex
-                baseBorrowLimitInUSD: 7_500_000, // $7.5M
-                maxBorrowLimitInUSD: 10_000_000 // $10M
+                baseBorrowLimitInUSD: 12_500_000, // $12.5M
+                maxBorrowLimitInUSD: 27_500_000 // $27.5M
             });
 
             setVaultLimits(VAULT_weETH_ETH_AND_wsETH); // TYPE_2 => 74
@@ -694,11 +697,18 @@ contract PayloadIGP53 {
 
     /// @notice Action 3: Set USDe and sUSDe rate handlers
     function action3() internal {
-        address USDC_RATE_HANDLER = address(0xf4f24CDD9A9929Ce262735253BADB03F959D208f);
-        address USDT_RATE_HANDLER = address(0xca91be2077Aad98A8B7ce82a665024c2Fd7e74Be);
-        address GHO_RATE_HANDLER = address(0x4acF39b8A63C744ce37594234eBebF5F99DfC710);
+        address USDC_RATE_HANDLER = address(
+            0xf4f24CDD9A9929Ce262735253BADB03F959D208f
+        );
+        address USDT_RATE_HANDLER = address(
+            0xca91be2077Aad98A8B7ce82a665024c2Fd7e74Be
+        );
+        address GHO_RATE_HANDLER = address(
+            0x4acF39b8A63C744ce37594234eBebF5F99DfC710
+        );
 
-        { // USDC
+        {
+            // USDC
             VAULT_FACTORY.setVaultAuth(
                 getVaultAddress(17), // Vault_SUSDE_USDC
                 USDC_RATE_HANDLER,
@@ -712,7 +722,8 @@ contract PayloadIGP53 {
             );
         }
 
-        { // USDT
+        {
+            // USDT
             VAULT_FACTORY.setVaultAuth(
                 getVaultAddress(18), // Vault_SUSDE_USDT
                 USDT_RATE_HANDLER,
@@ -726,7 +737,8 @@ contract PayloadIGP53 {
             );
         }
 
-        { // GHO
+        {
+            // GHO
             VAULT_FACTORY.setVaultAuth(
                 getVaultAddress(56), // Vault_USDe_GHO
                 GHO_RATE_HANDLER,
@@ -757,25 +769,33 @@ contract PayloadIGP53 {
 
     /// @notice Action 5: Update wstETH-ETH dex center price address
     function action5() internal {
-        IFluidDex(getDexAddress(9)).updateCenterPriceAddress(0, 1, 100 * 1e4);
+        IFluidDex(getDexAddress(1)).updateCenterPriceAddress(48, 1, 1);
     }
 
     /// @notice Action 6: Update Oracles
     function action6() internal {
-        { // T1 wstETH / GHO, id 55
-            IFluidVaultT1(getVaultAddress(55)).updateOracle(address(0));
+        {
+            // T1 wstETH / GHO, id 55
+            IFluidVaultT1(getVaultAddress(55)).updateOracle(
+                0x88C968C2a3dBAC9eA8A96ba8c12EC2e384CEC7E9
+            );
         }
 
-        { // T1 wstETH / USDE, id 70
-            IFluidVaultT1(getVaultAddress(70)).updateOracle(address(0));
+        {
+            // T1 wstETH / USDE, id 70
+            IFluidVaultT1(getVaultAddress(70)).updateOracle(
+                0xd65F4491a53CF033110Ceb5E28548d314c2Dd9fd
+            );
         }
 
-        { // T4 vault wstETH-ETH, id 44
-            IFluidVault(getVaultAddress(44)).updateOracle(0);
+        {
+            // T4 vault wstETH-ETH, id 44
+            IFluidVault(getVaultAddress(44)).updateOracle(51);
         }
 
-        { // T3 wstETH / USDC-USDT, id 46
-            IFluidVault(getVaultAddress(46)).updateOracle(0);
+        {
+            // T3 wstETH / USDC-USDT, id 46
+            IFluidVault(getVaultAddress(46)).updateOracle(49);
         }
     }
 
@@ -949,8 +969,8 @@ contract PayloadIGP53 {
         reduceVaultBorrowLimit(vaultId);
     }
 
-    function reduceVaultBorrowLimit(uint256 vaultId) internal {   
-        address vault_ =  VAULT_FACTORY.getVaultAddress(vaultId);
+    function reduceVaultBorrowLimit(uint256 vaultId) internal {
+        address vault_ = VAULT_FACTORY.getVaultAddress(vaultId);
         address token_ = IFluidVaultT1(vault_).constantsView().borrowToken;
 
         uint256 userBorrowData_ = LIQUIDITY.readFromStorage(
@@ -962,30 +982,34 @@ contract PayloadIGP53 {
         );
 
         uint256 totalBorrowAmount_ = BigMathMinified.fromBigNumber(
-            (userBorrowData_ >> LiquiditySlotsLink.BITS_USER_BORROW_AMOUNT) & X64,
+            (userBorrowData_ >> LiquiditySlotsLink.BITS_USER_BORROW_AMOUNT) &
+                X64,
             DEFAULT_EXPONENT_SIZE,
             DEFAULT_EXPONENT_MASK
         );
 
         uint256 baseDebtCeiling_ = getRawAmount(token_, 0, 1000, false); // $1000
 
-        AdminModuleStructs.UserBorrowConfig[] memory config_ = new AdminModuleStructs.UserBorrowConfig[](1);
+        AdminModuleStructs.UserBorrowConfig[]
+            memory config_ = new AdminModuleStructs.UserBorrowConfig[](1);
         config_[0] = AdminModuleStructs.UserBorrowConfig({
             user: vault_,
             token: token_,
             mode: uint8(userBorrowData_ & 1),
             expandPercent: 1 * 1e2, // 1%
             expandDuration: 30 days, // 30 days
-            baseDebtCeiling: totalBorrowAmount_ < baseDebtCeiling_ ? (totalBorrowAmount_ * 1001 / 1000) : baseDebtCeiling_,
-            maxDebtCeiling: totalBorrowAmount_  * 105 / 100 // 5% increase
+            baseDebtCeiling: totalBorrowAmount_ < baseDebtCeiling_
+                ? ((totalBorrowAmount_ * 1001) / 1000)
+                : baseDebtCeiling_,
+            maxDebtCeiling: (totalBorrowAmount_ * 105) / 100 // 5% increase
         });
 
         LIQUIDITY.updateUserBorrowConfigs(config_);
     }
 
-    function reduceVaultWithdrawalLimit(uint256 vaultId) internal {   
+    function reduceVaultWithdrawalLimit(uint256 vaultId) internal {
         address vault_ = VAULT_FACTORY.getVaultAddress(vaultId);
-        address token_ = IFluidVaultT1(vault_).constantsView().borrowToken;
+        address token_ = IFluidVaultT1(vault_).constantsView().withdrawToken;
 
         uint256 userSupplyData_ = LIQUIDITY.readFromStorage(
             LiquiditySlotsLink.calculateDoubleMappingStorageSlot(
@@ -996,21 +1020,25 @@ contract PayloadIGP53 {
         );
 
         uint256 totalSupplyAmount_ = BigMathMinified.fromBigNumber(
-            (userSupplyData_ >> LiquiditySlotsLink.BITS_USER_SUPPLY_AMOUNT) & X64,
+            (userSupplyData_ >> LiquiditySlotsLink.BITS_USER_SUPPLY_AMOUNT) &
+                X64,
             DEFAULT_EXPONENT_SIZE,
             DEFAULT_EXPONENT_MASK
         );
 
         uint256 baseWithdrawalLimit_ = getRawAmount(token_, 0, 1000, true); // $1000
 
-        AdminModuleStructs.UserSupplyConfig[] memory config_ = new AdminModuleStructs.UserSupplyConfig[](1);
+        AdminModuleStructs.UserSupplyConfig[]
+            memory config_ = new AdminModuleStructs.UserSupplyConfig[](1);
         config_[0] = AdminModuleStructs.UserSupplyConfig({
             user: vault_,
             token: token_,
             mode: uint8(userSupplyData_ & 1),
             expandPercent: 1 * 1e2, // 1%
             expandDuration: 30 days, // 30 days
-            baseWithdrawalLimit: totalSupplyAmount_ < baseWithdrawalLimit_ ? (totalSupplyAmount_ * 1001 / 1000) : baseWithdrawalLimit_
+            baseWithdrawalLimit: totalSupplyAmount_ < baseWithdrawalLimit_
+                ? ((totalSupplyAmount_ * 1001) / 1000)
+                : baseWithdrawalLimit_
         });
 
         LIQUIDITY.updateUserSupplyConfigs(config_);
