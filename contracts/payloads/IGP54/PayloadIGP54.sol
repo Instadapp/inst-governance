@@ -364,9 +364,10 @@ interface IFluidDex {
     ) external view returns (uint256 result_);
 
     function updateMaxSupplyShares(uint maxSupplyShares_) external;
+
     function updateMaxBorrowShares(uint maxBorrowShares_) external;
 
-        /// @notice struct to set user supply & withdrawal config
+    /// @notice struct to set user supply & withdrawal config
     struct UserSupplyConfig {
         ///
         /// @param user address
@@ -412,8 +413,13 @@ interface IFluidDex {
         uint256 maxDebtCeiling;
     }
 
-    function updateUserBorrowConfigs(UserBorrowConfig[] memory userBorrowConfigs_) external;
-    function updateUserSupplyConfigs(UserSupplyConfig[] memory userSupplyConfigs_) external;
+    function updateUserBorrowConfigs(
+        UserBorrowConfig[] memory userBorrowConfigs_
+    ) external;
+
+    function updateUserSupplyConfigs(
+        UserSupplyConfig[] memory userSupplyConfigs_
+    ) external;
 }
 
 interface IFluidDexResolver {
@@ -682,60 +688,70 @@ contract PayloadIGP54 {
     /// @notice Action 1: Increase limits and update threshold of cbBTC-wBTC Dex pool.
     function action1() internal {
         address CBBTC_WBTC_DEX_ADDRESS = getDexAddress(3);
-        { // Increase cbBTC-WBTC limits on liquidity layer.
+        {
+            // Increase cbBTC-WBTC limits on liquidity layer.
             Dex memory DEX_cbBTC_WBTC = Dex({
                 dex: CBBTC_WBTC_DEX_ADDRESS,
                 tokenA: cbBTC_ADDRESS,
                 tokenB: WBTC_ADDRESS,
                 smartCollateral: true,
                 smartDebt: true,
-                baseWithdrawalLimitInUSD: 50_000_000, // $50M
-                baseBorrowLimitInUSD: 10_000_000, // $10M
-                maxBorrowLimitInUSD: 50_000_000 // $50M
+                baseWithdrawalLimitInUSD: 20_000_000, // $20M
+                baseBorrowLimitInUSD: 20_000_000, // $20M
+                maxBorrowLimitInUSD: 32_000_000 // $32M
             });
             setDexLimits(DEX_cbBTC_WBTC); // Smart Collateral & Smart Debt
         }
 
-        { // Update max supply and borrow shares on dex
+        {
+            // Update max supply and borrow shares on dex
             IFluidDex(CBBTC_WBTC_DEX_ADDRESS).updateMaxSupplyShares(
                 200 * 1e18 // 200 shares
             );
             IFluidDex(CBBTC_WBTC_DEX_ADDRESS).updateMaxBorrowShares(
-                180 * 1e18 // 180 shares
+                150 * 1e18 // 150 shares
             );
         }
 
-        { // Increase [TYPE 4] cbBTC-wBTC | cbBTC-wBTC | Smart collateral & smart debt
+        {
+            // Increase [TYPE 4] cbBTC-wBTC | cbBTC-wBTC | Smart collateral & smart debt
             {
-                IFluidDex.UserSupplyConfig[] memory config_ = new IFluidDex.UserSupplyConfig[](1);
+                IFluidDex.UserSupplyConfig[]
+                    memory config_ = new IFluidDex.UserSupplyConfig[](1);
                 config_[0] = IFluidDex.UserSupplyConfig({
                     user: getVaultAddress(51),
                     expandPercent: 25 * 1e2, // 25%
                     expandDuration: 12 hours, // 12 hours
-                    baseWithdrawalLimit: 100 * 1e18 // 100 shares
+                    baseWithdrawalLimit: 75 * 1e18 // 75 shares
                 });
 
-                IFluidDex(CBBTC_WBTC_DEX_ADDRESS).updateUserSupplyConfigs(config_);
+                IFluidDex(CBBTC_WBTC_DEX_ADDRESS).updateUserSupplyConfigs(
+                    config_
+                );
             }
 
             {
-                IFluidDex.UserBorrowConfig[] memory config_ = new IFluidDex.UserBorrowConfig[](1);
+                IFluidDex.UserBorrowConfig[]
+                    memory config_ = new IFluidDex.UserBorrowConfig[](1);
                 config_[0] = IFluidDex.UserBorrowConfig({
                     user: getVaultAddress(51),
                     expandPercent: 20 * 1e2, // 20%
                     expandDuration: 12 hours, // 12 hours
-                    baseDebtCeiling: 100 * 1e18, // 100 shares
-                    maxDebtCeiling: 280 * 1e18 // 280 shares
+                    baseDebtCeiling: 75 * 1e18, // 75 shares
+                    maxDebtCeiling: 150 * 1e18 // 150 shares
                 });
 
-                IFluidDex(CBBTC_WBTC_DEX_ADDRESS).updateUserBorrowConfigs(config_);
+                IFluidDex(CBBTC_WBTC_DEX_ADDRESS).updateUserBorrowConfigs(
+                    config_
+                );
             }
         }
     }
 
     /// @notice Action 2: Increase limits for sUSDe/stables, weETH/stables, and weETH/wstETH vaults
     function action2() internal {
-        { // sUSDe/USDC
+        {
+            // sUSDe/USDC
             BorrowProtocolConfig memory protocolConfig_ = BorrowProtocolConfig({
                 protocol: getVaultAddress(17),
                 borrowToken: USDC_ADDRESS,
@@ -748,7 +764,8 @@ contract PayloadIGP54 {
             setBorrowProtocolLimits(protocolConfig_);
         }
 
-        { // sUSDe/USDT
+        {
+            // sUSDe/USDT
             BorrowProtocolConfig memory protocolConfig_ = BorrowProtocolConfig({
                 protocol: getVaultAddress(18),
                 borrowToken: USDT_ADDRESS,
@@ -761,7 +778,8 @@ contract PayloadIGP54 {
             setBorrowProtocolLimits(protocolConfig_);
         }
 
-        { // weETH/USDC
+        {
+            // weETH/USDC
             BorrowProtocolConfig memory protocolConfig_ = BorrowProtocolConfig({
                 protocol: getVaultAddress(19),
                 borrowToken: USDC_ADDRESS,
@@ -774,7 +792,8 @@ contract PayloadIGP54 {
             setBorrowProtocolLimits(protocolConfig_);
         }
 
-        { // weETH/USDT
+        {
+            // weETH/USDT
             BorrowProtocolConfig memory protocolConfig_ = BorrowProtocolConfig({
                 protocol: getVaultAddress(20),
                 borrowToken: USDT_ADDRESS,
@@ -787,7 +806,8 @@ contract PayloadIGP54 {
             setBorrowProtocolLimits(protocolConfig_);
         }
 
-         { // weETHs/wstETH
+        {
+            // weETHs/wstETH
             AdminModuleStructs.UserBorrowConfig[]
                 memory configs_ = new AdminModuleStructs.UserBorrowConfig[](1);
 
@@ -814,7 +834,6 @@ contract PayloadIGP54 {
             LIQUIDITY.updateUserBorrowConfigs(configs_);
         }
     }
-
 
     /**
      * |
@@ -980,7 +999,6 @@ contract PayloadIGP54 {
             setBorrowProtocolLimits(protocolConfig_);
         }
     }
-
 
     function getRawAmount(
         address token,
