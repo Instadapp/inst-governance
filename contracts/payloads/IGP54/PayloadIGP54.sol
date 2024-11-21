@@ -690,7 +690,7 @@ contract PayloadIGP54 {
                 smartCollateral: true,
                 smartDebt: true,
                 baseWithdrawalLimitInUSD: 50_000_000, // $50M
-                baseBorrowLimitInUSD: 50_000_000, // $50M
+                baseBorrowLimitInUSD: 10_000_000, // $10M
                 maxBorrowLimitInUSD: 50_000_000 // $50M
             });
             setDexLimits(DEX_cbBTC_WBTC); // Smart Collateral & Smart Debt
@@ -698,10 +698,10 @@ contract PayloadIGP54 {
 
         { // Update max supply and borrow shares
             IFluidDex(CBBTC_WBTC_DEX_ADDRESS).updateMaxSupplyShares(
-                200 * 1e18
+                200 * 1e18 // 200 shares
             );
             IFluidDex(CBBTC_WBTC_DEX_ADDRESS).updateMaxBorrowShares(
-                180 * 1e18
+                180 * 1e18 // 180 shares
             );
         }
 
