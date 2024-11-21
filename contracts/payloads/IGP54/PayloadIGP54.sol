@@ -682,7 +682,7 @@ contract PayloadIGP54 {
     /// @notice Action 1: Increase limits and update threshold of cbBTC-wBTC Dex pool.
     function action1() internal {
         address CBBTC_WBTC_DEX_ADDRESS = getDexAddress(3);
-        { // Increase cbBTC-WBTC limits.
+        { // Increase cbBTC-WBTC limits on liquidity layer.
             Dex memory DEX_cbBTC_WBTC = Dex({
                 dex: CBBTC_WBTC_DEX_ADDRESS,
                 tokenA: cbBTC_ADDRESS,
@@ -696,7 +696,7 @@ contract PayloadIGP54 {
             setDexLimits(DEX_cbBTC_WBTC); // Smart Collateral & Smart Debt
         }
 
-        { // Update max supply and borrow shares
+        { // Update max supply and borrow shares on dex
             IFluidDex(CBBTC_WBTC_DEX_ADDRESS).updateMaxSupplyShares(
                 200 * 1e18 // 200 shares
             );
@@ -705,7 +705,7 @@ contract PayloadIGP54 {
             );
         }
 
-        { // Increase cbBTC borrow limit
+        { // Increase [TYPE 4] cbBTC-wBTC | cbBTC-wBTC | Smart collateral & smart debt
             {
                 IFluidDex.UserSupplyConfig[] memory config_ = new IFluidDex.UserSupplyConfig[](1);
                 config_[0] = IFluidDex.UserSupplyConfig({
@@ -763,7 +763,7 @@ contract PayloadIGP54 {
 
         { // weETH/USDC
             BorrowProtocolConfig memory protocolConfig_ = BorrowProtocolConfig({
-                protocol: getVaultAddress(18),
+                protocol: getVaultAddress(19),
                 borrowToken: USDC_ADDRESS,
                 expandPercent: 20 * 1e2, // 20%
                 expandDuration: 12 hours, // 12 hours
@@ -776,7 +776,7 @@ contract PayloadIGP54 {
 
         { // weETH/USDT
             BorrowProtocolConfig memory protocolConfig_ = BorrowProtocolConfig({
-                protocol: getVaultAddress(18),
+                protocol: getVaultAddress(20),
                 borrowToken: USDT_ADDRESS,
                 expandPercent: 20 * 1e2, // 20%
                 expandDuration: 12 hours, // 12 hours
@@ -792,7 +792,7 @@ contract PayloadIGP54 {
                 memory configs_ = new AdminModuleStructs.UserBorrowConfig[](1);
 
             configs_[0] = AdminModuleStructs.UserBorrowConfig({
-                user: getVaultAddress(18),
+                user: getVaultAddress(27),
                 token: wstETH_ADDRESS,
                 mode: 1,
                 expandPercent: 20 * 1e2,
