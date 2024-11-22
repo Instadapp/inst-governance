@@ -828,7 +828,7 @@ contract PayloadIGP55 {
                 ),
                 maxDebtCeiling: getRawAmount(
                     wstETH_ADDRESS,
-                    10_000, // 10k wstETH
+                    10_000 * 1e18, // 10k wstETH
                     0,
                     false
                 )
