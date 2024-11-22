@@ -745,12 +745,7 @@ contract PayloadIGP54 {
             DEFAULT_EXPONENT_MASK
         );
 
-        uint256 baseWithdrawalLimit_ = getRawAmount(
-            token_,
-            0,
-            5_000_000,
-            true
-        ); // $5M
+        uint256 baseWithdrawalLimit_ = getRawAmount(token_, 0, 7_500_000, true); // $7.5M
 
         AdminModuleStructs.UserSupplyConfig[]
             memory config_ = new AdminModuleStructs.UserSupplyConfig[](1);
@@ -760,9 +755,7 @@ contract PayloadIGP54 {
             mode: uint8(userSupplyData_ & 1),
             expandPercent: 25 * 1e2, // 25%
             expandDuration: 12 hours, // 12 hours
-            baseWithdrawalLimit: totalSupplyAmount_ > baseWithdrawalLimit_
-                ? ((totalSupplyAmount_ * 1001) / 1000)
-                : baseWithdrawalLimit_
+            baseWithdrawalLimit: baseWithdrawalLimit_
         });
 
         LIQUIDITY.updateUserSupplyConfigs(config_);
