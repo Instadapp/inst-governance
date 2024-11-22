@@ -1047,8 +1047,8 @@ contract PayloadIGP55 {
             expandPercent: 25 * 1e2, // 25%
             expandDuration: 12 hours, // 12 hours
             baseWithdrawalLimit: baseWithdrawalLimit_ < totalSupplyAmount_
-                ? (totalSupplyAmount_ * 1001 / 1000)
-                : baseWithdrawalLimit_;
+                ? baseWithdrawalLimit_
+                : ((totalSupplyAmount_ * 1001) / 1000);
         });
 
         LIQUIDITY.updateUserSupplyConfigs(config_);
