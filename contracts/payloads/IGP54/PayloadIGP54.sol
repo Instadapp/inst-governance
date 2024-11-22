@@ -759,7 +759,7 @@ contract PayloadIGP54 {
             token: token_,
             mode: uint8(userSupplyData_ & 1),
             expandPercent: 25 * 1e2, // 25%
-            expandDuration: 12 hours, // 12 days
+            expandDuration: 12 hours, // 12 hours
             baseWithdrawalLimit: totalSupplyAmount_ > baseWithdrawalLimit_
                 ? ((totalSupplyAmount_ * 1001) / 1000)
                 : baseWithdrawalLimit_
