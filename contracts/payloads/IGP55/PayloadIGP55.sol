@@ -675,6 +675,9 @@ contract PayloadIGP55 {
 
         // Action 2: Increase limits for sUSDe/stables, weETH/stables, and weETH/wstETH vaults
         action2();
+
+        // Action 3: Adjust v1.0.0 vaults withdrawal limits.
+        action3();
     }
 
     function verifyProposal() external view {}
@@ -833,6 +836,20 @@ contract PayloadIGP55 {
 
             LIQUIDITY.updateUserBorrowConfigs(configs_);
         }
+    }
+
+    /// @notice Action 3: Adjust v1.0.0 vaults withdrawal limits.
+    function action3() internal {
+        adjustVaultWithdrawalLimit(1);
+        adjustVaultWithdrawalLimit(2);
+        adjustVaultWithdrawalLimit(3);
+        adjustVaultWithdrawalLimit(4);
+        adjustVaultWithdrawalLimit(5);
+        adjustVaultWithdrawalLimit(6);
+        adjustVaultWithdrawalLimit(7);
+        adjustVaultWithdrawalLimit(8);
+        adjustVaultWithdrawalLimit(9);
+        adjustVaultWithdrawalLimit(10);
     }
 
     /**
@@ -998,6 +1015,43 @@ contract PayloadIGP55 {
 
             setBorrowProtocolLimits(protocolConfig_);
         }
+    }
+
+    function adjustVaultWithdrawalLimit(uint256 vaultId) internal {
+        address vault_ = VAULT_FACTORY.getVaultAddress(vaultId);
+        address token_ = IFluidVaultT1(vault_).constantsView().supplyToken;
+
+        uint256 userSupplyData_ = LIQUIDITY.readFromStorage(
+            LiquiditySlotsLink.calculateDoubleMappingStorageSlot(
+                LiquiditySlotsLink.LIQUIDITY_USER_SUPPLY_DOUBLE_MAPPING_SLOT,
+                vault_,
+                token_
+            )
+        );
+
+        uint256 totalSupplyAmount_ = BigMathMinified.fromBigNumber(
+            (userSupplyData_ >> LiquiditySlotsLink.BITS_USER_SUPPLY_AMOUNT) &
+                X64,
+            DEFAULT_EXPONENT_SIZE,
+            DEFAULT_EXPONENT_MASK
+        );
+
+        uint256 baseWithdrawalLimit_ = getRawAmount(token_, 0, 7_500_000, true); // $7.5M
+
+        AdminModuleStructs.UserSupplyConfig[]
+            memory config_ = new AdminModuleStructs.UserSupplyConfig[](1);
+        config_[0] = AdminModuleStructs.UserSupplyConfig({
+            user: vault_,
+            token: token_,
+            mode: uint8(userSupplyData_ & 1),
+            expandPercent: 25 * 1e2, // 25%
+            expandDuration: 12 hours, // 12 hours
+            baseWithdrawalLimit: baseWithdrawalLimit_ < totalSupplyAmount_
+                ? (totalSupplyAmount_ * 1001 / 1000)
+                : baseWithdrawalLimit_;
+        });
+
+        LIQUIDITY.updateUserSupplyConfigs(config_);
     }
 
     function getRawAmount(
