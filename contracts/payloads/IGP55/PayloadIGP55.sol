@@ -1048,7 +1048,7 @@ contract PayloadIGP55 {
             expandDuration: 12 hours, // 12 hours
             baseWithdrawalLimit: baseWithdrawalLimit_ < totalSupplyAmount_
                 ? baseWithdrawalLimit_
-                : ((totalSupplyAmount_ * 1001) / 1000);
+                : ((totalSupplyAmount_ * 1001) / 1000)
         });
 
         LIQUIDITY.updateUserSupplyConfigs(config_);
