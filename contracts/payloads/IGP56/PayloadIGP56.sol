@@ -821,7 +821,7 @@ contract PayloadIGP56 {
                 uint256 token1Amount_ = 0; // 0 ETH
                 uint256 minShareAmount_ = 0; // 0 shares
 
-                targets[0] = "BASIC-A";
+                targets[0] = "FLUID-DEX-A";
                 encodedSpells[0] = abi.encodeWithSignature(
                     depositSignature,
                     INST_ETH_ADDRESS,
