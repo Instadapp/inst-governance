@@ -322,6 +322,8 @@ interface IERC20 {
         address caller
     ) external view returns (uint256);
 
+    function approve(address spender, uint256 amount) external returns (bool);
+
     function balanceOf(address account) external view returns (uint256);
 }
 
@@ -715,8 +717,11 @@ contract PayloadIGP56 {
         // Action 1: Set INST Market Rates
         action1();
 
-        // Action 2: Set INST-USDC Dex Pool Limits
+        // Action 2: Set INST-ETH Dex Pool and INST-ETH_ETH Vault Limits
         action2();
+
+        // Action 3: Transfer 5M INST to Team Multisig
+        action3();
     }
 
     function verifyProposal() external view {}
@@ -744,7 +749,7 @@ contract PayloadIGP56 {
         LIQUIDITY.updateRateDataV2s(params_);
     }
 
-    /// @notice Action 2: Set INST-ETH Dex Pool Limits
+    /// @notice Action 2: Set INST-ETH Dex Pool and INST-ETH_ETH Vault Limits
     function action2() internal {
         address INST_ETH_ADDRESS = getDexAddress(10);
 
@@ -760,94 +765,47 @@ contract PayloadIGP56 {
                 maxBorrowLimitInUSD: 0 // $0
             });
             setDexLimits(DEX_INST_ETH); // Smart Collateral
+
+            DEX_FACTORY.setDexAuth(INST_ETH_ADDRESS, TEAM_MULTISIG, true);
         }
 
-        { // Initialize INST-ETH DEX
-
-            uint256 centerPrice_ = uint256(10 * 1e27) / (3500); // Assuming ETH Price 3_500 and $10M INST
-            uint256 minCenterPrice_ = centerPrice_ / 100;
-            uint256 maxCenterPrice_ = centerPrice_ * 100;
-
-            uint256 token0Amount_ = 20 * 1e18;
-            uint256 token1Amount_ = centerPrice_ * token0Amount_ / 1e27;
-
-            IFluidDex.InitializeVariables memory initializeVariables_ = IFluidDex.InitializeVariables({
-                smartCol: true,
-                token0ColAmt: token0Amount_,
-                smartDebt: false,
-                token0DebtAmt: 0,
-                centerPrice: centerPrice_,
-                fee: 1 * 1e4,
-                revenueCut: 0,
-                upperPercent: 30 * 1e4,
-                lowerPercent: 30 * 1e4,
-                upperShiftThreshold: 0,
-                lowerShiftThreshold: 0,
-                thresholdShiftTime: 30 days,
-                centerPriceAddress: 0,
-                hookAddress: 0,
-                maxCenterPrice: maxCenterPrice_,
-                minCenterPrice: minCenterPrice_
+        {
+            // [TYPE 2] INST-ETH  | ETH | Smart collateral & debt
+            Vault memory VAULT_INST_ETH = Vault({
+                vault: getVaultAddress(75),
+                vaultType: TYPE.TYPE_2,
+                supplyToken: address(0),
+                borrowToken: ETH_ADDRESS,
+                baseWithdrawalLimitInUSD: 0, // set at Dex
+                baseBorrowLimitInUSD: 100, // $100
+                maxBorrowLimitInUSD: 150 // $150
             });
 
-            IFluidDex(INST_ETH_ADDRESS).initialize{value: token1Amount_}(initializeVariables_);
-        }
+            setVaultLimits(VAULT_INST_ETH); // TYPE_2 => 75
 
-        { // Set DSA Treasury as user on INST-ETH Dex
-            IFluidDex.UserSupplyConfig[]
-                memory config_ = new IFluidDex.UserSupplyConfig[](1);
-
-            config_[0] = IFluidDex.UserSupplyConfig({
-                user: address(TREASURY),
-                expandPercent: 25 * 1e2, // 25%
-                expandDuration: 12 hours, // 12 hours
-                baseWithdrawalLimit: 75 * 1e18 // 75 shares // TODO: Verify this
-            });
-
-            IFluidDex(INST_ETH_ADDRESS).updateUserSupplyConfigs(
-                config_
+            VAULT_FACTORY.setVaultAuth(
+                getVaultAddress(75),
+                TEAM_MULTISIG,
+                true
             );
         }
+    }
 
-        { // Supply 8M INST
-            string[] memory targets = new string[](1);
-            bytes[] memory encodedSpells = new bytes[](1);
+    /// @notice Action 3: Transfer 5M INST to Team Multisig
+    function action3() internal {
+        string[] memory targets = new string[](1);
+        bytes[] memory encodedSpells = new bytes[](1);
 
-            string memory depositSignature = "deposit(address,uint256,uint256,uint256)";
+        string memory withdrawSignature = "withdraw(address,uint256,address,uint256,uint256)";
 
-            // Spell 1: Deposit INST into INST-ETH Dex
-            {   
-                uint256 token0Amount_ = 8_000_000 * 1e18; // 8M INST
-                uint256 token1Amount_ = 0; // 0 ETH
-                uint256 minShareAmount_ = 0; // 0 shares
-
-                targets[0] = "FLUID-DEX-A";
-                encodedSpells[0] = abi.encodeWithSignature(
-                    depositSignature,
-                    INST_ETH_ADDRESS,
-                    token0Amount_, // token0 INST
-                    token1Amount_, // token1 ETH
-                    minShareAmount_
-                );
-            }
-
-            IDSAV2(TREASURY).cast(targets, encodedSpells, address(this));
+        // Spell 1: Transfer INST
+        {   
+            uint256 INST_AMOUNT = 5_000_000 * 1e18; // 5M INST
+            targets[0] = "BASIC-A";
+            encodedSpells[0] = abi.encodeWithSignature(withdrawSignature, INST_ADDRESS, INST_AMOUNT, TEAM_MULTISIG, 0, 0);
         }
-    }
 
-    /**
-     * |
-     * |     Team Multisig Functions      |
-     * |__________________________________
-     */
-
-    modifier onlyTeamMultisig() {
-        require(msg.sender == TEAM_MULTISIG, "msg.sender-not-allowed");
-        _;
-    }
-
-    function setExecutable(bool executable_) external onlyTeamMultisig {
-        executable = executable_;
+        IDSAV2(TREASURY).cast(targets, encodedSpells, address(this));
     }
 
     /**
@@ -985,6 +943,34 @@ contract PayloadIGP56 {
             });
 
             LIQUIDITY.updateUserBorrowConfigs(configs_);
+        }
+    }
+
+
+    function setVaultLimits(Vault memory vault_) internal {
+        if (vault_.vaultType == TYPE.TYPE_3) {
+            SupplyProtocolConfig memory protocolConfig_ = SupplyProtocolConfig({
+                protocol: vault_.vault,
+                supplyToken: vault_.supplyToken,
+                expandPercent: 25 * 1e2, // 25%
+                expandDuration: 12 hours, // 12 hours
+                baseWithdrawalLimitInUSD: vault_.baseWithdrawalLimitInUSD
+            });
+
+            setSupplyProtocolLimits(protocolConfig_);
+        }
+
+        if (vault_.vaultType == TYPE.TYPE_2) {
+            BorrowProtocolConfig memory protocolConfig_ = BorrowProtocolConfig({
+                protocol: vault_.vault,
+                borrowToken: vault_.borrowToken,
+                expandPercent: 20 * 1e2, // 20%
+                expandDuration: 12 hours, // 12 hours
+                baseBorrowLimitInUSD: vault_.baseBorrowLimitInUSD,
+                maxBorrowLimitInUSD: vault_.maxBorrowLimitInUSD
+            });
+
+            setBorrowProtocolLimits(protocolConfig_);
         }
     }
 
