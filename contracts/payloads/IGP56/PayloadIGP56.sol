@@ -644,8 +644,6 @@ contract PayloadIGP56 {
     IFluidDexResolver public constant FLUID_DEX_RESOLVER =
         IFluidDexResolver(0x7af0C11F5c787632e567e6418D74e5832d8FFd4c);
 
-    bool public executable;
-
     struct Dex {
         address dex;
         address tokenA;
@@ -712,7 +710,6 @@ contract PayloadIGP56 {
 
     function execute() external {
         require(address(this) == address(TIMELOCK), "not-valid-caller");
-        require(PayloadIGP56(ADDRESS_THIS).executable(), "not-executable");
 
         // Action 1: Set INST Market Rates
         action1();
