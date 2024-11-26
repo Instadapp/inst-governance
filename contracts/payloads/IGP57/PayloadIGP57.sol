@@ -569,8 +569,8 @@ interface IDSAV2 {
     function isAuth(address user) external view returns (bool);
 }
 
-contract PayloadIGP56 {
-    uint256 public constant PROPOSAL_ID = 56;
+contract PayloadIGP57 {
+    uint256 public constant PROPOSAL_ID = 57;
 
     address public constant PROPOSER =
         0xA45f7bD6A5Ff45D31aaCE6bCD3d426D9328cea01;
