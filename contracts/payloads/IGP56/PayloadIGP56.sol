@@ -738,12 +738,12 @@ contract PayloadIGP56 {
 
         params_[0] = AdminModuleStructs.RateDataV2Params({
                 token: INST_ADDRESS, // INST
-                kink1: 85 * 1e2, // 85%
-                kink2: 93 * 1e2, // 93%
+                kink1: 40 * 1e2, // 40%
+                kink2: 80 * 1e2, // 80%
                 rateAtUtilizationZero: 0, // 0%
-                rateAtUtilizationKink1: 7 * 1e2, // 7%
-                rateAtUtilizationKink2: 10 * 1e2, // 10%
-                rateAtUtilizationMax: 33 * 1e2 // 33%
+                rateAtUtilizationKink1: 5 * 1e2, // 5%
+                rateAtUtilizationKink2: 20 * 1e2, // 20%
+                rateAtUtilizationMax: 50 * 1e2 // 50%
         });
 
         LIQUIDITY.updateRateDataV2s(params_);
