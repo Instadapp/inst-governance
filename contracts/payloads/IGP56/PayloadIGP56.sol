@@ -737,7 +737,7 @@ contract PayloadIGP56 {
         AdminModuleStructs.RateDataV2Params[] memory params_ = new AdminModuleStructs.RateDataV2Params[](1);
 
         params_[0] = AdminModuleStructs.RateDataV2Params({
-                token: USDC_ADDRESS, // USDC
+                token: INST_ADDRESS, // INST
                 kink1: 85 * 1e2, // 85%
                 kink2: 93 * 1e2, // 93%
                 rateAtUtilizationZero: 0, // 0%
@@ -760,7 +760,7 @@ contract PayloadIGP56 {
                 tokenB: ETH_ADDRESS,
                 smartCollateral: true,
                 smartDebt: false,
-                baseWithdrawalLimitInUSD: 50_000_000, // $50M
+                baseWithdrawalLimitInUSD: 10_000_000, // $10M
                 baseBorrowLimitInUSD: 0, // $0
                 maxBorrowLimitInUSD: 0 // $0
             });
@@ -777,8 +777,8 @@ contract PayloadIGP56 {
                 supplyToken: address(0),
                 borrowToken: ETH_ADDRESS,
                 baseWithdrawalLimitInUSD: 0, // set at Dex
-                baseBorrowLimitInUSD: 100, // $100
-                maxBorrowLimitInUSD: 150 // $150
+                baseBorrowLimitInUSD: 200, // $200
+                maxBorrowLimitInUSD: 300 // $300
             });
 
             setVaultLimits(VAULT_INST_ETH); // TYPE_2 => 75
