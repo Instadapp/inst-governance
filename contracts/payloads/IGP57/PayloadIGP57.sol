@@ -699,7 +699,7 @@ contract PayloadIGP57 {
 
     /// @notice Action 2: Increase USDC-USDT Dex Pool Range.
     function action2() internal {
-        IFluidDex(getVaultAddress(2)).updateRangePercents(
+        IFluidDex(getDexAddress(2)).updateRangePercents(
             0.06 * 1e4, // 0.06%
             0.06 * 1e4, // 0.06%,
             3 hours
