@@ -741,7 +741,7 @@ contract PayloadIGP57 {
                 smartCollateral: true,
                 smartDebt: true,
                 baseWithdrawalLimitInUSD: 7_500_000, // $7.5M
-                baseBorrowLimitInUSD: 5_000_000, // $5M
+                baseBorrowLimitInUSD: 6_000_000, // $5M
                 maxBorrowLimitInUSD: 8_500_000 // $8.5M
             });
             setDexLimits(DEX_GHO_USDC); // Smart Collateral & Smart Debt
@@ -781,8 +781,8 @@ contract PayloadIGP57 {
                     user: GHO_USDC_VAULT_ADDRESS,
                     expandPercent: 20 * 1e2, // 20%
                     expandDuration: 12 hours, // 12 hours
-                    baseDebtCeiling: 2_000_000 * 1e18, // 2M shares
-                    maxDebtCeiling: 3_000_000 * 1e18 // 3M shares
+                    baseDebtCeiling: 3_000_000 * 1e18, // 3M shares
+                    maxDebtCeiling: 4_000_000 * 1e18 // 4M shares
                 });
 
                 IFluidDex(GHO_USDC_DEX_ADDRESS).updateUserBorrowConfigs(
