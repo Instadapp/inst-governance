@@ -636,7 +636,7 @@ contract PayloadIGP58 {
     function execute() external {
         require(address(this) == address(TIMELOCK), "not-valid-caller");
 
-        // Action 1: Give Aave Governance Executor 1.145M INST allowance from Treasury.
+        // Action 1: Approve 1.145M INST allowance to Aave Governance Executor from Treasury.
         action1();
     }
 
@@ -648,7 +648,7 @@ contract PayloadIGP58 {
      * |__________________________________
      */
 
-    /// @notice Action 1: Increase USDC-USDT Dex Pool Range.
+    /// @notice Action 1: Approve 1.145M INST allowance to Aave Governance Executor from Treasury.
     function action1() internal {
 
         address AAVE_EXECUTOR_ADDRESS = 0x5300A1a15135EA4dc7aD5a167152C01EFc9b192A;
