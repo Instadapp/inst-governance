@@ -80,7 +80,7 @@ contract PayloadIGP59 is PayloadIGPConstants, PayloadIGPHelpers {
 
     /// @notice Action 1: Update Dex Pool Deployment Logic
     function action1() internal {
-        address OLD_DEPLOYMENT_LOGIC = address(0);
+        address OLD_DEPLOYMENT_LOGIC = address(0x6779d9D2e8722724bb42328EE905911B64df7a21);
         address NEW_DEPLOYMENT_LOGIC = address(0);
         DEX_FACTORY.setDexDeploymentLogic(OLD_DEPLOYMENT_LOGIC, false);
         DEX_FACTORY.setDexDeploymentLogic(NEW_DEPLOYMENT_LOGIC, true);
