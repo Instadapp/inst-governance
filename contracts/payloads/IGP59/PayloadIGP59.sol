@@ -31,10 +31,6 @@ import { PayloadIGPHelpers } from "../common/helpers.sol";
 contract PayloadIGP59 is PayloadIGPConstants, PayloadIGPHelpers {
     uint256 public constant PROPOSAL_ID = 59;
 
-    constructor() {
-        ADDRESS_THIS = address(this);
-    }
-
     function propose(string memory description) external {
         require(
             msg.sender == PROPOSER ||
