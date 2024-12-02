@@ -31,9 +31,9 @@ import { PayloadIGPHelpers } from "../common/helpers.sol";
 contract PayloadIGP60 is PayloadIGPConstants, PayloadIGPHelpers {
     uint256 public constant PROPOSAL_ID = 60;
 
-    constructor() {
-        ADDRESS_THIS = address(this);
-    }
+    // State
+    uint256 public INST_ETH_VAULT_ID = 0;
+    uint256 public INST_ETH_DEX_ID = 0;
 
     function propose(string memory description) external {
         require(
@@ -78,13 +78,25 @@ contract PayloadIGP60 is PayloadIGPConstants, PayloadIGPHelpers {
 
     /**
      * |
+     * |     Team Multisig Actions      |
+     * |__________________________________
+     */
+    function setState(uint256 inst_eth_dex_id, uint256 inst_eth_vault_id) external {
+        INST_ETH_DEX_ID = inst_eth_dex_id;
+        INST_ETH_VAULT_ID = inst_eth_vault_id;
+    }
+
+    /**
+     * |
      * |     Proposal Payload Actions      |
      * |__________________________________
      */
 
     /// @notice Action 1: Set INST-ETH Dex Pool and INST-ETH_ETH Vault Limits
     function action1() internal {
-        address INST_ETH_ADDRESS = getDexAddress(11);
+        require(INST_ETH_DEX_ID > 10 && INST_ETH_VAULT_ID > 75, "invalid-ids");
+        address INST_ETH_ADDRESS = getDexAddress(INST_ETH_DEX_ID);
+        address INST_ETH_VAULT_ADDRESS = getVaultAddress(INST_ETH_VAULT_ID);
 
         { // Set DEX Limits on Liquidity Layer
             Dex memory DEX_INST_ETH = Dex({
@@ -97,7 +109,7 @@ contract PayloadIGP60 is PayloadIGPConstants, PayloadIGPHelpers {
                 baseBorrowLimitInUSD: 0, // $0
                 maxBorrowLimitInUSD: 0 // $0
             });
-            setDexLimits(DEX_INST_ETH); // Smart Collateral
+            setDexLimits(DEX_INST_ETH); // Smart Collateral and debt
 
             DEX_FACTORY.setDexAuth(INST_ETH_ADDRESS, TEAM_MULTISIG, true);
         }
@@ -105,7 +117,7 @@ contract PayloadIGP60 is PayloadIGPConstants, PayloadIGPHelpers {
         {
             // [TYPE 2] INST-ETH  | ETH | Smart collateral & debt
             Vault memory VAULT_INST_ETH = Vault({
-                vault: getVaultAddress(76),
+                vault: INST_ETH_VAULT_ADDRESS,
                 vaultType: TYPE.TYPE_2,
                 supplyToken: address(0),
                 borrowToken: ETH_ADDRESS,
@@ -117,7 +129,7 @@ contract PayloadIGP60 is PayloadIGPConstants, PayloadIGPHelpers {
             setVaultLimits(VAULT_INST_ETH); // TYPE_2 => 76
 
             VAULT_FACTORY.setVaultAuth(
-                getVaultAddress(76),
+                INST_ETH_VAULT_ADDRESS,
                 TEAM_MULTISIG,
                 true
             );
