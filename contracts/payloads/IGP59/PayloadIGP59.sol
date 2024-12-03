@@ -85,4 +85,21 @@ contract PayloadIGP59 is PayloadIGPConstants, PayloadIGPHelpers {
         DEX_FACTORY.setDexDeploymentLogic(OLD_DEPLOYMENT_LOGIC, false);
         DEX_FACTORY.setDexDeploymentLogic(NEW_DEPLOYMENT_LOGIC, true);
     }
+
+    /// @notice Action 2: Update wBTC-cbBTC dex pool range
+    function action2() internal {
+        IFluidDex(getDexAddress(3)).updateRangePercents(0.075 * 1e4, 0.075 * 1e4, 4 hours);
+    }
+
+    /// @notice Action 3: Update iETHv2 Risk Ratio of Spark
+    function action3() internal {
+        uint8[] memory protocolIds_ = new uint8[](1);
+        uint256[] memory newRiskRatios_ = new uint256[](1);
+
+        protocolIds_[0] = 7; // Protocol Id of Spark: 7
+        newRiskRatios_[0] = 90.5 * 1e4; // 90.5% or 90.5 * 1e4
+
+        // Update max risky ratio of Spark
+        IETHV2.updateMaxRiskRatio(protocolIds_, newRiskRatios_);
+    }
 }

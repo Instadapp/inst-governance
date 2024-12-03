@@ -25,6 +25,8 @@ import { ILendingRewards } from "./interfaces/IFToken.sol";
 
 import { IDSAV2 } from "./interfaces/IDSA.sol";
 
+import { ILite } from "./interfaces/ILite.sol";
+
 
 contract PayloadIGPConstants {
     address public immutable ADDRESS_THIS;
@@ -62,6 +64,10 @@ contract PayloadIGPConstants {
         IFluidVaultFactory(0x324c5Dc1fC42c7a4D43d92df1eBA58a54d13Bf2d);
     IFluidDexFactory public constant DEX_FACTORY =
         IFluidDexFactory(0x91716C4EDA1Fb55e84Bf8b4c7085f84285c19085);
+
+    
+    ILite public constant IETHV2 =
+        ILite(0xA0D3707c569ff8C87FA923d3823eC5D81c98Be78);
 
 
     // Tokens
