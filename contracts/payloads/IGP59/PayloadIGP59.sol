@@ -88,7 +88,8 @@ contract PayloadIGP59 is PayloadIGPConstants, PayloadIGPHelpers {
 
     /// @notice Action 2: Update wBTC-cbBTC dex pool range
     function action2() internal {
-        IFluidDex(getDexAddress(3)).updateRangePercents(0.075 * 1e4, 0.075 * 1e4, 4 hours);
+        IFluidDex(getDexAddress(3)).updateRangePercents(0.075 * 1e4, 0.075 * 1e4, 12 hours);
+        IFluidDex(getDexAddress(3)).updateThresholdPercent(50 * 1e4, 50 * 1e4, 4 hours, 0);
     }
 
     /// @notice Action 3: Update iETHv2 Risk Ratio of Spark
