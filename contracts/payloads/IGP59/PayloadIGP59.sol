@@ -68,6 +68,12 @@ contract PayloadIGP59 is PayloadIGPConstants, PayloadIGPHelpers {
 
         // Action 1: Update Dex Pool Deployment Logic
         action1();
+
+        // Action 2: Update wBTC-cbBTC dex pool range
+        action2();
+
+        // Action 3: Update iETHv2 Risk Ratio of Spark
+        action3();
     }
 
     function verifyProposal() external view {}
