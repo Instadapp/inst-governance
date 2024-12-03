@@ -34,6 +34,8 @@ contract PayloadIGP60 is PayloadIGPConstants, PayloadIGPHelpers {
     // State
     uint256 public INST_ETH_VAULT_ID = 0;
     uint256 public INST_ETH_DEX_ID = 0;
+    uint256 public ETH_USDC_DEX_ID = 0;
+    uint256 public ETH_USDC_VAULT_ID = 0;
 
     function propose(string memory description) external {
         require(
@@ -81,9 +83,20 @@ contract PayloadIGP60 is PayloadIGPConstants, PayloadIGPHelpers {
      * |     Team Multisig Actions      |
      * |__________________________________
      */
-    function setState(uint256 inst_eth_dex_id, uint256 inst_eth_vault_id) external {
+    function setState(
+        uint256 inst_eth_dex_id,
+        uint256 inst_eth_vault_id,
+        uint256 eth_usdc_dex_id,
+        uint256 eth_usdc_vault_id
+    ) external {
+        if (msg.sender != TEAM_MULTISIG) {
+            revert("not-team-multisig");
+        }
+
         INST_ETH_DEX_ID = inst_eth_dex_id;
         INST_ETH_VAULT_ID = inst_eth_vault_id;
+        ETH_USDC_DEX_ID = eth_usdc_dex_id;
+        ETH_USDC_VAULT_ID = eth_usdc_vault_id;
     }
 
     /**
@@ -92,11 +105,13 @@ contract PayloadIGP60 is PayloadIGPConstants, PayloadIGPHelpers {
      * |__________________________________
      */
 
-    /// @notice Action 1: Set INST-ETH Dex Pool and INST-ETH_ETH Vault Limits
+    /// @notice Action 1: Set new INST-ETH Dex Pool and INST-ETH_ETH Vault Limits
     function action1() internal {
-        require(INST_ETH_DEX_ID > 10 && INST_ETH_VAULT_ID > 75, "invalid-ids");
-        address INST_ETH_ADDRESS = getDexAddress(INST_ETH_DEX_ID);
-        address INST_ETH_VAULT_ADDRESS = getVaultAddress(INST_ETH_VAULT_ID);
+        uint256 inst_eth_dex_id = PayloadIGP60(address(this)).INST_ETH_DEX_ID();
+        uint256 inst_eth_vault_id = PayloadIGP60(address(this)).INST_ETH_VAULT_ID();
+        require(inst_eth_dex_id > 10 && inst_eth_vault_id > 75, "invalid-ids");
+        address INST_ETH_ADDRESS = getDexAddress(inst_eth_dex_id);
+        address INST_ETH_VAULT_ADDRESS = getVaultAddress(inst_eth_vault_id);
 
         { // Set DEX Limits on Liquidity Layer
             Dex memory DEX_INST_ETH = Dex({
@@ -126,10 +141,86 @@ contract PayloadIGP60 is PayloadIGPConstants, PayloadIGPHelpers {
                 maxBorrowLimitInUSD: 300 // $300
             });
 
-            setVaultLimits(VAULT_INST_ETH); // TYPE_2 => 76
+            setVaultLimits(VAULT_INST_ETH); // TYPE_2
 
             VAULT_FACTORY.setVaultAuth(
                 INST_ETH_VAULT_ADDRESS,
+                TEAM_MULTISIG,
+                true
+            );
+        }
+    }
+
+    /// @notice Action 2: Set new ETH-USDC Dex Pool and ETH-USDC Vault Limits
+    function action2() internal {
+        uint256 eth_usdc_dex_id = PayloadIGP60(address(this)).ETH_USDC_DEX_ID();
+        uint256 eth_usdc_vault_id = PayloadIGP60(address(this)).ETH_USDC_VAULT_ID();
+        require(eth_usdc_dex_id > 10 && eth_usdc_vault_id > 75, "invalid-ids");
+        address ETH_USDC_ADDRESS = getDexAddress(eth_usdc_dex_id);
+        address ETH_USDC_VAULT_ADDRESS = getVaultAddress(eth_usdc_vault_id);
+
+        { // Set DEX Limits on Liquidity Layer
+            Dex memory DEX_ETH_USDC = Dex({
+                dex: ETH_USDC_ADDRESS,
+                tokenA: ETH_ADDRESS,
+                tokenB: USDC_ADDRESS,
+                smartCollateral: true,
+                smartDebt: true,
+                baseWithdrawalLimitInUSD: 15_000_000, // $15M
+                baseBorrowLimitInUSD: 10_000_000, // $10M
+                maxBorrowLimitInUSD: 12_000_000 // $12M
+            });
+            setDexLimits(DEX_ETH_USDC); // Smart Collateral and debt
+
+            DEX_FACTORY.setDexAuth(ETH_USDC_ADDRESS, TEAM_MULTISIG, true);
+        }
+
+        {
+            // [TYPE 2] ETH-USDC  | ETH-USDC | Smart collateral & debt
+            Vault memory VAULT_ETH_USDC = Vault({
+                vault: ETH_USDC_VAULT_ADDRESS,
+                vaultType: TYPE.TYPE_2,
+                supplyToken: address(0),
+                borrowToken: USDC_ADDRESS,
+                baseWithdrawalLimitInUSD: 0, // set at Dex
+                baseBorrowLimitInUSD: 200, // $200
+                maxBorrowLimitInUSD: 300 // $300
+            });
+
+            setVaultLimits(VAULT_ETH_USDC); // TYPE_2
+
+            VAULT_FACTORY.setVaultAuth(
+                ETH_USDC_VAULT_ADDRESS,
+                TEAM_MULTISIG,
+                true
+            );
+        }
+    }
+
+    /// @notice Action 3: Reduce limits old ETH-USDC Dex Pool
+    function action3() internal {
+        address ETH_USDC_ADDRESS = getDexAddress(5);
+        address ETH_USDC_VAULT_ADDRESS = getVaultAddress(62);
+
+        { // Set DEX Limits on Liquidity Layer
+            Dex memory DEX_ETH_USDC = Dex({
+                dex: ETH_USDC_ADDRESS,
+                tokenA: ETH_ADDRESS,
+                tokenB: USDC_ADDRESS,
+                smartCollateral: true,
+                smartDebt: true,
+                baseWithdrawalLimitInUSD: 1000, // $1000
+                baseBorrowLimitInUSD: 800, // $800
+                maxBorrowLimitInUSD: 1000 // $1000
+            });
+            setDexLimits(DEX_ETH_USDC); // Smart Collateral and debt
+
+            DEX_FACTORY.setDexAuth(ETH_USDC_ADDRESS, TEAM_MULTISIG, true);
+        }
+
+        { // Set Team Multisig Auth on old ETH-USDC smart collateral and debt vault
+            VAULT_FACTORY.setVaultAuth(
+                ETH_USDC_VAULT_ADDRESS,
                 TEAM_MULTISIG,
                 true
             );
