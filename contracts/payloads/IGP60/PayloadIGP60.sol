@@ -77,6 +77,9 @@ contract PayloadIGP60 is PayloadIGPConstants, PayloadIGPHelpers {
 
         // Action 2: Set new ETH-USDC Dex Pool and ETH-USDC Vault Limits
         action2();
+
+        // Action 3: Reduce limits old ETH-USDC Dex Pool
+        action3();
     }
 
     function verifyProposal() external view {}
