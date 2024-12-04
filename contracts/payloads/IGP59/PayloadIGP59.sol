@@ -68,6 +68,12 @@ contract PayloadIGP59 is PayloadIGPConstants, PayloadIGPHelpers {
 
         // Action 1: Update Dex Pool Deployment Logic
         action1();
+
+        // Action 2: Update wBTC-cbBTC dex pool range
+        action2();
+
+        // Action 3: Update iETHv2 Risk Ratio of Spark
+        action3();
     }
 
     function verifyProposal() external view {}
@@ -84,5 +90,23 @@ contract PayloadIGP59 is PayloadIGPConstants, PayloadIGPHelpers {
         address NEW_DEPLOYMENT_LOGIC = address(0x7db5101f12555bD7Ef11B89e4928061B7C567D27);
         DEX_FACTORY.setDexDeploymentLogic(OLD_DEPLOYMENT_LOGIC, false);
         DEX_FACTORY.setDexDeploymentLogic(NEW_DEPLOYMENT_LOGIC, true);
+    }
+
+    /// @notice Action 2: Update wBTC-cbBTC dex pool range
+    function action2() internal {
+        IFluidDex(getDexAddress(3)).updateRangePercents(0.075 * 1e4, 0.075 * 1e4, 12 hours);
+        IFluidDex(getDexAddress(3)).updateThresholdPercent(50 * 1e4, 50 * 1e4, 4 hours, 0);
+    }
+
+    /// @notice Action 3: Update iETHv2 Risk Ratio of Spark
+    function action3() internal {
+        uint8[] memory protocolIds_ = new uint8[](1);
+        uint256[] memory newRiskRatios_ = new uint256[](1);
+
+        protocolIds_[0] = 7; // Protocol Id of Spark: 7
+        newRiskRatios_[0] = 90.5 * 1e4; // 90.5% or 90.5 * 1e4
+
+        // Update max risky ratio of Spark
+        IETHV2.updateMaxRiskRatio(protocolIds_, newRiskRatios_);
     }
 }

@@ -105,6 +105,12 @@ interface IFluidAdminDex {
     }
 
     function initialize(InitializeVariables memory initializeVariables_) external payable;
+
+    function updateRangePercents(
+        uint upperPercent_,
+        uint lowerPercent_,
+        uint shiftTime_
+    ) external; 
 }
 
 interface IFluidUserDex {
