@@ -176,19 +176,7 @@ contract PayloadIGP60 is PayloadIGPConstants, PayloadIGPHelpers {
         }
 
         {
-            // [TYPE 2] ETH-USDC  | ETH-USDC | Smart collateral & debt
-            Vault memory VAULT_ETH_USDC = Vault({
-                vault: ETH_USDC_VAULT_ADDRESS,
-                vaultType: TYPE.TYPE_2,
-                supplyToken: address(0),
-                borrowToken: USDC_ADDRESS,
-                baseWithdrawalLimitInUSD: 0, // set at Dex
-                baseBorrowLimitInUSD: 200, // $200
-                maxBorrowLimitInUSD: 300 // $300
-            });
-
-            setVaultLimits(VAULT_ETH_USDC); // TYPE_2
-
+            // Set Team Multisig Auth on new ETH-USDC smart collateral and debt vault
             VAULT_FACTORY.setVaultAuth(
                 ETH_USDC_VAULT_ADDRESS,
                 TEAM_MULTISIG,
@@ -338,9 +326,9 @@ contract PayloadIGP60 is PayloadIGPConstants, PayloadIGPHelpers {
     }
 
     // Token Prices Constants
-    uint256 public constant ETH_USD_PRICE = 3_550 * 1e2;
-    uint256 public constant wstETH_USD_PRICE = 3_950 * 1e2;
-    uint256 public constant weETH_USD_PRICE = 3_500 * 1e2;
+    uint256 public constant ETH_USD_PRICE = 3_850 * 1e2;
+    uint256 public constant wstETH_USD_PRICE = 4_550 * 1e2;
+    uint256 public constant weETH_USD_PRICE = 4_050 * 1e2;
 
     uint256 public constant BTC_USD_PRICE = 99_000 * 1e2;
 
@@ -348,7 +336,7 @@ contract PayloadIGP60 is PayloadIGPConstants, PayloadIGPHelpers {
     uint256 public constant sUSDe_USD_PRICE = 1 * 1e2;
     uint256 public constant sUSDs_USD_PRICE = 1 * 1e2;
     
-    uint256 public constant INST_USD_PRICE = 5.75 * 1e2;
+    uint256 public constant INST_USD_PRICE = 7 * 1e2;
 
     function getRawAmount(
         address token,
