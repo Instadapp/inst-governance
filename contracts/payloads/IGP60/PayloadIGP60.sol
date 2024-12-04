@@ -74,6 +74,9 @@ contract PayloadIGP60 is PayloadIGPConstants, PayloadIGPHelpers {
 
         // Action 1: Set INST-ETH Dex Pool and INST-ETH_ETH Vault Limits
         action1();
+
+        // Action 2: Set new ETH-USDC Dex Pool and ETH-USDC Vault Limits
+        action2();
     }
 
     function verifyProposal() external view {}
@@ -107,8 +110,8 @@ contract PayloadIGP60 is PayloadIGPConstants, PayloadIGPHelpers {
 
     /// @notice Action 1: Set new INST-ETH Dex Pool and INST-ETH_ETH Vault Limits
     function action1() internal {
-        uint256 inst_eth_dex_id = PayloadIGP60(address(this)).INST_ETH_DEX_ID();
-        uint256 inst_eth_vault_id = PayloadIGP60(address(this)).INST_ETH_VAULT_ID();
+        uint256 inst_eth_dex_id = PayloadIGP60(ADDRESS_THIS).INST_ETH_DEX_ID();
+        uint256 inst_eth_vault_id = PayloadIGP60(ADDRESS_THIS).INST_ETH_VAULT_ID();
         require(inst_eth_dex_id > 10 && inst_eth_vault_id > 75, "invalid-ids");
         address INST_ETH_ADDRESS = getDexAddress(inst_eth_dex_id);
         address INST_ETH_VAULT_ADDRESS = getVaultAddress(inst_eth_vault_id);
@@ -153,8 +156,8 @@ contract PayloadIGP60 is PayloadIGPConstants, PayloadIGPHelpers {
 
     /// @notice Action 2: Set new ETH-USDC Dex Pool and ETH-USDC Vault Limits
     function action2() internal {
-        uint256 eth_usdc_dex_id = PayloadIGP60(address(this)).ETH_USDC_DEX_ID();
-        uint256 eth_usdc_vault_id = PayloadIGP60(address(this)).ETH_USDC_VAULT_ID();
+        uint256 eth_usdc_dex_id = PayloadIGP60(ADDRESS_THIS).ETH_USDC_DEX_ID();
+        uint256 eth_usdc_vault_id = PayloadIGP60(ADDRESS_THIS).ETH_USDC_VAULT_ID();
         require(eth_usdc_dex_id > 10 && eth_usdc_vault_id > 75, "invalid-ids");
         address ETH_USDC_ADDRESS = getDexAddress(eth_usdc_dex_id);
         address ETH_USDC_VAULT_ADDRESS = getVaultAddress(eth_usdc_vault_id);
