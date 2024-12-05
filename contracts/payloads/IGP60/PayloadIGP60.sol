@@ -228,8 +228,8 @@ contract PayloadIGP60 is PayloadIGPConstants, PayloadIGPHelpers {
     function action4() internal {
         address cbBTC_wBTC_DEX_ADDRESS = getDexAddress(3);
 
-        uint256 maxCenterPrice_ = 0.997 * 1e27;
-        uint256 minCenterPrice_ = 1.0030090270812437 * 1e27;
+        uint256 minCenterPrice_ = 0.997 * 1e27;
+        uint256 maxCenterPrice_ = 1.0030090270812437 * 1e27;
         IFluidDex(cbBTC_wBTC_DEX_ADDRESS).updateCenterPriceLimits(maxCenterPrice_, minCenterPrice_);
     }
 
