@@ -66,8 +66,11 @@ contract PayloadIGP61 is PayloadIGPConstants, PayloadIGPHelpers {
     function execute() external {
         require(address(this) == address(TIMELOCK), "not-valid-caller");
 
-        // Action 1: Set INST-ETH Dex Pool and INST-ETH_ETH Vault Limits
+        // Action 1: Update cbBTC-wBTC dex pool min and max center price
         action1();
+
+        // Action 2: Reduce limits old INST-ETH Dex Pool
+        action2();
     }
 
     function verifyProposal() external view {}
@@ -90,23 +93,23 @@ contract PayloadIGP61 is PayloadIGPConstants, PayloadIGPHelpers {
         );
     }
 
-    /// @notice Action 2: Reduce limits old ETH-INST Dex Pool
+    /// @notice Action 2: Reduce limits old INST-ETH Dex Pool
     function action2() internal {
-        address ETH_INST_ADDRESS = getDexAddress(10);
+        address INST_ETH_DEX_ADDRESS = getDexAddress(10);
 
         {
             // Set DEX Limits on Liquidity Layer
-            Dex memory DEX_ETH_INST = Dex({
-                dex: ETH_INST_ADDRESS,
-                tokenA: ETH_ADDRESS,
-                tokenB: INST_ADDRESS,
+            Dex memory DEX_INST_ETH = Dex({
+                dex: INST_ETH_DEX_ADDRESS,
+                tokenA: INST_ADDRESS,
+                tokenB: ETH_ADDRESS,
                 smartCollateral: true,
                 smartDebt: false,
                 baseWithdrawalLimitInUSD: 100, // $100
                 baseBorrowLimitInUSD: 0, // $0
                 maxBorrowLimitInUSD: 0 // 0
             });
-            setDexLimits(DEX_ETH_INST); // Smart Collateral and debt
+            setDexLimits(DEX_INST_ETH); // Smart Collateral and debt
         }
     }
 
