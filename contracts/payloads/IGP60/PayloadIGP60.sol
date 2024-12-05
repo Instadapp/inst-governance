@@ -80,9 +80,6 @@ contract PayloadIGP60 is PayloadIGPConstants, PayloadIGPHelpers {
 
         // Action 3: Reduce limits old ETH-USDC Dex Pool
         action3();
-
-        // Action 4: Update cbBTC-wBTC dex pool min and max center price
-        action4();
     }
 
     function verifyProposal() external view {}
@@ -228,18 +225,6 @@ contract PayloadIGP60 is PayloadIGPConstants, PayloadIGPHelpers {
                 true
             );
         }
-    }
-
-    /// @notice Action 4: Update cbBTC-wBTC dex pool min and max center price
-    function action4() internal {
-        address cbBTC_wBTC_DEX_ADDRESS = getDexAddress(3);
-
-        uint256 minCenterPrice_ = (997 * 1e27) / 1000;
-        uint256 maxCenterPrice_ = (1e27 * 1000) / 997;
-        IFluidDex(cbBTC_wBTC_DEX_ADDRESS).updateCenterPriceLimits(
-            maxCenterPrice_,
-            minCenterPrice_
-        );
     }
 
     /**
