@@ -602,6 +602,76 @@ contract PayloadIGP57 {
         FluidVaultFactory(0x324c5Dc1fC42c7a4D43d92df1eBA58a54d13Bf2d);
     FluidDexFactory public constant DEX_FACTORY =
         FluidDexFactory(0x91716C4EDA1Fb55e84Bf8b4c7085f84285c19085);
+        address internal constant ETH_ADDRESS =
+        0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
+    address internal constant wstETH_ADDRESS =
+        0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0;
+    address internal constant weETH_ADDRESS =
+        0xCd5fE23C85820F7B72D0926FC9b05b43E359b7ee;
+
+    address internal constant USDC_ADDRESS =
+        0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
+    address internal constant USDT_ADDRESS =
+        0xdAC17F958D2ee523a2206206994597C13D831ec7;
+    address internal constant sUSDe_ADDRESS =
+        0x9D39A5DE30e57443BfF2A8307A4256c8797A3497;
+    address internal constant sUSDs_ADDRESS =
+        0xa3931d71877C0E7a3148CB7Eb4463524FEc27fbD;
+    address internal constant USDe_ADDRESS =
+        0x4c9EDD5852cd905f086C759E8383e09bff1E68B3;
+
+    address internal constant GHO_ADDRESS =
+        0x40D16FC0246aD3160Ccc09B8D0D3A2cD28aE6C2f;
+
+    address internal constant WBTC_ADDRESS =
+        0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599;
+    address internal constant cbBTC_ADDRESS =
+        0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf;
+
+    address internal constant INST_ADDRESS = 
+        0x6f40d4A6237C257fff2dB00FA0510DeEECd303eb;
+
+    address public constant F_USDT = 0x5C20B550819128074FD538Edf79791733ccEdd18;
+    address public constant F_USDC = 0x9Fb7b4477576Fe5B32be4C1843aFB1e55F251B33;
+
+    uint256 internal constant X8 = 0xff;
+    uint256 internal constant X10 = 0x3ff;
+    uint256 internal constant X14 = 0x3fff;
+    uint256 internal constant X15 = 0x7fff;
+    uint256 internal constant X16 = 0xffff;
+    uint256 internal constant X18 = 0x3ffff;
+    uint256 internal constant X24 = 0xffffff;
+    uint256 internal constant X64 = 0xffffffffffffffff;
+
+    uint256 internal constant DEFAULT_EXPONENT_SIZE = 8;
+    uint256 internal constant DEFAULT_EXPONENT_MASK = 0xff;
+
+    struct Dex {
+        address dex;
+        address tokenA;
+        address tokenB;
+        bool smartCollateral;
+        bool smartDebt;
+        uint256 baseWithdrawalLimitInUSD;
+        uint256 baseBorrowLimitInUSD;
+        uint256 maxBorrowLimitInUSD;
+    }
+
+    enum TYPE {
+        TYPE_2,
+        TYPE_3,
+        TYPE_4
+    }
+
+    struct Vault {
+        address vault;
+        TYPE vaultType;
+        address supplyToken;
+        address borrowToken;
+        uint256 baseWithdrawalLimitInUSD;
+        uint256 baseBorrowLimitInUSD;
+        uint256 maxBorrowLimitInUSD;
+    }
 
     constructor() {
         ADDRESS_THIS = address(this);
@@ -658,12 +728,37 @@ contract PayloadIGP57 {
      * |__________________________________
      */
 
-    /// @notice Action 1: Increase GHO-USDC Vault Limits.
+    /// @notice Action 1: Increase GHO-USDC Dex Pool and Vault Limits.
     function action1() internal {
         address GHO_USDC_VAULT_ADDRESS = getVaultAddress(61);
         address GHO_USDC_DEX_ADDRESS = getDexAddress(4);
-        {
-            // Increase [TYPE 4] GHO-USDC | GHO-USDC | Smart collateral & smart debt
+
+        {  // Increase GHO-USDC Dex Pool Limits
+            Dex memory DEX_GHO_USDC = Dex({
+                dex: GHO_USDC_DEX_ADDRESS,
+                tokenA: GHO_ADDRESS,
+                tokenB: USDC_ADDRESS,
+                smartCollateral: true,
+                smartDebt: true,
+                baseWithdrawalLimitInUSD: 7_500_000, // $7.5M
+                baseBorrowLimitInUSD: 6_000_000, // $5M
+                maxBorrowLimitInUSD: 8_500_000 // $8.5M
+            });
+            setDexLimits(DEX_GHO_USDC); // Smart Collateral & Smart Debt
+        }
+
+        { // Increase GHO-USDC Max Shares
+            IFluidDex(GHO_USDC_DEX_ADDRESS).updateMaxSupplyShares(
+                5_000_000 * 1e18 // 5M shares
+            );
+
+            IFluidDex(GHO_USDC_DEX_ADDRESS).updateMaxBorrowShares(
+                4_000_000 * 1e18 // 4M shares
+            );
+        }
+
+
+        { // Increase [TYPE 4] GHO-USDC | GHO-USDC | Smart collateral & smart debt
             {
                 IFluidDex.UserSupplyConfig[]
                     memory config_ = new IFluidDex.UserSupplyConfig[](1);
@@ -686,8 +781,8 @@ contract PayloadIGP57 {
                     user: GHO_USDC_VAULT_ADDRESS,
                     expandPercent: 20 * 1e2, // 20%
                     expandDuration: 12 hours, // 12 hours
-                    baseDebtCeiling: 2_000_000 * 1e18, // 2M shares
-                    maxDebtCeiling: 3_000_000 * 1e18 // 4M shares
+                    baseDebtCeiling: 3_000_000 * 1e18, // 3M shares
+                    maxDebtCeiling: 4_000_000 * 1e18 // 4M shares
                 });
 
                 IFluidDex(GHO_USDC_DEX_ADDRESS).updateUserBorrowConfigs(
@@ -702,7 +797,7 @@ contract PayloadIGP57 {
         IFluidDex(getDexAddress(2)).updateRangePercents(
             0.06 * 1e4, // 0.06%
             0.06 * 1e4, // 0.06%,
-            3 hours
+            12 hours
         );
     }
 
@@ -717,5 +812,225 @@ contract PayloadIGP57 {
 
     function getDexAddress(uint256 dexId_) public view returns (address) {
         return DEX_FACTORY.getDexAddress(dexId_);
+    }
+
+    struct SupplyProtocolConfig {
+        address protocol;
+        address supplyToken;
+        uint256 expandPercent;
+        uint256 expandDuration;
+        uint256 baseWithdrawalLimitInUSD;
+    }
+
+    struct BorrowProtocolConfig {
+        address protocol;
+        address borrowToken;
+        uint256 expandPercent;
+        uint256 expandDuration;
+        uint256 baseBorrowLimitInUSD;
+        uint256 maxBorrowLimitInUSD;
+    }
+
+    function setDexLimits(Dex memory dex_) internal {
+        // Smart Collateral
+        if (dex_.smartCollateral) {
+            SupplyProtocolConfig memory protocolConfigTokenA_ = SupplyProtocolConfig({
+                protocol: dex_.dex,
+                supplyToken: dex_.tokenA,
+                expandPercent: 50 * 1e2, // 50%
+                expandDuration: 1 hours, // 1 hour
+                baseWithdrawalLimitInUSD: dex_.baseWithdrawalLimitInUSD
+            });
+
+            setSupplyProtocolLimits(protocolConfigTokenA_);
+
+            SupplyProtocolConfig memory protocolConfigTokenB_ = SupplyProtocolConfig({
+                protocol: dex_.dex,
+                supplyToken: dex_.tokenB,
+                expandPercent: 50 * 1e2, // 50%
+                expandDuration: 1 hours, // 1 hour
+                baseWithdrawalLimitInUSD: dex_.baseWithdrawalLimitInUSD
+            });
+
+            setSupplyProtocolLimits(protocolConfigTokenB_);
+        }
+
+        // Smart Debt
+        if (dex_.smartDebt) {
+            BorrowProtocolConfig memory protocolConfigTokenA_ = BorrowProtocolConfig({
+                protocol: dex_.dex,
+                borrowToken: dex_.tokenA,
+                expandPercent: 50 * 1e2, // 50%
+                expandDuration: 1 hours, // 1 hour
+                baseBorrowLimitInUSD: dex_.baseBorrowLimitInUSD,
+                maxBorrowLimitInUSD: dex_.maxBorrowLimitInUSD
+            });
+
+            setBorrowProtocolLimits(protocolConfigTokenA_);
+
+            BorrowProtocolConfig memory protocolConfigTokenB_ = BorrowProtocolConfig({
+                protocol: dex_.dex,
+                borrowToken: dex_.tokenB,
+                expandPercent: 50 * 1e2, // 50%
+                expandDuration: 1 hours, // 1 hour
+                baseBorrowLimitInUSD: dex_.baseBorrowLimitInUSD,
+                maxBorrowLimitInUSD: dex_.maxBorrowLimitInUSD
+            });
+
+            setBorrowProtocolLimits(protocolConfigTokenB_);
+        }
+    }
+
+    function setSupplyProtocolLimits(
+        SupplyProtocolConfig memory protocolConfig_
+    ) internal {
+        {
+            // Supply Limits
+            AdminModuleStructs.UserSupplyConfig[]
+                memory configs_ = new AdminModuleStructs.UserSupplyConfig[](1);
+
+            configs_[0] = AdminModuleStructs.UserSupplyConfig({
+                user: address(protocolConfig_.protocol),
+                token: protocolConfig_.supplyToken,
+                mode: 1,
+                expandPercent: protocolConfig_.expandPercent,
+                expandDuration: protocolConfig_.expandDuration,
+                baseWithdrawalLimit: getRawAmount(
+                    protocolConfig_.supplyToken,
+                    0,
+                    protocolConfig_.baseWithdrawalLimitInUSD,
+                    true
+                )
+            });
+
+            LIQUIDITY.updateUserSupplyConfigs(configs_);
+        }
+    }
+
+    function setBorrowProtocolLimits(
+        BorrowProtocolConfig memory protocolConfig_
+    ) internal {
+        {
+            // Borrow Limits
+            AdminModuleStructs.UserBorrowConfig[]
+                memory configs_ = new AdminModuleStructs.UserBorrowConfig[](1);
+
+            configs_[0] = AdminModuleStructs.UserBorrowConfig({
+                user: address(protocolConfig_.protocol),
+                token: protocolConfig_.borrowToken,
+                mode: 1,
+                expandPercent: protocolConfig_.expandPercent,
+                expandDuration: protocolConfig_.expandDuration,
+                baseDebtCeiling: getRawAmount(
+                    protocolConfig_.borrowToken,
+                    0,
+                    protocolConfig_.baseBorrowLimitInUSD,
+                    false
+                ),
+                maxDebtCeiling: getRawAmount(
+                    protocolConfig_.borrowToken,
+                    0,
+                    protocolConfig_.maxBorrowLimitInUSD,
+                    false
+                )
+            });
+
+            LIQUIDITY.updateUserBorrowConfigs(configs_);
+        }
+    }
+
+
+    function setVaultLimits(Vault memory vault_) internal {
+        if (vault_.vaultType == TYPE.TYPE_3) {
+            SupplyProtocolConfig memory protocolConfig_ = SupplyProtocolConfig({
+                protocol: vault_.vault,
+                supplyToken: vault_.supplyToken,
+                expandPercent: 25 * 1e2, // 25%
+                expandDuration: 12 hours, // 12 hours
+                baseWithdrawalLimitInUSD: vault_.baseWithdrawalLimitInUSD
+            });
+
+            setSupplyProtocolLimits(protocolConfig_);
+        }
+
+        if (vault_.vaultType == TYPE.TYPE_2) {
+            BorrowProtocolConfig memory protocolConfig_ = BorrowProtocolConfig({
+                protocol: vault_.vault,
+                borrowToken: vault_.borrowToken,
+                expandPercent: 20 * 1e2, // 20%
+                expandDuration: 12 hours, // 12 hours
+                baseBorrowLimitInUSD: vault_.baseBorrowLimitInUSD,
+                maxBorrowLimitInUSD: vault_.maxBorrowLimitInUSD
+            });
+
+            setBorrowProtocolLimits(protocolConfig_);
+        }
+    }
+
+    function getRawAmount(
+        address token,
+        uint256 amount,
+        uint256 amountInUSD,
+        bool isSupply
+    ) public view returns (uint256) {
+        if (amount > 0 && amountInUSD > 0) {
+            revert("both usd and amount are not zero");
+        }
+        uint256 exchangePriceAndConfig_ = LIQUIDITY.readFromStorage(
+            LiquiditySlotsLink.calculateMappingStorageSlot(
+                LiquiditySlotsLink.LIQUIDITY_EXCHANGE_PRICES_MAPPING_SLOT,
+                token
+            )
+        );
+
+        (
+            uint256 supplyExchangePrice,
+            uint256 borrowExchangePrice
+        ) = LiquidityCalcs.calcExchangePrices(exchangePriceAndConfig_);
+
+        uint256 usdPrice = 0;
+        uint256 decimals = 18;
+        if (token == ETH_ADDRESS) {
+            usdPrice = 3_350 * 1e2;
+            decimals = 18;
+        } else if (token == wstETH_ADDRESS) {
+            usdPrice = 3_950 * 1e2;
+            decimals = 18;
+        } else if (token == weETH_ADDRESS) {
+            usdPrice = 3_500 * 1e2;
+            decimals = 18;
+        } else if (token == cbBTC_ADDRESS || token == WBTC_ADDRESS) {
+            usdPrice = 99_000 * 1e2;
+            decimals = 8;
+        } else if (token == USDC_ADDRESS || token == USDT_ADDRESS) {
+            usdPrice = 1 * 1e2;
+            decimals = 6;
+        } else if (token == sUSDe_ADDRESS) {
+            usdPrice = 1.12 * 1e2;
+            decimals = 18;
+        } else if (token == sUSDs_ADDRESS) {
+            usdPrice = 1.12 * 1e2;
+            decimals = 18;
+        } else if (token == GHO_ADDRESS || token == USDe_ADDRESS) {
+            usdPrice = 1 * 1e2;
+            decimals = 18;
+        } else if (token == INST_ADDRESS) {
+            usdPrice = 5.75 * 1e2;
+            decimals = 18;
+        } else {
+            revert("not-found");
+        }
+
+        uint256 exchangePrice = isSupply
+            ? supplyExchangePrice
+            : borrowExchangePrice;
+
+        if (amount > 0) {
+            return (amount * 1e12) / exchangePrice;
+        } else {
+            return
+                (amountInUSD * 1e12 * (10 ** decimals)) /
+                ((usdPrice * exchangePrice) / 1e2);
+        }
     }
 }
