@@ -5,28 +5,28 @@ import {BigMathMinified} from "../libraries/bigMathMinified.sol";
 import {LiquidityCalcs} from "../libraries/liquidityCalcs.sol";
 import {LiquiditySlotsLink} from "../libraries/liquiditySlotsLink.sol";
 
-import { IGovernorBravo } from "../common/interfaces/IGovernorBravo.sol";
-import { ITimelock } from "../common/interfaces/ITimelock.sol";
+import {IGovernorBravo} from "../common/interfaces/IGovernorBravo.sol";
+import {ITimelock} from "../common/interfaces/ITimelock.sol";
 
-import { IFluidLiquidityAdmin, AdminModuleStructs as FluidLiquidityAdminStructs } from "../common/interfaces/IFluidLiquidity.sol";
-import { IFluidReserveContract } from "../common/interfaces/IFluidReserveContract.sol";
+import {IFluidLiquidityAdmin, AdminModuleStructs as FluidLiquidityAdminStructs} from "../common/interfaces/IFluidLiquidity.sol";
+import {IFluidReserveContract} from "../common/interfaces/IFluidReserveContract.sol";
 
-import { IFluidVaultFactory } from "../common/interfaces/IFluidVaultFactory.sol";
-import { IFluidDexFactory } from "../common/interfaces/IFluidDexFactory.sol";
+import {IFluidVaultFactory} from "../common/interfaces/IFluidVaultFactory.sol";
+import {IFluidDexFactory} from "../common/interfaces/IFluidDexFactory.sol";
 
-import { IFluidDex } from "../common/interfaces/IFluidDex.sol";
-import { IFluidDexResolver } from "../common/interfaces/IFluidDex.sol";
+import {IFluidDex} from "../common/interfaces/IFluidDex.sol";
+import {IFluidDexResolver} from "../common/interfaces/IFluidDex.sol";
 
-import { IFluidVault } from "../common/interfaces/IFluidVault.sol";
-import { IFluidVaultT1 } from "../common/interfaces/IFluidVault.sol";
+import {IFluidVault} from "../common/interfaces/IFluidVault.sol";
+import {IFluidVaultT1} from "../common/interfaces/IFluidVault.sol";
 
-import { IFTokenAdmin } from "../common/interfaces/IFToken.sol";
-import { ILendingRewards } from "../common/interfaces/IFToken.sol";
+import {IFTokenAdmin} from "../common/interfaces/IFToken.sol";
+import {ILendingRewards} from "../common/interfaces/IFToken.sol";
 
-import { IDSAV2 } from "../common/interfaces/IDSA.sol";
+import {IDSAV2} from "../common/interfaces/IDSA.sol";
 
-import { PayloadIGPConstants } from "../common/constants.sol";
-import { PayloadIGPHelpers } from "../common/helpers.sol";
+import {PayloadIGPConstants} from "../common/constants.sol";
+import {PayloadIGPHelpers} from "../common/helpers.sol";
 
 contract PayloadIGP60 is PayloadIGPConstants, PayloadIGPHelpers {
     uint256 public constant PROPOSAL_ID = 60;
@@ -117,12 +117,14 @@ contract PayloadIGP60 is PayloadIGPConstants, PayloadIGPHelpers {
     /// @notice Action 1: Set new INST-ETH Dex Pool and INST-ETH_ETH Vault Limits
     function action1() internal {
         uint256 inst_eth_dex_id = PayloadIGP60(ADDRESS_THIS).INST_ETH_DEX_ID();
-        uint256 inst_eth_vault_id = PayloadIGP60(ADDRESS_THIS).INST_ETH_VAULT_ID();
+        uint256 inst_eth_vault_id = PayloadIGP60(ADDRESS_THIS)
+            .INST_ETH_VAULT_ID();
         require(inst_eth_dex_id > 10 && inst_eth_vault_id > 75, "invalid-ids");
         address INST_ETH_ADDRESS = getDexAddress(inst_eth_dex_id);
         address INST_ETH_VAULT_ADDRESS = getVaultAddress(inst_eth_vault_id);
 
-        { // Set DEX Limits on Liquidity Layer
+        {
+            // Set DEX Limits on Liquidity Layer
             Dex memory DEX_INST_ETH = Dex({
                 dex: INST_ETH_ADDRESS,
                 tokenA: INST_ADDRESS,
@@ -163,12 +165,14 @@ contract PayloadIGP60 is PayloadIGPConstants, PayloadIGPHelpers {
     /// @notice Action 2: Set new ETH-USDC Dex Pool and ETH-USDC Vault Limits
     function action2() internal {
         uint256 eth_usdc_dex_id = PayloadIGP60(ADDRESS_THIS).ETH_USDC_DEX_ID();
-        uint256 eth_usdc_vault_id = PayloadIGP60(ADDRESS_THIS).ETH_USDC_VAULT_ID();
+        uint256 eth_usdc_vault_id = PayloadIGP60(ADDRESS_THIS)
+            .ETH_USDC_VAULT_ID();
         require(eth_usdc_dex_id > 10 && eth_usdc_vault_id > 75, "invalid-ids");
         address ETH_USDC_ADDRESS = getDexAddress(eth_usdc_dex_id);
         address ETH_USDC_VAULT_ADDRESS = getVaultAddress(eth_usdc_vault_id);
 
-        { // Set DEX Limits on Liquidity Layer
+        {
+            // Set DEX Limits on Liquidity Layer
             Dex memory DEX_ETH_USDC = Dex({
                 dex: ETH_USDC_ADDRESS,
                 tokenA: ETH_ADDRESS,
@@ -199,7 +203,8 @@ contract PayloadIGP60 is PayloadIGPConstants, PayloadIGPHelpers {
         address ETH_USDC_ADDRESS = getDexAddress(5);
         address ETH_USDC_VAULT_ADDRESS = getVaultAddress(62);
 
-        { // Set DEX Limits on Liquidity Layer
+        {
+            // Set DEX Limits on Liquidity Layer
             Dex memory DEX_ETH_USDC = Dex({
                 dex: ETH_USDC_ADDRESS,
                 tokenA: ETH_ADDRESS,
@@ -215,7 +220,8 @@ contract PayloadIGP60 is PayloadIGPConstants, PayloadIGPHelpers {
             DEX_FACTORY.setDexAuth(ETH_USDC_ADDRESS, TEAM_MULTISIG, true);
         }
 
-        { // Set Team Multisig Auth on old ETH-USDC smart collateral and debt vault
+        {
+            // Set Team Multisig Auth on old ETH-USDC smart collateral and debt vault
             VAULT_FACTORY.setVaultAuth(
                 ETH_USDC_VAULT_ADDRESS,
                 TEAM_MULTISIG,
@@ -228,9 +234,12 @@ contract PayloadIGP60 is PayloadIGPConstants, PayloadIGPHelpers {
     function action4() internal {
         address cbBTC_wBTC_DEX_ADDRESS = getDexAddress(3);
 
-        uint256 minCenterPrice_ = 0.997 * 1e27;
-        uint256 maxCenterPrice_ = 1.0030090270812437 * 1e27;
-        IFluidDex(cbBTC_wBTC_DEX_ADDRESS).updateCenterPriceLimits(maxCenterPrice_, minCenterPrice_);
+        uint256 minCenterPrice_ = (997 * 1e27) / 1000;
+        uint256 maxCenterPrice_ = (1e27 * 1000) / 997;
+        IFluidDex(cbBTC_wBTC_DEX_ADDRESS).updateCenterPriceLimits(
+            maxCenterPrice_,
+            minCenterPrice_
+        );
     }
 
     /**
@@ -315,7 +324,6 @@ contract PayloadIGP60 is PayloadIGPConstants, PayloadIGPHelpers {
         }
     }
 
-
     function setVaultLimits(Vault memory vault_) internal {
         if (vault_.vaultType == TYPE.TYPE_3) {
             SupplyProtocolConfig memory protocolConfig_ = SupplyProtocolConfig({
@@ -353,7 +361,7 @@ contract PayloadIGP60 is PayloadIGPConstants, PayloadIGPHelpers {
     uint256 public constant STABLE_USD_PRICE = 1 * 1e2;
     uint256 public constant sUSDe_USD_PRICE = 1 * 1e2;
     uint256 public constant sUSDs_USD_PRICE = 1 * 1e2;
-    
+
     uint256 public constant INST_USD_PRICE = 7 * 1e2;
 
     function getRawAmount(
@@ -361,7 +369,7 @@ contract PayloadIGP60 is PayloadIGPConstants, PayloadIGPHelpers {
         uint256 amount,
         uint256 amountInUSD,
         bool isSupply
-    ) public override view returns (uint256) {
+    ) public view override returns (uint256) {
         if (amount > 0 && amountInUSD > 0) {
             revert("both usd and amount are not zero");
         }
