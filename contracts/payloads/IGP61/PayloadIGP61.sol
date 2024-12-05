@@ -66,10 +66,10 @@ contract PayloadIGP61 is PayloadIGPConstants, PayloadIGPHelpers {
     function execute() external {
         require(address(this) == address(TIMELOCK), "not-valid-caller");
 
-        // Action 1: Update cbBTC-wBTC dex pool min and max center price
+        // Action 1: Reduce limits old INST-ETH Dex Pool
         action1();
 
-        // Action 2: Reduce limits old INST-ETH Dex Pool
+        // Action 2: Update cbBTC-wBTC dex pool min and max center price
         action2();
     }
 
@@ -81,20 +81,8 @@ contract PayloadIGP61 is PayloadIGPConstants, PayloadIGPHelpers {
      * |__________________________________
      */
 
-    /// @notice Action 1: Update cbBTC-wBTC dex pool min and max center price
+    /// @notice Action 1: Reduce limits old INST-ETH Dex Pool
     function action1() internal {
-        address cbBTC_wBTC_DEX_ADDRESS = getDexAddress(3);
-
-        uint256 minCenterPrice_ = (997 * 1e27) / 1000;
-        uint256 maxCenterPrice_ = uint256(1e27 * 1000) / 997;
-        IFluidDex(cbBTC_wBTC_DEX_ADDRESS).updateCenterPriceLimits(
-            maxCenterPrice_,
-            minCenterPrice_
-        );
-    }
-
-    /// @notice Action 2: Reduce limits old INST-ETH Dex Pool
-    function action2() internal {
         address INST_ETH_DEX_ADDRESS = getDexAddress(10);
 
         {
@@ -112,6 +100,19 @@ contract PayloadIGP61 is PayloadIGPConstants, PayloadIGPHelpers {
             setDexLimits(DEX_INST_ETH); // Smart Collateral and debt
         }
     }
+
+    /// @notice Action 2: Update cbBTC-wBTC dex pool min and max center price
+    function action2() internal {
+        address cbBTC_wBTC_DEX_ADDRESS = getDexAddress(3);
+
+        uint256 minCenterPrice_ = (997 * 1e27) / 1000;
+        uint256 maxCenterPrice_ = uint256(1e27 * 1000) / 997;
+        IFluidDex(cbBTC_wBTC_DEX_ADDRESS).updateCenterPriceLimits(
+            maxCenterPrice_,
+            minCenterPrice_
+        );
+    }
+
 
     /**
      * |
