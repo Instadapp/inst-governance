@@ -40,6 +40,8 @@ contract PayloadIGPConstants {
         0x9efdE135CA4832AbF0408c44c6f5f370eB0f35e8;
     address public constant PROPOSER_AVO_MULTISIG_3 =
         0x5C43AAC965ff230AC1cF63e924D0153291D78BaD;
+    address public constant PROPOSER_AVO_MULTISIG_4 =
+        0x3dAff61fe5cfB1f1B4eA7FBa8173A58532Ef1841;
 
     // Governance Addresses
     IGovernorBravo public constant GOVERNOR =
@@ -98,6 +100,12 @@ contract PayloadIGPConstants {
 
     address internal constant INST_ADDRESS = 
         0x6f40d4A6237C257fff2dB00FA0510DeEECd303eb;
+
+    // fTokens
+    address internal constant F_USDT_ADDRESS = 0x5C20B550819128074FD538Edf79791733ccEdd18;
+    address internal constant F_USDC_ADDRESS = 0x9Fb7b4477576Fe5B32be4C1843aFB1e55F251B33;
+    address internal constant F_WETH_ADDRESS = 0x90551c1795392094FE6D29B758EcCD233cFAa260;
+    address internal constant F_GHO_ADDRESS = 0x6A29A46E21C730DcA1d8b23d637c101cec605C5B;
 
     // Constants
     uint256 internal constant X8 = 0xff;
