@@ -14,14 +14,11 @@ import {IFluidReserveContract} from "../common/interfaces/IFluidReserveContract.
 import {IFluidVaultFactory} from "../common/interfaces/IFluidVaultFactory.sol";
 import {IFluidDexFactory} from "../common/interfaces/IFluidDexFactory.sol";
 
-import {IFluidDex} from "../common/interfaces/IFluidDex.sol";
-import {IFluidDexResolver} from "../common/interfaces/IFluidDex.sol";
+import {IFluidDex, IFluidDexResolver} from "../common/interfaces/IFluidDex.sol";
 
-import {IFluidVault} from "../common/interfaces/IFluidVault.sol";
-import {IFluidVaultT1} from "../common/interfaces/IFluidVault.sol";
+import {IFluidVault, IFluidVaultT1} from "../common/interfaces/IFluidVault.sol";
 
-import {IFTokenAdmin} from "../common/interfaces/IFToken.sol";
-import {ILendingRewards} from "../common/interfaces/IFToken.sol";
+import {IFTokenAdmin, ILendingRewards} from "../common/interfaces/IFToken.sol";
 
 import {IDSAV2} from "../common/interfaces/IDSA.sol";
 import { IERC20 } from "../common/interfaces/IERC20.sol";
@@ -116,10 +113,12 @@ contract PayloadIGP62 is PayloadIGPConstants, PayloadIGPHelpers {
         address[] memory tokens = new address[](1);
         uint256[] memory amounts = new uint256[](1);
 
+        address fGHO_REWARDS_ADDRESS = 0x512Ac5b6Cf04f042486A198eDB3c28C6F2c6285A;
+
         {
-            /// fUSDC
+            /// fGHO
             IFTokenAdmin(F_GHO_ADDRESS).updateRewards(
-                0x512Ac5b6Cf04f042486A198eDB3c28C6F2c6285A
+                fGHO_REWARDS_ADDRESS
             );
 
             uint256 allowance = IERC20(GHO_ADDRESS).allowance(
@@ -133,6 +132,8 @@ contract PayloadIGP62 is PayloadIGPConstants, PayloadIGPHelpers {
         }
 
         FLUID_RESERVE.approve(protocols, tokens, amounts);
+
+        ILendingRewards(fGHO_REWARDS_ADDRESS).start();
     }
 
     /// @notice Action 2: Remove team multisig as auth from new pools and vaults
