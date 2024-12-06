@@ -99,6 +99,12 @@ contract PayloadIGPConstants {
     address internal constant INST_ADDRESS = 
         0x6f40d4A6237C257fff2dB00FA0510DeEECd303eb;
 
+    // fTokens
+    address internal constant F_USDT_ADDRESS = 0x5C20B550819128074FD538Edf79791733ccEdd18;
+    address internal constant F_USDC_ADDRESS = 0x9Fb7b4477576Fe5B32be4C1843aFB1e55F251B33;
+    address internal constant F_WETH_ADDRESS = 0x90551c1795392094FE6D29B758EcCD233cFAa260;
+    address internal constant F_GHO_ADDRESS = 0x6A29A46E21C730DcA1d8b23d637c101cec605C5B;
+
     // Constants
     uint256 internal constant X8 = 0xff;
     uint256 internal constant X10 = 0x3ff;
