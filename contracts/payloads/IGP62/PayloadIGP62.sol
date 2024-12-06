@@ -70,10 +70,10 @@ contract PayloadIGP62 is PayloadIGPConstants, PayloadIGPHelpers {
     function execute() external {
         require(address(this) == address(TIMELOCK), "not-valid-caller");
 
-        // Action 1: Reduce limits old INST-ETH Dex Pool
+        // Action 1: Set fGHO lending rewards
         action1();
 
-        // Action 2: Update cbBTC-wBTC dex pool min and max center price
+        // Action 2: Remove team multisig as auth from new pools and vaults
         action2();
     }
 
