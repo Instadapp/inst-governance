@@ -113,7 +113,7 @@ contract PayloadIGP62 is PayloadIGPConstants, PayloadIGPHelpers {
         address[] memory tokens = new address[](1);
         uint256[] memory amounts = new uint256[](1);
 
-        address fGHO_REWARDS_ADDRESS = 0x512Ac5b6Cf04f042486A198eDB3c28C6F2c6285A;
+        address fGHO_REWARDS_ADDRESS = 0x95755A4552690a53d7360B7e16155867868ae964;
 
         {
             /// fGHO
