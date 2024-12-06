@@ -41,7 +41,8 @@ contract PayloadIGP62 is PayloadIGPConstants, PayloadIGPHelpers {
                 msg.sender == TEAM_MULTISIG ||
                 address(this) == PROPOSER_AVO_MULTISIG ||
                 address(this) == PROPOSER_AVO_MULTISIG_2 ||
-                address(PROPOSER_AVO_MULTISIG_3) == PROPOSER_AVO_MULTISIG_3,
+                address(this) == PROPOSER_AVO_MULTISIG_3 || 
+                address(this) == PROPOSER_AVO_MULTISIG_4,
             "msg.sender-not-allowed"
         );
 

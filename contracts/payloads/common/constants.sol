@@ -40,6 +40,8 @@ contract PayloadIGPConstants {
         0x9efdE135CA4832AbF0408c44c6f5f370eB0f35e8;
     address public constant PROPOSER_AVO_MULTISIG_3 =
         0x5C43AAC965ff230AC1cF63e924D0153291D78BaD;
+    address public constant PROPOSER_AVO_MULTISIG_4 =
+        0x3dAff61fe5cfB1f1B4eA7FBa8173A58532Ef1841;
 
     // Governance Addresses
     IGovernorBravo public constant GOVERNOR =
