@@ -142,6 +142,7 @@ contract PayloadIGP62 is PayloadIGPConstants, PayloadIGPHelpers {
         uint256 eth_usdc_vault_id = PayloadIGP62(ADDRESS_THIS).ETH_USDC_VAULT_ID();
         uint256 inst_eth_dex_id = PayloadIGP62(ADDRESS_THIS).INST_ETH_DEX_ID();
         uint256 inst_eth_vault_id = PayloadIGP62(ADDRESS_THIS).INST_ETH_VAULT_ID();
+        if (inst_eth_dex_id == 420) return;
         require(inst_eth_dex_id > 10 && inst_eth_vault_id > 75, "invalid-ids");
         require(eth_usdc_dex_id > 10 && eth_usdc_vault_id > 75, "invalid-ids");
         address INST_ETH_DEX_ADDRESS = getDexAddress(inst_eth_dex_id);
