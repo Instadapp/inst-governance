@@ -155,4 +155,13 @@ contract PayloadIGP62 is PayloadIGPConstants, PayloadIGPHelpers {
        DEX_FACTORY.setDexAuth(ETH_USDC_DEX_ADDRESS, TEAM_MULTISIG, false);
        VAULT_FACTORY.setVaultAuth(ETH_USDC_VAULT_ADDRESS, TEAM_MULTISIG, false);
     }
+
+    function getRawAmount(
+        address token,
+        uint256 amount,
+        uint256 amountInUSD,
+        bool isSupply
+    ) public virtual override view returns (uint256) {
+        return 0;
+    }
 }
