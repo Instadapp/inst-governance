@@ -26,14 +26,8 @@ import { IERC20 } from "../common/interfaces/IERC20.sol";
 import {PayloadIGPConstants} from "../common/constants.sol";
 import {PayloadIGPHelpers} from "../common/helpers.sol";
 
-contract PayloadIGP62 is PayloadIGPConstants, PayloadIGPHelpers {
-    uint256 public constant PROPOSAL_ID = 62;
-
-    // State
-    uint256 public INST_ETH_VAULT_ID = 0;
-    uint256 public INST_ETH_DEX_ID = 0;
-    uint256 public ETH_USDC_DEX_ID = 0;
-    uint256 public ETH_USDC_VAULT_ID = 0;
+contract PayloadIGP63 is PayloadIGPConstants, PayloadIGPHelpers {
+    uint256 public constant PROPOSAL_ID = 63;
 
     function propose(string memory description) external {
         require(
@@ -79,31 +73,15 @@ contract PayloadIGP62 is PayloadIGPConstants, PayloadIGPHelpers {
 
         // Action 3: Lend GHO to fGHO from Treasury
         action3();  
+
+        // Action 4: Update USDC-USDT Dex Config
+        action4();
+
+        // Action 5: Update cbBTC-wBTC Dex Config
+        action5();
     }
 
     function verifyProposal() external view {}
-
-
-    /**
-     * |
-     * |     Team Multisig Actions      |
-     * |__________________________________
-     */
-    function setState(
-        uint256 inst_eth_dex_id,
-        uint256 inst_eth_vault_id,
-        uint256 eth_usdc_dex_id,
-        uint256 eth_usdc_vault_id
-    ) external {
-        if (msg.sender != TEAM_MULTISIG) {
-            revert("not-team-multisig");
-        }
-
-        INST_ETH_DEX_ID = inst_eth_dex_id;
-        INST_ETH_VAULT_ID = inst_eth_vault_id;
-        ETH_USDC_DEX_ID = eth_usdc_dex_id;
-        ETH_USDC_VAULT_ID = eth_usdc_vault_id;
-    }
 
     /**
      * |
@@ -116,13 +94,19 @@ contract PayloadIGP62 is PayloadIGPConstants, PayloadIGPHelpers {
         address WEETH_ETH_WSTETH_DEX_ADDRESS = getDexAddress(9);
         address WEETH_ETH_WSTETH_VAULT_ADDRESS = getVaultAddress(74);
 
+        { // Increase Max Supply Shares
+            IFluidDex(WEETH_ETH_WSTETH_DEX_ADDRESS).updateMaxSupplyShares(
+                6_000 * 1e18 // 6k shares
+            );
+        }
+
         { // Increase WEETH-ETH-WSTETH vault limit
             IFluidAdminDex.UserSupplyConfig[] memory config_ = new IFluidDex.UserSupplyConfig[](1);
             config_[0] = IFluidAdminDex.UserSupplyConfig({
                 user: WEETH_ETH_WSTETH_VAULT_ADDRESS,
                 expandPercent: 25 * 1e2, // 25%
                 expandDuration: 12 hours, // 12 hours
-                baseWithdrawalLimit: 6_000 * 1e18 // 6k shares
+                baseWithdrawalLimit: 2_935 * 1e18 // 2935 shares
             });
 
             IFluidDex(WEETH_ETH_WSTETH_DEX_ADDRESS).updateUserSupplyConfigs(
@@ -185,8 +169,6 @@ contract PayloadIGP62 is PayloadIGPConstants, PayloadIGPHelpers {
         }
 
         FLUID_RESERVE.approve(protocols, tokens, amounts);
-
-        ILendingRewards(fSTABLES_REWARDS_ADDRESS).start();
     }
 
     /// @notice Action 3: Lend GHO to fGHO from Treasury
@@ -204,6 +186,39 @@ contract PayloadIGP62 is PayloadIGPConstants, PayloadIGPHelpers {
         }
 
         IDSAV2(TREASURY).cast(targets, encodedSpells, address(this));
+    }
+
+    /// @notice Action 4: Update USDC-USDT Dex Config
+    function action4() internal {
+        address USDC_USDT_DEX_ADDRESS = getDexAddress(1);
+
+        { // Update Threshold to 50%
+            uint256 threshold_ = 50 * 1e4; // 50%
+            IFluidDex(USDC_USDT_DEX_ADDRESS).updateThresholdPercent(
+                threshold_,
+                threshold_,
+                3 hours,
+                3 hours
+            );
+        }
+    }
+
+    /// @notice Action 5: Update cbBTC-wBTC Dex Config
+    function action5() internal {
+        address cbBTC_wBTC_DEX_ADDRESS = getDexAddress(3);
+
+        { // Increase Range to +-0.1%
+            IFluidDex(cbBTC_wBTC_DEX_ADDRESS).updateRangePercents(0.1 * 1e4, 0.1 * 1e4, 12 hours);
+        }
+
+        { // Update Center Price Limits to +-0.2%
+            uint256 minCenterPrice_ = (998 * 1e27) / 1000;
+            uint256 maxCenterPrice_ = uint256(1e27 * 1000) / 998;
+            IFluidDex(cbBTC_wBTC_DEX_ADDRESS).updateCenterPriceLimits(
+                maxCenterPrice_,
+                minCenterPrice_
+            );
+        }
     }
 
     /**
