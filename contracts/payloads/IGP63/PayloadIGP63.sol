@@ -190,7 +190,7 @@ contract PayloadIGP63 is PayloadIGPConstants, PayloadIGPHelpers {
 
     /// @notice Action 4: Update USDC-USDT Dex Config
     function action4() internal {
-        address USDC_USDT_DEX_ADDRESS = getDexAddress(1);
+        address USDC_USDT_DEX_ADDRESS = getDexAddress(2);
 
         { // Update Threshold to 50%
             uint256 threshold_ = 50 * 1e4; // 50%
