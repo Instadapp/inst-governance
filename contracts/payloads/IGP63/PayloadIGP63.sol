@@ -181,7 +181,7 @@ contract PayloadIGP63 is PayloadIGPConstants, PayloadIGPHelpers {
         // Spell 1: Deposit GHO into fGHO
         {   
             uint256 GHO_AMOUNT = 4_000_000 * 1e18; // 4M GHO
-            targets[0] = "BASIC-D";
+            targets[0] = "BASIC-D-V2";
             encodedSpells[0] = abi.encodeWithSignature(depositSignature, F_GHO_ADDRESS, GHO_AMOUNT, 0, 0);
         }
 
