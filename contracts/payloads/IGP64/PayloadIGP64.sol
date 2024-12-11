@@ -29,8 +29,6 @@ import {PayloadIGPHelpers} from "../common/helpers.sol";
 contract PayloadIGP64 is PayloadIGPConstants, PayloadIGPHelpers {
     uint256 public constant PROPOSAL_ID = 64;
 
-    bool public skipAction5 = false;
-
     function propose(string memory description) external {
         require(
             msg.sender == PROPOSER ||
@@ -72,19 +70,6 @@ contract PayloadIGP64 is PayloadIGPConstants, PayloadIGPHelpers {
     }
 
     function verifyProposal() external view {}
-
-    /**
-     * |
-     * |     Team Multisig Actions      |
-     * |__________________________________
-     */
-    function setState(bool skipAction5_) external {
-        if (msg.sender != TEAM_MULTISIG) {
-            revert("not-team-multisig");
-        }
-
-        skipAction5 = skipAction5_;
-    }
 
     /**
      * |
