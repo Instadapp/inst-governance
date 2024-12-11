@@ -83,7 +83,7 @@ contract PayloadIGP65 is PayloadIGPConstants, PayloadIGPHelpers {
      */
     /// @notice Action 1: INST => FLUID
     function action1() internal {
-        INST(INST_ADDRESS).changeName("FLUID");
+        INST(INST_ADDRESS).changeName("Fluid");
         INST(INST_ADDRESS).changeSymbol("FLUID");
     }
 }
