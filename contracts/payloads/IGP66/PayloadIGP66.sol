@@ -26,11 +26,6 @@ import { IERC20 } from "../common/interfaces/IERC20.sol";
 import {PayloadIGPConstants} from "../common/constants.sol";
 import {PayloadIGPHelpers} from "../common/helpers.sol";
 
-interface INST {
-    function changeName(string calldata name_) external;
-    function changeSymbol(string calldata symbol_) external;
-}
-
 contract PayloadIGP66 is PayloadIGPConstants, PayloadIGPHelpers {
     uint256 public constant PROPOSAL_ID = 66;
 
@@ -70,7 +65,7 @@ contract PayloadIGP66 is PayloadIGPConstants, PayloadIGPHelpers {
     function execute() external {
         require(address(this) == address(TIMELOCK), "not-valid-caller");
 
-        // Action 1: INST => FLUID
+        // Action 1: Transfer 12% INST from Treasury to Team Multisig
         action1();
     }
 
@@ -81,9 +76,20 @@ contract PayloadIGP66 is PayloadIGPConstants, PayloadIGPHelpers {
      * |     Proposal Payload Actions      |
      * |__________________________________
      */
-    /// @notice Action 1: INST => FLUID
+    /// @notice Action 1: Transfer INST rewards from Treasury to Team Multisig
     function action1() internal {
-        INST(INST_ADDRESS).changeName("FLUID");
-        INST(INST_ADDRESS).changeSymbol("FLUID");
+        string[] memory targets = new string[](1);
+        bytes[] memory encodedSpells = new bytes[](1);
+
+        string memory withdrawSignature = "withdraw(address,uint256,addressuint256,uint256)";
+
+        // Spell 1: Transfer INST to Team Multisig
+        {   
+            uint256 INST_AMOUNT = 12_000_000 * 1e18; // 12M or 12% INST
+            targets[0] = "BASIC-A";
+            encodedSpells[0] = abi.encodeWithSignature(withdrawSignature, INST_ADDRESS, INST_AMOUNT, TEAM_MULTISIG, 0, 0);
+        }
+
+        IDSAV2(TREASURY).cast(targets, encodedSpells, address(this));
     }
 }
