@@ -85,7 +85,7 @@ contract PayloadIGP64 is PayloadIGPConstants, PayloadIGPHelpers {
 
         // Spell 1: Transfer INST to Team Multisig
         {   
-            uint256 INST_AMOUNT = 195_000 * 1e18; // 195k GHO
+            uint256 INST_AMOUNT = 195_000 * 1e18; // 195k INST
             targets[0] = "BASIC-A";
             encodedSpells[0] = abi.encodeWithSignature(withdrawSignature, INST_ADDRESS, INST_AMOUNT, TEAM_MULTISIG, 0, 0);
         }
