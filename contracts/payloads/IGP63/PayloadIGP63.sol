@@ -29,6 +29,8 @@ import {PayloadIGPHelpers} from "../common/helpers.sol";
 contract PayloadIGP63 is PayloadIGPConstants, PayloadIGPHelpers {
     uint256 public constant PROPOSAL_ID = 63;
 
+    bool public skipAction5 = false;
+
     function propose(string memory description) external {
         require(
             msg.sender == PROPOSER ||
@@ -82,6 +84,19 @@ contract PayloadIGP63 is PayloadIGPConstants, PayloadIGPHelpers {
     }
 
     function verifyProposal() external view {}
+
+    /**
+     * |
+     * |     Team Multisig Actions      |
+     * |__________________________________
+     */
+    function setState(bool skipAction5_) external {
+        if (msg.sender != TEAM_MULTISIG) {
+            revert("not-team-multisig");
+        }
+
+        skipAction5 = skipAction5_;
+    }
 
     /**
      * |
@@ -197,7 +212,8 @@ contract PayloadIGP63 is PayloadIGPConstants, PayloadIGPHelpers {
             IFluidDex(cbBTC_wBTC_DEX_ADDRESS).updateRangePercents(0.1 * 1e4, 0.1 * 1e4, 12 hours);
         }
 
-        { // Update Center Price Limits to +-0.2%
+        if (!PayloadIGP63(ADDRESS_THIS).skipAction5()) { 
+            // Update Center Price Limits to +-0.2%
             uint256 minCenterPrice_ = (998 * 1e27) / 1000;
             uint256 maxCenterPrice_ = uint256(1e27 * 1000) / 998;
             IFluidDex(cbBTC_wBTC_DEX_ADDRESS).updateCenterPriceLimits(
