@@ -199,7 +199,7 @@ contract PayloadIGP63 is PayloadIGPConstants, PayloadIGPHelpers {
                 threshold_,
                 threshold_,
                 3 hours,
-                3 hours
+                12 hours
             );
         }
     }
