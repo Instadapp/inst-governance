@@ -100,28 +100,14 @@ contract PayloadIGP63 is PayloadIGPConstants, PayloadIGPHelpers {
             );
         }
 
-        { // Increase WEETH-ETH-WSTETH vault limit
-            IFluidAdminDex.UserSupplyConfig[] memory config_ = new IFluidDex.UserSupplyConfig[](1);
-            config_[0] = IFluidAdminDex.UserSupplyConfig({
-                user: WEETH_ETH_WSTETH_VAULT_ADDRESS,
-                expandPercent: 25 * 1e2, // 25%
-                expandDuration: 12 hours, // 12 hours
-                baseWithdrawalLimit: 2_935 * 1e18 // 2935 shares
-            });
-
-            IFluidDex(WEETH_ETH_WSTETH_DEX_ADDRESS).updateUserSupplyConfigs(
-                config_
-            );
-        }
-
         {
             BorrowProtocolConfig memory config_ = BorrowProtocolConfig({
                 protocol: WEETH_ETH_WSTETH_VAULT_ADDRESS,
                 borrowToken: wstETH_ADDRESS,
                 expandPercent: 20 * 1e2, // 20%
                 expandDuration: 12 hours, // 12 hours
-                baseBorrowLimitInUSD: 42_000_000, // $42M
-                maxBorrowLimitInUSD: 92_000_000 // $92M
+                baseBorrowLimitInUSD: 15_000_000, // $15M
+                maxBorrowLimitInUSD: 45_000_000 // $45M
             });
 
             setBorrowProtocolLimits(config_);
@@ -331,17 +317,17 @@ contract PayloadIGP63 is PayloadIGPConstants, PayloadIGPHelpers {
     }
 
     // Token Prices Constants
-    uint256 public constant ETH_USD_PRICE = 3_950 * 1e2;
-    uint256 public constant wstETH_USD_PRICE = 4_550 * 1e2;
-    uint256 public constant weETH_USD_PRICE = 4_050 * 1e2;
+    uint256 public constant ETH_USD_PRICE = 3_600 * 1e2;
+    uint256 public constant wstETH_USD_PRICE = 4_250 * 1e2;
+    uint256 public constant weETH_USD_PRICE = 3_800 * 1e2;
 
-    uint256 public constant BTC_USD_PRICE = 99_000 * 1e2;
+    uint256 public constant BTC_USD_PRICE = 96_000 * 1e2;
 
     uint256 public constant STABLE_USD_PRICE = 1 * 1e2;
     uint256 public constant sUSDe_USD_PRICE = 1 * 1e2;
     uint256 public constant sUSDs_USD_PRICE = 1 * 1e2;
 
-    uint256 public constant INST_USD_PRICE = 7.5 * 1e2;
+    uint256 public constant INST_USD_PRICE = 7.3 * 1e2;
 
     function getRawAmount(
         address token,
