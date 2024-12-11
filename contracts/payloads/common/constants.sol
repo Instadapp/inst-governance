@@ -35,7 +35,7 @@ contract PayloadIGPConstants {
     address public constant PROPOSER =
         0xA45f7bD6A5Ff45D31aaCE6bCD3d426D9328cea01;
     address public constant PROPOSER_AVO_MULTISIG =
-        0x059a94a72451c0ae1Cc1cE4bf0Db52421Bbe8210;
+        0x059A94A72951c0ae1cc1CE3BF0dB52421bbE8210;
     address public constant PROPOSER_AVO_MULTISIG_2 =
         0x9efdE135CA4832AbF0408c44c6f5f370eB0f35e8;
     address public constant PROPOSER_AVO_MULTISIG_3 =
