@@ -81,7 +81,7 @@ contract PayloadIGP66 is PayloadIGPConstants, PayloadIGPHelpers {
         string[] memory targets = new string[](1);
         bytes[] memory encodedSpells = new bytes[](1);
 
-        string memory withdrawSignature = "withdraw(address,uint256,addressuint256,uint256)";
+        string memory withdrawSignature = "withdraw(address,uint256,address,uint256,uint256)";
 
         // Spell 1: Transfer INST to Team Multisig
         {   
