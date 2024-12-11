@@ -29,8 +29,6 @@ import {PayloadIGPHelpers} from "../common/helpers.sol";
 contract PayloadIGP64 is PayloadIGPConstants, PayloadIGPHelpers {
     uint256 public constant PROPOSAL_ID = 64;
 
-    bool public skipAction5 = false;
-
     function propose(string memory description) external {
         require(
             msg.sender == PROPOSER ||
@@ -75,19 +73,6 @@ contract PayloadIGP64 is PayloadIGPConstants, PayloadIGPHelpers {
 
     /**
      * |
-     * |     Team Multisig Actions      |
-     * |__________________________________
-     */
-    function setState(bool skipAction5_) external {
-        if (msg.sender != TEAM_MULTISIG) {
-            revert("not-team-multisig");
-        }
-
-        skipAction5 = skipAction5_;
-    }
-
-    /**
-     * |
      * |     Proposal Payload Actions      |
      * |__________________________________
      */
@@ -96,11 +81,11 @@ contract PayloadIGP64 is PayloadIGPConstants, PayloadIGPHelpers {
         string[] memory targets = new string[](1);
         bytes[] memory encodedSpells = new bytes[](1);
 
-        string memory withdrawSignature = "withdraw(address,uint256,addressuint256,uint256)";
+        string memory withdrawSignature = "withdraw(address,uint256,address,uint256,uint256)";
 
         // Spell 1: Transfer INST to Team Multisig
         {   
-            uint256 INST_AMOUNT = 195_000 * 1e18; // 195k GHO
+            uint256 INST_AMOUNT = 195_000 * 1e18; // 195k INST
             targets[0] = "BASIC-A";
             encodedSpells[0] = abi.encodeWithSignature(withdrawSignature, INST_ADDRESS, INST_AMOUNT, TEAM_MULTISIG, 0, 0);
         }
