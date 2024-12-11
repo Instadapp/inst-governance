@@ -26,10 +26,13 @@ import { IERC20 } from "../common/interfaces/IERC20.sol";
 import {PayloadIGPConstants} from "../common/constants.sol";
 import {PayloadIGPHelpers} from "../common/helpers.sol";
 
+interface INST {
+    function changeName(string calldata name_) external;
+    function changeSymbol(string calldata symbol_) external;
+}
+
 contract PayloadIGP65 is PayloadIGPConstants, PayloadIGPHelpers {
     uint256 public constant PROPOSAL_ID = 65;
-
-    bool public skipAction5 = false;
 
     function propose(string memory description) external {
         require(
@@ -67,7 +70,7 @@ contract PayloadIGP65 is PayloadIGPConstants, PayloadIGPHelpers {
     function execute() external {
         require(address(this) == address(TIMELOCK), "not-valid-caller");
 
-        // Action 1: Transfer 12% INST from Treasury to Team Multisig
+        // Action 1: INST => FLUID
         action1();
     }
 
@@ -75,36 +78,12 @@ contract PayloadIGP65 is PayloadIGPConstants, PayloadIGPHelpers {
 
     /**
      * |
-     * |     Team Multisig Actions      |
-     * |__________________________________
-     */
-    function setState(bool skipAction5_) external {
-        if (msg.sender != TEAM_MULTISIG) {
-            revert("not-team-multisig");
-        }
-
-        skipAction5 = skipAction5_;
-    }
-
-    /**
-     * |
      * |     Proposal Payload Actions      |
      * |__________________________________
      */
-    /// @notice Action 1: Transfer INST rewards from Treasury to Team Multisig
+    /// @notice Action 1: INST => FLUID
     function action1() internal {
-        string[] memory targets = new string[](1);
-        bytes[] memory encodedSpells = new bytes[](1);
-
-        string memory withdrawSignature = "withdraw(address,uint256,addressuint256,uint256)";
-
-        // Spell 1: Transfer INST to Team Multisig
-        {   
-            uint256 INST_AMOUNT = 12_000_000 * 1e18; // 12M or 12% INST
-            targets[0] = "BASIC-A";
-            encodedSpells[0] = abi.encodeWithSignature(withdrawSignature, INST_ADDRESS, INST_AMOUNT, TEAM_MULTISIG, 0, 0);
-        }
-
-        IDSAV2(TREASURY).cast(targets, encodedSpells, address(this));
+        INST(INST_ADDRESS).changeName("FLUID");
+        INST(INST_ADDRESS).changeSymbol("FLUID");
     }
 }
