@@ -36,7 +36,8 @@ contract PayloadIGP66 is PayloadIGPConstants, PayloadIGPHelpers {
                 address(this) == PROPOSER_AVO_MULTISIG ||
                 address(this) == PROPOSER_AVO_MULTISIG_2 ||
                 address(this) == PROPOSER_AVO_MULTISIG_3 || 
-                address(this) == PROPOSER_AVO_MULTISIG_4,
+                address(this) == PROPOSER_AVO_MULTISIG_4 ||
+                address(this) == PROPOSER_AVO_MULTISIG_5,
             "msg.sender-not-allowed"
         );
 
