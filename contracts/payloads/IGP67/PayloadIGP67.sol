@@ -26,8 +26,20 @@ import { IERC20 } from "../common/interfaces/IERC20.sol";
 import {PayloadIGPConstants} from "../common/constants.sol";
 import {PayloadIGPHelpers} from "../common/helpers.sol";
 
-contract PayloadIGP66 is PayloadIGPConstants, PayloadIGPHelpers {
-    uint256 public constant PROPOSAL_ID = 66;
+interface IStETHRedemptionProtocol {
+    /// @notice Sets `maxLTV` to `maxLTV_` (in 1e2: 1% = 100, 100% = 10000). Must be > 0 and < 100%.
+    function setMaxLTV(uint16 maxLTV_) external;
+}
+
+contract PayloadIGP67 is PayloadIGPConstants, PayloadIGPHelpers {
+    uint256 public constant PROPOSAL_ID = 67;
+
+
+    // State
+    uint256 public INST_ETH_VAULT_ID = 0;
+    uint256 public INST_ETH_DEX_ID = 0;
+    uint256 public ETH_USDC_DEX_ID = 0;
+    uint256 public ETH_USDC_VAULT_ID = 0;
 
     function propose(string memory description) external {
         require(
@@ -71,9 +83,36 @@ contract PayloadIGP66 is PayloadIGPConstants, PayloadIGPHelpers {
 
         // Action 2: Set Dust Allowance to rsETH-ETH<>wstETH, rsETH<>wstETH, weETHs-ETH<>wstETH vaults
         action2();
+
+        // Action 3: Increase Allowance and LTV of stETH redemption protocol
+        action3();
+
+        // Action 4: Remove Team Multisig as Auth from ETH-USDC and INST-ETH dex and vaults
+        action4();
     }
 
     function verifyProposal() external view {}
+
+    /**
+     * |
+     * |     Team Multisig Actions      |
+     * |__________________________________
+     */
+    function setState(
+        uint256 inst_eth_dex_id,
+        uint256 inst_eth_vault_id,
+        uint256 eth_usdc_dex_id,
+        uint256 eth_usdc_vault_id
+    ) external {
+        if (msg.sender != TEAM_MULTISIG) {
+            revert("not-team-multisig");
+        }
+
+        INST_ETH_DEX_ID = inst_eth_dex_id;
+        INST_ETH_VAULT_ID = inst_eth_vault_id;
+        ETH_USDC_DEX_ID = eth_usdc_dex_id;
+        ETH_USDC_VAULT_ID = eth_usdc_vault_id;
+    }
 
     /**
      * |
@@ -126,7 +165,7 @@ contract PayloadIGP66 is PayloadIGPConstants, PayloadIGPHelpers {
                 vaultType: TYPE.TYPE_2,
                 supplyToken: address(0),
                 borrowToken: wstETH_ADDRESS,
-                baseWithdrawalLimitInUSD: 50_000, // $50k
+                baseWithdrawalLimitInUSD: 0, // $0
                 baseBorrowLimitInUSD: 40_000, // $40k
                 maxBorrowLimitInUSD: 50_000 // $50k
             });
@@ -145,7 +184,7 @@ contract PayloadIGP66 is PayloadIGPConstants, PayloadIGPHelpers {
             Vault memory VAULT_rsETH_AND_wstETH = Vault({
                 vault: getVaultAddress(79),
                 vaultType: TYPE.TYPE_1,
-                supplyToken: address(0),
+                supplyToken: rsETH_ADDRESS,
                 borrowToken: wstETH_ADDRESS,
                 baseWithdrawalLimitInUSD: 50_000, // $50k
                 baseBorrowLimitInUSD: 40_000, // $40k
@@ -155,7 +194,7 @@ contract PayloadIGP66 is PayloadIGPConstants, PayloadIGPHelpers {
             setVaultLimits(VAULT_rsETH_AND_wstETH); // TYPE_1 => 79
 
             VAULT_FACTORY.setVaultAuth(
-                getVaultAddress(78),
+                getVaultAddress(79),
                 TEAM_MULTISIG,
                 true
             );
@@ -168,7 +207,7 @@ contract PayloadIGP66 is PayloadIGPConstants, PayloadIGPHelpers {
                 vaultType: TYPE.TYPE_2,
                 supplyToken: address(0),
                 borrowToken: wstETH_ADDRESS,
-                baseWithdrawalLimitInUSD: 50_000, // $50k
+                baseWithdrawalLimitInUSD: 0, // $0
                 baseBorrowLimitInUSD: 40_000, // $40k
                 maxBorrowLimitInUSD: 50_000 // $50k
             });
@@ -181,6 +220,42 @@ contract PayloadIGP66 is PayloadIGPConstants, PayloadIGPHelpers {
                 true
             );
         }
+    }
+
+    /// @notice Action 3: Increase Allowance and LTV of stETH redemption protocol
+    function action3() internal {
+        { // Increase Allowance to 10k wstETH
+            uint256 amount_ = getRawAmount(wstETH_ADDRESS, 10_000, 0, false);
+
+            BorrowProtocolConfig memory config_ = BorrowProtocolConfig({
+                protocol: 0x1F6B2bFDd5D1e6AdE7B17027ff5300419a56Ad6b,
+                borrowToken: wstETH_ADDRESS,
+                expandPercent: 50 * 1e2, // 50%
+                expandDuration: 1 hours, // 1 hour
+                baseBorrowLimitInUSD: amount_,
+                maxBorrowLimitInUSD: amount_
+            });
+
+            setBorrowProtocolLimits(config_);
+        }
+
+        { // Increase LTV to 95%
+            IStETHRedemptionProtocol(0x1F6B2bFDd5D1e6AdE7B17027ff5300419a56Ad6b).setMaxLTV(95 * 1e2);
+        }
+    }
+
+    /// @notice Action 4: Remove Team Multisig as Auth from ETH-USDC and INST-ETH dex and vaults
+    function action4() internal {
+        uint256 eth_usdc_dex_id = PayloadIGP67(ADDRESS_THIS).ETH_USDC_DEX_ID();
+        uint256 eth_usdc_vault_id = PayloadIGP67(ADDRESS_THIS).ETH_USDC_VAULT_ID();
+        uint256 inst_eth_dex_id = PayloadIGP67(ADDRESS_THIS).INST_ETH_DEX_ID();
+        uint256 inst_eth_vault_id = PayloadIGP67(ADDRESS_THIS).INST_ETH_VAULT_ID();
+
+        if (inst_eth_dex_id != 420) DEX_FACTORY.setDexAuth(getDexAddress(inst_eth_dex_id), TEAM_MULTISIG, false);
+        if (eth_usdc_dex_id != 420) DEX_FACTORY.setDexAuth(getDexAddress(eth_usdc_dex_id), TEAM_MULTISIG, false);
+
+        if (inst_eth_vault_id != 420) VAULT_FACTORY.setVaultAuth(getVaultAddress(inst_eth_vault_id), TEAM_MULTISIG, false);
+        if (eth_usdc_vault_id != 420) VAULT_FACTORY.setVaultAuth(getVaultAddress(eth_usdc_vault_id), TEAM_MULTISIG, false);
     }
 
      /**
