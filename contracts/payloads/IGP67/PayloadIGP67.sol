@@ -66,8 +66,11 @@ contract PayloadIGP66 is PayloadIGPConstants, PayloadIGPHelpers {
     function execute() external {
         require(address(this) == address(TIMELOCK), "not-valid-caller");
 
-        // Action 1: Transfer 12% INST from Treasury to Team Multisig
+        // Action 1: Set Dust Allowance to rsETH-ETH and weETHs-ETH dex pools
         action1();
+
+        // Action 2: Set Dust Allowance to rsETH-ETH<>wstETH, rsETH<>wstETH, weETHs-ETH<>wstETH vaults
+        action2();
     }
 
     function verifyProposal() external view {}
@@ -77,7 +80,7 @@ contract PayloadIGP66 is PayloadIGPConstants, PayloadIGPHelpers {
      * |     Proposal Payload Actions      |
      * |__________________________________
      */
-    /// @notice Action 1: Set Dust Allowance to rsETH-ETH & weETHs-ETH
+    /// @notice Action 1: Set Dust Allowance to rsETH-ETH & weETHs-ETH dex pools
     function action1() internal {
         {
             // rsETH-ETH
