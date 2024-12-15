@@ -22,7 +22,7 @@ import {IFTokenAdmin, ILendingRewards} from "../common/interfaces/IFToken.sol";
 
 import {IDSAV2} from "../common/interfaces/IDSA.sol";
 import { IERC20 } from "../common/interfaces/IERC20.sol";
-
+import { IProxy } from "../common/interfaces/IProxy.sol";
 import {PayloadIGPConstants} from "../common/constants.sol";
 import {PayloadIGPHelpers} from "../common/helpers.sol";
 
@@ -40,6 +40,9 @@ contract PayloadIGP67 is PayloadIGPConstants, PayloadIGPHelpers {
     uint256 public INST_ETH_DEX_ID = 0;
     uint256 public ETH_USDC_DEX_ID = 0;
     uint256 public ETH_USDC_VAULT_ID = 0;
+
+    uint256 public CBBTC_WBTC_MAX_CENTER_PRICE = 0;
+    uint256 public CBBTC_WBTC_MIN_CENTER_PRICE = 0;
 
     function propose(string memory description) external {
         require(
@@ -89,6 +92,9 @@ contract PayloadIGP67 is PayloadIGPConstants, PayloadIGPHelpers {
 
         // Action 4: Remove Team Multisig as Auth from ETH-USDC and INST-ETH dex and vaults
         action4();
+
+        // Action 5: Update Fluid Reserve Contract Implementation
+        action5();
     }
 
     function verifyProposal() external view {}
@@ -102,7 +108,9 @@ contract PayloadIGP67 is PayloadIGPConstants, PayloadIGPHelpers {
         uint256 inst_eth_dex_id,
         uint256 inst_eth_vault_id,
         uint256 eth_usdc_dex_id,
-        uint256 eth_usdc_vault_id
+        uint256 eth_usdc_vault_id,
+        uint256 cbBTC_wBTC_max_center_price,
+        uint256 cbBTC_wBTC_min_center_price
     ) external {
         if (msg.sender != TEAM_MULTISIG) {
             revert("not-team-multisig");
@@ -112,6 +120,8 @@ contract PayloadIGP67 is PayloadIGPConstants, PayloadIGPHelpers {
         INST_ETH_VAULT_ID = inst_eth_vault_id;
         ETH_USDC_DEX_ID = eth_usdc_dex_id;
         ETH_USDC_VAULT_ID = eth_usdc_vault_id;
+        CBBTC_WBTC_MAX_CENTER_PRICE = cbBTC_wBTC_max_center_price;
+        CBBTC_WBTC_MIN_CENTER_PRICE = cbBTC_wBTC_min_center_price;
     }
 
     /**
@@ -225,15 +235,15 @@ contract PayloadIGP67 is PayloadIGPConstants, PayloadIGPHelpers {
     /// @notice Action 3: Increase Allowance and LTV of stETH redemption protocol
     function action3() internal {
         { // Increase Allowance to 10k wstETH
-            uint256 amount_ = getRawAmount(wstETH_ADDRESS, 10_000, 0, false);
+            uint256 amount_ = getRawAmount(ETH_ADDRESS, 10_000, 0, false);
 
             BorrowProtocolConfig memory config_ = BorrowProtocolConfig({
                 protocol: 0x1F6B2bFDd5D1e6AdE7B17027ff5300419a56Ad6b,
-                borrowToken: wstETH_ADDRESS,
-                expandPercent: 50 * 1e2, // 50%
-                expandDuration: 1 hours, // 1 hour
+                borrowToken: ETH_ADDRESS,
+                expandPercent: 0, 
+                expandDuration: 1,
                 baseBorrowLimitInUSD: amount_,
-                maxBorrowLimitInUSD: amount_
+                maxBorrowLimitInUSD: amount_ * 1001 / 1000
             });
 
             setBorrowProtocolLimits(config_);
@@ -256,6 +266,71 @@ contract PayloadIGP67 is PayloadIGPConstants, PayloadIGPHelpers {
 
         if (inst_eth_vault_id != 420) VAULT_FACTORY.setVaultAuth(getVaultAddress(inst_eth_vault_id), TEAM_MULTISIG, false);
         if (eth_usdc_vault_id != 420) VAULT_FACTORY.setVaultAuth(getVaultAddress(eth_usdc_vault_id), TEAM_MULTISIG, false);
+    }
+
+    /// @notice Action 5: Update Fluid Reserve Contract Implementation
+    function action5() internal {
+        IProxy(address(FLUID_RESERVE)).upgradeToAndCall(address(0xE2283Cdec12c6AF6C51557BB4640c640800d7060), abi.encode());
+    }
+
+    /// @notice Action 6: Increase USDC allowance to cbBTC<>USDC and wBTC<>USDC vaults
+    function action6() internal {
+        address[] memory protocols = new address[](2);
+        address[] memory tokens = new address[](2);
+        uint256[] memory amounts = new uint256[](2);
+
+        {   // wBTC<>USDCs
+            address wBTC_USDC_VAULT = getVaultAddress(21);
+
+            uint256 allowance = IERC20(USDC_ADDRESS).allowance(
+                address(FLUID_RESERVE),
+                wBTC_USDC_VAULT
+            );
+
+            protocols[0] = wBTC_USDC_VAULT;
+            tokens[0] = USDC_ADDRESS;
+            amounts[0] = allowance + (6_000 * 1e6);
+        }
+
+        {   // cbBTC<>USDCs
+            address cbBTC_USDC_VAULT = getVaultAddress(28);
+
+            uint256 allowance = IERC20(USDT_ADDRESS).allowance(
+                address(FLUID_RESERVE),
+                cbBTC_USDC_VAULT
+            );
+
+            protocols[1] = cbBTC_USDC_VAULT;
+            tokens[1] = USDT_ADDRESS;
+            amounts[1] = allowance + (4_000 * 1e6);
+        }
+
+        FLUID_RESERVE.approve(protocols, tokens, amounts);
+    }
+
+    /// @notice Action 7: Update cbBTC-wBTC Dex Config
+    function action7() internal {
+        address cbBTC_wBTC_DEX_ADDRESS = getDexAddress(3);
+
+        uint256 maxCenterPriceConfig_ = PayloadIGP67(ADDRESS_THIS).CBBTC_WBTC_MAX_CENTER_PRICE();
+        uint256 minCenterPriceConfig_ = PayloadIGP67(ADDRESS_THIS).CBBTC_WBTC_MIN_CENTER_PRICE();
+
+        if (maxCenterPriceConfig_ == 420 && minCenterPriceConfig_ == 420) return;
+
+        require(maxCenterPriceConfig_ < 4, "max-center-price-is-too-high");
+        require(minCenterPriceConfig_ < 4, "min-center-price-is-too-low");
+
+        maxCenterPriceConfig_ = 1000 - maxCenterPriceConfig_;
+        minCenterPriceConfig_ = 1000 - minCenterPriceConfig_;
+
+        // Update Center Price Limits between 0.3% to 0.2%
+        uint256 minCenterPrice_ = (maxCenterPriceConfig_ * 1e27) / 1000;
+        uint256 maxCenterPrice_ = uint256(1e27 * 1000) / minCenterPriceConfig_;
+
+        IFluidDex(cbBTC_wBTC_DEX_ADDRESS).updateCenterPriceLimits(
+            maxCenterPrice_,
+            minCenterPrice_
+        );
     }
 
      /**
