@@ -240,7 +240,7 @@ contract PayloadIGP67 is PayloadIGPConstants, PayloadIGPHelpers {
 
     /// @notice Action 3: Increase Allowance and LTV of stETH redemption protocol
     function action3() internal {
-        { // Increase Allowance to 10k wstETH
+        { // Increase Allowance to 10k ETH
             uint256 amount_ = getRawAmount(ETH_ADDRESS, 10_000, 0, false);
 
             BorrowProtocolConfig memory config_ = BorrowProtocolConfig({
@@ -298,16 +298,16 @@ contract PayloadIGP67 is PayloadIGPConstants, PayloadIGPHelpers {
             amounts[0] = allowance + (6_000 * 1e6);
         }
 
-        {   // cbBTC<>USDCs
-            address cbBTC_USDC_VAULT = getVaultAddress(28);
+        {   // cbBTC<>USDC
+            address cbBTC_USDC_VAULT = getVaultAddress(29);
 
-            uint256 allowance = IERC20(USDT_ADDRESS).allowance(
+            uint256 allowance = IERC20(USDC_ADDRESS).allowance(
                 address(FLUID_RESERVE),
                 cbBTC_USDC_VAULT
             );
 
             protocols[1] = cbBTC_USDC_VAULT;
-            tokens[1] = USDT_ADDRESS;
+            tokens[1] = USDC_ADDRESS;
             amounts[1] = allowance + (4_000 * 1e6);
         }
 
