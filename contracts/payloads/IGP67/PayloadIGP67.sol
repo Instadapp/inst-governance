@@ -95,6 +95,12 @@ contract PayloadIGP67 is PayloadIGPConstants, PayloadIGPHelpers {
 
         // Action 5: Update Fluid Reserve Contract Implementation
         action5();
+
+        // Action 6: Increase USDC allowance to cbBTC<>USDC and wBTC<>USDC vaults
+        action6();
+
+        // Action 7: Update cbBTC-wBTC Dex Config
+        action7();
     }
 
     function verifyProposal() external view {}
@@ -317,13 +323,10 @@ contract PayloadIGP67 is PayloadIGPConstants, PayloadIGPHelpers {
 
         if (maxCenterPriceConfig_ == 420 && minCenterPriceConfig_ == 420) return;
 
-        require(maxCenterPriceConfig_ < 4, "max-center-price-is-too-high");
-        require(minCenterPriceConfig_ < 4, "min-center-price-is-too-low");
+        require(maxCenterPriceConfig_ > 995 && maxCenterPriceConfig_ < 1000, "max-center-price-is-too-high");
+        require(minCenterPriceConfig_ > 995 && minCenterPriceConfig_ < 1000, "min-center-price-is-too-low");
 
-        maxCenterPriceConfig_ = 1000 - maxCenterPriceConfig_;
-        minCenterPriceConfig_ = 1000 - minCenterPriceConfig_;
-
-        // Update Center Price Limits between 0.3% to 0.2%
+        // Update Center Price Limits between 0.4% to 0.2%
         uint256 minCenterPrice_ = (maxCenterPriceConfig_ * 1e27) / 1000;
         uint256 maxCenterPrice_ = uint256(1e27 * 1000) / minCenterPriceConfig_;
 
