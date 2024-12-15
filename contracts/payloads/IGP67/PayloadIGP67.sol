@@ -21,8 +21,8 @@ import {IFluidVault, IFluidVaultT1} from "../common/interfaces/IFluidVault.sol";
 import {IFTokenAdmin, ILendingRewards} from "../common/interfaces/IFToken.sol";
 
 import {IDSAV2} from "../common/interfaces/IDSA.sol";
-import { IERC20 } from "../common/interfaces/IERC20.sol";
-import { IProxy } from "../common/interfaces/IProxy.sol";
+import {IERC20} from "../common/interfaces/IERC20.sol";
+import {IProxy} from "../common/interfaces/IProxy.sol";
 import {PayloadIGPConstants} from "../common/constants.sol";
 import {PayloadIGPHelpers} from "../common/helpers.sol";
 
@@ -34,15 +34,13 @@ interface IStETHRedemptionProtocol {
 contract PayloadIGP67 is PayloadIGPConstants, PayloadIGPHelpers {
     uint256 public constant PROPOSAL_ID = 67;
 
-
     // State
     uint256 public INST_ETH_VAULT_ID = 0;
     uint256 public INST_ETH_DEX_ID = 0;
     uint256 public ETH_USDC_DEX_ID = 0;
     uint256 public ETH_USDC_VAULT_ID = 0;
 
-    uint256 public CBBTC_WBTC_MAX_CENTER_PRICE = 0;
-    uint256 public CBBTC_WBTC_MIN_CENTER_PRICE = 0;
+    uint256 public CBBTC_WBTC_NEW_CENTER_PRICE = 0;
 
     function propose(string memory description) external {
         require(
@@ -50,7 +48,7 @@ contract PayloadIGP67 is PayloadIGPConstants, PayloadIGPHelpers {
                 msg.sender == TEAM_MULTISIG ||
                 address(this) == PROPOSER_AVO_MULTISIG ||
                 address(this) == PROPOSER_AVO_MULTISIG_2 ||
-                address(this) == PROPOSER_AVO_MULTISIG_3 || 
+                address(this) == PROPOSER_AVO_MULTISIG_3 ||
                 address(this) == PROPOSER_AVO_MULTISIG_4 ||
                 address(this) == PROPOSER_AVO_MULTISIG_5,
             "msg.sender-not-allowed"
@@ -115,8 +113,7 @@ contract PayloadIGP67 is PayloadIGPConstants, PayloadIGPHelpers {
         uint256 inst_eth_vault_id,
         uint256 eth_usdc_dex_id,
         uint256 eth_usdc_vault_id,
-        uint256 cbBTC_wBTC_max_center_price,
-        uint256 cbBTC_wBTC_min_center_price
+        uint256 cbBTC_wBTC_new_center_price
     ) external {
         if (msg.sender != TEAM_MULTISIG) {
             revert("not-team-multisig");
@@ -126,8 +123,7 @@ contract PayloadIGP67 is PayloadIGPConstants, PayloadIGPHelpers {
         INST_ETH_VAULT_ID = inst_eth_vault_id;
         ETH_USDC_DEX_ID = eth_usdc_dex_id;
         ETH_USDC_VAULT_ID = eth_usdc_vault_id;
-        CBBTC_WBTC_MAX_CENTER_PRICE = cbBTC_wBTC_max_center_price;
-        CBBTC_WBTC_MIN_CENTER_PRICE = cbBTC_wBTC_min_center_price;
+        CBBTC_WBTC_NEW_CENTER_PRICE = cbBTC_wBTC_new_center_price;
     }
 
     /**
@@ -240,43 +236,71 @@ contract PayloadIGP67 is PayloadIGPConstants, PayloadIGPHelpers {
 
     /// @notice Action 3: Increase Allowance and LTV of stETH redemption protocol
     function action3() internal {
-        { // Increase Allowance to 10k ETH
+        {
+            // Increase Allowance to 10k ETH
             uint256 amount_ = getRawAmount(ETH_ADDRESS, 10_000, 0, false);
 
             BorrowProtocolConfig memory config_ = BorrowProtocolConfig({
                 protocol: 0x1F6B2bFDd5D1e6AdE7B17027ff5300419a56Ad6b,
                 borrowToken: ETH_ADDRESS,
-                expandPercent: 0, 
+                expandPercent: 0,
                 expandDuration: 1,
                 baseBorrowLimitInUSD: amount_,
-                maxBorrowLimitInUSD: amount_ * 1001 / 1000
+                maxBorrowLimitInUSD: (amount_ * 1001) / 1000
             });
 
             setBorrowProtocolLimits(config_);
         }
 
-        { // Increase LTV to 95%
-            IStETHRedemptionProtocol(0x1F6B2bFDd5D1e6AdE7B17027ff5300419a56Ad6b).setMaxLTV(95 * 1e2);
+        {
+            // Increase LTV to 95%
+            IStETHRedemptionProtocol(0x1F6B2bFDd5D1e6AdE7B17027ff5300419a56Ad6b)
+                .setMaxLTV(95 * 1e2);
         }
     }
 
     /// @notice Action 4: Remove Team Multisig as Auth from ETH-USDC and INST-ETH dex and vaults
     function action4() internal {
         uint256 eth_usdc_dex_id = PayloadIGP67(ADDRESS_THIS).ETH_USDC_DEX_ID();
-        uint256 eth_usdc_vault_id = PayloadIGP67(ADDRESS_THIS).ETH_USDC_VAULT_ID();
+        uint256 eth_usdc_vault_id = PayloadIGP67(ADDRESS_THIS)
+            .ETH_USDC_VAULT_ID();
         uint256 inst_eth_dex_id = PayloadIGP67(ADDRESS_THIS).INST_ETH_DEX_ID();
-        uint256 inst_eth_vault_id = PayloadIGP67(ADDRESS_THIS).INST_ETH_VAULT_ID();
+        uint256 inst_eth_vault_id = PayloadIGP67(ADDRESS_THIS)
+            .INST_ETH_VAULT_ID();
 
-        if (inst_eth_dex_id != 420) DEX_FACTORY.setDexAuth(getDexAddress(inst_eth_dex_id), TEAM_MULTISIG, false);
-        if (eth_usdc_dex_id != 420) DEX_FACTORY.setDexAuth(getDexAddress(eth_usdc_dex_id), TEAM_MULTISIG, false);
+        if (inst_eth_dex_id != 420)
+            DEX_FACTORY.setDexAuth(
+                getDexAddress(inst_eth_dex_id),
+                TEAM_MULTISIG,
+                false
+            );
+        if (eth_usdc_dex_id != 420)
+            DEX_FACTORY.setDexAuth(
+                getDexAddress(eth_usdc_dex_id),
+                TEAM_MULTISIG,
+                false
+            );
 
-        if (inst_eth_vault_id != 420) VAULT_FACTORY.setVaultAuth(getVaultAddress(inst_eth_vault_id), TEAM_MULTISIG, false);
-        if (eth_usdc_vault_id != 420) VAULT_FACTORY.setVaultAuth(getVaultAddress(eth_usdc_vault_id), TEAM_MULTISIG, false);
+        if (inst_eth_vault_id != 420)
+            VAULT_FACTORY.setVaultAuth(
+                getVaultAddress(inst_eth_vault_id),
+                TEAM_MULTISIG,
+                false
+            );
+        if (eth_usdc_vault_id != 420)
+            VAULT_FACTORY.setVaultAuth(
+                getVaultAddress(eth_usdc_vault_id),
+                TEAM_MULTISIG,
+                false
+            );
     }
 
     /// @notice Action 5: Update Fluid Reserve Contract Implementation
     function action5() internal {
-        IProxy(address(FLUID_RESERVE)).upgradeToAndCall(address(0xE2283Cdec12c6AF6C51557BB4640c640800d7060), abi.encode());
+        IProxy(address(FLUID_RESERVE)).upgradeToAndCall(
+            address(0xE2283Cdec12c6AF6C51557BB4640c640800d7060),
+            abi.encode()
+        );
     }
 
     /// @notice Action 6: Increase USDC allowance to cbBTC<>USDC and wBTC<>USDC vaults
@@ -285,7 +309,8 @@ contract PayloadIGP67 is PayloadIGPConstants, PayloadIGPHelpers {
         address[] memory tokens = new address[](2);
         uint256[] memory amounts = new uint256[](2);
 
-        {   // wBTC<>USDCs
+        {
+            // wBTC<>USDCs
             address wBTC_USDC_VAULT = getVaultAddress(21);
 
             uint256 allowance = IERC20(USDC_ADDRESS).allowance(
@@ -298,7 +323,8 @@ contract PayloadIGP67 is PayloadIGPConstants, PayloadIGPHelpers {
             amounts[0] = allowance + (6_000 * 1e6);
         }
 
-        {   // cbBTC<>USDC
+        {
+            // cbBTC<>USDC
             address cbBTC_USDC_VAULT = getVaultAddress(29);
 
             uint256 allowance = IERC20(USDC_ADDRESS).allowance(
@@ -318,17 +344,19 @@ contract PayloadIGP67 is PayloadIGPConstants, PayloadIGPHelpers {
     function action7() internal {
         address cbBTC_wBTC_DEX_ADDRESS = getDexAddress(3);
 
-        uint256 maxCenterPriceConfig_ = PayloadIGP67(ADDRESS_THIS).CBBTC_WBTC_MAX_CENTER_PRICE();
-        uint256 minCenterPriceConfig_ = PayloadIGP67(ADDRESS_THIS).CBBTC_WBTC_MIN_CENTER_PRICE();
+        uint256 newCenterPrice_ = PayloadIGP67(ADDRESS_THIS)
+            .CBBTC_WBTC_NEW_CENTER_PRICE();
 
-        if (maxCenterPriceConfig_ == 420 && minCenterPriceConfig_ == 420) return;
+        if (newCenterPrice_ == 420) return;
 
-        require(maxCenterPriceConfig_ > 995 && maxCenterPriceConfig_ < 1000, "max-center-price-is-too-high");
-        require(minCenterPriceConfig_ > 995 && minCenterPriceConfig_ < 1000, "min-center-price-is-too-low");
+        require(
+            newCenterPrice_ > 997 && newCenterPrice_ <= 998,
+            "new-center-price-is-too-high"
+        );
 
-        // Update Center Price Limits between 0.4% to 0.2%
-        uint256 minCenterPrice_ = (maxCenterPriceConfig_ * 1e27) / 1000;
-        uint256 maxCenterPrice_ = uint256(1e27 * 1000) / minCenterPriceConfig_;
+        // Update Center Price Limits between 0.3% to 0.2%
+        uint256 minCenterPrice_ = (newCenterPrice_ * 1e27) / 1000;
+        uint256 maxCenterPrice_ = uint256(1e27 * 1000) / newCenterPrice_;
 
         IFluidDex(cbBTC_wBTC_DEX_ADDRESS).updateCenterPriceLimits(
             maxCenterPrice_,
@@ -336,7 +364,7 @@ contract PayloadIGP67 is PayloadIGPConstants, PayloadIGPHelpers {
         );
     }
 
-     /**
+    /**
      * |
      * |     Proposal Payload Helpers      |
      * |__________________________________
@@ -420,7 +448,9 @@ contract PayloadIGP67 is PayloadIGPConstants, PayloadIGPHelpers {
     }
 
     function setVaultLimits(Vault memory vault_) internal {
-        if (vault_.vaultType == TYPE.TYPE_3 || vault_.vaultType == TYPE.TYPE_1) {
+        if (
+            vault_.vaultType == TYPE.TYPE_3 || vault_.vaultType == TYPE.TYPE_1
+        ) {
             SupplyProtocolConfig memory protocolConfig_ = SupplyProtocolConfig({
                 protocol: vault_.vault,
                 supplyToken: vault_.supplyToken,
@@ -432,7 +462,9 @@ contract PayloadIGP67 is PayloadIGPConstants, PayloadIGPHelpers {
             setSupplyProtocolLimits(protocolConfig_);
         }
 
-        if (vault_.vaultType == TYPE.TYPE_2 || vault_.vaultType == TYPE.TYPE_1) {
+        if (
+            vault_.vaultType == TYPE.TYPE_2 || vault_.vaultType == TYPE.TYPE_1
+        ) {
             BorrowProtocolConfig memory protocolConfig_ = BorrowProtocolConfig({
                 protocol: vault_.vault,
                 borrowToken: vault_.borrowToken,
