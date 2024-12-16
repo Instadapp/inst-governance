@@ -84,7 +84,7 @@ contract PayloadIGP68 is PayloadIGPConstants, PayloadIGPHelpers {
         // Action 6: Set dust allowance to mETH<>USDC, mETH<>GHO vaults
         action6();
 
-        // Action 7: Update USDC, USDT and GHO market rates.
+        // Action 7: Update USDC, USDT, GHO and USDe market rates.
         action7();
     }
 
@@ -336,9 +336,9 @@ contract PayloadIGP68 is PayloadIGPConstants, PayloadIGPHelpers {
         }
     }
 
-    /// @notice Action 7: Update USDC, USDT and GHO market rates.
+    /// @notice Action 7: Update USDC, USDT, GHO and USDe market rates.
     function action7() internal {
-        FluidLiquidityAdminStructs.RateDataV2Params[] memory params_ = new FluidLiquidityAdminStructs.RateDataV2Params[](3);
+        FluidLiquidityAdminStructs.RateDataV2Params[] memory params_ = new FluidLiquidityAdminStructs.RateDataV2Params[](4);
 
        params_[0] = FluidLiquidityAdminStructs.RateDataV2Params({
             token: USDC_ADDRESS, // USDC
@@ -346,7 +346,7 @@ contract PayloadIGP68 is PayloadIGPConstants, PayloadIGPHelpers {
             kink2: 93 * 1e2, // 93%
             rateAtUtilizationZero: 0, // 0%
             rateAtUtilizationKink1: 12 * 1e2, // 12%
-            rateAtUtilizationKink2: 14 * 1e2, // 14%
+            rateAtUtilizationKink2: 15 * 1e2, // 15%
             rateAtUtilizationMax: 40 * 1e2 // 40%
        });
 
@@ -356,7 +356,7 @@ contract PayloadIGP68 is PayloadIGPConstants, PayloadIGPHelpers {
             kink2: 93 * 1e2, // 93%
             rateAtUtilizationZero: 0, // 0%
             rateAtUtilizationKink1: 12 * 1e2, // 12%
-            rateAtUtilizationKink2: 14 * 1e2, // 14%
+            rateAtUtilizationKink2: 15 * 1e2, // 15%
             rateAtUtilizationMax: 40 * 1e2 // 40%
        });
 
@@ -366,7 +366,17 @@ contract PayloadIGP68 is PayloadIGPConstants, PayloadIGPHelpers {
             kink2: 93 * 1e2, // 93%
             rateAtUtilizationZero: 0, // 0%
             rateAtUtilizationKink1: 12 * 1e2, // 12%
-            rateAtUtilizationKink2: 14 * 1e2, // 14%
+            rateAtUtilizationKink2: 15 * 1e2, // 15%
+            rateAtUtilizationMax: 40 * 1e2 // 40%
+       });
+
+        params_[3] = FluidLiquidityAdminStructs.RateDataV2Params({
+            token: USDe_ADDRESS, // USDe
+            kink1: 85 * 1e2, // 85%
+            kink2: 93 * 1e2, // 93%
+            rateAtUtilizationZero: 0, // 0%
+            rateAtUtilizationKink1: 12 * 1e2, // 12%
+            rateAtUtilizationKink2: 15 * 1e2, // 15%
             rateAtUtilizationMax: 40 * 1e2 // 40%
        });
 
