@@ -81,7 +81,7 @@ contract PayloadIGP68 is PayloadIGPConstants, PayloadIGPHelpers {
         // Action 5: Withdraw funds from Reserve
         action5();
 
-        // Action 6: Set dust allowance to mETH<>USDC, mETH<>GHO vaults
+        // Action 6: Set dust allowance to mETH<>USDC, mETH<>USDT, mETH<>GHO vaults
         action6();
 
         // Action 7: Update USDC, USDT, GHO and USDe market rates.
@@ -95,7 +95,7 @@ contract PayloadIGP68 is PayloadIGPConstants, PayloadIGPHelpers {
      * |     Proposal Payload Actions      |
      * |__________________________________
      */
-    /// @notice Action 1: Set Dust Allowance to rsETH-ETH & weETHs-ETH dex pools
+    /// @notice Action 1: Set launch allowance to rsETH-ETH & weETHs-ETH dex pools
     function action1() internal {
         {
             // rsETH-ETH
@@ -112,8 +112,6 @@ contract PayloadIGP68 is PayloadIGPConstants, PayloadIGPHelpers {
             setDexLimits(DEX_rsETH_ETH); // Smart Collateral
 
             DEX_FACTORY.setDexAuth(getDexAddress(13), TEAM_MULTISIG, false);
-
-            // TODO: set max supply shares limits?
         }
 
         {
@@ -131,12 +129,10 @@ contract PayloadIGP68 is PayloadIGPConstants, PayloadIGPHelpers {
             setDexLimits(DEX_weETHs_ETH); // Smart Collateral
 
             DEX_FACTORY.setDexAuth(getDexAddress(14), TEAM_MULTISIG, false);
-
-            // TODO: set max supply shares limits?
         }
     }
 
-    /// @notice Action 2: Set dust allowance to rsETH-ETH<>wstETH, rsETH<>wstETH, weETHs-ETH<>wstETH vaults
+    /// @notice Action 2: Set launch allowance to rsETH-ETH<>wstETH, rsETH<>wstETH, weETHs-ETH<>wstETH vaults
     function action2() internal {
         {
             // [TYPE 2] rsETH-ETH<>wstETH | Smart collateral & debt
@@ -166,7 +162,7 @@ contract PayloadIGP68 is PayloadIGPConstants, PayloadIGPHelpers {
                 vaultType: TYPE.TYPE_1,
                 supplyToken: rsETH_ADDRESS,
                 borrowToken: wstETH_ADDRESS,
-                baseWithdrawalLimitInUSD: 20_000_000, // $20M
+                baseWithdrawalLimitInUSD: 7_500_000, // $7.5M
                 baseBorrowLimitInUSD: 7_500_000, // $7.5M
                 maxBorrowLimitInUSD: 18_000_000 // $18M
             });
@@ -264,7 +260,7 @@ contract PayloadIGP68 is PayloadIGPConstants, PayloadIGPHelpers {
         FLUID_RESERVE.withdrawFunds(tokens, amounts, TEAM_MULTISIG);
     }
 
-    /// @notice Action 6: Set dust allowance to rsETH-ETH<>wstETH, rsETH<>wstETH, weETHs-ETH<>wstETH vaults
+    /// @notice Action 6: Set dust allowance to mETH<>USDC, mETH<>USDT, mETH<>GHO vaults
     function action6() internal {
         {
             address mETH_USDC_VAULT = getVaultAddress(81);
@@ -290,23 +286,23 @@ contract PayloadIGP68 is PayloadIGPConstants, PayloadIGPHelpers {
         }
 
         {
-            address mETH_USDC_VAULT = getVaultAddress(82);
+            address mETH_USDT_VAULT = getVaultAddress(82);
 
-            // [TYPE 1] mETH<>USDC | collateral & debt
-            Vault memory VAULT_mETH_USDC = Vault({
-                vault: mETH_USDC_VAULT,
+            // [TYPE 1] mETH<>USDT | collateral & debt
+            Vault memory VAULT_mETH_USDT = Vault({
+                vault: mETH_USDT_VAULT,
                 vaultType: TYPE.TYPE_1,
                 supplyToken: mETH_ADDRESS,
-                borrowToken: USDC_ADDRESS,
+                borrowToken: USDT_ADDRESS,
                 baseWithdrawalLimitInUSD: 50_000, // $50k
                 baseBorrowLimitInUSD: 40_000, // $40k
                 maxBorrowLimitInUSD: 50_000 // $50k
             });
 
-            setVaultLimits(VAULT_mETH_USDC); // TYPE_1 => 82
+            setVaultLimits(VAULT_mETH_USDT); // TYPE_1 => 82
 
             VAULT_FACTORY.setVaultAuth(
-                mETH_USDC_VAULT,
+                mETH_USDT_VAULT,
                 TEAM_MULTISIG,
                 true
             );
