@@ -10,6 +10,12 @@ interface IFluidReserveContract {
 
     function transferFunds(address token_) external;
 
+    function withdrawFunds(
+        address[] memory tokens_,
+        uint256[] memory amounts_,
+        address to_
+    ) external;
+
     function getProtocolTokens(address protocol_) external;
 
     function updateAuth(address auth_, bool isAuth_) external;
