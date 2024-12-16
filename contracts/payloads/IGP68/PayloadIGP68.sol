@@ -256,7 +256,7 @@ contract PayloadIGP68 is PayloadIGPConstants, PayloadIGPHelpers {
         amounts[0] = 300 * 1e18; // 300 ETH
 
         tokens[1] = WBTC_ADDRESS;
-        amounts[1] = IERC20(WBTC_ADDRESS).balanceOf(address(TREASURY)) - 10;
+        amounts[1] = IERC20(WBTC_ADDRESS).balanceOf(address(FLUID_RESERVE)) - 10;
  
         FLUID_RESERVE.withdrawFunds(tokens, amounts, TEAM_MULTISIG);
     }
@@ -495,19 +495,20 @@ contract PayloadIGP68 is PayloadIGPConstants, PayloadIGPHelpers {
     }
 
     // Token Prices Constants
-    uint256 public constant ETH_USD_PRICE = 3_900 * 1e2;
-    uint256 public constant wstETH_USD_PRICE = 4_650 * 1e2;
-    uint256 public constant weETH_USD_PRICE = 4_150 * 1e2;
-    uint256 public constant rsETH_USD_PRICE = 4_050 * 1e2;
-    uint256 public constant weETHs_USD_PRICE = 3_950 * 1e2;
+    uint256 public constant ETH_USD_PRICE = 4_000 * 1e2;
+    uint256 public constant wstETH_USD_PRICE = 4_750 * 1e2;
+    uint256 public constant weETH_USD_PRICE = 4_250 * 1e2;
+    uint256 public constant rsETH_USD_PRICE = 4_150 * 1e2;
+    uint256 public constant weETHs_USD_PRICE = 4_050 * 1e2;
+    uint256 public constant mETH_USD_PRICE = 4_050 * 1e2;
 
-    uint256 public constant BTC_USD_PRICE = 101_000 * 1e2;
+    uint256 public constant BTC_USD_PRICE = 105_000 * 1e2;
 
     uint256 public constant STABLE_USD_PRICE = 1 * 1e2;
     uint256 public constant sUSDe_USD_PRICE = 1 * 1e2;
     uint256 public constant sUSDs_USD_PRICE = 1 * 1e2;
 
-    uint256 public constant INST_USD_PRICE = 8.5 * 1e2;
+    uint256 public constant INST_USD_PRICE = 9 * 1e2;
 
     function getRawAmount(
         address token,
@@ -546,6 +547,9 @@ contract PayloadIGP68 is PayloadIGPConstants, PayloadIGPHelpers {
             decimals = 18;
         } else if (token == weETHs_ADDRESS) {
             usdPrice = weETHs_USD_PRICE;
+            decimals = 18;
+        } else if (token == mETH_ADDRESS) {
+            usdPrice = mETH_USD_PRICE;
             decimals = 18;
         } else if (token == cbBTC_ADDRESS || token == WBTC_ADDRESS) {
             usdPrice = BTC_USD_PRICE;
