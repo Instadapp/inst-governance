@@ -243,6 +243,7 @@ contract PayloadIGP68 is PayloadIGPConstants, PayloadIGPHelpers {
             setDexLimits(DEX_USDC_USDT); // Smart Collateral and Smart Debt
 
             // TODO: set max borrow shares limits?
+            // TODO: increase vaults limits?
         }
     }
 
