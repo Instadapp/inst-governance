@@ -83,6 +83,9 @@ contract PayloadIGP68 is PayloadIGPConstants, PayloadIGPHelpers {
 
         // Action 6: Set dust allowance to mETH<>USDC, mETH<>GHO vaults
         action6();
+
+        // Action 7: Update USDC, USDT and GHO market rates.
+        action7();
     }
 
     function verifyProposal() external view {}
@@ -249,12 +252,15 @@ contract PayloadIGP68 is PayloadIGPConstants, PayloadIGPHelpers {
 
     /// @notice Action 5: Withdraw funds from Reserve
     function action5() internal {
-        address[] memory tokens = new address[](1);
-        uint256[] memory amounts = new uint256[](1);
+        address[] memory tokens = new address[](2);
+        uint256[] memory amounts = new uint256[](2);
 
-        tokens[0] = USDC_ADDRESS;
-        amounts[0] = 100_000 * 1e6;
+        tokens[0] = ETH_ADDRESS;
+        amounts[0] = 300 * 1e18; // 300 ETH
 
+        tokens[1] = WBTC_ADDRESS;
+        amounts[1] = IERC20(WBTC_ADDRESS).balanceOf(address(TREASURY)) - 10;
+ 
         FLUID_RESERVE.withdrawFunds(tokens, amounts, TEAM_MULTISIG);
     }
 
@@ -328,6 +334,43 @@ contract PayloadIGP68 is PayloadIGPConstants, PayloadIGPHelpers {
                 true
             );
         }
+    }
+
+    /// @notice Action 7: Update USDC, USDT and GHO market rates.
+    function action7() internal {
+        FluidLiquidityAdminStructs.RateDataV2Params[] memory params_ = new FluidLiquidityAdminStructs.RateDataV2Params[](3);
+
+       params_[0] = FluidLiquidityAdminStructs.RateDataV2Params({
+            token: USDC_ADDRESS, // USDC
+            kink1: 85 * 1e2, // 85%
+            kink2: 93 * 1e2, // 93%
+            rateAtUtilizationZero: 0, // 0%
+            rateAtUtilizationKink1: 12 * 1e2, // 12%
+            rateAtUtilizationKink2: 14 * 1e2, // 14%
+            rateAtUtilizationMax: 40 * 1e2 // 40%
+       });
+
+        params_[1] = FluidLiquidityAdminStructs.RateDataV2Params({
+            token: USDT_ADDRESS, // USDT
+            kink1: 85 * 1e2, // 85%
+            kink2: 93 * 1e2, // 93%
+            rateAtUtilizationZero: 0, // 0%
+            rateAtUtilizationKink1: 12 * 1e2, // 12%
+            rateAtUtilizationKink2: 14 * 1e2, // 14%
+            rateAtUtilizationMax: 40 * 1e2 // 40%
+       });
+
+        params_[2] = FluidLiquidityAdminStructs.RateDataV2Params({
+            token: GHO_ADDRESS, // GHO
+            kink1: 85 * 1e2, // 85%
+            kink2: 93 * 1e2, // 93%
+            rateAtUtilizationZero: 0, // 0%
+            rateAtUtilizationKink1: 12 * 1e2, // 12%
+            rateAtUtilizationKink2: 14 * 1e2, // 14%
+            rateAtUtilizationMax: 40 * 1e2 // 40%
+       });
+
+       LIQUIDITY.updateRateDataV2s(params_);
     }
 
     /**
