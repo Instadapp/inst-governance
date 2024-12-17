@@ -122,7 +122,7 @@ contract PayloadIGP68 is PayloadIGPConstants, PayloadIGPHelpers {
                 tokenB: ETH_ADDRESS,
                 smartCollateral: true,
                 smartDebt: false,
-                baseWithdrawalLimitInUSD: 20_000_000, // $20M
+                baseWithdrawalLimitInUSD: 7_500_000, // $7.5M
                 baseBorrowLimitInUSD: 0, // $0
                 maxBorrowLimitInUSD: 0 // $0
             });
@@ -185,7 +185,7 @@ contract PayloadIGP68 is PayloadIGPConstants, PayloadIGPHelpers {
                 borrowToken: wstETH_ADDRESS,
                 baseWithdrawalLimitInUSD: 0, // $0
                 baseBorrowLimitInUSD: 7_500_000, // $7.5M
-                maxBorrowLimitInUSD: 18_000_000 // $18M
+                maxBorrowLimitInUSD: 9_500_000 // $9.5M
             });
 
             setVaultLimits(VAULT_weETHs_ETH_AND_wstETH); // TYPE_2 => 80
@@ -210,20 +210,25 @@ contract PayloadIGP68 is PayloadIGPConstants, PayloadIGPHelpers {
                 tokenB: USDC_ADDRESS,
                 smartCollateral: true,
                 smartDebt: true,
-                baseWithdrawalLimitInUSD: 30_000_000, // $30M
-                baseBorrowLimitInUSD: 7_500_000, // $7.5M
-                maxBorrowLimitInUSD: 20_000_000 // $20M
+                baseWithdrawalLimitInUSD: 15_000_000, // $15M
+                baseBorrowLimitInUSD: 12_000_000, // $12M
+                maxBorrowLimitInUSD: 30_000_000 // $30M
             });
             setDexLimits(DEX_ETH_USDC); // Smart Collateral and Smart Debt
         }
 
-        { // Update Max Supply Shares
+        {
+            // Update Max Supply Shares
             IFluidDex(ETH_USDC_DEX_ADDRESS).updateMaxSupplyShares(15_000_000); // 15M
         }
 
-        { // Update Max Borrow Shares
-            IFluidDex(ETH_USDC_DEX_ADDRESS).updateMaxBorrowShares(12_000_000); // 12M
+        {
+            // Update Max Borrow Shares
+            IFluidDex(ETH_USDC_DEX_ADDRESS).updateMaxBorrowShares(10_000_000); // 10M
         }
+
+        // TODO: also need to increase ETH-USDC DEX vault limits? Around the same shares?
+        // Withdraw limits should be fine but borrow limits should be increased to 10M shares
     }
 
     /// @notice Action 4: Increase USDC-USDT dex limits
@@ -244,6 +249,9 @@ contract PayloadIGP68 is PayloadIGPConstants, PayloadIGPHelpers {
 
             // TODO: set max borrow shares limits?
             // TODO: increase vaults limits?
+
+            // @samyak
+            // We will need to increase the max borrow shares to 25M but no need to do any changes on vaults side.
         }
     }
 
@@ -256,8 +264,10 @@ contract PayloadIGP68 is PayloadIGPConstants, PayloadIGPHelpers {
         amounts[0] = 300 * 1e18; // 300 ETH
 
         tokens[1] = WBTC_ADDRESS;
-        amounts[1] = IERC20(WBTC_ADDRESS).balanceOf(address(FLUID_RESERVE)) - 10;
- 
+        amounts[1] =
+            IERC20(WBTC_ADDRESS).balanceOf(address(FLUID_RESERVE)) -
+            10;
+
         FLUID_RESERVE.withdrawFunds(tokens, amounts, TEAM_MULTISIG);
     }
 
@@ -272,18 +282,14 @@ contract PayloadIGP68 is PayloadIGPConstants, PayloadIGPHelpers {
                 vaultType: TYPE.TYPE_1,
                 supplyToken: mETH_ADDRESS,
                 borrowToken: USDC_ADDRESS,
-                baseWithdrawalLimitInUSD: 50_000, // $50k
-                baseBorrowLimitInUSD: 40_000, // $40k
-                maxBorrowLimitInUSD: 50_000 // $50k
+                baseWithdrawalLimitInUSD: 20_000, // $20k
+                baseBorrowLimitInUSD: 10_000, // $10k
+                maxBorrowLimitInUSD: 15_000 // $15k
             });
 
             setVaultLimits(VAULT_mETH_USDC); // TYPE_1 => 81
 
-            VAULT_FACTORY.setVaultAuth(
-                mETH_USDC_VAULT,
-                TEAM_MULTISIG,
-                true
-            );
+            VAULT_FACTORY.setVaultAuth(mETH_USDC_VAULT, TEAM_MULTISIG, true);
         }
 
         {
@@ -295,18 +301,14 @@ contract PayloadIGP68 is PayloadIGPConstants, PayloadIGPHelpers {
                 vaultType: TYPE.TYPE_1,
                 supplyToken: mETH_ADDRESS,
                 borrowToken: USDT_ADDRESS,
-                baseWithdrawalLimitInUSD: 50_000, // $50k
-                baseBorrowLimitInUSD: 40_000, // $40k
-                maxBorrowLimitInUSD: 50_000 // $50k
+                baseWithdrawalLimitInUSD: 20_000, // $20k
+                baseBorrowLimitInUSD: 10_000, // $10k
+                maxBorrowLimitInUSD: 15_000 // $15k
             });
 
             setVaultLimits(VAULT_mETH_USDT); // TYPE_1 => 82
 
-            VAULT_FACTORY.setVaultAuth(
-                mETH_USDT_VAULT,
-                TEAM_MULTISIG,
-                true
-            );
+            VAULT_FACTORY.setVaultAuth(mETH_USDT_VAULT, TEAM_MULTISIG, true);
         }
 
         {
@@ -318,26 +320,25 @@ contract PayloadIGP68 is PayloadIGPConstants, PayloadIGPHelpers {
                 vaultType: TYPE.TYPE_1,
                 supplyToken: mETH_ADDRESS,
                 borrowToken: GHO_ADDRESS,
-                baseWithdrawalLimitInUSD: 50_000, // $50k
-                baseBorrowLimitInUSD: 40_000, // $40k
-                maxBorrowLimitInUSD: 50_000 // $50k
+                baseWithdrawalLimitInUSD: 20_000, // $20k
+                baseBorrowLimitInUSD: 10_000, // $10k
+                maxBorrowLimitInUSD: 15_000 // $15k
             });
 
             setVaultLimits(VAULT_mETH_GHO); // TYPE_1 => 83
 
-            VAULT_FACTORY.setVaultAuth(
-                mETH_GHO_VAULT,
-                TEAM_MULTISIG,
-                true
-            );
+            VAULT_FACTORY.setVaultAuth(mETH_GHO_VAULT, TEAM_MULTISIG, true);
         }
     }
 
     /// @notice Action 7: Update USDC, USDT, GHO and USDe market rates.
     function action7() internal {
-        FluidLiquidityAdminStructs.RateDataV2Params[] memory params_ = new FluidLiquidityAdminStructs.RateDataV2Params[](4);
+        FluidLiquidityAdminStructs.RateDataV2Params[]
+            memory params_ = new FluidLiquidityAdminStructs.RateDataV2Params[](
+                4
+            );
 
-       params_[0] = FluidLiquidityAdminStructs.RateDataV2Params({
+        params_[0] = FluidLiquidityAdminStructs.RateDataV2Params({
             token: USDC_ADDRESS, // USDC
             kink1: 85 * 1e2, // 85%
             kink2: 93 * 1e2, // 93%
@@ -345,7 +346,7 @@ contract PayloadIGP68 is PayloadIGPConstants, PayloadIGPHelpers {
             rateAtUtilizationKink1: 12 * 1e2, // 12%
             rateAtUtilizationKink2: 15 * 1e2, // 15%
             rateAtUtilizationMax: 40 * 1e2 // 40%
-       });
+        });
 
         params_[1] = FluidLiquidityAdminStructs.RateDataV2Params({
             token: USDT_ADDRESS, // USDT
@@ -355,7 +356,7 @@ contract PayloadIGP68 is PayloadIGPConstants, PayloadIGPHelpers {
             rateAtUtilizationKink1: 12 * 1e2, // 12%
             rateAtUtilizationKink2: 15 * 1e2, // 15%
             rateAtUtilizationMax: 40 * 1e2 // 40%
-       });
+        });
 
         params_[2] = FluidLiquidityAdminStructs.RateDataV2Params({
             token: GHO_ADDRESS, // GHO
@@ -365,7 +366,7 @@ contract PayloadIGP68 is PayloadIGPConstants, PayloadIGPHelpers {
             rateAtUtilizationKink1: 12 * 1e2, // 12%
             rateAtUtilizationKink2: 15 * 1e2, // 15%
             rateAtUtilizationMax: 40 * 1e2 // 40%
-       });
+        });
 
         params_[3] = FluidLiquidityAdminStructs.RateDataV2Params({
             token: USDe_ADDRESS, // USDe
@@ -375,9 +376,9 @@ contract PayloadIGP68 is PayloadIGPConstants, PayloadIGPHelpers {
             rateAtUtilizationKink1: 12 * 1e2, // 12%
             rateAtUtilizationKink2: 15 * 1e2, // 15%
             rateAtUtilizationMax: 40 * 1e2 // 40%
-       });
+        });
 
-       LIQUIDITY.updateRateDataV2s(params_);
+        LIQUIDITY.updateRateDataV2s(params_);
     }
 
     /**
