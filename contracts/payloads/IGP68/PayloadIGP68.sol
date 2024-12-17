@@ -66,10 +66,10 @@ contract PayloadIGP68 is PayloadIGPConstants, PayloadIGPHelpers {
     function execute() external {
         require(address(this) == address(TIMELOCK), "not-valid-caller");
 
-        // Action 1: Set launch allowance to rsETH-ETH and weETHs-ETH dex pools
+        // Action 1: Set launch allowance to weETHs-ETH dex pool
         action1();
 
-        // Action 2: Set launch allowance to rsETH-ETH<>wstETH, rsETH<>wstETH, weETHs-ETH<>wstETH vaults
+        // Action 2: Set launch allowance to weETHs-ETH<>wstETH vault
         action2();
 
         // Action 3: Increase ETH-USDC Dex Pool and Vaults Limits
@@ -95,25 +95,8 @@ contract PayloadIGP68 is PayloadIGPConstants, PayloadIGPHelpers {
      * |     Proposal Payload Actions      |
      * |__________________________________
      */
-    /// @notice Action 1: Set launch allowance to rsETH-ETH & weETHs-ETH dex pools
+    /// @notice Action 1: Set launch allowance to weETHs-ETH dex pool
     function action1() internal {
-        {
-            // rsETH-ETH
-            Dex memory DEX_rsETH_ETH = Dex({
-                dex: getDexAddress(13),
-                tokenA: rsETH_ADDRESS,
-                tokenB: ETH_ADDRESS,
-                smartCollateral: true,
-                smartDebt: false,
-                baseWithdrawalLimitInUSD: 20_000_000, // $20M
-                baseBorrowLimitInUSD: 0, // $0
-                maxBorrowLimitInUSD: 0 // $0
-            });
-            setDexLimits(DEX_rsETH_ETH); // Smart Collateral
-
-            DEX_FACTORY.setDexAuth(getDexAddress(13), TEAM_MULTISIG, false);
-        }
-
         {
             // weETHs-ETH
             Dex memory DEX_weETHs_ETH = Dex({
@@ -132,50 +115,8 @@ contract PayloadIGP68 is PayloadIGPConstants, PayloadIGPHelpers {
         }
     }
 
-    /// @notice Action 2: Set launch allowance to rsETH-ETH<>wstETH, rsETH<>wstETH, weETHs-ETH<>wstETH vaults
+    /// @notice Action 2: Set launch allowance to weETHs-ETH<>wstETH vault
     function action2() internal {
-        {
-            // [TYPE 2] rsETH-ETH<>wstETH | Smart collateral & debt
-            Vault memory VAULT_rsETH_ETH_AND_wstETH = Vault({
-                vault: getVaultAddress(78),
-                vaultType: TYPE.TYPE_2,
-                supplyToken: address(0),
-                borrowToken: wstETH_ADDRESS,
-                baseWithdrawalLimitInUSD: 0, // $0
-                baseBorrowLimitInUSD: 7_500_000, // $7.5M
-                maxBorrowLimitInUSD: 18_000_000 // $18M
-            });
-
-            setVaultLimits(VAULT_rsETH_ETH_AND_wstETH); // TYPE_2 => 78
-
-            VAULT_FACTORY.setVaultAuth(
-                getVaultAddress(78),
-                TEAM_MULTISIG,
-                false
-            );
-        }
-
-        {
-            // [TYPE 1] rsETH<>wstETH | collateral & debt
-            Vault memory VAULT_rsETH_AND_wstETH = Vault({
-                vault: getVaultAddress(79),
-                vaultType: TYPE.TYPE_1,
-                supplyToken: rsETH_ADDRESS,
-                borrowToken: wstETH_ADDRESS,
-                baseWithdrawalLimitInUSD: 7_500_000, // $7.5M
-                baseBorrowLimitInUSD: 7_500_000, // $7.5M
-                maxBorrowLimitInUSD: 18_000_000 // $18M
-            });
-
-            setVaultLimits(VAULT_rsETH_AND_wstETH); // TYPE_1 => 79
-
-            VAULT_FACTORY.setVaultAuth(
-                getVaultAddress(79),
-                TEAM_MULTISIG,
-                false
-            );
-        }
-
         {
             // [TYPE 2] weETHs-ETH<>wstETH | Smart collateral & debt
             Vault memory VAULT_weETHs_ETH_AND_wstETH = Vault({
@@ -201,6 +142,7 @@ contract PayloadIGP68 is PayloadIGPConstants, PayloadIGPHelpers {
     /// @notice Action 3: Increase ETH-USDC Dex Pool and Vaults Limits
     function action3() internal {
         address ETH_USDC_DEX_ADDRESS = getDexAddress(12);
+        address ETH_USDC_VAULT_ADDRESS = getVaultAddress(77);
 
         {
             // ETH-USDC Dex Limits
@@ -219,24 +161,38 @@ contract PayloadIGP68 is PayloadIGPConstants, PayloadIGPHelpers {
 
         {
             // Update Max Supply Shares
-            IFluidDex(ETH_USDC_DEX_ADDRESS).updateMaxSupplyShares(15_000_000); // 15M
+            IFluidDex(ETH_USDC_DEX_ADDRESS).updateMaxSupplyShares(15_000_000 * 1e18); // 15M
         }
 
         {
             // Update Max Borrow Shares
-            IFluidDex(ETH_USDC_DEX_ADDRESS).updateMaxBorrowShares(10_000_000); // 10M
+            IFluidDex(ETH_USDC_DEX_ADDRESS).updateMaxBorrowShares(10_000_000 * 1e18); // 10M
         }
 
-        // TODO: also need to increase ETH-USDC DEX vault limits? Around the same shares?
-        // Withdraw limits should be fine but borrow limits should be increased to 10M shares
+        {   // Update ETH-USDC vault borrow shares limit
+            IFluidAdminDex.UserBorrowConfig[]
+                memory config_ = new IFluidAdminDex.UserBorrowConfig[](1);
+            config_[0] = IFluidAdminDex.UserBorrowConfig({
+                user: ETH_USDC_VAULT_ADDRESS,
+                expandPercent: 20 * 1e2, // 20%
+                expandDuration: 12 hours, // 12 hours
+                baseDebtCeiling: 5_000_000 * 1e18, // 5M shares
+                maxDebtCeiling: 10_000_000 * 1e18 // 10M shares
+            });
+
+            IFluidDex(ETH_USDC_DEX_ADDRESS).updateUserBorrowConfigs(
+                config_
+            );
+        }
     }
 
     /// @notice Action 4: Increase USDC-USDT dex limits
     function action4() internal {
+        address USDC_USDT_DEX_ADDRESS = getDexAddress(2);
         {
             // USDC-USDT
             Dex memory DEX_USDC_USDT = Dex({
-                dex: getDexAddress(2),
+                dex: USDC_USDT_DEX_ADDRESS,
                 tokenA: USDC_ADDRESS,
                 tokenB: USDT_ADDRESS,
                 smartCollateral: false,
@@ -246,13 +202,13 @@ contract PayloadIGP68 is PayloadIGPConstants, PayloadIGPHelpers {
                 maxBorrowLimitInUSD: 25_000_000 // $25M
             });
             setDexLimits(DEX_USDC_USDT); // Smart Collateral and Smart Debt
-
-            // TODO: set max borrow shares limits?
-            // TODO: increase vaults limits?
-
-            // @samyak
-            // We will need to increase the max borrow shares to 25M but no need to do any changes on vaults side.
         }
+
+        {
+            // Update Max Borrow Shares
+            IFluidDex(USDC_USDT_DEX_ADDRESS).updateMaxBorrowShares(25_000_000 * 1e18); // 25M
+        }
+
     }
 
     /// @notice Action 5: Withdraw funds from Reserve
