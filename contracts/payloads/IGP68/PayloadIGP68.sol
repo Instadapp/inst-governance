@@ -75,17 +75,14 @@ contract PayloadIGP68 is PayloadIGPConstants, PayloadIGPHelpers {
         // Action 3: Increase ETH-USDC Dex Pool and Vaults Limits
         action3();
 
-        // Action 4: Increase USDC-USDT dex limits
+        // Action 4: Withdraw funds from Reserve
         action4();
 
-        // Action 5: Withdraw funds from Reserve
+        // Action 5: Set dust allowance to mETH<>USDC, mETH<>USDT, mETH<>GHO vaults
         action5();
 
-        // Action 6: Set dust allowance to mETH<>USDC, mETH<>USDT, mETH<>GHO vaults
+        // Action 6: Update USDC, USDT, GHO and USDe market rates.
         action6();
-
-        // Action 7: Update USDC, USDT, GHO and USDe market rates.
-        action7();
     }
 
     function verifyProposal() external view {}
@@ -186,33 +183,8 @@ contract PayloadIGP68 is PayloadIGPConstants, PayloadIGPHelpers {
         }
     }
 
-    /// @notice Action 4: Increase USDC-USDT dex limits
+    /// @notice Action 4: Withdraw funds from Reserve
     function action4() internal {
-        address USDC_USDT_DEX_ADDRESS = getDexAddress(2);
-        {
-            // USDC-USDT
-            Dex memory DEX_USDC_USDT = Dex({
-                dex: USDC_USDT_DEX_ADDRESS,
-                tokenA: USDC_ADDRESS,
-                tokenB: USDT_ADDRESS,
-                smartCollateral: false,
-                smartDebt: true,
-                baseWithdrawalLimitInUSD: 0, // $0M
-                baseBorrowLimitInUSD: 7_500_000, // $7.5M
-                maxBorrowLimitInUSD: 25_000_000 // $25M
-            });
-            setDexLimits(DEX_USDC_USDT); // Smart Collateral and Smart Debt
-        }
-
-        {
-            // Update Max Borrow Shares
-            IFluidDex(USDC_USDT_DEX_ADDRESS).updateMaxBorrowShares(25_000_000 * 1e18); // 25M
-        }
-
-    }
-
-    /// @notice Action 5: Withdraw funds from Reserve
-    function action5() internal {
         address[] memory tokens = new address[](2);
         uint256[] memory amounts = new uint256[](2);
 
@@ -227,8 +199,8 @@ contract PayloadIGP68 is PayloadIGPConstants, PayloadIGPHelpers {
         FLUID_RESERVE.withdrawFunds(tokens, amounts, TEAM_MULTISIG);
     }
 
-    /// @notice Action 6: Set dust allowance to mETH<>USDC, mETH<>USDT, mETH<>GHO vaults
-    function action6() internal {
+    /// @notice Action 5: Set dust allowance to mETH<>USDC, mETH<>USDT, mETH<>GHO vaults
+    function action5() internal {
         {
             address mETH_USDC_VAULT = getVaultAddress(81);
 
@@ -287,8 +259,8 @@ contract PayloadIGP68 is PayloadIGPConstants, PayloadIGPHelpers {
         }
     }
 
-    /// @notice Action 7: Update USDC, USDT, GHO and USDe market rates.
-    function action7() internal {
+    /// @notice Action 6: Update USDC, USDT, GHO and USDe market rates.
+    function action6() internal {
         FluidLiquidityAdminStructs.RateDataV2Params[]
             memory params_ = new FluidLiquidityAdminStructs.RateDataV2Params[](
                 4
