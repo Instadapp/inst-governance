@@ -26,8 +26,8 @@ import {IProxy} from "../common/interfaces/IProxy.sol";
 import {PayloadIGPConstants} from "../common/constants.sol";
 import {PayloadIGPHelpers} from "../common/helpers.sol";
 
-contract PayloadIGP68 is PayloadIGPConstants, PayloadIGPHelpers {
-    uint256 public constant PROPOSAL_ID = 68;
+contract PayloadIGP69 is PayloadIGPConstants, PayloadIGPHelpers {
+    uint256 public constant PROPOSAL_ID = 69;
 
     function propose(string memory description) external {
         require(
@@ -342,20 +342,20 @@ contract PayloadIGP68 is PayloadIGPConstants, PayloadIGPHelpers {
     }
 
     // Token Prices Constants
-    uint256 public constant ETH_USD_PRICE = 4_000 * 1e2;
-    uint256 public constant wstETH_USD_PRICE = 4_750 * 1e2;
-    uint256 public constant weETH_USD_PRICE = 4_250 * 1e2;
-    uint256 public constant rsETH_USD_PRICE = 4_150 * 1e2;
-    uint256 public constant weETHs_USD_PRICE = 4_050 * 1e2;
-    uint256 public constant mETH_USD_PRICE = 4_050 * 1e2;
+    uint256 public constant ETH_USD_PRICE = 3_750 * 1e2;
+    uint256 public constant wstETH_USD_PRICE = 4_450 * 1e2;
+    uint256 public constant weETH_USD_PRICE = 3_950 * 1e2;
+    uint256 public constant rsETH_USD_PRICE = 3_850 * 1e2;
+    uint256 public constant weETHs_USD_PRICE = 3_750 * 1e2;
+    uint256 public constant mETH_USD_PRICE = 3_850 * 1e2;
 
-    uint256 public constant BTC_USD_PRICE = 105_000 * 1e2;
+    uint256 public constant BTC_USD_PRICE = 102_000 * 1e2;
 
     uint256 public constant STABLE_USD_PRICE = 1 * 1e2;
     uint256 public constant sUSDe_USD_PRICE = 1 * 1e2;
     uint256 public constant sUSDs_USD_PRICE = 1 * 1e2;
 
-    uint256 public constant INST_USD_PRICE = 9 * 1e2;
+    uint256 public constant INST_USD_PRICE = 8 * 1e2;
 
     function getRawAmount(
         address token,
