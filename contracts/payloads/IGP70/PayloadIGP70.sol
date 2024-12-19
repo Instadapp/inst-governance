@@ -29,7 +29,7 @@ import {PayloadIGPHelpers} from "../common/helpers.sol";
 contract PayloadIGP70 is PayloadIGPConstants, PayloadIGPHelpers {
     uint256 public constant PROPOSAL_ID = 70;
 
-    // 
+    //
     uint256 public CBBTC_WBTC_NEW_CENTER_PRICE;
     bool public CBBTC_WBTC_SKIP_REBALANCE_TIME;
     bool public CBBTC_WBTC_SKIP_RANGE_CHANGE;
@@ -115,7 +115,8 @@ contract PayloadIGP70 is PayloadIGPConstants, PayloadIGPHelpers {
     function action1() internal {
         address cbBTC_wBTC_DEX_ADDRESS = getDexAddress(3);
 
-        uint256 newCenterPrice_ = PayloadIGP70(ADDRESS_THIS).CBBTC_WBTC_NEW_CENTER_PRICE();
+        uint256 newCenterPrice_ = PayloadIGP70(ADDRESS_THIS)
+            .CBBTC_WBTC_NEW_CENTER_PRICE();
 
         if (newCenterPrice_ == 420) return;
 
@@ -143,7 +144,7 @@ contract PayloadIGP70 is PayloadIGPConstants, PayloadIGPHelpers {
         IFluidDex(cbBTC_wBTC_DEX_ADDRESS).updateThresholdPercent(
             50 * 1e4,
             50 * 1e4,
-            9 days,
+            9 hours,
             1
         );
     }
