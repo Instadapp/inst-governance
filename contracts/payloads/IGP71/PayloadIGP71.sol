@@ -78,7 +78,7 @@ contract PayloadIGP71 is PayloadIGPConstants, PayloadIGPHelpers {
      * |__________________________________
      */
 
-    /// @notice Action 1: Increase Allowance and LTV of stETH redemption protocol
+    /// @notice Action 1: Increase Allowance of stETH redemption protocol
     function action1() internal {
         {
             uint256 exchangePriceAndConfig_ = LIQUIDITY.readFromStorage(
