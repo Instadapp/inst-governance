@@ -66,7 +66,7 @@ contract PayloadIGP71 is PayloadIGPConstants, PayloadIGPHelpers {
     function execute() external {
         require(address(this) == address(TIMELOCK), "not-valid-caller");
 
-        // Action 1: Increase Allowance and LTV of stETH redemption protocol
+        // Action 1: Increase Allowance of stETH redemption protocol
         action1();
     }
 
