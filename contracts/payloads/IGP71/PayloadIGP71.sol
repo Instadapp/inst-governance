@@ -82,11 +82,18 @@ contract PayloadIGP71 is PayloadIGPConstants, PayloadIGPHelpers {
     function action1() internal {
         {
             // Increase Allowance to 10k ETH
-            uint256 amount_ = getRawAmount(ETH_ADDRESS, 10_000, 0, false);
+            uint256 amount_ = getRawAmount(
+                ETH_ADDRESS,
+                10_000 * 1e18,
+                0,
+                false
+            );
 
             // Borrow Limits
             FluidLiquidityAdminStructs.UserBorrowConfig[]
-                memory configs_ = new FluidLiquidityAdminStructs.UserBorrowConfig[](1);
+                memory configs_ = new FluidLiquidityAdminStructs.UserBorrowConfig[](
+                    1
+                );
 
             configs_[0] = FluidLiquidityAdminStructs.UserBorrowConfig({
                 user: address(0x1F6B2bFDd5D1e6AdE7B17027ff5300419a56Ad6b),
