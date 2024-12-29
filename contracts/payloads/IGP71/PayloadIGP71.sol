@@ -93,7 +93,7 @@ contract PayloadIGP71 is PayloadIGPConstants, PayloadIGPHelpers {
                 uint256 borrowExchangePrice
             ) = LiquidityCalcs.calcExchangePrices(exchangePriceAndConfig_);
 
-            amount_ = (10_000 * 1e18 * 1e12) / borrowExchangePrice;
+            uint256 amount_ = (10_000 * 1e18 * 1e12) / borrowExchangePrice;
 
             // Borrow Limits
             FluidLiquidityAdminStructs.UserBorrowConfig[]
