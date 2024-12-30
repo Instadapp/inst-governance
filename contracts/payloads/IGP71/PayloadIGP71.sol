@@ -105,7 +105,7 @@ contract PayloadIGP71 is PayloadIGPConstants, PayloadIGPHelpers {
                 user: address(0x1F6B2bFDd5D1e6AdE7B17027ff5300419a56Ad6b),
                 token: ETH_ADDRESS,
                 mode: 1,
-                expandPercent: 1,
+                expandPercent: 0,
                 expandDuration: 1,
                 baseDebtCeiling: amount_,
                 maxDebtCeiling: (amount_ * 1001) / 1000
