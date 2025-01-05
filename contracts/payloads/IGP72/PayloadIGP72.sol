@@ -86,7 +86,7 @@ contract PayloadIGP71 is PayloadIGPConstants, PayloadIGPHelpers {
     function action1() internal {
         uint256 upperPercent_ = 0.0001 * 1e4; // 0.0001%
         uint256 lowerPercent_ = 0.05 * 1e4; // 0.05%
-        uint256 shiftTime_ = 1; // 1 second
+        uint256 shiftTime_ = 0; // 0 second
 
         {
             // wstETH<>ETH
@@ -205,7 +205,9 @@ contract PayloadIGP71 is PayloadIGPConstants, PayloadIGPHelpers {
     /// @notice Action 5: Add rebalancer to fGHO
     function action5() internal {
         // set rebalancer at fToken to reserve contract proxy
-        IFTokenAdmin(F_GHO_ADDRESS).updateRebalancer(0x264786EF916af64a1DB19F513F24a3681734ce92);
+        IFTokenAdmin(F_GHO_ADDRESS).updateRebalancer(
+            0x264786EF916af64a1DB19F513F24a3681734ce92
+        );
     }
 
     /**
