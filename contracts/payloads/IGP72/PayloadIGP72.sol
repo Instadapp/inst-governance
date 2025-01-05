@@ -85,7 +85,8 @@ contract PayloadIGP71 is PayloadIGPConstants, PayloadIGPHelpers {
         uint256 lowerPercent_ = 0.05 * 1e4; // 0.05%
         uint256 shiftTime_ = 1; // 1 second
 
-        { // wstETH<>ETH
+        {
+            // wstETH<>ETH
             IFluidDex(getDexAddress(1)).updateRangePercents(
                 upperPercent_,
                 lowerPercent_,
@@ -93,7 +94,8 @@ contract PayloadIGP71 is PayloadIGPConstants, PayloadIGPHelpers {
             );
         }
 
-        { // weETH<>ETH
+        {
+            // weETH<>ETH
             IFluidDex(getDexAddress(9)).updateRangePercents(
                 upperPercent_,
                 lowerPercent_,
@@ -101,7 +103,8 @@ contract PayloadIGP71 is PayloadIGPConstants, PayloadIGPHelpers {
             );
         }
 
-        { // rsETH<>ETH
+        {
+            // rsETH<>ETH
             IFluidDex(getDexAddress(13)).updateRangePercents(
                 upperPercent_,
                 lowerPercent_,
@@ -109,7 +112,8 @@ contract PayloadIGP71 is PayloadIGPConstants, PayloadIGPHelpers {
             );
         }
 
-        { // weETHs<>ETH
+        {
+            // weETHs<>ETH
             IFluidDex(getDexAddress(14)).updateRangePercents(
                 upperPercent_,
                 lowerPercent_,
@@ -120,11 +124,18 @@ contract PayloadIGP71 is PayloadIGPConstants, PayloadIGPHelpers {
 
     // @notice Action 2: Update wbBTC<>cbBTC dex configs
     function action2() internal {
-        { // Update threshold percent
-            IFluidDex(getDexAddress(15)).updateThresholdPercent(25 * 1e4, 25 * 1e4, 4 hours, 0);
+        {
+            // Update threshold percent
+            IFluidDex(getDexAddress(15)).updateThresholdPercent(
+                25 * 1e4,
+                25 * 1e4,
+                9 hours,
+                0
+            );
         }
 
-        { // Update max supply and borrow shares
+        {
+            // Update max supply and borrow shares
             IFluidDex(getDexAddress(15)).updateMaxSupplyShares(150 * 1e18);
             IFluidDex(getDexAddress(15)).updateMaxBorrowShares(120 * 1e18);
         }
@@ -141,9 +152,9 @@ contract PayloadIGP71 is PayloadIGPConstants, PayloadIGPHelpers {
                 vaultType: TYPE.TYPE_1,
                 supplyToken: rsETH_ADDRESS,
                 borrowToken: wstETH_ADDRESS,
-                baseWithdrawalLimitInUSD: 7_500_000, // $7.5M
-                baseBorrowLimitInUSD: 7_500_000, // $7.5M
-                maxBorrowLimitInUSD: 10_000_000 // $10M
+                baseWithdrawalLimitInUSD: 10_000_000, // $10M
+                baseBorrowLimitInUSD: 10_000_000, // $10M
+                maxBorrowLimitInUSD: 30_000_000 // $30M
             });
 
             setVaultLimits(VAULT_rsETH_wstETH); // TYPE_1 => 79
@@ -152,8 +163,9 @@ contract PayloadIGP71 is PayloadIGPConstants, PayloadIGPHelpers {
 
     /// @notice Action 4: Update wstETH market rate and borrow cap
     function action4() internal {
-        {   // Update wstETH rate
-             FluidLiquidityAdminStructs.RateDataV1Params[]
+        {
+            // Update wstETH rate
+            FluidLiquidityAdminStructs.RateDataV1Params[]
                 memory params_ = new FluidLiquidityAdminStructs.RateDataV1Params[](
                     1
                 );
@@ -169,14 +181,17 @@ contract PayloadIGP71 is PayloadIGPConstants, PayloadIGPHelpers {
             LIQUIDITY.updateRateDataV1s(params_);
         }
 
-        {   // Update max utilization of wstETH
+        {
+            // Update max utilization of wstETH
             FluidLiquidityAdminStructs.TokenConfig[]
-                memory params_ = new FluidLiquidityAdminStructs.TokenConfig[](1);
+                memory params_ = new FluidLiquidityAdminStructs.TokenConfig[](
+                    1
+                );
 
             params_[0] = FluidLiquidityAdminStructs.TokenConfig({
                 token: wstETH_ADDRESS, // wstETH
-                threshold: 0.3 * 1e2, // 0.3
-                fee: 0 * 1e2, // 0%
+                threshold: 0.3 * 1e2, // 0.3%
+                fee: 10 * 1e2, // 10%
                 maxUtilization: 75 * 1e2 // 75%
             });
 
