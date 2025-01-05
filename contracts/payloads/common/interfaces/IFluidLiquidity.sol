@@ -34,6 +34,7 @@ interface AdminModuleStructs {
         address token;
         uint256 fee;
         uint256 threshold;
+        uint256 maxUtilization;
     }
 
     struct UserSupplyConfig {
