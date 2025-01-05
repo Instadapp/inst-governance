@@ -77,6 +77,9 @@ contract PayloadIGP71 is PayloadIGPConstants, PayloadIGPHelpers {
 
         // Action 4: Update max utilization of wstETH
         action4();
+
+        // Action 5: Add rebalancer to fGHO
+        action5();
     }
 
     /// @notice Action 1: Update Range for ETH based Dexes
@@ -197,6 +200,12 @@ contract PayloadIGP71 is PayloadIGPConstants, PayloadIGPHelpers {
 
             LIQUIDITY.updateTokenConfigs(params_);
         }
+    }
+
+    /// @notice Action 5: Add rebalancer to fGHO
+    function action5() internal {
+        // set rebalancer at fToken to reserve contract proxy
+        IFTokenAdmin(F_GHO_ADDRESS).updateRebalancer(0x264786EF916af64a1DB19F513F24a3681734ce92);
     }
 
     /**
