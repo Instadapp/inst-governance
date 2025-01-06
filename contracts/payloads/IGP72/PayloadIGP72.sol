@@ -155,9 +155,9 @@ contract PayloadIGP72 is PayloadIGPConstants, PayloadIGPHelpers {
                 vaultType: TYPE.TYPE_1,
                 supplyToken: rsETH_ADDRESS,
                 borrowToken: wstETH_ADDRESS,
-                baseWithdrawalLimitInUSD: 10_000_000, // $10M
-                baseBorrowLimitInUSD: 10_000_000, // $10M
-                maxBorrowLimitInUSD: 30_000_000 // $30M
+                baseWithdrawalLimitInUSD: 15_000_000, // $15M
+                baseBorrowLimitInUSD: 15_000_000, // $15M
+                maxBorrowLimitInUSD: 50_000_000 // $50M
             });
 
             setVaultLimits(VAULT_rsETH_wstETH); // TYPE_1 => 79
