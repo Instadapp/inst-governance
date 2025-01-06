@@ -26,8 +26,8 @@ import {IProxy} from "../common/interfaces/IProxy.sol";
 import {PayloadIGPConstants} from "../common/constants.sol";
 import {PayloadIGPHelpers} from "../common/helpers.sol";
 
-contract PayloadIGP71 is PayloadIGPConstants, PayloadIGPHelpers {
-    uint256 public constant PROPOSAL_ID = 71;
+contract PayloadIGP72 is PayloadIGPConstants, PayloadIGPHelpers {
+    uint256 public constant PROPOSAL_ID = 72;
 
     function propose(string memory description) external {
         require(
@@ -69,13 +69,13 @@ contract PayloadIGP71 is PayloadIGPConstants, PayloadIGPHelpers {
         // Action 1: Update Range for ETH based Dexes
         action1();
 
-        // Action 2: Update max utilization of wstETH
+        // Action 2: Update wbBTC<>cbBTC dex configs
         action2();
 
-        // Action 3: Update max utilization of wstETH
+        // Action 3: Increase rsETH-wstETH vault limits
         action3();
 
-        // Action 4: Update max utilization of wstETH
+        // Action 4: Update wstETH market rate and borrow cap
         action4();
 
         // Action 5: Add rebalancer to fGHO
@@ -129,7 +129,7 @@ contract PayloadIGP71 is PayloadIGPConstants, PayloadIGPHelpers {
     function action2() internal {
         {
             // Update threshold percent
-            IFluidDex(getDexAddress(15)).updateThresholdPercent(
+            IFluidDex(getDexAddress(3)).updateThresholdPercent(
                 25 * 1e4,
                 25 * 1e4,
                 9 hours,
@@ -139,8 +139,8 @@ contract PayloadIGP71 is PayloadIGPConstants, PayloadIGPHelpers {
 
         {
             // Update max supply and borrow shares
-            IFluidDex(getDexAddress(15)).updateMaxSupplyShares(150 * 1e18);
-            IFluidDex(getDexAddress(15)).updateMaxBorrowShares(120 * 1e18);
+            IFluidDex(getDexAddress(3)).updateMaxSupplyShares(150 * 1e18);
+            IFluidDex(getDexAddress(3)).updateMaxBorrowShares(120 * 1e18);
         }
     }
 
@@ -149,7 +149,7 @@ contract PayloadIGP71 is PayloadIGPConstants, PayloadIGPHelpers {
         {
             address rsETH_wstETH_VAULT = getVaultAddress(79);
 
-            // [TYPE 1] mETH<>USDT | collateral & debt
+            // [TYPE 1] rsETH<>wstETH | collateral & debt
             Vault memory VAULT_rsETH_wstETH = Vault({
                 vault: rsETH_wstETH_VAULT,
                 vaultType: TYPE.TYPE_1,
@@ -332,13 +332,13 @@ contract PayloadIGP71 is PayloadIGPConstants, PayloadIGPHelpers {
     uint256 public constant weETHs_USD_PRICE = 3_750 * 1e2;
     uint256 public constant mETH_USD_PRICE = 3_850 * 1e2;
 
-    uint256 public constant BTC_USD_PRICE = 102_000 * 1e2;
+    uint256 public constant BTC_USD_PRICE = 99_000 * 1e2;
 
     uint256 public constant STABLE_USD_PRICE = 1 * 1e2;
     uint256 public constant sUSDe_USD_PRICE = 1 * 1e2;
     uint256 public constant sUSDs_USD_PRICE = 1 * 1e2;
 
-    uint256 public constant FLUID_USD_PRICE = 8 * 1e2;
+    uint256 public constant FLUID_USD_PRICE = 6 * 1e2;
 
     function getRawAmount(
         address token,
