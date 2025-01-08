@@ -197,7 +197,7 @@ contract PayloadIGP73 is PayloadIGPConstants, PayloadIGPHelpers {
                 token: wstETH_ADDRESS, // wstETH
                 threshold: 0.3 * 1e2, // 0.3%
                 fee: 10 * 1e2, // 10%
-                maxUtilization: 100 * 1e2 // 100%
+                maxUtilization: 95 * 1e2 // 100%
             });
 
             LIQUIDITY.updateTokenConfigs(params_);
