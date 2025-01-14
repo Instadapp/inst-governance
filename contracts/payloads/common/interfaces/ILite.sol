@@ -20,4 +20,6 @@ interface ILite {
     ) external;
 
     function updateAggrMaxVaultRatio(uint256 newAggrMaxVaultRatio_) external;
+
+    function addDSAAuth(address auth_) external;
 }
