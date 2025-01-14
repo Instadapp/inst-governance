@@ -75,7 +75,7 @@ contract PayloadIGP75 is PayloadIGPConstants, PayloadIGPHelpers {
 
     /// @notice Action 1: Set limits for fSUSDs
     function action1() internal {
-        IFTokenAdmin fSUSDs_ADDRESS = IFTokenAdmin(address(0)); // TODO: Add address
+        IFTokenAdmin fSUSDs_ADDRESS = IFTokenAdmin(address(0x2BBE31d63E6813E3AC858C04dae43FB2a72B0D11));
 
         SupplyProtocolConfig memory protocolConfigTokenB_ = SupplyProtocolConfig({
             protocol: address(fSUSDs_ADDRESS),
