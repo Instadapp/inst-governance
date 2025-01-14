@@ -94,7 +94,10 @@ contract PayloadIGP74 is PayloadIGPConstants, PayloadIGPHelpers {
             targets[1] = "BASIC-A";
             encodedSpells[1] = abi.encodeWithSignature(withdrawSignature, MORPHO_ADDRESS, type(uint256).max, TEAM_MULTISIG, 0, 0);
         }
+        // Add Governance Timelock as an authorized auth on iETH v2 DSA
+        IETHV2.addDSAAuth(address(this));
 
+        // Cast the spells
         IETH_V2_DSA.cast(targets, encodedSpells, address(this));
     }
 }
