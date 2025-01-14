@@ -114,6 +114,7 @@ contract PayloadIGPConstants {
     address internal constant F_USDC_ADDRESS = 0x9Fb7b4477576Fe5B32be4C1843aFB1e55F251B33;
     address internal constant F_WETH_ADDRESS = 0x90551c1795392094FE6D29B758EcCD233cFAa260;
     address internal constant F_GHO_ADDRESS = 0x6A29A46E21C730DcA1d8b23d637c101cec605C5B;
+    address internal constant F_SUSDs_ADDRESS = 0x2BBE31d63E6813E3AC858C04dae43FB2a72B0D11;
 
     // Constants
     uint256 internal constant X8 = 0xff;

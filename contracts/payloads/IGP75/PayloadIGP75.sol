@@ -75,7 +75,7 @@ contract PayloadIGP75 is PayloadIGPConstants, PayloadIGPHelpers {
 
     /// @notice Action 1: Set limits for fSUSDs
     function action1() internal {
-        IFTokenAdmin fSUSDs_ADDRESS = IFTokenAdmin(address(0x2BBE31d63E6813E3AC858C04dae43FB2a72B0D11));
+        IFTokenAdmin fSUSDs_ADDRESS = IFTokenAdmin(address(F_SUSDs_ADDRESS));
 
         SupplyProtocolConfig memory protocolConfigTokenB_ = SupplyProtocolConfig({
             protocol: address(fSUSDs_ADDRESS),
@@ -86,6 +86,11 @@ contract PayloadIGP75 is PayloadIGPConstants, PayloadIGPHelpers {
         });
 
         setSupplyProtocolLimits(protocolConfigTokenB_);
+
+        // set rebalancer at fToken to reserve contract proxy
+        IFTokenAdmin(F_SUSDs_ADDRESS).updateRebalancer(
+            0x264786EF916af64a1DB19F513F24a3681734ce92
+        );
     }
 
     // @notice Action 2: Set initial limits for sUSDs based vaults
