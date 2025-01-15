@@ -71,6 +71,9 @@ contract PayloadIGP76 is PayloadIGPConstants, PayloadIGPHelpers {
 
         // Action 2: Transfer 210k FLUID to Team Multisig
         action2();
+
+        // Action 3: Set allowances from reserve contract
+        action3();
     }
 
     /// @notice Action 1: Set limits for fSUSDs
@@ -90,6 +93,14 @@ contract PayloadIGP76 is PayloadIGPConstants, PayloadIGPHelpers {
             // set oracle for cbBTC-wBTC T4 Vault
             IFluidVault(cbBTC_wBTC_T4_VAULT).updateOracle(ORACLE_cbBTC_wBTC);
         }
+
+        {  // GHO-USDC T4 Vault - 61
+            address GHO_USDC_T4_VAULT = getVaultAddress(61);
+            uint256 ORACLE_GHO_USDC = 0;
+
+            // set oracle for GHO-USDC T4 Vault
+            IFluidVault(GHO_USDC_T4_VAULT).updateOracle(ORACLE_GHO_USDC);
+        }
     }
 
     // @notice Action 2: Transfer 210k FLUID to Team Multisig
@@ -107,5 +118,40 @@ contract PayloadIGP76 is PayloadIGPConstants, PayloadIGPHelpers {
         }
 
         IDSAV2(TREASURY).cast(targets, encodedSpells, address(this));
+    }
+
+    /// @notice Action 3: Set allowances from reserve contract
+    function action3() internal {
+        address[] memory protocols = new address[](2);
+        address[] memory tokens = new address[](2);
+        uint256[] memory amounts = new uint256[](2);
+
+        {
+            // wBTC<>USDC
+            address wBTC_USDC_VAULT = getVaultAddress(21);
+
+            uint256 allowance = IERC20(USDC_ADDRESS).allowance(
+                address(FLUID_RESERVE),
+                wBTC_USDC_VAULT
+            );
+
+            protocols[0] = wBTC_USDC_VAULT;
+            tokens[0] = USDC_ADDRESS;
+            amounts[0] = allowance + (33_100 * 1e6);
+        }
+
+        {
+            // fGHO
+            uint256 allowance = IERC20(GHO_ADDRESS).allowance(
+                address(FLUID_RESERVE),
+                F_GHO_ADDRESS
+            );
+
+            protocols[1] = F_GHO_ADDRESS;
+            tokens[1] = GHO_ADDRESS;
+            amounts[1] = allowance + (200_000 * 1e18);
+        }
+
+        FLUID_RESERVE.approve(protocols, tokens, amounts);
     }
 }
