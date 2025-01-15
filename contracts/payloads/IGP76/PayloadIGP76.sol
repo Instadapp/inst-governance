@@ -69,7 +69,7 @@ contract PayloadIGP76 is PayloadIGPConstants, PayloadIGPHelpers {
         // Action 1: Set oracles for T4 Vaults
         action1();
 
-        // Action 2: Transfer 210k FLUID to Team Multisig
+        // Action 2: Transfer 240k FLUID to Team Multisig
         action2();
 
         // Action 3: Set allowances from reserve contract
@@ -103,7 +103,7 @@ contract PayloadIGP76 is PayloadIGPConstants, PayloadIGPHelpers {
         }
     }
 
-    // @notice Action 2: Transfer 210k FLUID to Team Multisig
+    /// @notice Action 2: Transfer 240k FLUID to Team Multisig
     function action2() internal {
         string[] memory targets = new string[](1);
         bytes[] memory encodedSpells = new bytes[](1);
@@ -112,7 +112,7 @@ contract PayloadIGP76 is PayloadIGPConstants, PayloadIGPHelpers {
 
         // Spell 1: Transfer INST to Team Multisig
         {   
-            uint256 FLUID_AMOUNT = 210_000 * 1e18; // 210k FLUID
+            uint256 FLUID_AMOUNT = 240_000 * 1e18; // 240k FLUID
             targets[0] = "BASIC-A";
             encodedSpells[0] = abi.encodeWithSignature(withdrawSignature, FLUID_ADDRESS, FLUID_AMOUNT, TEAM_MULTISIG, 0, 0);
         }
