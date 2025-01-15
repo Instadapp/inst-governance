@@ -130,26 +130,16 @@ contract PayloadIGP76 is PayloadIGPConstants, PayloadIGPHelpers {
             // wBTC<>USDC
             address wBTC_USDC_VAULT = getVaultAddress(21);
 
-            uint256 allowance = IERC20(USDC_ADDRESS).allowance(
-                address(FLUID_RESERVE),
-                wBTC_USDC_VAULT
-            );
-
             protocols[0] = wBTC_USDC_VAULT;
             tokens[0] = USDC_ADDRESS;
-            amounts[0] = allowance + (33_100 * 1e6);
+            amounts[0] = (34_000 * 1e6);
         }
 
         {
             // fGHO
-            uint256 allowance = IERC20(GHO_ADDRESS).allowance(
-                address(FLUID_RESERVE),
-                F_GHO_ADDRESS
-            );
-
             protocols[1] = F_GHO_ADDRESS;
             tokens[1] = GHO_ADDRESS;
-            amounts[1] = allowance + (200_000 * 1e18);
+            amounts[1] = (240_000 * 1e18);
         }
 
         FLUID_RESERVE.approve(protocols, tokens, amounts);
