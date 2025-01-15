@@ -80,7 +80,7 @@ contract PayloadIGP76 is PayloadIGPConstants, PayloadIGPHelpers {
     function action1() internal {
         {  // wsETH-ETH T4 Vault - 44
             address wsETH_ETH_T4_VAULT = getVaultAddress(44);
-            uint256 ORACLE_wsETH_ETH = 0;
+            uint256 ORACLE_wsETH_ETH = 77; // https://etherscan.io/address/0xc0aaB32BD6258773b43c0dC8E2049C6a4960c488#code
 
             // set oracle for wsETH-ETH T4 Vault
             IFluidVault(wsETH_ETH_T4_VAULT).updateOracle(ORACLE_wsETH_ETH);
@@ -88,7 +88,7 @@ contract PayloadIGP76 is PayloadIGPConstants, PayloadIGPHelpers {
 
         { // cbBTC-wBTC T4 Vault - 51
             address cbBTC_wBTC_T4_VAULT = getVaultAddress(51);
-            uint256 ORACLE_cbBTC_wBTC = 0;
+            uint256 ORACLE_cbBTC_wBTC = 76; // https://etherscan.io/address/0x0fe9AAFf5B740061f6696f90cF489c0D6B6B4488#code
 
             // set oracle for cbBTC-wBTC T4 Vault
             IFluidVault(cbBTC_wBTC_T4_VAULT).updateOracle(ORACLE_cbBTC_wBTC);
@@ -96,7 +96,7 @@ contract PayloadIGP76 is PayloadIGPConstants, PayloadIGPHelpers {
 
         {  // GHO-USDC T4 Vault - 61
             address GHO_USDC_T4_VAULT = getVaultAddress(61);
-            uint256 ORACLE_GHO_USDC = 0;
+            uint256 ORACLE_GHO_USDC = 78; // https://etherscan.io/address/0xFE99a98E536c13f05E410F550bfE06fE55386e71#code
 
             // set oracle for GHO-USDC T4 Vault
             IFluidVault(GHO_USDC_T4_VAULT).updateOracle(ORACLE_GHO_USDC);
