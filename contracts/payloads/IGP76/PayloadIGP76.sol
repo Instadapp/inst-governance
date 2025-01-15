@@ -76,7 +76,7 @@ contract PayloadIGP76 is PayloadIGPConstants, PayloadIGPHelpers {
         action3();
     }
 
-    /// @notice Action 1: Set limits for fSUSDs
+    /// @notice Action 1: Set oracles for T4 vaults
     function action1() internal {
         {  // wsETH-ETH T4 Vault - 44
             address wsETH_ETH_T4_VAULT = getVaultAddress(44);
