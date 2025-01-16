@@ -270,18 +270,18 @@ contract PayloadIGP77 is PayloadIGPConstants, PayloadIGPHelpers {
     }
 
     // Token Prices Constants
-    uint256 public constant ETH_USD_PRICE = 3_230 * 1e2;
-    uint256 public constant wstETH_USD_PRICE = 3_550 * 1e2;
-    uint256 public constant weETH_USD_PRICE = 3_950 * 1e2;
+    uint256 public constant ETH_USD_PRICE = 3_330 * 1e2;
+    uint256 public constant wstETH_USD_PRICE = 3_950 * 1e2;
+    uint256 public constant weETH_USD_PRICE = 3_550 * 1e2;
     uint256 public constant rsETH_USD_PRICE = 3_850 * 1e2;
     uint256 public constant weETHs_USD_PRICE = 3_750 * 1e2;
     uint256 public constant mETH_USD_PRICE = 3_850 * 1e2;
 
-    uint256 public constant BTC_USD_PRICE = 95_000 * 1e2;
+    uint256 public constant BTC_USD_PRICE = 99_000 * 1e2;
 
     uint256 public constant STABLE_USD_PRICE = 1 * 1e2;
-    uint256 public constant sUSDe_USD_PRICE = 1 * 1e2;
-    uint256 public constant sUSDs_USD_PRICE = 1 * 1e2;
+    uint256 public constant sUSDe_USD_PRICE = 1.15 * 1e2;
+    uint256 public constant sUSDs_USD_PRICE = 1.02 * 1e2;
 
     uint256 public constant FLUID_USD_PRICE = 6 * 1e2;
 
