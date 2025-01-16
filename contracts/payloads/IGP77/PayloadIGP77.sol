@@ -87,9 +87,9 @@ contract PayloadIGP77 is PayloadIGPConstants, PayloadIGPHelpers {
                 vaultType: TYPE.TYPE_1,
                 supplyToken: tBTC_ADDRESS,
                 borrowToken: USDC_ADDRESS,
-                baseWithdrawalLimitInUSD: 50_000, // $50k
-                baseBorrowLimitInUSD: 40_000, // $40k
-                maxBorrowLimitInUSD: 50_000 // $50k
+                baseWithdrawalLimitInUSD: 10_000, // $10k
+                baseBorrowLimitInUSD: 8_000, // $8k
+                maxBorrowLimitInUSD: 10_000 // $10k
             });
 
             setVaultLimits(VAULT_tBTC_USDC); // TYPE_1 => 88
@@ -106,9 +106,9 @@ contract PayloadIGP77 is PayloadIGPConstants, PayloadIGPHelpers {
                 vaultType: TYPE.TYPE_1,
                 supplyToken: tBTC_ADDRESS,
                 borrowToken: USDT_ADDRESS,
-                baseWithdrawalLimitInUSD: 50_000, // $50k
-                baseBorrowLimitInUSD: 40_000, // $40k
-                maxBorrowLimitInUSD: 50_000 // $50k
+                baseWithdrawalLimitInUSD: 10_000, // $10k
+                baseBorrowLimitInUSD: 8_000, // $8k
+                maxBorrowLimitInUSD: 10_000 // $10k
             });
 
             setVaultLimits(VAULT_tBTC_USDT); // TYPE_1 => 89
@@ -125,9 +125,9 @@ contract PayloadIGP77 is PayloadIGPConstants, PayloadIGPHelpers {
                 vaultType: TYPE.TYPE_1,
                 supplyToken: tBTC_ADDRESS,
                 borrowToken: GHO_ADDRESS,
-                baseWithdrawalLimitInUSD: 50_000, // $50k
-                baseBorrowLimitInUSD: 40_000, // $40k
-                maxBorrowLimitInUSD: 50_000 // $50k
+                baseWithdrawalLimitInUSD: 10_000, // $10k
+                baseBorrowLimitInUSD: 8_000, // $8k
+                maxBorrowLimitInUSD: 10_000 // $10k
             });
 
             setVaultLimits(VAULT_tBTC_GHO); // TYPE_1 => 90
@@ -147,9 +147,9 @@ contract PayloadIGP77 is PayloadIGPConstants, PayloadIGPHelpers {
                 vaultType: TYPE.TYPE_1,
                 supplyToken: weETH_ADDRESS,
                 borrowToken: sUSDs_ADDRESS,
-                baseWithdrawalLimitInUSD: 50_000, // $50k
-                baseBorrowLimitInUSD: 40_000, // $40k
-                maxBorrowLimitInUSD: 50_000 // $50k
+                baseWithdrawalLimitInUSD: 10_000, // $10k
+                baseBorrowLimitInUSD: 8_000, // $8k
+                maxBorrowLimitInUSD: 10_000 // $10k
             });
 
             setVaultLimits(VAULT_weETH_sUSDs); // TYPE_1 => 91
@@ -160,7 +160,8 @@ contract PayloadIGP77 is PayloadIGPConstants, PayloadIGPHelpers {
 
     /// @notice action 3: Update vault deployment logics on vault factory
     function action3() internal {
-        {   // Vault T1
+        {
+            // Vault T1
             address OLD_DEPLOYMENT_LOGIC = 0x2Cc710218F2e3a82CcC77Cc4B3B93Ee6Ba9451CD;
             address NEW_DEPLOYMENT_LOGIC = 0xF4b87B0A2315534A8233724b87f2a8E3197ad649;
 
@@ -168,7 +169,8 @@ contract PayloadIGP77 is PayloadIGPConstants, PayloadIGPHelpers {
             VAULT_FACTORY.setVaultDeploymentLogic(NEW_DEPLOYMENT_LOGIC, true);
         }
 
-        {   // Vault T2
+        {
+            // Vault T2
             address OLD_DEPLOYMENT_LOGIC = 0xD4d748356D1C82A5565a15a1670D13FB505b018E;
             address NEW_DEPLOYMENT_LOGIC = 0xf92b954D3B2F6497B580D799Bf0907332AF1f63B;
 
@@ -176,7 +178,8 @@ contract PayloadIGP77 is PayloadIGPConstants, PayloadIGPHelpers {
             VAULT_FACTORY.setVaultDeploymentLogic(NEW_DEPLOYMENT_LOGIC, true);
         }
 
-        {   // Vault T3
+        {
+            // Vault T3
             address OLD_DEPLOYMENT_LOGIC = 0x84b2A41339ef51FFAc89Ffe69cAd53CD92b82A28;
             address NEW_DEPLOYMENT_LOGIC = 0xbc9c8528c66D1910CFb6Bde2a8f1C2F1D38026c7;
 
@@ -184,7 +187,8 @@ contract PayloadIGP77 is PayloadIGPConstants, PayloadIGPHelpers {
             VAULT_FACTORY.setVaultDeploymentLogic(NEW_DEPLOYMENT_LOGIC, true);
         }
 
-        {   // Vault T4
+        {
+            // Vault T4
             address OLD_DEPLOYMENT_LOGIC = 0x13472F00A43B59b644B301fEd48651c0C889bdB4;
             address NEW_DEPLOYMENT_LOGIC = 0xC292c87F3116CBbfb2186d4594Dc48d55fCa6e34;
 
