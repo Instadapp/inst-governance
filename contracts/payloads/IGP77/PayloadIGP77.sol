@@ -66,44 +66,18 @@ contract PayloadIGP77 is PayloadIGPConstants, PayloadIGPHelpers {
     function execute() external {
         require(address(this) == address(TIMELOCK), "not-valid-caller");
 
-        // Action 1: Set initial limits for sUSDe-USDT dex pool
+        // Action 1: Set vault limits for tBTC<>USDC, tBTC<>USDT, tBTC<>GHO
         action1();
 
-        // Action 2: Set vault limits for tBTC<>USDC, tBTC<>USDT, tBTC<>GHO
+        // Action 2: Set vault limits for weETH<>sUSDs
         action2();
 
-        // Action 3: Set vault limits for weETH<>sUSDs
+        // Action 3: Update vault deployment logics on vault factory
         action3();
-
-        // Action 4: Update vault deployment logics on vault factory
-        action4();
     }
 
-    /// @notice Action 1: Set limits for fSUSDs
+    // @notice Action 1: Set initial limits for tBTC<>USDC, tBTC<>USDT, tBTC<>GHO vaults
     function action1() internal {
-        { // sUSDe-USDT
-            address sUSDe_USDT_DEX = getDexAddress(15);
-            {
-                // sUSDe-USDT Dex
-                Dex memory DEX_sUSDe_USDT = Dex({
-                    dex: sUSDe_USDT_DEX,
-                    tokenA: sUSDe_ADDRESS,
-                    tokenB: USDT_ADDRESS,
-                    smartCollateral: true,
-                    smartDebt: false,
-                    baseWithdrawalLimitInUSD: 50_000, // $50k
-                    baseBorrowLimitInUSD: 0, // $0
-                    maxBorrowLimitInUSD: 0 // $0
-                });
-                setDexLimits(DEX_sUSDe_USDT); // Smart Collateral
-
-                DEX_FACTORY.setDexAuth(sUSDe_USDT_DEX, TEAM_MULTISIG, false);
-            }
-       }
-    }
-
-    // @notice Action 2: Set initial limits for tBTC<>USDC, tBTC<>USDT, tBTC<>GHO vaults
-    function action2() internal {
         {
             address tBTC_USDC_VAULT = getVaultAddress(88);
 
@@ -162,8 +136,8 @@ contract PayloadIGP77 is PayloadIGPConstants, PayloadIGPHelpers {
         }
     }
 
-    // @notice Action 3: Set initial limits for weETH<>sUSDs
-    function action3() internal {
+    // @notice Action 2: Set initial limits for weETH<>sUSDs
+    function action2() internal {
         {
             address weETH_sUSDs_VAULT = getVaultAddress(91);
 
@@ -184,8 +158,8 @@ contract PayloadIGP77 is PayloadIGPConstants, PayloadIGPHelpers {
         }
     }
 
-    /// @notice action 4: Update vault deployment logics on vault factory
-    function action4() internal {
+    /// @notice action 3: Update vault deployment logics on vault factory
+    function action3() internal {
         {   // Vault T1
             address OLD_DEPLOYMENT_LOGIC = 0x2Cc710218F2e3a82CcC77Cc4B3B93Ee6Ba9451CD;
             address NEW_DEPLOYMENT_LOGIC = 0xF4b87B0A2315534A8233724b87f2a8E3197ad649;
