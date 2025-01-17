@@ -105,6 +105,8 @@ contract PayloadIGPConstants {
         0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599;
     address internal constant cbBTC_ADDRESS =
         0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf;
+    address internal constant tBTC_ADDRESS =
+        0x18084fbA666a33d37592fA2633fD49a74DD93a88;
 
     address internal constant INST_ADDRESS = 
         0x6f40d4A6237C257fff2dB00FA0510DeEECd303eb;
