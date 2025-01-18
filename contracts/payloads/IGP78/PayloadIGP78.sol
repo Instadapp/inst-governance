@@ -97,7 +97,7 @@ contract PayloadIGP78 is PayloadIGPConstants, PayloadIGPHelpers {
     // @notice Action 1: Set initial limits for sUSDe-USDT dex and vault
     function action1() internal {
         address sUSDe_USDT_DEX = getDexAddress(15);
-        address sUSDe_USDT__USDT_VAULT = getVaultAddress(0); // TODO
+        address sUSDe_USDT__USDT_VAULT = getVaultAddress(92);
         {
             // sUSDe-USDT DEX
             {
@@ -130,7 +130,7 @@ contract PayloadIGP78 is PayloadIGPConstants, PayloadIGPHelpers {
                 maxBorrowLimitInUSD: 10_000 // $10k
             });
 
-            setVaultLimits(VAULT_sUSDe_USDT); // TYPE_2 => 0 // TODO
+            setVaultLimits(VAULT_sUSDe_USDT); // TYPE_2 => 92
 
             VAULT_FACTORY.setVaultAuth(
                 sUSDe_USDT__USDT_VAULT,
@@ -143,7 +143,7 @@ contract PayloadIGP78 is PayloadIGPConstants, PayloadIGPHelpers {
     // @notice Action 2: Set initial limits for USDe-USDT dex and vault
     function action2() internal {
         address USDe_USDT_DEX = getDexAddress(18);
-        address USDe_USDT__USDT_VAULT = getVaultAddress(0); // TODO
+        address USDe_USDT__USDT_VAULT = getVaultAddress(93);
 
         {
             // USDe-USDT DEX
@@ -177,7 +177,7 @@ contract PayloadIGP78 is PayloadIGPConstants, PayloadIGPHelpers {
                 maxBorrowLimitInUSD: 10_000 // $10k
             });
 
-            setVaultLimits(VAULT_USDe_USDT); // TYPE_2 => 0 // TODO
+            setVaultLimits(VAULT_USDe_USDT); // TYPE_2 => 93
 
             VAULT_FACTORY.setVaultAuth(
                 USDe_USDT__USDT_VAULT,
@@ -190,9 +190,9 @@ contract PayloadIGP78 is PayloadIGPConstants, PayloadIGPHelpers {
     // @notice Action 3: Set initial limits for eBTC-cbBTC dex and eBTC-cbBTC | WBTC T2 vault
     function action3() internal {
         address eBTC_cbBTC_DEX = getDexAddress(16);
-        address eBTC_cbBTC__WBTC_VAULT = getVaultAddress(0); // TODO
-        address eBTC__wBTC_VAULT = getVaultAddress(0); // TODO
-        address eBTC__cbBTC_VAULT = getVaultAddress(0); // TODO
+        address eBTC_cbBTC__WBTC_VAULT = getVaultAddress(96);
+        address eBTC__wBTC_VAULT = getVaultAddress(94);
+        address eBTC__cbBTC_VAULT = getVaultAddress(95);
 
         {
             // eBTC-cbBTC DEX
@@ -226,7 +226,7 @@ contract PayloadIGP78 is PayloadIGPConstants, PayloadIGPHelpers {
                 maxBorrowLimitInUSD: 10_000 // $10k
             });
 
-            setVaultLimits(VAULT_eBTC_cbBTC); // TYPE_2 => 0 // TODO
+            setVaultLimits(VAULT_eBTC_cbBTC); // TYPE_2 => 96
 
             VAULT_FACTORY.setVaultAuth(
                 eBTC_cbBTC__WBTC_VAULT,
@@ -247,7 +247,7 @@ contract PayloadIGP78 is PayloadIGPConstants, PayloadIGPHelpers {
                 maxBorrowLimitInUSD: 10_000 // $10k
             });
 
-            setVaultLimits(VAULT_eBTC_cbBTC); // TYPE_1 => 0 // TODO
+            setVaultLimits(VAULT_eBTC_cbBTC); // TYPE_1 => 95
 
             VAULT_FACTORY.setVaultAuth(
                 eBTC__cbBTC_VAULT,
@@ -268,7 +268,7 @@ contract PayloadIGP78 is PayloadIGPConstants, PayloadIGPHelpers {
                 maxBorrowLimitInUSD: 10_000 // $10k
             });
 
-            setVaultLimits(VAULT_eBTC_wBTC); // TYPE_1 => 0 // TODO
+            setVaultLimits(VAULT_eBTC_wBTC); // TYPE_1 => 94
 
             VAULT_FACTORY.setVaultAuth(
                 eBTC__wBTC_VAULT,
@@ -281,7 +281,7 @@ contract PayloadIGP78 is PayloadIGPConstants, PayloadIGPHelpers {
     // @notice Action 4: Set initial limits for lBTC-cbBTC dex and lBTC-cbBTC | WBTC T2 vault
     function action4() internal {
         address lBTC_cbBTC_DEX = getDexAddress(17);
-        address lBTC_cbBTC__WBTC_VAULT = getVaultAddress(0); // TODO
+        address lBTC_cbBTC__WBTC_VAULT = getVaultAddress(97);
 
         {
             // lBTC-cbBTC DEX
@@ -315,7 +315,7 @@ contract PayloadIGP78 is PayloadIGPConstants, PayloadIGPHelpers {
                 maxBorrowLimitInUSD: 10_000 // $10k
             });
 
-            setVaultLimits(VAULT_lBTC_cbBTC_wBTC); // TYPE_2 => 0 // TODO
+            setVaultLimits(VAULT_lBTC_cbBTC_wBTC); // TYPE_2 => 97
 
             VAULT_FACTORY.setVaultAuth(
                 lBTC_cbBTC__WBTC_VAULT,
