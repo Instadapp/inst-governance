@@ -66,11 +66,29 @@ contract PayloadIGP78 is PayloadIGPConstants, PayloadIGPHelpers {
     function execute() external {
         require(address(this) == address(TIMELOCK), "not-valid-caller");
 
-        // Action 1: Set vault limits for tBTC<>USDC, tBTC<>USDT, tBTC<>GHO
+        // Action 1: Set initial limits for sUSDe-USDT dex and vault
         action1();
 
-        // Action 2: Set vault limits for weETH<>sUSDs
+        // Action 2: Set initial limits for USDe-USDT dex and vault
         action2();
+
+        // Action 3: Set initial limits for eBTC-cbBTC dex and vault
+        action3();
+
+        // Action 4: Set initial limits for lBTC-cbBTC dex and vault
+        action4();
+
+        // Action 5: Update USDC-USDT Dex Config 
+        action5();
+
+        // Action 6: Update wstETH-ETH Dex Config 
+        action6();
+
+        // Action 7: Update vault deployment logics on vault factory
+        action7();
+
+        // Action 8: Remove sUSDe handlers
+        action8();
     }
 
     // @notice Action 1: Set initial limits for sUSDe-USDT dex and vault
