@@ -575,7 +575,7 @@ contract PayloadIGP78 is PayloadIGPConstants, PayloadIGPHelpers {
 
     /// @notice Action 11: Increase limits sUSDe<>USDC-USDT T3 Vault
     function action11() internal {
-        address USDC_USDT_DEX_ADDRESS = getDexAddress(1);
+        address USDC_USDT_DEX_ADDRESS = getDexAddress(2);
         address sUSDe_USDC_USDT_VAULT = getVaultAddress(50);
 
         {
