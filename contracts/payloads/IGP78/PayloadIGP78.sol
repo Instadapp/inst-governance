@@ -565,7 +565,7 @@ contract PayloadIGP78 is PayloadIGPConstants, PayloadIGPHelpers {
                 borrowToken: wstETH_ETH_DEX_ADDRESS,
                 expandPercent: 20 * 1e2, // 20%
                 expandDuration: 12 hours, // 12 hours
-                baseBorrowLimit: 1500 * 1e18, // 1500 shares
+                baseBorrowLimit: 3000 * 1e18, // 3000 shares
                 maxBorrowLimit: 7200 * 1e18 // 7200 shares
             });
 
@@ -584,7 +584,7 @@ contract PayloadIGP78 is PayloadIGPConstants, PayloadIGPHelpers {
                 borrowToken: USDC_USDT_DEX_ADDRESS,
                 expandPercent: 20 * 1e2, // 20%
                 expandDuration: 12 hours, // 12 hours
-                baseBorrowLimit: 4_000_000 * 1e18, // 4M shares
+                baseBorrowLimit: 5_000_000 * 1e18, // 5M shares
                 maxBorrowLimit: 20_000_000 * 1e18 // 20M shares
             });
 
