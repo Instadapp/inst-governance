@@ -117,6 +117,38 @@ contract PayloadIGPHelpers is PayloadIGPConstants {
         }
     }
 
+
+    struct BorrowProtocolConfigInShares {
+        address protocol;
+        address borrowToken;
+        uint256 expandPercent;
+        uint256 expandDuration;
+        uint256 baseBorrowLimit;
+        uint256 maxBorrowLimit;
+    }
+
+    function setBorrowProtocolLimitsInShares(
+        BorrowProtocolConfigInShares memory protocolConfig_
+    ) internal {
+        {
+            // Borrow Limits
+            FluidLiquidityAdminStructs.UserBorrowConfig[]
+                memory configs_ = new FluidLiquidityAdminStructs.UserBorrowConfig[](1);
+
+            configs_[0] = FluidLiquidityAdminStructs.UserBorrowConfig({
+                user: address(protocolConfig_.protocol),
+                token: protocolConfig_.borrowToken,
+                mode: 1,
+                expandPercent: protocolConfig_.expandPercent,
+                expandDuration: protocolConfig_.expandDuration,
+                baseDebtCeiling: protocolConfig_.baseBorrowLimit,
+                maxDebtCeiling: protocolConfig_.maxBorrowLimit
+            });
+
+            LIQUIDITY.updateUserBorrowConfigs(configs_);
+        }
+    }
+
     function getRawAmount(
         address token,
         uint256 amount,

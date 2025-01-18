@@ -66,16 +66,16 @@ contract PayloadIGP78 is PayloadIGPConstants, PayloadIGPHelpers {
     function execute() external {
         require(address(this) == address(TIMELOCK), "not-valid-caller");
 
-        // Action 1: Set initial limits for sUSDe-USDT dex and vault
+        // Action 1: Set initial limits for sUSDe-USDT dex and sUSDe-USDT<>USDT T2 vault
         action1();
 
-        // Action 2: Set initial limits for USDe-USDT dex and vault
+        // Action 2: Set initial limits for USDe-USDT dex and USDe-USDT<>USDT T2 vault
         action2();
 
-        // Action 3: Set initial limits for eBTC-cbBTC dex and eBTC-cbBTC | WBTC T2 vault
+        // Action 3: Set initial limits for eBTC-cbBTC dex and eBTC-cbBTC<>WBTC T2, eBTC<>cbBTC T1, eBTC<>wBTC T1 vaults
         action3();
 
-        // Action 4: Set initial limits for lBTC-cbBTC dex and lBTC-cbBTC | WBTC T2 vault
+        // Action 4: Set initial limits for lBTC-cbBTC dex and lBTC-cbBTC<>WBTC T2 vault
         action4();
 
         // Action 5: Update USDC-USDT Dex Config
@@ -92,9 +92,15 @@ contract PayloadIGP78 is PayloadIGPConstants, PayloadIGPHelpers {
 
         // Action 9: Update sUSDs market rate
         action9();
+
+        // Action 10: Increase limits wstETH-ETH T4 Vault
+        action10();
+
+        // Action 11: Increase limits sUSDe<>USDC-USDT T3 Vault
+        action11();
     }
 
-    // @notice Action 1: Set initial limits for sUSDe-USDT dex and sUSDe-USDT | USDT T2 vault
+    // @notice Action 1: Set initial limits for sUSDe-USDT dex and sUSDe-USDT<>USDT T2 vault
     function action1() internal {
         address sUSDe_USDT_DEX = getDexAddress(15);
         address sUSDe_USDT__USDT_VAULT = getVaultAddress(92);
@@ -140,7 +146,7 @@ contract PayloadIGP78 is PayloadIGPConstants, PayloadIGPHelpers {
         }
     }
 
-    // @notice Action 2: Set initial limits for USDe-USDT dex and vault
+    // @notice Action 2: Set initial limits for USDe-USDT dex and USDe-USDT<>USDT T2 vault
     function action2() internal {
         address USDe_USDT_DEX = getDexAddress(18);
         address USDe_USDT__USDT_VAULT = getVaultAddress(93);
@@ -187,7 +193,7 @@ contract PayloadIGP78 is PayloadIGPConstants, PayloadIGPHelpers {
         }
     }
 
-    // @notice Action 3: Set initial limits for eBTC-cbBTC dex and eBTC-cbBTC | WBTC T2 vault
+    // @notice Action 3: Set initial limits for eBTC-cbBTC dex and eBTC-cbBTC<>WBTC T2, eBTC<>cbBTC T1, eBTC<>wBTC T1 vaults
     function action3() internal {
         address eBTC_cbBTC_DEX = getDexAddress(16);
         address eBTC_cbBTC__WBTC_VAULT = getVaultAddress(96);
@@ -270,7 +276,7 @@ contract PayloadIGP78 is PayloadIGPConstants, PayloadIGPHelpers {
         }
     }
 
-    // @notice Action 4: Set initial limits for lBTC-cbBTC dex and lBTC-cbBTC | WBTC T2 vault
+    // @notice Action 4: Set initial limits for lBTC-cbBTC dex and lBTC-cbBTC<>WBTC T2 vault
     function action4() internal {
         address lBTC_cbBTC_DEX = getDexAddress(17);
         address lBTC_cbBTC__WBTC_VAULT = getVaultAddress(97);
@@ -545,6 +551,45 @@ contract PayloadIGP78 is PayloadIGPConstants, PayloadIGPHelpers {
         });
 
         LIQUIDITY.updateRateDataV1s(params_);
+    }
+
+
+    /// @notice Action 10: Increase limits wstETH-ETH T4 Vault
+    function action10() internal {
+        address wstETH_ETH_DEX_ADDRESS = getDexAddress(1);
+        address wstETH_ETH_VAULT = getVaultAddress(44);
+
+        {
+            BorrowProtocolConfigInShares memory config_ = BorrowProtocolConfigInShares({
+                protocol: wstETH_ETH_VAULT,
+                borrowToken: wstETH_ETH_DEX_ADDRESS,
+                expandPercent: 20 * 1e2, // 20%
+                expandDuration: 12 hours, // 12 hours
+                baseBorrowLimit: 1500 * 1e18, // 1500 shares
+                maxBorrowLimit: 7200 * 1e18 // 7200 shares
+            });
+
+            setBorrowProtocolLimitsInShares(config_);
+        }
+    }
+
+    /// @notice Action 11: Increase limits sUSDe<>USDC-USDT T3 Vault
+    function action11() internal {
+        address USDC_USDT_DEX_ADDRESS = getDexAddress(1);
+        address sUSDe_USDC_USDT_VAULT = getVaultAddress(50);
+
+        {
+            BorrowProtocolConfigInShares memory config_ = BorrowProtocolConfigInShares({
+                protocol: sUSDe_USDC_USDT_VAULT,
+                borrowToken: USDC_USDT_DEX_ADDRESS,
+                expandPercent: 20 * 1e2, // 20%
+                expandDuration: 12 hours, // 12 hours
+                baseBorrowLimit: 4_000_000 * 1e18, // 4M shares
+                maxBorrowLimit: 20_000_000 * 1e18 // 20M shares
+            });
+
+            setBorrowProtocolLimitsInShares(config_);
+        }
     }
 
     /**
