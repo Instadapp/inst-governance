@@ -78,10 +78,10 @@ contract PayloadIGP78 is PayloadIGPConstants, PayloadIGPHelpers {
         // Action 4: Set initial limits for lBTC-cbBTC dex and vault
         action4();
 
-        // Action 5: Update USDC-USDT Dex Config 
+        // Action 5: Update USDC-USDT Dex Config
         action5();
 
-        // Action 6: Update wstETH-ETH Dex Config 
+        // Action 6: Update wstETH-ETH Dex Config
         action6();
 
         // Action 7: Update vault deployment logics on vault factory
@@ -95,7 +95,8 @@ contract PayloadIGP78 is PayloadIGPConstants, PayloadIGPHelpers {
     function action1() internal {
         address sUSDe_USDT_DEX = getDexAddress(15);
         address sUSDe_USDT__USDT_VAULT = getVaultAddress(0); // TODO
-        { // sUSDe-USDT DEX
+        {
+            // sUSDe-USDT DEX
             {
                 // sUSDe-USDT Dex
                 Dex memory DEX_sUSDe_USDT = Dex({
@@ -112,7 +113,7 @@ contract PayloadIGP78 is PayloadIGPConstants, PayloadIGPHelpers {
 
                 DEX_FACTORY.setDexAuth(sUSDe_USDT_DEX, TEAM_MULTISIG, true);
             }
-       }
+        }
 
         {
             // [TYPE 2] sUSDe-USDT<>USDT | smart collateral & debt
@@ -121,14 +122,18 @@ contract PayloadIGP78 is PayloadIGPConstants, PayloadIGPHelpers {
                 vaultType: TYPE.TYPE_2,
                 supplyToken: address(0),
                 borrowToken: USDT_ADDRESS,
-                baseWithdrawalLimitInUSD: 0, 
+                baseWithdrawalLimitInUSD: 0,
                 baseBorrowLimitInUSD: 8_000, // $8k
                 maxBorrowLimitInUSD: 10_000 // $10k
             });
 
             setVaultLimits(VAULT_sUSDe_USDT); // TYPE_2 => 0 // TODO
 
-            VAULT_FACTORY.setVaultAuth(sUSDe_USDT__USDT_VAULT, TEAM_MULTISIG, true);
+            VAULT_FACTORY.setVaultAuth(
+                sUSDe_USDT__USDT_VAULT,
+                TEAM_MULTISIG,
+                true
+            );
         }
     }
 
@@ -137,7 +142,8 @@ contract PayloadIGP78 is PayloadIGPConstants, PayloadIGPHelpers {
         address USDe_USDT_DEX = getDexAddress(18);
         address USDe_USDT__USDT_VAULT = getVaultAddress(0); // TODO
 
-        { // USDe-USDT DEX
+        {
+            // USDe-USDT DEX
             {
                 // USDe-USDT Dex
                 Dex memory DEX_USDe_USDT = Dex({
@@ -154,7 +160,7 @@ contract PayloadIGP78 is PayloadIGPConstants, PayloadIGPHelpers {
 
                 DEX_FACTORY.setDexAuth(USDe_USDT_DEX, TEAM_MULTISIG, true);
             }
-       }
+        }
 
         {
             // [TYPE 2] sUSDe-USDT<>USDT | smart collateral & debt
@@ -163,23 +169,28 @@ contract PayloadIGP78 is PayloadIGPConstants, PayloadIGPHelpers {
                 vaultType: TYPE.TYPE_2,
                 supplyToken: address(0),
                 borrowToken: USDT_ADDRESS,
-                baseWithdrawalLimitInUSD: 0, 
+                baseWithdrawalLimitInUSD: 0,
                 baseBorrowLimitInUSD: 8_000, // $8k
                 maxBorrowLimitInUSD: 10_000 // $10k
             });
 
             setVaultLimits(VAULT_USDe_USDT); // TYPE_2 => 0 // TODO
 
-            VAULT_FACTORY.setVaultAuth(USDe_USDT__USDT_VAULT, TEAM_MULTISIG, true);
+            VAULT_FACTORY.setVaultAuth(
+                USDe_USDT__USDT_VAULT,
+                TEAM_MULTISIG,
+                true
+            );
         }
     }
 
-    // @notice Action 3: Set initial limits for eBTC-cbBTC dex and vault
+    // @notice Action 3: Set initial limits for eBTC-cbBTC dex and eBTC-cbBTC | WBTC T2 vault
     function action3() internal {
         address eBTC_cbBTC_DEX = getDexAddress(16);
-        address eBTC_cbBTC__cbBTC_VAULT = getVaultAddress(0); // TODO
+        address eBTC_cbBTC__WBTC_VAULT = getVaultAddress(0); // TODO
 
-        { // eBTC-cbBTC DEX
+        {
+            // eBTC-cbBTC DEX
             {
                 // eBTC-cbBTC Dex
                 Dex memory DEX_eBTC_cbBTC = Dex({
@@ -196,32 +207,37 @@ contract PayloadIGP78 is PayloadIGPConstants, PayloadIGPHelpers {
 
                 DEX_FACTORY.setDexAuth(eBTC_cbBTC_DEX, TEAM_MULTISIG, true);
             }
-       }
+        }
 
         {
-            // [TYPE 2] eBTC-cbBTC<>cbBTC | smart collateral & debt
+            // [TYPE 2] eBTC-cbBTC<>WBTC | smart collateral & debt
             Vault memory VAULT_eBTC_cbBTC = Vault({
-                vault: eBTC_cbBTC__cbBTC_VAULT,
+                vault: eBTC_cbBTC__WBTC_VAULT,
                 vaultType: TYPE.TYPE_2,
                 supplyToken: address(0),
-                borrowToken: cbBTC_ADDRESS,
-                baseWithdrawalLimitInUSD: 0, 
+                borrowToken: WBTC_ADDRESS,
+                baseWithdrawalLimitInUSD: 0,
                 baseBorrowLimitInUSD: 8_000, // $8k
                 maxBorrowLimitInUSD: 10_000 // $10k
             });
 
             setVaultLimits(VAULT_eBTC_cbBTC); // TYPE_2 => 0 // TODO
 
-            VAULT_FACTORY.setVaultAuth(eBTC_cbBTC__cbBTC_VAULT, TEAM_MULTISIG, true);
+            VAULT_FACTORY.setVaultAuth(
+                eBTC_cbBTC__WBTC_VAULT,
+                TEAM_MULTISIG,
+                true
+            );
         }
     }
 
-    // @notice Action 4: Set initial limits for lBTC-cbBTC dex and vault
+    // @notice Action 4: Set initial limits for lBTC-cbBTC dex and lBTC-cbBTC | WBTC T2 vault
     function action4() internal {
         address lBTC_cbBTC_DEX = getDexAddress(17);
-        address lBTC_cbBTC__cbBTC_VAULT = getVaultAddress(0); // TODO
+        address lBTC_cbBTC__WBTC_VAULT = getVaultAddress(0); // TODO
 
-        { // lBTC-cbBTC DEX
+        {
+            // lBTC-cbBTC DEX
             {
                 // lBTC-cbBTC Dex
                 Dex memory DEX_lBTC_cbBTC = Dex({
@@ -238,32 +254,36 @@ contract PayloadIGP78 is PayloadIGPConstants, PayloadIGPHelpers {
 
                 DEX_FACTORY.setDexAuth(lBTC_cbBTC_DEX, TEAM_MULTISIG, true);
             }
-       }
+        }
 
         {
-            // [TYPE 2] lBTC-cbBTC<>cbBTC | smart collateral & debt
+            // [TYPE 2] lBTC-cbBTC<>WBTC | smart collateral & debt
             Vault memory VAULT_lBTC_cbBTC = Vault({
-                vault: lBTC_cbBTC__cbBTC_VAULT,
+                vault: lBTC_cbBTC__WBTC_VAULT,
                 vaultType: TYPE.TYPE_2,
                 supplyToken: address(0),
-                borrowToken: cbBTC_ADDRESS,
-                baseWithdrawalLimitInUSD: 0, 
+                borrowToken: WBTC_ADDRESS,
+                baseWithdrawalLimitInUSD: 0,
                 baseBorrowLimitInUSD: 8_000, // $8k
                 maxBorrowLimitInUSD: 10_000 // $10k
             });
 
             setVaultLimits(VAULT_lBTC_cbBTC); // TYPE_2 => 0 // TODO
 
-            VAULT_FACTORY.setVaultAuth(lBTC_cbBTC__cbBTC_VAULT, TEAM_MULTISIG, true);
+            VAULT_FACTORY.setVaultAuth(
+                lBTC_cbBTC__WBTC_VAULT,
+                TEAM_MULTISIG,
+                true
+            );
         }
     }
 
-    // @notice Action 5: Update USDC-USDT Dex Config 
+    // @notice Action 5: Update USDC-USDT Dex Config
     function action5() internal {
         address USDC_USDT_DEX_ADDRESS = getDexAddress(2);
 
-
-        {   // double the limits
+        {
+            // double the limits
             Dex memory DEX_USDC_USDT = Dex({
                 dex: USDC_USDT_DEX_ADDRESS,
                 tokenA: USDC_ADDRESS,
@@ -277,17 +297,22 @@ contract PayloadIGP78 is PayloadIGPConstants, PayloadIGPHelpers {
             setDexLimits(DEX_USDC_USDT); // Smart Debt
         }
 
-        { // Update Range
-            IFluidDex(USDC_USDT_DEX_ADDRESS).updateRangePercents(0.1 * 1e4, 0.1 * 1e4, 2 days);
+        {
+            // Update Range
+            IFluidDex(USDC_USDT_DEX_ADDRESS).updateRangePercents(
+                0.1 * 1e4,
+                0.1 * 1e4,
+                2 days
+            );
         }
     }
 
-    // @notice Action 6: Update wstETH-ETH Dex Config 
+    // @notice Action 6: Update wstETH-ETH Dex Config
     function action6() internal {
         address wstETH_ETH_DEX_ADDRESS = getDexAddress(1);
 
-
-        {   // double the limits
+        {
+            // double the limits
             Dex memory DEX_wstETH_ETH = Dex({
                 dex: wstETH_ETH_DEX_ADDRESS,
                 tokenA: wstETH_ADDRESS,
@@ -301,8 +326,13 @@ contract PayloadIGP78 is PayloadIGPConstants, PayloadIGPHelpers {
             setDexLimits(DEX_wstETH_ETH); // Smart Debt
         }
 
-        { // Update Range
-            IFluidDex(wstETH_ETH_DEX_ADDRESS).updateRangePercents(0.0001 * 1e4, 0.6 * 1e4, 1);
+        {
+            // Update Range
+            IFluidDex(wstETH_ETH_DEX_ADDRESS).updateRangePercents(
+                0.0001 * 1e4,
+                0.06 * 1e4,
+                1
+            );
         }
     }
 
@@ -347,35 +377,70 @@ contract PayloadIGP78 is PayloadIGPConstants, PayloadIGPHelpers {
 
     // @notice Action 8: Remove sUSDe handlers
     function action8() internal {
-        { // USDC based vault
+        {
+            // USDC based vault
             address USDC_VAULT_HANDLER = 0xf4f24CDD9A9929Ce262735253BADB03F959D208f;
             address sUSDe_VAULT_ADDRESS = getVaultAddress(27); // sUSDe<>USDC
             address OLD_sUSDe_VAULT_ADDRESS = getVaultAddress(7); // Old sUSDe<>USDC
             address USDe_VAULT_ADDRESS = getVaultAddress(66); // USDe<>USDC
 
-            VAULT_FACTORY.setVaultAuth(sUSDe_VAULT_ADDRESS, USDC_VAULT_HANDLER, false);
-            VAULT_FACTORY.setVaultAuth(OLD_sUSDe_VAULT_ADDRESS, USDC_VAULT_HANDLER, false);
-            VAULT_FACTORY.setVaultAuth(USDe_VAULT_ADDRESS, USDC_VAULT_HANDLER, false);
+            VAULT_FACTORY.setVaultAuth(
+                sUSDe_VAULT_ADDRESS,
+                USDC_VAULT_HANDLER,
+                false
+            );
+            VAULT_FACTORY.setVaultAuth(
+                OLD_sUSDe_VAULT_ADDRESS,
+                USDC_VAULT_HANDLER,
+                false
+            );
+            VAULT_FACTORY.setVaultAuth(
+                USDe_VAULT_ADDRESS,
+                USDC_VAULT_HANDLER,
+                false
+            );
         }
 
-        { // USDT based vault
+        {
+            // USDT based vault
             address USDT_VAULT_HANDLER = 0xca91be2077Aad98A8B7ce82a665024c2Fd7e74Be;
             address sUSDe_VAULT_ADDRESS = getVaultAddress(28); // sUSDe<>USDT
             address OLD_sUSDe_VAULT_ADDRESS = getVaultAddress(8); // Old sUSDe<>USDT
             address USDe_VAULT_ADDRESS = getVaultAddress(67); // USDe<>USDT
 
-            VAULT_FACTORY.setVaultAuth(sUSDe_VAULT_ADDRESS, USDT_VAULT_HANDLER, false);
-            VAULT_FACTORY.setVaultAuth(OLD_sUSDe_VAULT_ADDRESS, USDT_VAULT_HANDLER, false);
-            VAULT_FACTORY.setVaultAuth(USDe_VAULT_ADDRESS, USDT_VAULT_HANDLER, false);
+            VAULT_FACTORY.setVaultAuth(
+                sUSDe_VAULT_ADDRESS,
+                USDT_VAULT_HANDLER,
+                false
+            );
+            VAULT_FACTORY.setVaultAuth(
+                OLD_sUSDe_VAULT_ADDRESS,
+                USDT_VAULT_HANDLER,
+                false
+            );
+            VAULT_FACTORY.setVaultAuth(
+                USDe_VAULT_ADDRESS,
+                USDT_VAULT_HANDLER,
+                false
+            );
         }
 
-        { // GHO based vault
+        {
+            // GHO based vault
             address GHO_VAULT_HANDLER = 0x4acF39b8A63C744ce37594234eBebF5F99DfC710;
             address sUSDe_VAULT_ADDRESS = getVaultAddress(56); // sUSDe<>GHO
             address USDe_VAULT_ADDRESS = getVaultAddress(68); // USDe<>GHO
 
-            VAULT_FACTORY.setVaultAuth(sUSDe_VAULT_ADDRESS, GHO_VAULT_HANDLER, false);
-            VAULT_FACTORY.setVaultAuth(USDe_VAULT_ADDRESS, GHO_VAULT_HANDLER, false);
+            VAULT_FACTORY.setVaultAuth(
+                sUSDe_VAULT_ADDRESS,
+                GHO_VAULT_HANDLER,
+                false
+            );
+            VAULT_FACTORY.setVaultAuth(
+                USDe_VAULT_ADDRESS,
+                GHO_VAULT_HANDLER,
+                false
+            );
         }
     }
 
@@ -550,7 +615,12 @@ contract PayloadIGP78 is PayloadIGPConstants, PayloadIGPHelpers {
         } else if (token == mETH_ADDRESS) {
             usdPrice = mETH_USD_PRICE;
             decimals = 18;
-        } else if (token == cbBTC_ADDRESS || token == WBTC_ADDRESS || token == eBTC_ADDRESS || token == lBTC_ADDRESS) {
+        } else if (
+            token == cbBTC_ADDRESS ||
+            token == WBTC_ADDRESS ||
+            token == eBTC_ADDRESS ||
+            token == lBTC_ADDRESS
+        ) {
             usdPrice = BTC_USD_PRICE;
             decimals = 8;
         } else if (token == tBTC_ADDRESS) {
