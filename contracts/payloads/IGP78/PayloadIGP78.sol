@@ -337,7 +337,7 @@ contract PayloadIGP78 is PayloadIGPConstants, PayloadIGPHelpers {
                 smartDebt: true,
                 baseWithdrawalLimitInUSD: 0, // $0
                 baseBorrowLimitInUSD: 10_000_000, // $10M
-                maxBorrowLimitInUSD: 42_000_000 // $42M
+                maxBorrowLimitInUSD: 50_000_000 // $50M
             });
             setDexLimits(DEX_USDC_USDT); // Smart Debt
         }
@@ -552,7 +552,6 @@ contract PayloadIGP78 is PayloadIGPConstants, PayloadIGPHelpers {
 
         LIQUIDITY.updateRateDataV1s(params_);
     }
-
 
     /// @notice Action 10: Increase limits wstETH-ETH T4 Vault
     function action10() internal {
