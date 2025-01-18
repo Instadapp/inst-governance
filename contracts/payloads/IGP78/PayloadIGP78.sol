@@ -560,16 +560,16 @@ contract PayloadIGP78 is PayloadIGPConstants, PayloadIGPHelpers {
         address wstETH_ETH_VAULT = getVaultAddress(44);
 
         {
-            BorrowProtocolConfigInShares memory config_ = BorrowProtocolConfigInShares({
+            DexBorrowProtocolConfigInShares memory config_ = DexBorrowProtocolConfigInShares({
+                dex: wstETH_ETH_DEX_ADDRESS,
                 protocol: wstETH_ETH_VAULT,
-                borrowToken: wstETH_ETH_DEX_ADDRESS,
                 expandPercent: 20 * 1e2, // 20%
                 expandDuration: 12 hours, // 12 hours
                 baseBorrowLimit: 3000 * 1e18, // 3000 shares
                 maxBorrowLimit: 7200 * 1e18 // 7200 shares
             });
 
-            setBorrowProtocolLimitsInShares(config_);
+            setDexBorrowProtocolLimitsInShares(config_);
         }
     }
 
@@ -579,16 +579,16 @@ contract PayloadIGP78 is PayloadIGPConstants, PayloadIGPHelpers {
         address sUSDe_USDC_USDT_VAULT = getVaultAddress(50);
 
         {
-            BorrowProtocolConfigInShares memory config_ = BorrowProtocolConfigInShares({
+            DexBorrowProtocolConfigInShares memory config_ = DexBorrowProtocolConfigInShares({
+                dex: USDC_USDT_DEX_ADDRESS,
                 protocol: sUSDe_USDC_USDT_VAULT,
-                borrowToken: USDC_USDT_DEX_ADDRESS,
                 expandPercent: 20 * 1e2, // 20%
                 expandDuration: 12 hours, // 12 hours
                 baseBorrowLimit: 5_000_000 * 1e18, // 5M shares
                 maxBorrowLimit: 20_000_000 * 1e18 // 20M shares
             });
 
-            setBorrowProtocolLimitsInShares(config_);
+            setDexBorrowProtocolLimitsInShares(config_);
         }
     }
 

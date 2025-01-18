@@ -14,7 +14,7 @@ import { IFluidReserveContract } from "./interfaces/IFluidReserveContract.sol";
 import { IFluidVaultFactory } from "./interfaces/IFluidVaultFactory.sol";
 import { IFluidDexFactory } from "./interfaces/IFluidDexFactory.sol";
 
-import { IFluidDex } from "./interfaces/IFluidDex.sol";
+import { IFluidDex, IFluidAdminDex } from "./interfaces/IFluidDex.sol";
 import { IFluidDexResolver } from "./interfaces/IFluidDex.sol";
 
 import { IFluidVault } from "./interfaces/IFluidVault.sol";
@@ -118,35 +118,31 @@ contract PayloadIGPHelpers is PayloadIGPConstants {
     }
 
 
-    struct BorrowProtocolConfigInShares {
+    struct DexBorrowProtocolConfigInShares {
+        address dex;
         address protocol;
-        address borrowToken;
         uint256 expandPercent;
         uint256 expandDuration;
         uint256 baseBorrowLimit;
         uint256 maxBorrowLimit;
     }
 
-    function setBorrowProtocolLimitsInShares(
-        BorrowProtocolConfigInShares memory protocolConfig_
+    function setDexBorrowProtocolLimitsInShares(
+        DexBorrowProtocolConfigInShares memory protocolConfig_
     ) internal {
-        {
-            // Borrow Limits
-            FluidLiquidityAdminStructs.UserBorrowConfig[]
-                memory configs_ = new FluidLiquidityAdminStructs.UserBorrowConfig[](1);
+        IFluidAdminDex.UserBorrowConfig[]
+            memory config_ = new IFluidAdminDex.UserBorrowConfig[](1);
+        config_[0] = IFluidAdminDex.UserBorrowConfig({
+            user: protocolConfig_.protocol,
+            expandPercent: protocolConfig_.expandPercent,
+            expandDuration: protocolConfig_.expandDuration,
+            baseDebtCeiling: protocolConfig_.baseBorrowLimit,
+            maxDebtCeiling: protocolConfig_.maxBorrowLimit
+        });
 
-            configs_[0] = FluidLiquidityAdminStructs.UserBorrowConfig({
-                user: address(protocolConfig_.protocol),
-                token: protocolConfig_.borrowToken,
-                mode: 1,
-                expandPercent: protocolConfig_.expandPercent,
-                expandDuration: protocolConfig_.expandDuration,
-                baseDebtCeiling: protocolConfig_.baseBorrowLimit,
-                maxDebtCeiling: protocolConfig_.maxBorrowLimit
-            });
-
-            LIQUIDITY.updateUserBorrowConfigs(configs_);
-        }
+        IFluidDex(protocolConfig_.dex).updateUserBorrowConfigs(
+            config_
+        );
     }
 
     function getRawAmount(
