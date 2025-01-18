@@ -72,10 +72,10 @@ contract PayloadIGP78 is PayloadIGPConstants, PayloadIGPHelpers {
         // Action 2: Set initial limits for USDe-USDT dex and vault
         action2();
 
-        // Action 3: Set initial limits for eBTC-cbBTC dex and vault
+        // Action 3: Set initial limits for eBTC-cbBTC dex and eBTC-cbBTC | WBTC T2 vault
         action3();
 
-        // Action 4: Set initial limits for lBTC-cbBTC dex and vault
+        // Action 4: Set initial limits for lBTC-cbBTC dex and lBTC-cbBTC | WBTC T2 vault
         action4();
 
         // Action 5: Update USDC-USDT Dex Config
@@ -89,6 +89,9 @@ contract PayloadIGP78 is PayloadIGPConstants, PayloadIGPHelpers {
 
         // Action 8: Remove sUSDe handlers
         action8();
+
+        // Action 9: Update sUSDs market rate
+        action9();
     }
 
     // @notice Action 1: Set initial limits for sUSDe-USDT dex and vault
@@ -188,6 +191,8 @@ contract PayloadIGP78 is PayloadIGPConstants, PayloadIGPHelpers {
     function action3() internal {
         address eBTC_cbBTC_DEX = getDexAddress(16);
         address eBTC_cbBTC__WBTC_VAULT = getVaultAddress(0); // TODO
+        address eBTC__WBTC_VAULT = getVaultAddress(0); // TODO
+        address eBTC__cbBTC_VAULT = getVaultAddress(0); // TODO
 
         {
             // eBTC-cbBTC DEX
@@ -225,6 +230,27 @@ contract PayloadIGP78 is PayloadIGPConstants, PayloadIGPHelpers {
 
             VAULT_FACTORY.setVaultAuth(
                 eBTC_cbBTC__WBTC_VAULT,
+                TEAM_MULTISIG,
+                true
+            );
+        }
+
+        {
+            // [TYPE 1] eBTC<>cbBTC| collateral & debt
+            Vault memory VAULT_eBTC_cbBTC = Vault({
+                vault: eBTC__cbBTC_VAULT,
+                vaultType: TYPE.TYPE_1,
+                supplyToken: eBTC_ADDRESS,
+                borrowToken: cbBTC_ADDRESS,
+                baseWithdrawalLimitInUSD: 10_000, // $10k
+                baseBorrowLimitInUSD: 8_000, // $8k
+                maxBorrowLimitInUSD: 10_000 // $10k
+            });
+
+            setVaultLimits(VAULT_eBTC_cbBTC); // TYPE_1 => 0 // TODO
+
+            VAULT_FACTORY.setVaultAuth(
+                eBTC__cbBTC_VAULT,
                 TEAM_MULTISIG,
                 true
             );
@@ -464,6 +490,24 @@ contract PayloadIGP78 is PayloadIGPConstants, PayloadIGPHelpers {
             );
             IFluidVaultT1(USDe_VAULT_ADDRESS).updateBorrowRateMagnifier(100 * 1e2);
         }
+    }
+
+    /// @notice Action 9: Update sUSDs market rate
+    function action9() internal {
+        FluidLiquidityAdminStructs.RateDataV1Params[]
+            memory params_ = new FluidLiquidityAdminStructs.RateDataV1Params[](
+                1
+            );
+
+        params_[0] = FluidLiquidityAdminStructs.RateDataV1Params({
+            token: sUSDs_ADDRESS, // sUSDs
+            kink: 90 * 1e2, // 90%
+            rateAtUtilizationZero: 0, // 0%
+            rateAtUtilizationKink: 0 * 1e2, // 0%
+            rateAtUtilizationMax: 10 * 1e2 // 10%
+        });
+
+        LIQUIDITY.updateRateDataV1s(params_);
     }
 
     /**
