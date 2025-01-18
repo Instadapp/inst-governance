@@ -331,7 +331,7 @@ contract PayloadIGP78 is PayloadIGPConstants, PayloadIGPHelpers {
             IFluidDex(wstETH_ETH_DEX_ADDRESS).updateRangePercents(
                 0.0001 * 1e4,
                 0.06 * 1e4,
-                1
+                0
             );
         }
     }
