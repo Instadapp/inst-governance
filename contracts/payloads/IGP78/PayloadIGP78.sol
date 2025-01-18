@@ -191,7 +191,7 @@ contract PayloadIGP78 is PayloadIGPConstants, PayloadIGPHelpers {
     function action3() internal {
         address eBTC_cbBTC_DEX = getDexAddress(16);
         address eBTC_cbBTC__WBTC_VAULT = getVaultAddress(0); // TODO
-        address eBTC__WBTC_VAULT = getVaultAddress(0); // TODO
+        address eBTC__wBTC_VAULT = getVaultAddress(0); // TODO
         address eBTC__cbBTC_VAULT = getVaultAddress(0); // TODO
 
         {
@@ -251,6 +251,27 @@ contract PayloadIGP78 is PayloadIGPConstants, PayloadIGPHelpers {
 
             VAULT_FACTORY.setVaultAuth(
                 eBTC__cbBTC_VAULT,
+                TEAM_MULTISIG,
+                true
+            );
+        }
+
+        {
+            // [TYPE 1] eBTC<>wBTC| collateral & debt
+            Vault memory VAULT_eBTC_wBTC = Vault({
+                vault: eBTC__wBTC_VAULT,
+                vaultType: TYPE.TYPE_1,
+                supplyToken: eBTC_ADDRESS,
+                borrowToken: WBTC_ADDRESS,
+                baseWithdrawalLimitInUSD: 10_000, // $10k
+                baseBorrowLimitInUSD: 8_000, // $8k
+                maxBorrowLimitInUSD: 10_000 // $10k
+            });
+
+            setVaultLimits(VAULT_eBTC_wBTC); // TYPE_1 => 0 // TODO
+
+            VAULT_FACTORY.setVaultAuth(
+                eBTC__wBTC_VAULT,
                 TEAM_MULTISIG,
                 true
             );
