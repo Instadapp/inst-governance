@@ -258,7 +258,7 @@ contract PayloadIGP78 is PayloadIGPConstants, PayloadIGPHelpers {
 
         {
             // [TYPE 2] lBTC-cbBTC<>WBTC | smart collateral & debt
-            Vault memory VAULT_lBTC_cbBTC = Vault({
+            Vault memory VAULT_lBTC_cbBTC_wBTC = Vault({
                 vault: lBTC_cbBTC__WBTC_VAULT,
                 vaultType: TYPE.TYPE_2,
                 supplyToken: address(0),
@@ -268,7 +268,7 @@ contract PayloadIGP78 is PayloadIGPConstants, PayloadIGPHelpers {
                 maxBorrowLimitInUSD: 10_000 // $10k
             });
 
-            setVaultLimits(VAULT_lBTC_cbBTC); // TYPE_2 => 0 // TODO
+            setVaultLimits(VAULT_lBTC_cbBTC_wBTC); // TYPE_2 => 0 // TODO
 
             VAULT_FACTORY.setVaultAuth(
                 lBTC_cbBTC__WBTC_VAULT,
@@ -297,6 +297,10 @@ contract PayloadIGP78 is PayloadIGPConstants, PayloadIGPHelpers {
             setDexLimits(DEX_USDC_USDT); // Smart Debt
         }
 
+        {   // Set max supply and borrow shares
+            IFluidDex(USDC_USDT_DEX_ADDRESS).updateMaxBorrowShares(2_000_000 * 1e18); // Current 1_000_000 * 1e18
+        }
+
         {
             // Update Range
             IFluidDex(USDC_USDT_DEX_ADDRESS).updateRangePercents(
@@ -312,7 +316,7 @@ contract PayloadIGP78 is PayloadIGPConstants, PayloadIGPHelpers {
         address wstETH_ETH_DEX_ADDRESS = getDexAddress(1);
 
         {
-            // double the limits
+            // 1.5x the limits
             Dex memory DEX_wstETH_ETH = Dex({
                 dex: wstETH_ETH_DEX_ADDRESS,
                 tokenA: wstETH_ADDRESS,
@@ -324,6 +328,11 @@ contract PayloadIGP78 is PayloadIGPConstants, PayloadIGPHelpers {
                 maxBorrowLimitInUSD: 45_000_000 // $45M
             });
             setDexLimits(DEX_wstETH_ETH); // Smart Debt
+        }
+
+        {   // Set max supply and borrow shares
+            IFluidDex(wstETH_ETH_DEX_ADDRESS).updateMaxSupplyShares(9645 * 1e18); // Current 6430 * 1e18
+            IFluidDex(wstETH_ETH_DEX_ADDRESS).updateMaxBorrowShares(7314 * 1e18); // Current 4876 * 1e18
         }
 
         {
@@ -380,7 +389,7 @@ contract PayloadIGP78 is PayloadIGPConstants, PayloadIGPHelpers {
         {
             // USDC based vault
             address USDC_VAULT_HANDLER = 0xf4f24CDD9A9929Ce262735253BADB03F959D208f;
-            address sUSDe_VAULT_ADDRESS = getVaultAddress(27); // sUSDe<>USDC
+            address sUSDe_VAULT_ADDRESS = getVaultAddress(17); // sUSDe<>USDC
             address OLD_sUSDe_VAULT_ADDRESS = getVaultAddress(7); // Old sUSDe<>USDC
             address USDe_VAULT_ADDRESS = getVaultAddress(66); // USDe<>USDC
 
@@ -389,22 +398,27 @@ contract PayloadIGP78 is PayloadIGPConstants, PayloadIGPHelpers {
                 USDC_VAULT_HANDLER,
                 false
             );
+            IFluidVaultT1(sUSDe_VAULT_ADDRESS).updateBorrowRateMagnifier(100 * 1e2);
+
             VAULT_FACTORY.setVaultAuth(
                 OLD_sUSDe_VAULT_ADDRESS,
                 USDC_VAULT_HANDLER,
                 false
             );
+            IFluidVaultT1(OLD_sUSDe_VAULT_ADDRESS).updateBorrowRateMagnifier(100 * 1e2);
+
             VAULT_FACTORY.setVaultAuth(
                 USDe_VAULT_ADDRESS,
                 USDC_VAULT_HANDLER,
                 false
             );
+            IFluidVaultT1(USDe_VAULT_ADDRESS).updateBorrowRateMagnifier(100 * 1e2);
         }
 
         {
             // USDT based vault
             address USDT_VAULT_HANDLER = 0xca91be2077Aad98A8B7ce82a665024c2Fd7e74Be;
-            address sUSDe_VAULT_ADDRESS = getVaultAddress(28); // sUSDe<>USDT
+            address sUSDe_VAULT_ADDRESS = getVaultAddress(18); // sUSDe<>USDT
             address OLD_sUSDe_VAULT_ADDRESS = getVaultAddress(8); // Old sUSDe<>USDT
             address USDe_VAULT_ADDRESS = getVaultAddress(67); // USDe<>USDT
 
@@ -413,16 +427,21 @@ contract PayloadIGP78 is PayloadIGPConstants, PayloadIGPHelpers {
                 USDT_VAULT_HANDLER,
                 false
             );
+            IFluidVaultT1(sUSDe_VAULT_ADDRESS).updateBorrowRateMagnifier(100 * 1e2);
+
             VAULT_FACTORY.setVaultAuth(
                 OLD_sUSDe_VAULT_ADDRESS,
                 USDT_VAULT_HANDLER,
                 false
-            );
+            );  
+            IFluidVaultT1(OLD_sUSDe_VAULT_ADDRESS).updateBorrowRateMagnifier(100 * 1e2);
+
             VAULT_FACTORY.setVaultAuth(
                 USDe_VAULT_ADDRESS,
                 USDT_VAULT_HANDLER,
                 false
             );
+            IFluidVaultT1(USDe_VAULT_ADDRESS).updateBorrowRateMagnifier(100 * 1e2);
         }
 
         {
@@ -436,11 +455,14 @@ contract PayloadIGP78 is PayloadIGPConstants, PayloadIGPHelpers {
                 GHO_VAULT_HANDLER,
                 false
             );
+            IFluidVaultT1(sUSDe_VAULT_ADDRESS).updateBorrowRateMagnifier(100 * 1e2);
+
             VAULT_FACTORY.setVaultAuth(
                 USDe_VAULT_ADDRESS,
                 GHO_VAULT_HANDLER,
                 false
             );
+            IFluidVaultT1(USDe_VAULT_ADDRESS).updateBorrowRateMagnifier(100 * 1e2);
         }
     }
 
