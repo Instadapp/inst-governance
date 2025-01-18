@@ -172,7 +172,7 @@ contract PayloadIGP78 is PayloadIGPConstants, PayloadIGPHelpers {
         }
 
         {
-            // [TYPE 2] sUSDe-USDT<>USDT | smart collateral & debt
+            // [TYPE 2] USDe-USDT<>USDT | smart collateral & debt
             Vault memory VAULT_USDe_USDT = Vault({
                 vault: USDe_USDT__USDT_VAULT,
                 vaultType: TYPE.TYPE_2,
