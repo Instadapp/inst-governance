@@ -281,7 +281,7 @@ contract PayloadIGP77 is PayloadIGPConstants, PayloadIGPHelpers {
 
         {
             // [TYPE 2] deUSD-USDC<>USDT | smart collateral & normal debt
-            Vault memory VAULT_deUSD_USD = Vault({
+            Vault memory VAULT_deUSD_USDC_USDT = Vault({
                 vault: deUSD_USDC__USDT_VAULT,
                 vaultType: TYPE.TYPE_2,
                 supplyToken: address(0),
