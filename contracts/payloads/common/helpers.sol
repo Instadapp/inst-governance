@@ -14,7 +14,7 @@ import { IFluidReserveContract } from "./interfaces/IFluidReserveContract.sol";
 import { IFluidVaultFactory } from "./interfaces/IFluidVaultFactory.sol";
 import { IFluidDexFactory } from "./interfaces/IFluidDexFactory.sol";
 
-import { IFluidDex } from "./interfaces/IFluidDex.sol";
+import { IFluidDex, IFluidAdminDex } from "./interfaces/IFluidDex.sol";
 import { IFluidDexResolver } from "./interfaces/IFluidDex.sol";
 
 import { IFluidVault } from "./interfaces/IFluidVault.sol";
@@ -115,6 +115,34 @@ contract PayloadIGPHelpers is PayloadIGPConstants {
 
             LIQUIDITY.updateUserBorrowConfigs(configs_);
         }
+    }
+
+
+    struct DexBorrowProtocolConfigInShares {
+        address dex;
+        address protocol;
+        uint256 expandPercent;
+        uint256 expandDuration;
+        uint256 baseBorrowLimit;
+        uint256 maxBorrowLimit;
+    }
+
+    function setDexBorrowProtocolLimitsInShares(
+        DexBorrowProtocolConfigInShares memory protocolConfig_
+    ) internal {
+        IFluidAdminDex.UserBorrowConfig[]
+            memory config_ = new IFluidAdminDex.UserBorrowConfig[](1);
+        config_[0] = IFluidAdminDex.UserBorrowConfig({
+            user: protocolConfig_.protocol,
+            expandPercent: protocolConfig_.expandPercent,
+            expandDuration: protocolConfig_.expandDuration,
+            baseDebtCeiling: protocolConfig_.baseBorrowLimit,
+            maxDebtCeiling: protocolConfig_.maxBorrowLimit
+        });
+
+        IFluidDex(protocolConfig_.dex).updateUserBorrowConfigs(
+            config_
+        );
     }
 
     function getRawAmount(
