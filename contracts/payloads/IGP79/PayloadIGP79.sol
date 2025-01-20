@@ -84,9 +84,9 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
                 vaultType: TYPE.TYPE_1,
                 supplyToken: ETH_ADDRESS,
                 borrowToken: sUSDs_ADDRESS,
-                baseWithdrawalLimitInUSD: 5_000_000, // $5M
-                baseBorrowLimitInUSD: 5_000_000, // $5M
-                maxBorrowLimitInUSD: 7_500_000 // $7.5M
+                baseWithdrawalLimitInUSD: 15_000_000, // $15M
+                baseBorrowLimitInUSD: 15_000_000, // $15M
+                maxBorrowLimitInUSD: 100_000_000 // $100M
             });
 
             setVaultLimits(VAULT_ETH_sUSDs); // TYPE_1 => 84
@@ -103,14 +103,18 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
                 vaultType: TYPE.TYPE_1,
                 supplyToken: wstETH_ADDRESS,
                 borrowToken: sUSDs_ADDRESS,
-                baseWithdrawalLimitInUSD: 5_000_000, // $5M
-                baseBorrowLimitInUSD: 5_000_000, // $5M
-                maxBorrowLimitInUSD: 7_500_000 // $7.5M
+                baseWithdrawalLimitInUSD: 20_000_000, // $20M
+                baseBorrowLimitInUSD: 20_000_000, // $20M
+                maxBorrowLimitInUSD: 100_000_000 // $100M
             });
 
             setVaultLimits(VAULT_wstETH_sUSDs); // TYPE_1 => 85
 
-            VAULT_FACTORY.setVaultAuth(wstETH_sUSDs_VAULT, TEAM_MULTISIG, false);
+            VAULT_FACTORY.setVaultAuth(
+                wstETH_sUSDs_VAULT,
+                TEAM_MULTISIG,
+                false
+            );
         }
 
         {
@@ -122,9 +126,9 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
                 vaultType: TYPE.TYPE_1,
                 supplyToken: cbBTC_ADDRESS,
                 borrowToken: sUSDs_ADDRESS,
-                baseWithdrawalLimitInUSD: 5_000_000, // $5M
-                baseBorrowLimitInUSD: 5_000_000, // $5M
-                maxBorrowLimitInUSD: 7_500_000 // $7.5M
+                baseWithdrawalLimitInUSD: 20_000_000, // $20M
+                baseBorrowLimitInUSD: 20_000_000, // $20M
+                maxBorrowLimitInUSD: 100_000_000 // $100M
             });
 
             setVaultLimits(VAULT_cbBTC_sUSDs); // TYPE_1 => 86
@@ -141,9 +145,9 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
                 vaultType: TYPE.TYPE_1,
                 supplyToken: weETH_ADDRESS,
                 borrowToken: sUSDs_ADDRESS,
-                baseWithdrawalLimitInUSD: 5_000_000, // $5M
-                baseBorrowLimitInUSD: 5_000_000, // $5M
-                maxBorrowLimitInUSD: 7_500_000 // $7.5M
+                baseWithdrawalLimitInUSD: 20_000_000, // $20M
+                baseBorrowLimitInUSD: 20_000_000, // $20M
+                maxBorrowLimitInUSD: 100_000_000 // $100M
             });
 
             setVaultLimits(VAULT_weETH_sUSDs); // TYPE_1 => 91
@@ -164,8 +168,8 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
                 supplyToken: tBTC_ADDRESS,
                 borrowToken: USDC_ADDRESS,
                 baseWithdrawalLimitInUSD: 7_500_000, // $7.5M
-                baseBorrowLimitInUSD: 5_000_000, // $5M
-                maxBorrowLimitInUSD: 7_500_000 // $7.5M
+                baseBorrowLimitInUSD: 7_500_000, // $7.5M
+                maxBorrowLimitInUSD: 10_000_000 // $10M
             });
 
             setVaultLimits(VAULT_tBTC_USDC); // TYPE_1 => 88
@@ -183,8 +187,8 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
                 supplyToken: tBTC_ADDRESS,
                 borrowToken: USDT_ADDRESS,
                 baseWithdrawalLimitInUSD: 7_500_000, // $7.5M
-                baseBorrowLimitInUSD: 5_000_000, // $5M
-                maxBorrowLimitInUSD: 7_500_000 // $7.5M
+                baseBorrowLimitInUSD: 7_500_000, // $7.5M
+                maxBorrowLimitInUSD: 10_000_000 // $10M
             });
 
             setVaultLimits(VAULT_tBTC_USDT); // TYPE_1 => 89
@@ -202,8 +206,8 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
                 supplyToken: tBTC_ADDRESS,
                 borrowToken: GHO_ADDRESS,
                 baseWithdrawalLimitInUSD: 7_500_000, // $7.5M
-                baseBorrowLimitInUSD: 5_000_000, // $5M
-                maxBorrowLimitInUSD: 7_500_000 // $7.5M
+                baseBorrowLimitInUSD: 7_500_000, // $7.5M
+                maxBorrowLimitInUSD: 10_000_000 // $10M
             });
 
             setVaultLimits(VAULT_tBTC_GHO); // TYPE_1 => 90
