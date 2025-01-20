@@ -205,7 +205,8 @@ contract PayloadIGP77 is PayloadIGPConstants, PayloadIGPHelpers {
                 DEX_FACTORY.setDexAuth(
                     lBTC_cbBTC_DEX, 
                     TEAM_MULTISIG, 
-                    false);
+                    false
+                );
             }
         }
 
@@ -275,7 +276,8 @@ contract PayloadIGP77 is PayloadIGPConstants, PayloadIGPHelpers {
                 DEX_FACTORY.setDexAuth(
                     deUSD_USDC_DEX, 
                     TEAM_MULTISIG, 
-                    true);
+                    true
+                );
             }
         }
 
