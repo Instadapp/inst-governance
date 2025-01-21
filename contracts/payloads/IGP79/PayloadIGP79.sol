@@ -475,6 +475,7 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
     // @notice Action 8: Increase ETH-USDC DEX limits
     function action8() internal {
         address ETH_USDC_DEX_ADDRESS = getDexAddress(12);
+        address ETH_USDC_VAULT_ADDRESS = getVaultAddress(77);
 
         {
             // Double the ETH-USDC Dex Limits
@@ -499,6 +500,37 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
         {
             // Double Max Borrow Shares
             IFluidDex(ETH_USDC_DEX_ADDRESS).updateMaxBorrowShares(20_000_000 * 1e18); // 20M
+        }
+
+        {       // Update ETH-USDC vault supply shares limit
+                IFluidDex.UserSupplyConfig[]
+                    memory config_ = new IFluidDex.UserSupplyConfig[](1);
+                config_[0] = IFluidDex.UserSupplyConfig({
+                    user: ETH_USDC_VAULT_ADDRESS,
+                    expandPercent: 25 * 1e2, // 25%
+                    expandDuration: 12 hours, // 12 hours
+                    baseWithdrawalLimit: 30_000_000 * 1e18 // 30M shares // 2x
+                });
+
+                IFluidDex(ETH_USDC_DEX_ADDRESS).updateUserSupplyConfigs(
+                    config_
+                );
+            }
+
+        {   // Update ETH-USDC vault borrow shares limit
+            IFluidAdminDex.UserBorrowConfig[]
+                memory config_ = new IFluidAdminDex.UserBorrowConfig[](1);
+            config_[0] = IFluidAdminDex.UserBorrowConfig({
+                user: ETH_USDC_VAULT_ADDRESS,
+                expandPercent: 20 * 1e2, // 20%
+                expandDuration: 12 hours, // 12 hours
+                baseDebtCeiling: 10_000_000 * 1e18, // 10M shares // 2x
+                maxDebtCeiling: 20_000_000 * 1e18 // 20M shares // 2x
+            });
+
+            IFluidDex(ETH_USDC_DEX_ADDRESS).updateUserBorrowConfigs(
+                config_
+            );
         }
     }
     
