@@ -37,6 +37,7 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
     bool public skipAction6;
     bool public skipAction7;
     bool public skipAction8;
+    bool public isExecutable;
 
     function propose(string memory description) external {
         require(
@@ -73,6 +74,11 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
     }
 
     function execute() external {
+
+        if (!PayloadIGP79(ADDRESS_THIS).isExecutable()) {
+            revert("IGP-79 Execution not allowed: isExecutable() returned false");
+        }
+
         require(address(this) == address(TIMELOCK), "not-valid-caller");
 
         // Action 1: Set launch limits for sUSDs based vaults
@@ -116,7 +122,9 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
         bool skipAction5_,
         bool skipAction6_,
         bool skipAction7_,
-        bool skipAction8_
+        bool skipAction8_,
+
+        bool isExecutable_
  
     ) external {
         if (msg.sender != TEAM_MULTISIG) {
@@ -131,6 +139,7 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
         skipAction6 = skipAction6_;
         skipAction7 = skipAction7_;
         skipAction8 = skipAction8_;
+        isExecutable = isExecutable_;
     }
 
     /**
