@@ -66,28 +66,182 @@ contract PayloadIGP77 is PayloadIGPConstants, PayloadIGPHelpers {
     function execute() external {
         require(address(this) == address(TIMELOCK), "not-valid-caller");
 
-        // Action 1: Set launch limits for eBTC-cbBTC DEX and eBTC-cbBTC<>WBTC T2, eBTC<>cbBTC T1, eBTC<>wBTC T1 vaults
+        // Action 1: Set launch limits for sUSDs based vaults
         action1();
 
-        // Action 2: Set launch limits for lBTC-cbBTC DEX and lBTC-cbBTC<>WBTC T2 vault
+        // Action 2: Set launch limits for tBTC<>USDC, tBTC<>USDT, tBTC<>GHO vaults
         action2();
 
-        // Action 3: Update wbBTC<>cbBTC DEX configs
+        // Action 3: Set launch limits for eBTC-cbBTC DEX and eBTC-cbBTC<>WBTC T2, eBTC<>cbBTC T1, eBTC<>wBTC T1 vaults
         action3();
 
-        // Action 4: Set initial limits for deUSD-USDC DEX and deUSDC-USDC<>USDT T2 vault
+        // Action 4: Set launch limits for lBTC-cbBTC DEX and lBTC-cbBTC<>WBTC T2 vault
         action4();
 
+        // Action 5: Update wbBTC<>cbBTC DEX configs
+        action5();
+
+        // Action 6: Set initial limits for deUSD-USDC DEX and deUSDC-USDC<>USDT T2 vault
+        action6();
+
+        //Action 7: Transfer 70 ETH, 150 wstETH, all 81.02 stETH to team multisig for funding rewards
+        action7();
+
+        //Action 8: Collect Revenue
+        action8();
     }
-    
+
     /**
      * |
      * |     Proposal Payload Actions      |
      * |__________________________________
      */
 
-    // @notice Action 1: Set launch limits for eBTC-cbBTC DEX and eBTC-cbBTC<>WBTC T2, eBTC<>cbBTC T1, eBTC<>wBTC T1 vaults
+    // @notice Action 1: Set launch limits for sUSDs based vaults
     function action1() internal {
+        {
+            address ETH_sUSDs_VAULT = getVaultAddress(84);
+
+            // [TYPE 1] ETH<>sUSDs | collateral & debt
+            Vault memory VAULT_ETH_sUSDs = Vault({
+                vault: ETH_sUSDs_VAULT,
+                vaultType: TYPE.TYPE_1,
+                supplyToken: ETH_ADDRESS,
+                borrowToken: sUSDs_ADDRESS,
+                baseWithdrawalLimitInUSD: 15_000_000, // $15M
+                baseBorrowLimitInUSD: 15_000_000, // $15M
+                maxBorrowLimitInUSD: 100_000_000 // $100M
+            });
+
+            setVaultLimits(VAULT_ETH_sUSDs); // TYPE_1 => 84
+
+            VAULT_FACTORY.setVaultAuth(ETH_sUSDs_VAULT, TEAM_MULTISIG, false);
+        }
+
+        {
+            address wstETH_sUSDs_VAULT = getVaultAddress(85);
+
+            // [TYPE 1] wstETH<>sUSDs | collateral & debt
+            Vault memory VAULT_wstETH_sUSDs = Vault({
+                vault: wstETH_sUSDs_VAULT,
+                vaultType: TYPE.TYPE_1,
+                supplyToken: wstETH_ADDRESS,
+                borrowToken: sUSDs_ADDRESS,
+                baseWithdrawalLimitInUSD: 20_000_000, // $20M
+                baseBorrowLimitInUSD: 20_000_000, // $20M
+                maxBorrowLimitInUSD: 100_000_000 // $100M
+            });
+
+            setVaultLimits(VAULT_wstETH_sUSDs); // TYPE_1 => 85
+
+            VAULT_FACTORY.setVaultAuth(
+                wstETH_sUSDs_VAULT,
+                TEAM_MULTISIG,
+                false
+            );
+        }
+
+        {
+            address cbBTC_sUSDs_VAULT = getVaultAddress(86);
+
+            // [TYPE 1] cbBTC<>sUSDs | collateral & debt
+            Vault memory VAULT_cbBTC_sUSDs = Vault({
+                vault: cbBTC_sUSDs_VAULT,
+                vaultType: TYPE.TYPE_1,
+                supplyToken: cbBTC_ADDRESS,
+                borrowToken: sUSDs_ADDRESS,
+                baseWithdrawalLimitInUSD: 20_000_000, // $20M
+                baseBorrowLimitInUSD: 20_000_000, // $20M
+                maxBorrowLimitInUSD: 100_000_000 // $100M
+            });
+
+            setVaultLimits(VAULT_cbBTC_sUSDs); // TYPE_1 => 86
+
+            VAULT_FACTORY.setVaultAuth(cbBTC_sUSDs_VAULT, TEAM_MULTISIG, false);
+        }
+
+        {
+            address weETH_sUSDs_VAULT = getVaultAddress(91);
+
+            // [TYPE 1] weETH<>sUSDs | collateral & debt
+            Vault memory VAULT_weETH_sUSDs = Vault({
+                vault: weETH_sUSDs_VAULT,
+                vaultType: TYPE.TYPE_1,
+                supplyToken: weETH_ADDRESS,
+                borrowToken: sUSDs_ADDRESS,
+                baseWithdrawalLimitInUSD: 20_000_000, // $20M
+                baseBorrowLimitInUSD: 20_000_000, // $20M
+                maxBorrowLimitInUSD: 100_000_000 // $100M
+            });
+
+            setVaultLimits(VAULT_weETH_sUSDs); // TYPE_1 => 91
+
+            VAULT_FACTORY.setVaultAuth(weETH_sUSDs_VAULT, TEAM_MULTISIG, false);
+        }
+    }
+
+    // @notice Action 2: Set launch limits for tBTC<>USDC, tBTC<>USDT, tBTC<>GHO vaults
+    function action2() internal {
+        {
+            address tBTC_USDC_VAULT = getVaultAddress(88);
+
+            // [TYPE 1] tBTC<>USDC | collateral & debt
+            Vault memory VAULT_tBTC_USDC = Vault({
+                vault: tBTC_USDC_VAULT,
+                vaultType: TYPE.TYPE_1,
+                supplyToken: tBTC_ADDRESS,
+                borrowToken: USDC_ADDRESS,
+                baseWithdrawalLimitInUSD: 7_500_000, // $7.5M
+                baseBorrowLimitInUSD: 7_500_000, // $7.5M
+                maxBorrowLimitInUSD: 10_000_000 // $10M
+            });
+
+            setVaultLimits(VAULT_tBTC_USDC); // TYPE_1 => 88
+
+            VAULT_FACTORY.setVaultAuth(tBTC_USDC_VAULT, TEAM_MULTISIG, false);
+        }
+
+        {
+            address tBTC_USDT_VAULT = getVaultAddress(89);
+
+            // [TYPE 1] tBTC<>USDT | collateral & debt
+            Vault memory VAULT_tBTC_USDT = Vault({
+                vault: tBTC_USDT_VAULT,
+                vaultType: TYPE.TYPE_1,
+                supplyToken: tBTC_ADDRESS,
+                borrowToken: USDT_ADDRESS,
+                baseWithdrawalLimitInUSD: 7_500_000, // $7.5M
+                baseBorrowLimitInUSD: 7_500_000, // $7.5M
+                maxBorrowLimitInUSD: 10_000_000 // $10M
+            });
+
+            setVaultLimits(VAULT_tBTC_USDT); // TYPE_1 => 89
+
+            VAULT_FACTORY.setVaultAuth(tBTC_USDT_VAULT, TEAM_MULTISIG, false);
+        }
+
+        {
+            address tBTC_GHO_VAULT = getVaultAddress(90);
+
+            // [TYPE 1] tBTC<>GHO | collateral & debt
+            Vault memory VAULT_tBTC_GHO = Vault({
+                vault: tBTC_GHO_VAULT,
+                vaultType: TYPE.TYPE_1,
+                supplyToken: tBTC_ADDRESS,
+                borrowToken: GHO_ADDRESS,
+                baseWithdrawalLimitInUSD: 7_500_000, // $7.5M
+                baseBorrowLimitInUSD: 7_500_000, // $7.5M
+                maxBorrowLimitInUSD: 10_000_000 // $10M
+            });
+
+            setVaultLimits(VAULT_tBTC_GHO); // TYPE_1 => 90
+
+            VAULT_FACTORY.setVaultAuth(tBTC_GHO_VAULT, TEAM_MULTISIG, false);
+        }
+    }
+
+    // @notice Action 3: Set launch limits for eBTC-cbBTC DEX and eBTC-cbBTC<>WBTC T2, eBTC<>cbBTC T1, eBTC<>wBTC T1 vaults
+    function action3() internal {
         address eBTC_cbBTC_DEX = getDexAddress(16);
         address eBTC_cbBTC__WBTC_VAULT = getVaultAddress(96);
         address eBTC__wBTC_VAULT = getVaultAddress(94);
@@ -181,8 +335,8 @@ contract PayloadIGP77 is PayloadIGPConstants, PayloadIGPHelpers {
         }
     }
 
-    // @notice Action 2: Set launch limits for lBTC-cbBTC DEX and lBTC-cbBTC<>WBTC T2 vault
-    function action2() internal {
+    // @notice Action 4: Set launch limits for lBTC-cbBTC DEX and lBTC-cbBTC<>WBTC T2 vault
+    function action4() internal {
         address lBTC_cbBTC_DEX = getDexAddress(17);
         address lBTC_cbBTC__WBTC_VAULT = getVaultAddress(97);
 
@@ -232,8 +386,8 @@ contract PayloadIGP77 is PayloadIGPConstants, PayloadIGPHelpers {
         }
     }
 
-    // @notice Action 3: Update wbBTC<>cbBTC DEX configs
-    function action3() internal {
+    // @notice Action 5: Update wbBTC<>cbBTC DEX configs
+    function action5() internal {
         address cbBTC_wBTC_DEX_ADDRESS = getDexAddress(3);
 
         // updates the upper and lower range +-0.2%
@@ -252,8 +406,8 @@ contract PayloadIGP77 is PayloadIGPConstants, PayloadIGPHelpers {
         );
     }
 
-    // @notice Action 4: Set launch limits for deUSD-USDC DEX and deUSD-USDC<>USDT T2 vault
-    function action4() internal {
+    // @notice Action 6: Set launch limits for deUSD-USDC DEX and deUSD-USDC<>USDT T2 vault
+    function action6() internal {
         address deUSD_USDC_DEX = getDexAddress(19);
         address deUSD_USDC__USDT_VAULT = getVaultAddress(98);
 
@@ -301,6 +455,55 @@ contract PayloadIGP77 is PayloadIGPConstants, PayloadIGPHelpers {
                 true
             );
         }
+    }
+
+    // @notice Action 7: Transfer 70 ETH, 150 wstETH, all 81.02 stETH to team multisig for funding rewards
+    function action7() internal {
+        string[] memory targets = new string[](3);
+        bytes[] memory encodedSpells = new bytes[](3);
+
+        string memory withdrawSignature = "withdraw(address,uint256,address,uint256,uint256)";
+
+        // Spell 1: Transfer stETH
+        {   
+            address STETH_ADDRESS = 0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84;
+            uint256 STETH_AMOUNT = 81.02 * 1e18; // 81.02 stETH
+            targets[0] = "BASIC-A";
+            encodedSpells[0] = abi.encodeWithSignature(withdrawSignature, STETH_ADDRESS, STETH_AMOUNT, TEAM_MULTISIG, 0, 0);
+        }
+
+        // Spell 2: Transfer ETH
+        {   
+            address ETH_ADDRESS = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
+            uint256 ETH_AMOUNT = 70 * 1e18; // 70 ETH
+            targets[1] = "BASIC-A";
+            encodedSpells[1] = abi.encodeWithSignature(withdrawSignature, STETH_ADDRESS, STETH_AMOUNT, TEAM_MULTISIG, 0, 0);
+        }
+
+        // Spell 3: Transfer wstETH
+        {   
+            address WSTETH_ADDRESS = 0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0;
+            uint256 WSTETH_AMOUNT = 150 * 1e18; // 150 wstETH
+            targets[2] = "BASIC-A";
+            encodedSpells[2] = abi.encodeWithSignature(withdrawSignature, STETH_ADDRESS, STETH_AMOUNT, TEAM_MULTISIG, 0, 0);
+        }
+
+        IDSAV2(TREASURY).cast(targets, encodedSpells, address(this));
+    }
+
+    // @notice Action 8: Collect revenue
+    function action8() internal {
+        address[] memory tokens = new address[](7);
+
+        tokens[0] = ETH_ADDRESS;
+        tokens[1] = wstETH_ADDRESS;
+        tokens[2] = USDC_ADDRESS;
+        tokens[3] = USDT_ADDRESS;
+        tokens[4] = GHO_ADDRESS;
+        tokens[5] = WBTC_ADDRESS;
+        tokens[6] = cbBTC_ADDRESS;
+
+        LIQUIDITY.collectRevenue(tokens);
     }
 
     /**
