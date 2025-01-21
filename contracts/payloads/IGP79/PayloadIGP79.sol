@@ -97,7 +97,7 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
         // Action 5: Update wbBTC<>cbBTC DEX configs
         action5();
 
-        // Action 6: Set initial limits for deUSD-USDC DEX and deUSDC-USDC<>USDT T2 vault
+        // Action 6: Set launch limits for deUSD-USDC DEX
         action6();
 
         //Action 7: Collect Revenue
@@ -449,7 +449,7 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
         );
     }
 
-    // @notice Action 6: Set initial limits for deUSD-USDC DEX and deUSD-USDC<>USDT T2 vault
+    // @notice Action 6: Set launch limits for deUSD-USDC DEX
     function action6() internal {
         if (PayloadIGP79(ADDRESS_THIS).skipAction6()) return;
 
@@ -531,9 +531,9 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
 
         {
             // Update ETH-USDC vault supply shares limit
-            IFluidDex.UserSupplyConfig[]
-                memory config_ = new IFluidDex.UserSupplyConfig[](1);
-            config_[0] = IFluidDex.UserSupplyConfig({
+            IFluidAdminDex.UserSupplyConfig[]
+                memory config_ = new IFluidAdminDex.UserSupplyConfig[](1);
+            config_[0] = IFluidAdminDex.UserSupplyConfig({
                 user: ETH_USDC_VAULT_ADDRESS,
                 expandPercent: 25 * 1e2, // 25%
                 expandDuration: 12 hours, // 12 hours
@@ -676,12 +676,12 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
     // Token Prices Constants
     uint256 public constant ETH_USD_PRICE = 3_330 * 1e2;
     uint256 public constant wstETH_USD_PRICE = 3_950 * 1e2;
-    uint256 public constant weETH_USD_PRICE = 3_550 * 1e2;
+    uint256 public constant weETH_USD_PRICE = 3_500 * 1e2;
     uint256 public constant rsETH_USD_PRICE = 3_850 * 1e2;
     uint256 public constant weETHs_USD_PRICE = 3_750 * 1e2;
     uint256 public constant mETH_USD_PRICE = 3_850 * 1e2;
 
-    uint256 public constant BTC_USD_PRICE = 99_000 * 1e2;
+    uint256 public constant BTC_USD_PRICE = 106_000 * 1e2;
 
     uint256 public constant STABLE_USD_PRICE = 1 * 1e2;
     uint256 public constant sUSDe_USD_PRICE = 1.15 * 1e2;
@@ -750,7 +750,7 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
         } else if (token == sUSDs_ADDRESS) {
             usdPrice = sUSDs_USD_PRICE;
             decimals = 18;
-        } else if (token == GHO_ADDRESS || token == USDe_ADDRESS) {
+        } else if (token == GHO_ADDRESS || token == USDe_ADDRESS || token == deUSD_ADDRESS) {
             usdPrice = STABLE_USD_PRICE;
             decimals = 18;
         } else if (token == INST_ADDRESS) {
