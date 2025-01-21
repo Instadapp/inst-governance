@@ -38,6 +38,7 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
     bool public skipAction7;
     bool public skipAction8;
     bool public isExecutable;
+    bool public skipCbbtcWbtcRangeUpdate;
 
     function propose(string memory description) external {
         require(
@@ -123,7 +124,8 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
         bool skipAction6_,
         bool skipAction7_,
         bool skipAction8_,
-        bool isExecutable_
+        bool isExecutable_,
+        bool skipCbbtcWbtcRangeUpdate_
     ) external {
         if (msg.sender != TEAM_MULTISIG) {
             revert("not-team-multisig");
@@ -138,6 +140,7 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
         skipAction7 = skipAction7_;
         skipAction8 = skipAction8_;
         isExecutable = isExecutable_;
+        skipCbbtcWbtcRangeUpdate = skipCbbtcWbtcRangeUpdate_;
     }
 
     /**
@@ -433,12 +436,14 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
 
         address cbBTC_wBTC_DEX_ADDRESS = getDexAddress(3);
 
-        // updates the upper and lower range +-0.2%
-        IFluidDex(cbBTC_wBTC_DEX_ADDRESS).updateRangePercents(
-            0.2 * 1e4,
-            0.2 * 1e4,
-            2 days
-        );
+        if(!PayloadIGP79(ADDRESS_THIS).skipCbbtcWbtcRangeUpdate()) {
+            // updates the upper and lower range +-0.2%
+            IFluidDex(cbBTC_wBTC_DEX_ADDRESS).updateRangePercents(
+                0.2 * 1e4,
+                0.2 * 1e4,
+                2 days
+            );
+        }
 
         // update min/max center price limits to 0.2%
         uint256 minCenterPrice_ = (998 * 1e27) / 1000;
