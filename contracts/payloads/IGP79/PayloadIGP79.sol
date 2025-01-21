@@ -86,6 +86,9 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
 
         //Action 7: Collect Revenue
         action7();
+
+        //Action 8: Increase the ETH-USDC DEX limits
+        action8();
     }
 
     /**
@@ -469,6 +472,36 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
         LIQUIDITY.collectRevenue(tokens);
     }
 
+    // @notice Action 8: Increase ETH-USDC DEX limits
+    function action8() internal {
+        address ETH_USDC_DEX_ADDRESS = getDexAddress(12);
+
+        {
+            // Double the ETH-USDC Dex Limits
+            Dex memory DEX_ETH_USDC = Dex({
+                dex: ETH_USDC_DEX_ADDRESS,
+                tokenA: ETH_ADDRESS,
+                tokenB: USDC_ADDRESS,
+                smartCollateral: true,
+                smartDebt: true,
+                baseWithdrawalLimitInUSD: 30_000_000, // $30M
+                baseBorrowLimitInUSD: 24_000_000, // $24M
+                maxBorrowLimitInUSD: 60_000_000 // $60M
+            });
+            setDexLimits(DEX_ETH_USDC); // Smart Collateral and Smart Debt
+        }
+
+        {
+            // Double Max Supply Shares
+            IFluidDex(ETH_USDC_DEX_ADDRESS).updateMaxSupplyShares(30_000_000 * 1e18); // 30M
+        }
+
+        {
+            // Double Max Borrow Shares
+            IFluidDex(ETH_USDC_DEX_ADDRESS).updateMaxBorrowShares(20_000_000 * 1e18); // 20M
+        }
+    }
+    
     /**
      * |
      * |     Proposal Payload Helpers      |
