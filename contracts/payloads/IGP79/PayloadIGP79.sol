@@ -37,7 +37,6 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
     bool public skipAction6;
     bool public skipAction7;
     bool public skipAction8;
-
     bool public isExecutable;
 
     function propose(string memory description) external {
@@ -77,7 +76,7 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
     function execute() external {
 
         if (!PayloadIGP79(ADDRESS_THIS).isExecutable()) {
-        revert("IGP-79 Execution not allowed: isExecutable() returned false");
+            revert("IGP-79 Execution not allowed: isExecutable() returned false");
         }
 
         require(address(this) == address(TIMELOCK), "not-valid-caller");
@@ -140,7 +139,6 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
         skipAction6 = skipAction6_;
         skipAction7 = skipAction7_;
         skipAction8 = skipAction8_;
-
         isExecutable = isExecutable_;
     }
 
