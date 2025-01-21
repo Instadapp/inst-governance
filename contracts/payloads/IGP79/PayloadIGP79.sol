@@ -84,11 +84,8 @@ contract PayloadIGP77 is PayloadIGPConstants, PayloadIGPHelpers {
         // Action 6: Set initial limits for deUSD-USDC DEX and deUSDC-USDC<>USDT T2 vault
         action6();
 
-        //Action 7: Transfer 70 ETH, 150 wstETH, all 81.02 stETH to team multisig for funding rewards
+        //Action 7: Collect Revenue
         action7();
-
-        //Action 8: Collect Revenue
-        action8();
     }
 
     /**
@@ -457,42 +454,8 @@ contract PayloadIGP77 is PayloadIGPConstants, PayloadIGPHelpers {
         }
     }
 
-    // @notice Action 7: Transfer 70 ETH, 150 wstETH, all 81.02 stETH to team multisig for funding rewards
+    // @notice Action 7: Collect revenue
     function action7() internal {
-        string[] memory targets = new string[](3);
-        bytes[] memory encodedSpells = new bytes[](3);
-
-        string memory withdrawSignature = "withdraw(address,uint256,address,uint256,uint256)";
-
-        // Spell 1: Transfer stETH
-        {   
-            address STETH_ADDRESS = 0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84;
-            uint256 STETH_AMOUNT = 81.02 * 1e18; // 81.02 stETH
-            targets[0] = "BASIC-A";
-            encodedSpells[0] = abi.encodeWithSignature(withdrawSignature, STETH_ADDRESS, STETH_AMOUNT, TEAM_MULTISIG, 0, 0);
-        }
-
-        // Spell 2: Transfer ETH
-        {   
-            address ETH_ADDRESS = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
-            uint256 ETH_AMOUNT = 70 * 1e18; // 70 ETH
-            targets[1] = "BASIC-A";
-            encodedSpells[1] = abi.encodeWithSignature(withdrawSignature, ETH_ADDRESS, ETH_AMOUNT, TEAM_MULTISIG, 0, 0);
-        }
-
-        // Spell 3: Transfer wstETH
-        {   
-            address WSTETH_ADDRESS = 0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0;
-            uint256 WSTETH_AMOUNT = 150 * 1e18; // 150 wstETH
-            targets[2] = "BASIC-A";
-            encodedSpells[2] = abi.encodeWithSignature(withdrawSignature, WSTETH_ADDRESS, WSTETH_AMOUNT, TEAM_MULTISIG, 0, 0);
-        }
-
-        IDSAV2(TREASURY).cast(targets, encodedSpells, address(this));
-    }
-
-    // @notice Action 8: Collect revenue
-    function action8() internal {
         address[] memory tokens = new address[](7);
 
         tokens[0] = ETH_ADDRESS;
