@@ -29,6 +29,15 @@ import {PayloadIGPHelpers} from "../common/helpers.sol";
 contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
     uint256 public constant PROPOSAL_ID = 79;
 
+    bool public skipAction1;
+    bool public skipAction2;
+    bool public skipAction3;
+    bool public skipAction4;
+    bool public skipAction5;
+    bool public skipAction6;
+    bool public skipAction7;
+    bool public skipAction8;
+
     function propose(string memory description) external {
         require(
             msg.sender == PROPOSER ||
@@ -71,10 +80,70 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
 
         // Action 2: Set launch limits for tBTC<>USDC, tBTC<>USDT, tBTC<>GHO vaults
         action2();
+
+        // Action 3: Set launch limits for eBTC-cbBTC DEX and eBTC-cbBTC<>WBTC T2, eBTC<>cbBTC T1, eBTC<>wBTC T1 vaults
+        action3();
+
+        // Action 4: Set launch limits for lBTC-cbBTC DEX and lBTC-cbBTC<>WBTC T2 vault
+        action4();
+
+        // Action 5: Update wbBTC<>cbBTC DEX configs
+        action5();
+
+        // Action 6: Set initial limits for deUSD-USDC DEX and deUSDC-USDC<>USDT T2 vault
+        action6();
+
+        //Action 7: Collect Revenue
+        action7();
+
+        //Action 8: Increase the ETH-USDC DEX limits
+        action8();
     }
+
+    function verifyProposal() external view {}
+
+    /**
+     * |
+     * |     Team Multisig Actions      |
+     * |__________________________________
+     */
+    function setState(
+
+        bool skipAction1_,
+        bool skipAction2_,
+        bool skipAction3_,
+        bool skipAction4_,
+        bool skipAction5_,
+        bool skipAction6_,
+        bool skipAction7_,
+        bool skipAction8_
+ 
+    ) external {
+        if (msg.sender != TEAM_MULTISIG) {
+            revert("not-team-multisig");
+        }
+
+        skipAction1 = skipAction1_;
+        skipAction2 = skipAction2_;
+        skipAction3 = skipAction3_;
+        skipAction4 = skipAction4_;
+        skipAction5 = skipAction5_;
+        skipAction6 = skipAction6_;
+        skipAction7 = skipAction7_;
+        skipAction8 = skipAction8_;
+    }
+
+    /**
+     * |
+     * |     Proposal Payload Actions      |
+     * |__________________________________
+     */
 
     // @notice Action 1: Set launch limits for sUSDs based vaults
     function action1() internal {
+
+        if (PayloadIGP79(ADDRESS_THIS).skipAction1()) return;
+
         {
             address ETH_sUSDs_VAULT = getVaultAddress(84);
 
@@ -158,6 +227,9 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
 
     // @notice Action 2: Set launch limits for tBTC<>USDC, tBTC<>USDT, tBTC<>GHO vaults
     function action2() internal {
+
+        if (PayloadIGP79(ADDRESS_THIS).skipAction2()) return;
+
         {
             address tBTC_USDC_VAULT = getVaultAddress(88);
 
@@ -216,6 +288,318 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
         }
     }
 
+    // @notice Action 3: Set launch limits for eBTC-cbBTC DEX and eBTC-cbBTC<>WBTC T2, eBTC<>cbBTC T1, eBTC<>wBTC T1 vaults
+    function action3() internal {
+
+        if (PayloadIGP79(ADDRESS_THIS).skipAction3()) return;
+
+        address eBTC_cbBTC_DEX = getDexAddress(16);
+        address eBTC_cbBTC__WBTC_VAULT = getVaultAddress(96);
+        address eBTC__wBTC_VAULT = getVaultAddress(94);
+        address eBTC__cbBTC_VAULT = getVaultAddress(95);
+
+        {
+            // eBTC-cbBTC DEX
+            {
+                // eBTC-cbBTC Dex
+                Dex memory DEX_eBTC_cbBTC = Dex({
+                    dex: eBTC_cbBTC_DEX,
+                    tokenA: eBTC_ADDRESS,
+                    tokenB: cbBTC_ADDRESS,
+                    smartCollateral: true,
+                    smartDebt: false,
+                    baseWithdrawalLimitInUSD: 20_000_000, // $20M
+                    baseBorrowLimitInUSD: 0, // $0
+                    maxBorrowLimitInUSD: 0 // $0
+                });
+                setDexLimits(DEX_eBTC_cbBTC); // Smart Collateral
+
+                DEX_FACTORY.setDexAuth(
+                    eBTC_cbBTC_DEX, 
+                    TEAM_MULTISIG, 
+                    false
+                );
+            }
+        }
+
+        {
+            // [TYPE 2] eBTC-cbBTC<>WBTC | smart collateral & normal debt
+            Vault memory VAULT_eBTC_cbBTC = Vault({
+                vault: eBTC_cbBTC__WBTC_VAULT,
+                vaultType: TYPE.TYPE_2,
+                supplyToken: address(0),
+                borrowToken: WBTC_ADDRESS,
+                baseWithdrawalLimitInUSD: 0,
+                baseBorrowLimitInUSD: 5_000_000, // $5M
+                maxBorrowLimitInUSD: 7_500_000 // $7.5M
+            });
+
+            setVaultLimits(VAULT_eBTC_cbBTC); // TYPE_2 => 96
+
+            VAULT_FACTORY.setVaultAuth(
+                eBTC_cbBTC__WBTC_VAULT,
+                TEAM_MULTISIG,
+                false
+            );
+        }
+
+        {
+            // [TYPE 1] eBTC<>cbBTC | normal collateral & normal debt
+            Vault memory VAULT_eBTC_cbBTC = Vault({
+                vault: eBTC__cbBTC_VAULT,
+                vaultType: TYPE.TYPE_1,
+                supplyToken: eBTC_ADDRESS,
+                borrowToken: cbBTC_ADDRESS,
+                baseWithdrawalLimitInUSD: 5_000_000, // $5M
+                baseBorrowLimitInUSD: 5_000_000, // $5M
+                maxBorrowLimitInUSD: 7_500_000 // $7.5M
+            });
+
+            setVaultLimits(VAULT_eBTC_cbBTC); // TYPE_1 => 95
+
+            VAULT_FACTORY.setVaultAuth(
+                eBTC__cbBTC_VAULT, 
+                TEAM_MULTISIG, 
+                false
+            );
+        }
+
+        {
+            // [TYPE 1] eBTC<>wBTC | normal collateral & normal debt
+            Vault memory VAULT_eBTC_wBTC = Vault({
+                vault: eBTC__wBTC_VAULT,
+                vaultType: TYPE.TYPE_1,
+                supplyToken: eBTC_ADDRESS,
+                borrowToken: WBTC_ADDRESS,
+                baseWithdrawalLimitInUSD: 5_000_000, // $5M
+                baseBorrowLimitInUSD: 5_000_000, // $5M
+                maxBorrowLimitInUSD: 7_500_000 // $7.5M
+            });
+
+            setVaultLimits(VAULT_eBTC_wBTC); // TYPE_1 => 94
+
+            VAULT_FACTORY.setVaultAuth(
+                eBTC__wBTC_VAULT, 
+                TEAM_MULTISIG, 
+                false
+            );
+        }
+    }
+
+    // @notice Action 4: Set launch limits for lBTC-cbBTC DEX and lBTC-cbBTC<>WBTC T2 vault
+    function action4() internal {
+
+        if (PayloadIGP79(ADDRESS_THIS).skipAction4()) return;
+
+        address lBTC_cbBTC_DEX = getDexAddress(17);
+        address lBTC_cbBTC__WBTC_VAULT = getVaultAddress(97);
+
+        {
+            // lBTC-cbBTC DEX
+            {
+                // lBTC-cbBTC Dex
+                Dex memory DEX_lBTC_cbBTC = Dex({
+                    dex: lBTC_cbBTC_DEX,
+                    tokenA: lBTC_ADDRESS,
+                    tokenB: cbBTC_ADDRESS,
+                    smartCollateral: true,
+                    smartDebt: false,
+                    baseWithdrawalLimitInUSD: 20_000_000, // $20M
+                    baseBorrowLimitInUSD: 0, // $0
+                    maxBorrowLimitInUSD: 0 // $0
+                });
+                setDexLimits(DEX_lBTC_cbBTC); // Smart Collateral
+
+                DEX_FACTORY.setDexAuth(
+                    lBTC_cbBTC_DEX, 
+                    TEAM_MULTISIG, 
+                    false
+                );
+            }
+        }
+
+        {
+            // [TYPE 2] lBTC-cbBTC<>WBTC | smart collateral & normal debt
+            Vault memory VAULT_lBTC_cbBTC_wBTC = Vault({
+                vault: lBTC_cbBTC__WBTC_VAULT,
+                vaultType: TYPE.TYPE_2,
+                supplyToken: address(0),
+                borrowToken: WBTC_ADDRESS,
+                baseWithdrawalLimitInUSD: 0,
+                baseBorrowLimitInUSD: 5_000_000, // $5M
+                maxBorrowLimitInUSD: 7_500_000 // $7.5M
+            });
+
+            setVaultLimits(VAULT_lBTC_cbBTC_wBTC); // TYPE_2 => 97
+
+            VAULT_FACTORY.setVaultAuth(
+                lBTC_cbBTC__WBTC_VAULT,
+                TEAM_MULTISIG,
+                false
+            );
+        }
+    }
+
+    // @notice Action 5: Update wbBTC<>cbBTC DEX configs
+    function action5() internal {
+
+        if (PayloadIGP79(ADDRESS_THIS).skipAction5()) return;
+
+        address cbBTC_wBTC_DEX_ADDRESS = getDexAddress(3);
+
+        // updates the upper and lower range +-0.2%
+        IFluidDex(cbBTC_wBTC_DEX_ADDRESS).updateRangePercents(
+            0.2 * 1e4,
+            0.2 * 1e4,
+            2 days
+        );
+
+        // update min/max center price limits to 0.2%
+        uint256 minCenterPrice_ = (998 * 1e27) / 1000;
+        uint256 maxCenterPrice_ = uint256(1e27 * 1000) / 998;
+        IFluidDex(cbBTC_wBTC_DEX_ADDRESS).updateCenterPriceLimits(
+            maxCenterPrice_,
+            minCenterPrice_
+        );
+    }
+
+    // @notice Action 6: Set initial limits for deUSD-USDC DEX and deUSD-USDC<>USDT T2 vault
+    function action6() internal {
+
+        if (PayloadIGP79(ADDRESS_THIS).skipAction6()) return;
+
+        address deUSD_USDC_DEX = getDexAddress(19);
+        address deUSD_USDC__USDT_VAULT = getVaultAddress(98);
+
+        {
+            // deUSD-USDC DEX
+            {
+                // deUSD-USDC Dex
+                Dex memory DEX_deUSD_USDC = Dex({
+                    dex: deUSD_USDC_DEX,
+                    tokenA: deUSD_ADDRESS,
+                    tokenB: USDC_ADDRESS,
+                    smartCollateral: true,
+                    smartDebt: false,
+                    baseWithdrawalLimitInUSD: 10_000, // $10k
+                    baseBorrowLimitInUSD: 0, // $0
+                    maxBorrowLimitInUSD: 0 // $0
+                });
+                setDexLimits(DEX_deUSD_USDC); // Smart Collateral
+
+                DEX_FACTORY.setDexAuth(
+                    deUSD_USDC_DEX, 
+                    TEAM_MULTISIG, 
+                    true
+                );
+            }
+        }
+
+        {
+            // [TYPE 2] deUSD-USDC<>USDT | smart collateral & normal debt
+            Vault memory VAULT_deUSD_USDC_USDT = Vault({
+                vault: deUSD_USDC__USDT_VAULT,
+                vaultType: TYPE.TYPE_2,
+                supplyToken: address(0),
+                borrowToken: USDT_ADDRESS,
+                baseWithdrawalLimitInUSD: 0,
+                baseBorrowLimitInUSD: 8_000, // $8k
+                maxBorrowLimitInUSD: 10_000 // $10k
+            });
+
+            setVaultLimits(VAULT_deUSD_USDC_USDT); // TYPE_2 => 98
+
+            VAULT_FACTORY.setVaultAuth(
+                deUSD_USDC__USDT_VAULT,
+                TEAM_MULTISIG,
+                true
+            );
+        }
+    }
+
+    // @notice Action 7: Collect revenue
+    function action7() internal {
+
+        if (PayloadIGP79(ADDRESS_THIS).skipAction7()) return;
+
+        address[] memory tokens = new address[](7);
+
+        tokens[0] = ETH_ADDRESS;
+        tokens[1] = wstETH_ADDRESS;
+        tokens[2] = USDC_ADDRESS;
+        tokens[3] = USDT_ADDRESS;
+        tokens[4] = GHO_ADDRESS;
+        tokens[5] = WBTC_ADDRESS;
+        tokens[6] = cbBTC_ADDRESS;
+
+        LIQUIDITY.collectRevenue(tokens);
+    }
+
+    // @notice Action 8: Increase ETH-USDC DEX limits
+    function action8() internal {
+
+        if (PayloadIGP79(ADDRESS_THIS).skipAction8()) return;
+
+        address ETH_USDC_DEX_ADDRESS = getDexAddress(12);
+        address ETH_USDC_VAULT_ADDRESS = getVaultAddress(77);
+
+        {
+            // Double the ETH-USDC Dex Limits
+            Dex memory DEX_ETH_USDC = Dex({
+                dex: ETH_USDC_DEX_ADDRESS,
+                tokenA: ETH_ADDRESS,
+                tokenB: USDC_ADDRESS,
+                smartCollateral: true,
+                smartDebt: true,
+                baseWithdrawalLimitInUSD: 30_000_000, // $30M
+                baseBorrowLimitInUSD: 24_000_000, // $24M
+                maxBorrowLimitInUSD: 60_000_000 // $60M
+            });
+            setDexLimits(DEX_ETH_USDC); // Smart Collateral and Smart Debt
+        }
+
+        {
+            // Double Max Supply Shares
+            IFluidDex(ETH_USDC_DEX_ADDRESS).updateMaxSupplyShares(30_000_000 * 1e18); // 30M
+        }
+
+        {
+            // Double Max Borrow Shares
+            IFluidDex(ETH_USDC_DEX_ADDRESS).updateMaxBorrowShares(20_000_000 * 1e18); // 20M
+        }
+
+        {       // Update ETH-USDC vault supply shares limit
+                IFluidDex.UserSupplyConfig[]
+                    memory config_ = new IFluidDex.UserSupplyConfig[](1);
+                config_[0] = IFluidDex.UserSupplyConfig({
+                    user: ETH_USDC_VAULT_ADDRESS,
+                    expandPercent: 25 * 1e2, // 25%
+                    expandDuration: 12 hours, // 12 hours
+                    baseWithdrawalLimit: 30_000_000 * 1e18 // 30M shares // 2x
+                });
+
+                IFluidDex(ETH_USDC_DEX_ADDRESS).updateUserSupplyConfigs(
+                    config_
+                );
+            }
+
+        {   // Update ETH-USDC vault borrow shares limit
+            IFluidAdminDex.UserBorrowConfig[]
+                memory config_ = new IFluidAdminDex.UserBorrowConfig[](1);
+            config_[0] = IFluidAdminDex.UserBorrowConfig({
+                user: ETH_USDC_VAULT_ADDRESS,
+                expandPercent: 20 * 1e2, // 20%
+                expandDuration: 12 hours, // 12 hours
+                baseDebtCeiling: 10_000_000 * 1e18, // 10M shares // 2x
+                maxDebtCeiling: 20_000_000 * 1e18 // 20M shares // 2x
+            });
+
+            IFluidDex(ETH_USDC_DEX_ADDRESS).updateUserBorrowConfigs(
+                config_
+            );
+        }
+    }
+    
     /**
      * |
      * |     Proposal Payload Helpers      |
