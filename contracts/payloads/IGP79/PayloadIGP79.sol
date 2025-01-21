@@ -74,9 +74,10 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
     }
 
     function execute() external {
-
         if (!PayloadIGP79(ADDRESS_THIS).isExecutable()) {
-            revert("IGP-79 Execution not allowed: isExecutable() returned false");
+            revert(
+                "IGP-79 Execution not allowed: isExecutable() returned false"
+            );
         }
 
         require(address(this) == address(TIMELOCK), "not-valid-caller");
@@ -114,7 +115,6 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
      * |__________________________________
      */
     function setState(
-
         bool skipAction1_,
         bool skipAction2_,
         bool skipAction3_,
@@ -123,9 +123,7 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
         bool skipAction6_,
         bool skipAction7_,
         bool skipAction8_,
-
         bool isExecutable_
- 
     ) external {
         if (msg.sender != TEAM_MULTISIG) {
             revert("not-team-multisig");
@@ -150,7 +148,6 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
 
     // @notice Action 1: Set launch limits for sUSDs based vaults
     function action1() internal {
-
         if (PayloadIGP79(ADDRESS_THIS).skipAction1()) return;
 
         {
@@ -162,8 +159,8 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
                 vaultType: TYPE.TYPE_1,
                 supplyToken: ETH_ADDRESS,
                 borrowToken: sUSDs_ADDRESS,
-                baseWithdrawalLimitInUSD: 15_000_000, // $15M
-                baseBorrowLimitInUSD: 15_000_000, // $15M
+                baseWithdrawalLimitInUSD: 20_000_000, // $20M
+                baseBorrowLimitInUSD: 20_000_000, // $20M
                 maxBorrowLimitInUSD: 100_000_000 // $100M
             });
 
@@ -236,7 +233,6 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
 
     // @notice Action 2: Set launch limits for tBTC<>USDC, tBTC<>USDT, tBTC<>GHO vaults
     function action2() internal {
-
         if (PayloadIGP79(ADDRESS_THIS).skipAction2()) return;
 
         {
@@ -299,7 +295,6 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
 
     // @notice Action 3: Set launch limits for eBTC-cbBTC DEX and eBTC-cbBTC<>WBTC T2, eBTC<>cbBTC T1, eBTC<>wBTC T1 vaults
     function action3() internal {
-
         if (PayloadIGP79(ADDRESS_THIS).skipAction3()) return;
 
         address eBTC_cbBTC_DEX = getDexAddress(16);
@@ -323,11 +318,7 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
                 });
                 setDexLimits(DEX_eBTC_cbBTC); // Smart Collateral
 
-                DEX_FACTORY.setDexAuth(
-                    eBTC_cbBTC_DEX, 
-                    TEAM_MULTISIG, 
-                    false
-                );
+                DEX_FACTORY.setDexAuth(eBTC_cbBTC_DEX, TEAM_MULTISIG, false);
             }
         }
 
@@ -339,8 +330,8 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
                 supplyToken: address(0),
                 borrowToken: WBTC_ADDRESS,
                 baseWithdrawalLimitInUSD: 0,
-                baseBorrowLimitInUSD: 5_000_000, // $5M
-                maxBorrowLimitInUSD: 7_500_000 // $7.5M
+                baseBorrowLimitInUSD: 7_500_000, // $7.5M
+                maxBorrowLimitInUSD: 15_000_000 // $15M
             });
 
             setVaultLimits(VAULT_eBTC_cbBTC); // TYPE_2 => 96
@@ -352,26 +343,22 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
             );
         }
 
-        {
-            // [TYPE 1] eBTC<>cbBTC | normal collateral & normal debt
-            Vault memory VAULT_eBTC_cbBTC = Vault({
-                vault: eBTC__cbBTC_VAULT,
-                vaultType: TYPE.TYPE_1,
-                supplyToken: eBTC_ADDRESS,
-                borrowToken: cbBTC_ADDRESS,
-                baseWithdrawalLimitInUSD: 5_000_000, // $5M
-                baseBorrowLimitInUSD: 5_000_000, // $5M
-                maxBorrowLimitInUSD: 7_500_000 // $7.5M
-            });
+        // {
+        //     // [TYPE 1] eBTC<>cbBTC | normal collateral & normal debt
+        //     Vault memory VAULT_eBTC_cbBTC = Vault({
+        //         vault: eBTC__cbBTC_VAULT,
+        //         vaultType: TYPE.TYPE_1,
+        //         supplyToken: eBTC_ADDRESS,
+        //         borrowToken: cbBTC_ADDRESS,
+        //         baseWithdrawalLimitInUSD: 5_000_000, // $5M
+        //         baseBorrowLimitInUSD: 5_000_000, // $5M
+        //         maxBorrowLimitInUSD: 7_500_000 // $7.5M
+        //     });
 
-            setVaultLimits(VAULT_eBTC_cbBTC); // TYPE_1 => 95
+        //     setVaultLimits(VAULT_eBTC_cbBTC); // TYPE_1 => 95
 
-            VAULT_FACTORY.setVaultAuth(
-                eBTC__cbBTC_VAULT, 
-                TEAM_MULTISIG, 
-                false
-            );
-        }
+        //     VAULT_FACTORY.setVaultAuth(eBTC__cbBTC_VAULT, TEAM_MULTISIG, false);
+        // }
 
         {
             // [TYPE 1] eBTC<>wBTC | normal collateral & normal debt
@@ -380,24 +367,19 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
                 vaultType: TYPE.TYPE_1,
                 supplyToken: eBTC_ADDRESS,
                 borrowToken: WBTC_ADDRESS,
-                baseWithdrawalLimitInUSD: 5_000_000, // $5M
-                baseBorrowLimitInUSD: 5_000_000, // $5M
-                maxBorrowLimitInUSD: 7_500_000 // $7.5M
+                baseWithdrawalLimitInUSD: 7_500_000, // $7.5M
+                baseBorrowLimitInUSD: 7_500_000, // $7.5M
+                maxBorrowLimitInUSD: 15_000_000 // $15M
             });
 
             setVaultLimits(VAULT_eBTC_wBTC); // TYPE_1 => 94
 
-            VAULT_FACTORY.setVaultAuth(
-                eBTC__wBTC_VAULT, 
-                TEAM_MULTISIG, 
-                false
-            );
+            VAULT_FACTORY.setVaultAuth(eBTC__wBTC_VAULT, TEAM_MULTISIG, false);
         }
     }
 
     // @notice Action 4: Set launch limits for lBTC-cbBTC DEX and lBTC-cbBTC<>WBTC T2 vault
     function action4() internal {
-
         if (PayloadIGP79(ADDRESS_THIS).skipAction4()) return;
 
         address lBTC_cbBTC_DEX = getDexAddress(17);
@@ -419,11 +401,7 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
                 });
                 setDexLimits(DEX_lBTC_cbBTC); // Smart Collateral
 
-                DEX_FACTORY.setDexAuth(
-                    lBTC_cbBTC_DEX, 
-                    TEAM_MULTISIG, 
-                    false
-                );
+                DEX_FACTORY.setDexAuth(lBTC_cbBTC_DEX, TEAM_MULTISIG, false);
             }
         }
 
@@ -435,8 +413,8 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
                 supplyToken: address(0),
                 borrowToken: WBTC_ADDRESS,
                 baseWithdrawalLimitInUSD: 0,
-                baseBorrowLimitInUSD: 5_000_000, // $5M
-                maxBorrowLimitInUSD: 7_500_000 // $7.5M
+                baseBorrowLimitInUSD: 7_500_000, // $7.5M
+                maxBorrowLimitInUSD: 15_000_000 // $15M
             });
 
             setVaultLimits(VAULT_lBTC_cbBTC_wBTC); // TYPE_2 => 97
@@ -451,7 +429,6 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
 
     // @notice Action 5: Update wbBTC<>cbBTC DEX configs
     function action5() internal {
-
         if (PayloadIGP79(ADDRESS_THIS).skipAction5()) return;
 
         address cbBTC_wBTC_DEX_ADDRESS = getDexAddress(3);
@@ -474,11 +451,9 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
 
     // @notice Action 6: Set initial limits for deUSD-USDC DEX and deUSD-USDC<>USDT T2 vault
     function action6() internal {
-
         if (PayloadIGP79(ADDRESS_THIS).skipAction6()) return;
 
         address deUSD_USDC_DEX = getDexAddress(19);
-        address deUSD_USDC__USDT_VAULT = getVaultAddress(98);
 
         {
             // deUSD-USDC DEX
@@ -490,45 +465,19 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
                     tokenB: USDC_ADDRESS,
                     smartCollateral: true,
                     smartDebt: false,
-                    baseWithdrawalLimitInUSD: 10_000, // $10k
+                    baseWithdrawalLimitInUSD: 10_000_000, // $10M
                     baseBorrowLimitInUSD: 0, // $0
                     maxBorrowLimitInUSD: 0 // $0
                 });
                 setDexLimits(DEX_deUSD_USDC); // Smart Collateral
 
-                DEX_FACTORY.setDexAuth(
-                    deUSD_USDC_DEX, 
-                    TEAM_MULTISIG, 
-                    true
-                );
+                DEX_FACTORY.setDexAuth(deUSD_USDC_DEX, TEAM_MULTISIG, true);
             }
-        }
-
-        {
-            // [TYPE 2] deUSD-USDC<>USDT | smart collateral & normal debt
-            Vault memory VAULT_deUSD_USDC_USDT = Vault({
-                vault: deUSD_USDC__USDT_VAULT,
-                vaultType: TYPE.TYPE_2,
-                supplyToken: address(0),
-                borrowToken: USDT_ADDRESS,
-                baseWithdrawalLimitInUSD: 0,
-                baseBorrowLimitInUSD: 8_000, // $8k
-                maxBorrowLimitInUSD: 10_000 // $10k
-            });
-
-            setVaultLimits(VAULT_deUSD_USDC_USDT); // TYPE_2 => 98
-
-            VAULT_FACTORY.setVaultAuth(
-                deUSD_USDC__USDT_VAULT,
-                TEAM_MULTISIG,
-                true
-            );
         }
     }
 
     // @notice Action 7: Collect revenue
     function action7() internal {
-
         if (PayloadIGP79(ADDRESS_THIS).skipAction7()) return;
 
         address[] memory tokens = new address[](7);
@@ -546,7 +495,6 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
 
     // @notice Action 8: Increase ETH-USDC DEX limits
     function action8() internal {
-
         if (PayloadIGP79(ADDRESS_THIS).skipAction8()) return;
 
         address ETH_USDC_DEX_ADDRESS = getDexAddress(12);
@@ -569,30 +517,34 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
 
         {
             // Double Max Supply Shares
-            IFluidDex(ETH_USDC_DEX_ADDRESS).updateMaxSupplyShares(30_000_000 * 1e18); // 30M
+            IFluidDex(ETH_USDC_DEX_ADDRESS).updateMaxSupplyShares(
+                30_000_000 * 1e18
+            ); // 30M
         }
 
         {
             // Double Max Borrow Shares
-            IFluidDex(ETH_USDC_DEX_ADDRESS).updateMaxBorrowShares(20_000_000 * 1e18); // 20M
+            IFluidDex(ETH_USDC_DEX_ADDRESS).updateMaxBorrowShares(
+                20_000_000 * 1e18
+            ); // 20M
         }
 
-        {       // Update ETH-USDC vault supply shares limit
-                IFluidDex.UserSupplyConfig[]
-                    memory config_ = new IFluidDex.UserSupplyConfig[](1);
-                config_[0] = IFluidDex.UserSupplyConfig({
-                    user: ETH_USDC_VAULT_ADDRESS,
-                    expandPercent: 25 * 1e2, // 25%
-                    expandDuration: 12 hours, // 12 hours
-                    baseWithdrawalLimit: 30_000_000 * 1e18 // 30M shares // 2x
-                });
+        {
+            // Update ETH-USDC vault supply shares limit
+            IFluidDex.UserSupplyConfig[]
+                memory config_ = new IFluidDex.UserSupplyConfig[](1);
+            config_[0] = IFluidDex.UserSupplyConfig({
+                user: ETH_USDC_VAULT_ADDRESS,
+                expandPercent: 25 * 1e2, // 25%
+                expandDuration: 12 hours, // 12 hours
+                baseWithdrawalLimit: 10_000_000 * 1e18 // 10M shares
+            });
 
-                IFluidDex(ETH_USDC_DEX_ADDRESS).updateUserSupplyConfigs(
-                    config_
-                );
-            }
+            IFluidDex(ETH_USDC_DEX_ADDRESS).updateUserSupplyConfigs(config_);
+        }
 
-        {   // Update ETH-USDC vault borrow shares limit
+        {
+            // Update ETH-USDC vault borrow shares limit
             IFluidAdminDex.UserBorrowConfig[]
                 memory config_ = new IFluidAdminDex.UserBorrowConfig[](1);
             config_[0] = IFluidAdminDex.UserBorrowConfig({
@@ -603,12 +555,10 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
                 maxDebtCeiling: 20_000_000 * 1e18 // 20M shares // 2x
             });
 
-            IFluidDex(ETH_USDC_DEX_ADDRESS).updateUserBorrowConfigs(
-                config_
-            );
+            IFluidDex(ETH_USDC_DEX_ADDRESS).updateUserBorrowConfigs(config_);
         }
     }
-    
+
     /**
      * |
      * |     Proposal Payload Helpers      |
