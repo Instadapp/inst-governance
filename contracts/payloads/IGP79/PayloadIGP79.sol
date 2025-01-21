@@ -37,6 +37,8 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
     bool public skipAction6;
     bool public skipAction7;
     bool public skipAction8;
+    bool public skipAction9;
+    bool public skipAction10;
     bool public isExecutable;
     bool public skipCbbtcWbtcRangeUpdate;
 
@@ -86,26 +88,32 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
         // Action 1: Set launch limits for sUSDs based vaults
         action1();
 
-        // Action 2: Set launch limits for tBTC<>USDC, tBTC<>USDT, tBTC<>GHO vaults
+        // Action 2: Set launch limits for sUSDe-USDT dex and sUSDe-USDT<>USDT T2 vault
         action2();
 
-        // Action 3: Set launch limits for eBTC-cbBTC DEX and eBTC-cbBTC<>WBTC T2, eBTC<>cbBTC T1, eBTC<>wBTC T1 vaults
+        // Action 3: Set launch limits for USDe-USDT dex and USDe-USDT<>USDT T2 vault
         action3();
 
-        // Action 4: Set launch limits for lBTC-cbBTC DEX and lBTC-cbBTC<>WBTC T2 vault
+        // Action 4: Set launch limits for tBTC<>USDC, tBTC<>USDT, tBTC<>GHO vaults
         action4();
 
-        // Action 5: Update wbBTC<>cbBTC DEX configs
+        // Action 5: Set launch limits for eBTC-cbBTC DEX and eBTC-cbBTC<>WBTC T2 and eBTC<>wBTC T1 vaults
         action5();
 
-        // Action 6: Set launch limits for deUSD-USDC DEX
+        // Action 6: Set launch limits for lBTC-cbBTC DEX and lBTC-cbBTC<>WBTC T2 vault
         action6();
 
-        //Action 7: Collect Revenue
+        // Action 7: Set launch limits for deUSD-USDC DEX
         action7();
 
-        //Action 8: Increase the ETH-USDC DEX limits
+        // Action 8: Update wbBTC<>cbBTC DEX configs
         action8();
+
+        // Action 9: Collect revenue
+        action9();
+
+        // Action 10: Increase the ETH-USDC DEX limits
+        action10();
     }
 
     function verifyProposal() external view {}
@@ -124,6 +132,8 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
         bool skipAction6_,
         bool skipAction7_,
         bool skipAction8_,
+        bool skipAction9_,
+        bool skipAction10_,
         bool isExecutable_,
         bool skipCbbtcWbtcRangeUpdate_
     ) external {
@@ -139,6 +149,8 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
         skipAction6 = skipAction6_;
         skipAction7 = skipAction7_;
         skipAction8 = skipAction8_;
+        skipAction9 = skipAction9_;
+        skipAction10 = skipAction10_;
         isExecutable = isExecutable_;
         skipCbbtcWbtcRangeUpdate = skipCbbtcWbtcRangeUpdate_;
     }
@@ -234,9 +246,106 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
         }
     }
 
-    // @notice Action 2: Set launch limits for tBTC<>USDC, tBTC<>USDT, tBTC<>GHO vaults
+    // @notice Action 2: Set launch limits for sUSDe-USDT dex and sUSDe-USDT<>USDT T2 vault
     function action2() internal {
         if (PayloadIGP79(ADDRESS_THIS).skipAction2()) return;
+
+        address sUSDe_USDT_DEX = getDexAddress(15);
+        address sUSDe_USDT__USDT_VAULT = getVaultAddress(92);
+        {
+            // sUSDe-USDT DEX
+            {
+                // sUSDe-USDT Dex
+                Dex memory DEX_sUSDe_USDT = Dex({
+                    dex: sUSDe_USDT_DEX,
+                    tokenA: sUSDe_ADDRESS,
+                    tokenB: USDT_ADDRESS,
+                    smartCollateral: true,
+                    smartDebt: false,
+                    baseWithdrawalLimitInUSD: 15_000_000, // $15M
+                    baseBorrowLimitInUSD: 0, // $0
+                    maxBorrowLimitInUSD: 0 // $0
+                });
+                setDexLimits(DEX_sUSDe_USDT); // Smart Collateral
+
+                DEX_FACTORY.setDexAuth(sUSDe_USDT_DEX, TEAM_MULTISIG, false);
+            }
+        }
+
+        {
+            // [TYPE 2] sUSDe-USDT<>USDT | smart collateral & debt
+            Vault memory VAULT_sUSDe_USDT = Vault({
+                vault: sUSDe_USDT__USDT_VAULT,
+                vaultType: TYPE.TYPE_2,
+                supplyToken: address(0),
+                borrowToken: USDT_ADDRESS,
+                baseWithdrawalLimitInUSD: 0,
+                baseBorrowLimitInUSD: 10_000_000, // $10M
+                maxBorrowLimitInUSD: 12_500_000 // $12.5M
+            });
+
+            setVaultLimits(VAULT_sUSDe_USDT); // TYPE_2 => 92
+
+            VAULT_FACTORY.setVaultAuth(
+                sUSDe_USDT__USDT_VAULT,
+                TEAM_MULTISIG,
+                false
+            );
+        }
+    }
+
+    // @notice Action 3: Set launch limits for USDe-USDT dex and USDe-USDT<>USDT T2 vault
+    function action3() internal {
+        if (PayloadIGP79(ADDRESS_THIS).skipAction3()) return;
+
+        address USDe_USDT_DEX = getDexAddress(18);
+        address USDe_USDT__USDT_VAULT = getVaultAddress(93);
+
+        {
+            // USDe-USDT DEX
+            {
+                // USDe-USDT Dex
+                Dex memory DEX_USDe_USDT = Dex({
+                    dex: USDe_USDT_DEX,
+                    tokenA: USDe_ADDRESS,
+                    tokenB: USDT_ADDRESS,
+                    smartCollateral: true,
+                    smartDebt: false,
+                    baseWithdrawalLimitInUSD: 15_000_000, // $15M
+                    baseBorrowLimitInUSD: 0, // $0
+                    maxBorrowLimitInUSD: 0 // $0
+                });
+                setDexLimits(DEX_USDe_USDT); // Smart Collateral
+
+                DEX_FACTORY.setDexAuth(USDe_USDT_DEX, TEAM_MULTISIG, false);
+            }
+        }
+
+        {
+            // [TYPE 2] USDe-USDT<>USDT | smart collateral & debt
+            Vault memory VAULT_USDe_USDT = Vault({
+                vault: USDe_USDT__USDT_VAULT,
+                vaultType: TYPE.TYPE_2,
+                supplyToken: address(0),
+                borrowToken: USDT_ADDRESS,
+                baseWithdrawalLimitInUSD: 0,
+                baseBorrowLimitInUSD: 10_000_000, // $10M
+                maxBorrowLimitInUSD: 12_500_000 // $12.5M
+            });
+
+            setVaultLimits(VAULT_USDe_USDT); // TYPE_2 => 93
+
+            VAULT_FACTORY.setVaultAuth(
+                USDe_USDT__USDT_VAULT,
+                TEAM_MULTISIG,
+                false
+            );
+        }
+    }
+
+    // @notice Action 4: Set launch limits for tBTC<>USDC, tBTC<>USDT, tBTC<>GHO vaults
+    function action4() internal {
+        if (PayloadIGP79(ADDRESS_THIS).skipAction4()) return;
 
         {
             address tBTC_USDC_VAULT = getVaultAddress(88);
@@ -296,9 +405,9 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
         }
     }
 
-    // @notice Action 3: Set launch limits for eBTC-cbBTC DEX and eBTC-cbBTC<>WBTC T2, eBTC<>cbBTC T1, eBTC<>wBTC T1 vaults
-    function action3() internal {
-        if (PayloadIGP79(ADDRESS_THIS).skipAction3()) return;
+    // @notice Action 5: Set launch limits for eBTC-cbBTC DEX and eBTC-cbBTC<>WBTC T2 and eBTC<>wBTC T1 vaults
+    function action5() internal {
+        if (PayloadIGP79(ADDRESS_THIS).skipAction5()) return;
 
         address eBTC_cbBTC_DEX = getDexAddress(16);
         address eBTC_cbBTC__WBTC_VAULT = getVaultAddress(96);
@@ -381,9 +490,9 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
         }
     }
 
-    // @notice Action 4: Set launch limits for lBTC-cbBTC DEX and lBTC-cbBTC<>WBTC T2 vault
-    function action4() internal {
-        if (PayloadIGP79(ADDRESS_THIS).skipAction4()) return;
+    // @notice Action 6: Set launch limits for lBTC-cbBTC DEX and lBTC-cbBTC<>WBTC T2 vault
+    function action6() internal {
+        if (PayloadIGP79(ADDRESS_THIS).skipAction6()) return;
 
         address lBTC_cbBTC_DEX = getDexAddress(17);
         address lBTC_cbBTC__WBTC_VAULT = getVaultAddress(97);
@@ -430,33 +539,9 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
         }
     }
 
-    // @notice Action 5: Update wbBTC<>cbBTC DEX configs
-    function action5() internal {
-        if (PayloadIGP79(ADDRESS_THIS).skipAction5()) return;
-
-        address cbBTC_wBTC_DEX_ADDRESS = getDexAddress(3);
-
-        if(!PayloadIGP79(ADDRESS_THIS).skipCbbtcWbtcRangeUpdate()) {
-            // updates the upper and lower range +-0.2%
-            IFluidDex(cbBTC_wBTC_DEX_ADDRESS).updateRangePercents(
-                0.2 * 1e4,
-                0.2 * 1e4,
-                2 days
-            );
-        }
-
-        // update min/max center price limits to 0.2%
-        uint256 minCenterPrice_ = (998 * 1e27) / 1000;
-        uint256 maxCenterPrice_ = uint256(1e27 * 1000) / 998;
-        IFluidDex(cbBTC_wBTC_DEX_ADDRESS).updateCenterPriceLimits(
-            maxCenterPrice_,
-            minCenterPrice_
-        );
-    }
-
-    // @notice Action 6: Set launch limits for deUSD-USDC DEX
-    function action6() internal {
-        if (PayloadIGP79(ADDRESS_THIS).skipAction6()) return;
+    // @notice Action 7: Set launch limits for deUSD-USDC DEX
+    function action7() internal {
+        if (PayloadIGP79(ADDRESS_THIS).skipAction7()) return;
 
         address deUSD_USDC_DEX = getDexAddress(19);
 
@@ -481,9 +566,33 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
         }
     }
 
-    // @notice Action 7: Collect revenue
-    function action7() internal {
-        if (PayloadIGP79(ADDRESS_THIS).skipAction7()) return;
+    // @notice Action 8: Update wbBTC<>cbBTC DEX configs
+    function action8() internal {
+        if (PayloadIGP79(ADDRESS_THIS).skipAction8()) return;
+
+        address cbBTC_wBTC_DEX_ADDRESS = getDexAddress(3);
+
+        if(!PayloadIGP79(ADDRESS_THIS).skipCbbtcWbtcRangeUpdate()) {
+            // updates the upper and lower range +-0.2%
+            IFluidDex(cbBTC_wBTC_DEX_ADDRESS).updateRangePercents(
+                0.2 * 1e4,
+                0.2 * 1e4,
+                2 days
+            );
+        }
+
+        // update min/max center price limits to 0.2%
+        uint256 minCenterPrice_ = (998 * 1e27) / 1000;
+        uint256 maxCenterPrice_ = uint256(1e27 * 1000) / 998;
+        IFluidDex(cbBTC_wBTC_DEX_ADDRESS).updateCenterPriceLimits(
+            maxCenterPrice_,
+            minCenterPrice_
+        );
+    }
+
+    // @notice Action 9: Collect revenue
+    function action9() internal {
+        if (PayloadIGP79(ADDRESS_THIS).skipAction9()) return;
 
         address[] memory tokens = new address[](7);
 
@@ -498,9 +607,9 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
         LIQUIDITY.collectRevenue(tokens);
     }
 
-    // @notice Action 8: Increase ETH-USDC DEX limits
-    function action8() internal {
-        if (PayloadIGP79(ADDRESS_THIS).skipAction8()) return;
+    // @notice Action 10: Increase ETH-USDC DEX limits
+    function action10() internal {
+        if (PayloadIGP79(ADDRESS_THIS).skipAction10()) return;
 
         address ETH_USDC_DEX_ADDRESS = getDexAddress(12);
         address ETH_USDC_VAULT_ADDRESS = getVaultAddress(77);
