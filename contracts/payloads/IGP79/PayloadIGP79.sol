@@ -403,7 +403,7 @@ contract PayloadIGP77 is PayloadIGPConstants, PayloadIGPHelpers {
         );
     }
 
-    // @notice Action 6: Set launch limits for deUSD-USDC DEX and deUSD-USDC<>USDT T2 vault
+    // @notice Action 6: Set initial limits for deUSD-USDC DEX and deUSD-USDC<>USDT T2 vault
     function action6() internal {
         address deUSD_USDC_DEX = getDexAddress(19);
         address deUSD_USDC__USDT_VAULT = getVaultAddress(98);
