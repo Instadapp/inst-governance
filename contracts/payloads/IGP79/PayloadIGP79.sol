@@ -477,7 +477,7 @@ contract PayloadIGP77 is PayloadIGPConstants, PayloadIGPHelpers {
             address ETH_ADDRESS = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
             uint256 ETH_AMOUNT = 70 * 1e18; // 70 ETH
             targets[1] = "BASIC-A";
-            encodedSpells[1] = abi.encodeWithSignature(withdrawSignature, ETH_ADDRESS, STETH_AMOUNT, TEAM_MULTISIG, 0, 0);
+            encodedSpells[1] = abi.encodeWithSignature(withdrawSignature, ETH_ADDRESS, TETH_AMOUNT, TEAM_MULTISIG, 0, 0);
         }
 
         // Spell 3: Transfer wstETH
@@ -485,7 +485,7 @@ contract PayloadIGP77 is PayloadIGPConstants, PayloadIGPHelpers {
             address WSTETH_ADDRESS = 0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0;
             uint256 WSTETH_AMOUNT = 150 * 1e18; // 150 wstETH
             targets[2] = "BASIC-A";
-            encodedSpells[2] = abi.encodeWithSignature(withdrawSignature, WSTETH_ADDRESS, STETH_AMOUNT, TEAM_MULTISIG, 0, 0);
+            encodedSpells[2] = abi.encodeWithSignature(withdrawSignature, WSTETH_ADDRESS, WSTETH_AMOUNT, TEAM_MULTISIG, 0, 0);
         }
 
         IDSAV2(TREASURY).cast(targets, encodedSpells, address(this));
