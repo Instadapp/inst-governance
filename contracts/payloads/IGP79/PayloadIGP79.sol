@@ -40,7 +40,7 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
     bool public skipAction9;
     bool public skipAction10;
     bool public isExecutable;
-    bool public skipCbbtcWbtcRangeUpdate;
+    bool public skipCbbtcWbtcCenterPriceUpdate;
 
     function propose(string memory description) external {
         require(
@@ -133,7 +133,7 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
         bool skipAction9_,
         bool skipAction10_,
         bool isExecutable_,
-        bool skipCbbtcWbtcRangeUpdate_
+        bool skipCbbtcWbtcCenterPriceUpdate_
     ) external {
         if (msg.sender != TEAM_MULTISIG) {
             revert("not-team-multisig");
@@ -150,7 +150,7 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
         skipAction9 = skipAction9_;
         skipAction10 = skipAction10_;
         isExecutable = isExecutable_;
-        skipCbbtcWbtcRangeUpdate = skipCbbtcWbtcRangeUpdate_;
+        skipCbbtcWbtcCenterPriceUpdate = skipCbbtcWbtcCenterPriceUpdate_;
     }
 
     /**
@@ -577,7 +577,7 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
             2 days
         );
 
-        if (!PayloadIGP79(ADDRESS_THIS).skipCbbtcWbtcRangeUpdate()) {
+        if (!PayloadIGP79(ADDRESS_THIS).skipCbbtcWbtcCenterPriceUpdate()) {
             // update min/max center price limits to 0.2%
             uint256 minCenterPrice_ = (998 * 1e27) / 1000;
             uint256 maxCenterPrice_ = uint256(1e27 * 1000) / 998;
