@@ -29,6 +29,15 @@ import {PayloadIGPHelpers} from "../common/helpers.sol";
 contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
     uint256 public constant PROPOSAL_ID = 79;
 
+    bool public skipAction1;
+    bool public skipAction2;
+    bool public skipAction3;
+    bool public skipAction4;
+    bool public skipAction5;
+    bool public skipAction6;
+    bool public skipAction7;
+    bool public skipAction8;
+
     function propose(string memory description) external {
         require(
             msg.sender == PROPOSER ||
@@ -91,6 +100,39 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
         action8();
     }
 
+    function verifyProposal() external view {}
+
+    /**
+     * |
+     * |     Team Multisig Actions      |
+     * |__________________________________
+     */
+    function setState(
+
+        bool skipAction1_,
+        bool skipAction2_,
+        bool skipAction3_,
+        bool skipAction4_,
+        bool skipAction5_,
+        bool skipAction6_,
+        bool skipAction7_,
+        bool skipAction8_
+ 
+    ) external {
+        if (msg.sender != TEAM_MULTISIG) {
+            revert("not-team-multisig");
+        }
+
+        skipAction1 = skipAction1_;
+        skipAction2 = skipAction2_;
+        skipAction3 = skipAction3_;
+        skipAction4 = skipAction4_;
+        skipAction5 = skipAction5_;
+        skipAction6 = skipAction6_;
+        skipAction7 = skipAction7_;
+        skipAction8 = skipAction8_;
+    }
+
     /**
      * |
      * |     Proposal Payload Actions      |
@@ -99,6 +141,9 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
 
     // @notice Action 1: Set launch limits for sUSDs based vaults
     function action1() internal {
+
+        if (PayloadIGP79(ADDRESS_THIS).skipAction1()) return;
+
         {
             address ETH_sUSDs_VAULT = getVaultAddress(84);
 
@@ -182,6 +227,9 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
 
     // @notice Action 2: Set launch limits for tBTC<>USDC, tBTC<>USDT, tBTC<>GHO vaults
     function action2() internal {
+
+        if (PayloadIGP79(ADDRESS_THIS).skipAction2()) return;
+
         {
             address tBTC_USDC_VAULT = getVaultAddress(88);
 
@@ -242,6 +290,9 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
 
     // @notice Action 3: Set launch limits for eBTC-cbBTC DEX and eBTC-cbBTC<>WBTC T2, eBTC<>cbBTC T1, eBTC<>wBTC T1 vaults
     function action3() internal {
+
+        if (PayloadIGP79(ADDRESS_THIS).skipAction3()) return;
+
         address eBTC_cbBTC_DEX = getDexAddress(16);
         address eBTC_cbBTC__WBTC_VAULT = getVaultAddress(96);
         address eBTC__wBTC_VAULT = getVaultAddress(94);
@@ -337,6 +388,9 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
 
     // @notice Action 4: Set launch limits for lBTC-cbBTC DEX and lBTC-cbBTC<>WBTC T2 vault
     function action4() internal {
+
+        if (PayloadIGP79(ADDRESS_THIS).skipAction4()) return;
+
         address lBTC_cbBTC_DEX = getDexAddress(17);
         address lBTC_cbBTC__WBTC_VAULT = getVaultAddress(97);
 
@@ -388,6 +442,9 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
 
     // @notice Action 5: Update wbBTC<>cbBTC DEX configs
     function action5() internal {
+
+        if (PayloadIGP79(ADDRESS_THIS).skipAction5()) return;
+
         address cbBTC_wBTC_DEX_ADDRESS = getDexAddress(3);
 
         // updates the upper and lower range +-0.2%
@@ -408,6 +465,9 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
 
     // @notice Action 6: Set initial limits for deUSD-USDC DEX and deUSD-USDC<>USDT T2 vault
     function action6() internal {
+
+        if (PayloadIGP79(ADDRESS_THIS).skipAction6()) return;
+
         address deUSD_USDC_DEX = getDexAddress(19);
         address deUSD_USDC__USDT_VAULT = getVaultAddress(98);
 
@@ -459,6 +519,9 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
 
     // @notice Action 7: Collect revenue
     function action7() internal {
+
+        if (PayloadIGP79(ADDRESS_THIS).skipAction7()) return;
+
         address[] memory tokens = new address[](7);
 
         tokens[0] = ETH_ADDRESS;
@@ -474,6 +537,9 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
 
     // @notice Action 8: Increase ETH-USDC DEX limits
     function action8() internal {
+
+        if (PayloadIGP79(ADDRESS_THIS).skipAction8()) return;
+
         address ETH_USDC_DEX_ADDRESS = getDexAddress(12);
         address ETH_USDC_VAULT_ADDRESS = getVaultAddress(77);
 
