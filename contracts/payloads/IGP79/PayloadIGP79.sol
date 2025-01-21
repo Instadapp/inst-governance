@@ -76,7 +76,7 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
     function execute() external {
         if (!PayloadIGP79(ADDRESS_THIS).isExecutable()) {
             revert(
-                "IGP-79 Execution not allowed: isExecutable() returned false"
+                "IGP-79 Execution not executable"
             );
         }
 
