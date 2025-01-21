@@ -78,9 +78,7 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
 
     function execute() external {
         if (!PayloadIGP79(ADDRESS_THIS).isExecutable()) {
-            revert(
-                "IGP-79 Execution not executable"
-            );
+            revert("IGP-79 Execution not executable");
         }
 
         require(address(this) == address(TIMELOCK), "not-valid-caller");
@@ -280,8 +278,8 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
                 supplyToken: address(0),
                 borrowToken: USDT_ADDRESS,
                 baseWithdrawalLimitInUSD: 0,
-                baseBorrowLimitInUSD: 10_000_000, // $10M
-                maxBorrowLimitInUSD: 12_500_000 // $12.5M
+                baseBorrowLimitInUSD: 15_000_000, // $15M
+                maxBorrowLimitInUSD: 30_000_000 // $30M
             });
 
             setVaultLimits(VAULT_sUSDe_USDT); // TYPE_2 => 92
@@ -329,8 +327,8 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
                 supplyToken: address(0),
                 borrowToken: USDT_ADDRESS,
                 baseWithdrawalLimitInUSD: 0,
-                baseBorrowLimitInUSD: 10_000_000, // $10M
-                maxBorrowLimitInUSD: 12_500_000 // $12.5M
+                baseBorrowLimitInUSD: 15_000_000, // $15M
+                maxBorrowLimitInUSD: 30_000_000 // $30M
             });
 
             setVaultLimits(VAULT_USDe_USDT); // TYPE_2 => 93
@@ -572,7 +570,7 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
 
         address cbBTC_wBTC_DEX_ADDRESS = getDexAddress(3);
 
-        if(!PayloadIGP79(ADDRESS_THIS).skipCbbtcWbtcRangeUpdate()) {
+        if (!PayloadIGP79(ADDRESS_THIS).skipCbbtcWbtcRangeUpdate()) {
             // updates the upper and lower range +-0.2%
             IFluidDex(cbBTC_wBTC_DEX_ADDRESS).updateRangePercents(
                 0.2 * 1e4,
@@ -864,7 +862,11 @@ contract PayloadIGP79 is PayloadIGPConstants, PayloadIGPHelpers {
         } else if (token == sUSDs_ADDRESS) {
             usdPrice = sUSDs_USD_PRICE;
             decimals = 18;
-        } else if (token == GHO_ADDRESS || token == USDe_ADDRESS || token == deUSD_ADDRESS) {
+        } else if (
+            token == GHO_ADDRESS ||
+            token == USDe_ADDRESS ||
+            token == deUSD_ADDRESS
+        ) {
             usdPrice = STABLE_USD_PRICE;
             decimals = 18;
         } else if (token == INST_ADDRESS) {
