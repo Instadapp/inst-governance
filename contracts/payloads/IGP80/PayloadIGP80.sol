@@ -83,6 +83,9 @@ contract PayloadIGP80 is PayloadIGPConstants, PayloadIGPHelpers {
 
         // Action 5: Set dust allowance for USDe-USDT<>USDC-USDT T4 vault
         action5();
+
+        // @notice Action 6: Update wstETH-ETH DEX Lower Range
+        action6();
     }
 
     function verifyProposal() external view {}
@@ -303,6 +306,20 @@ contract PayloadIGP80 is PayloadIGPConstants, PayloadIGPHelpers {
                 TEAM_MULTISIG,
                 true
             );
+    }
+
+    // @notice Action 6: Update wstETH-ETH DEX Lower Range
+    function action6() internal {
+        address wstETH_ETH_DEX_ADDRESS = getDexAddress(1);
+
+        {
+            // Update Lower Range
+            IFluidDex(wstETH_ETH_DEX_ADDRESS).updateRangePercents(
+                0.0001 * 1e4,
+                0.075 * 1e4,
+                0
+            );
+        }
     }
 
     /**
