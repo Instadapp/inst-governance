@@ -29,11 +29,7 @@ import {PayloadIGPHelpers} from "../common/helpers.sol";
 contract PayloadIGP80 is PayloadIGPConstants, PayloadIGPHelpers {
     uint256 public constant PROPOSAL_ID = 80;
 
-    bool public skipAction1;
-    uint256 public deusd_usdc_dex_id;
-    bool public skipAction3;
-    bool public skipAction4;
-    bool public skipAction5;
+    bool public skip_deusd_usdc_dex_auth_removal;
     bool public isExecutable;
 
     function propose(string memory description) external {
@@ -101,22 +97,14 @@ contract PayloadIGP80 is PayloadIGPConstants, PayloadIGPHelpers {
      * |__________________________________
      */
     function setState(
-        bool skipAction1_,
-        uint256 deusd_usdc_dex_id,
-        bool skipAction3_,
-        bool skipAction4_,
-        bool skipAction5_,
+        bool skip_deusd_usdc_dex_auth_removal,
         bool isExecutable_
     ) external {
         if (msg.sender != TEAM_MULTISIG) {
             revert("not-team-multisig");
         }
 
-        skipAction1 = skipAction1_;
-        deUSD_USDC_DEX_ID = deusd_usdc_dex_id;
-        skipAction3 = skipAction3_;
-        skipAction4 = skipAction4_;
-        skipAction5 = skipAction5_;
+        SKIP_deUSD_USDC_DEX_AUTH_REMOVAL = skip_deusd_usdc_dex_auth_removal;
         isExecutable = isExecutable_;
     }
 
@@ -128,8 +116,6 @@ contract PayloadIGP80 is PayloadIGPConstants, PayloadIGPHelpers {
 
     // @notice Action 1: Set dust limits for USDC collateral vaults
     function action1() internal {
-        if (PayloadIGP80(ADDRESS_THIS).skipAction1()) return;
-
         {
             address USDC_ETH_VAULT = getVaultAddress(100);
 
@@ -202,20 +188,18 @@ contract PayloadIGP80 is PayloadIGPConstants, PayloadIGPHelpers {
 
     // @notice Action 2: Remove Multisig as auth from deUSD-USDC DEX
     function action2() internal {
-        uint256 deusd_usdc_dex_id = PayloadIGP80(ADDRESS_THIS).deUSD_USDC_DEX_ID();
 
-        if (deusd_usdc_dex_id != 420)
+        if (!PayloadIGP80(ADDRESS_THIS).skip_deusd_usdc_dex_auth_removal()) {
             DEX_FACTORY.setDexAuth(
                 getDexAddress(deusd_usdc_dex_id),
                 TEAM_MULTISIG,
                 false
             );
+        }
     }
 
     // @notice Action 3: Set dust allowance for USR-USDC DEX
     function action3() internal {
-        if (PayloadIGP80(ADDRESS_THIS).skipAction3()) return;
-
         address USR_USDC_DEX = getDexAddress(20);
 
         {
@@ -245,8 +229,6 @@ contract PayloadIGP80 is PayloadIGPConstants, PayloadIGPHelpers {
 
     // @notice Action 4:  Set dust allowance for sUSDe-USDT<>USDC-USDT T4 vault
     function action4() internal {
-        if (PayloadIGP80(ADDRESS_THIS).skipAction4()) return;
-
         address sUSDe_USDT_DEX_ADDRESS = getDexAddress(15);
         address USDC_USDT_DEX_ADDRESS = getDexAddress(2);
         address sUSDe_USDT__USDC_USDT_VAULT_ADDRESS = getVaultAddress(98);
@@ -283,8 +265,6 @@ contract PayloadIGP80 is PayloadIGPConstants, PayloadIGPHelpers {
     
     // @notice Action 5:  Set dust allowance for USDe-USDT<>USDC-USDT T4 vault
     function action5() internal {
-        if (PayloadIGP80(ADDRESS_THIS).skipAction5()) return;
-
         address USDe_USDT_DEX_ADDRESS = getDexAddress(18);
         address USDC_USDT_DEX_ADDRESS = getDexAddress(2);
         address USDe_USDT__USDC_USDT_VAULT_ADDRESS = getVaultAddress(99);
