@@ -255,6 +255,12 @@ contract PayloadIGP80 is PayloadIGPConstants, PayloadIGPHelpers {
 
             IFluidDex(USDC_USDT_DEX_ADDRESS).updateUserBorrowConfigs(config_);
         }
+
+        VAULT_FACTORY.setVaultAuth(
+                sUSDe_USDT__USDC_USDT_VAULT_ADDRESS,
+                TEAM_MULTISIG,
+                true
+            );
     }
     
     // @notice Action 5:  Set dust allowance for USDe-USDT<>USDC-USDT T4 vault
@@ -291,6 +297,12 @@ contract PayloadIGP80 is PayloadIGPConstants, PayloadIGPHelpers {
 
             IFluidDex(USDC_USDT_DEX_ADDRESS).updateUserBorrowConfigs(config_);
         }
+
+        VAULT_FACTORY.setVaultAuth(
+                USDe_USDT__USDC_USDT_VAULT_ADDRESS,
+                TEAM_MULTISIG,
+                true
+            );
     }
 
     /**
