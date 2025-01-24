@@ -30,7 +30,6 @@ contract PayloadIGP80 is PayloadIGPConstants, PayloadIGPHelpers {
     uint256 public constant PROPOSAL_ID = 80;
 
     bool public skip_deusd_usdc_dex_auth_removal;
-    bool public isExecutable;
 
     function propose(string memory description) external {
         require(
@@ -67,9 +66,6 @@ contract PayloadIGP80 is PayloadIGPConstants, PayloadIGPHelpers {
     }
 
     function execute() external {
-        if (!PayloadIGP80(ADDRESS_THIS).isExecutable()) {
-            revert("IGP-80 Execution not executable");
-        }
 
         require(address(this) == address(TIMELOCK), "not-valid-caller");
 
@@ -97,15 +93,13 @@ contract PayloadIGP80 is PayloadIGPConstants, PayloadIGPHelpers {
      * |__________________________________
      */
     function setState(
-        bool skip_deusd_usdc_dex_auth_removal_,
-        bool isExecutable_
+        bool skip_deusd_usdc_dex_auth_removal_
     ) external {
         if (msg.sender != TEAM_MULTISIG) {
             revert("not-team-multisig");
         }
 
         skip_deusd_usdc_dex_auth_removal = skip_deusd_usdc_dex_auth_removal_;
-        isExecutable = isExecutable_;
     }
 
     /**
