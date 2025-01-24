@@ -97,14 +97,14 @@ contract PayloadIGP80 is PayloadIGPConstants, PayloadIGPHelpers {
      * |__________________________________
      */
     function setState(
-        bool skip_deusd_usdc_dex_auth_removal,
+        bool skip_deusd_usdc_dex_auth_removal_,
         bool isExecutable_
     ) external {
         if (msg.sender != TEAM_MULTISIG) {
             revert("not-team-multisig");
         }
 
-        SKIP_deUSD_USDC_DEX_AUTH_REMOVAL = skip_deusd_usdc_dex_auth_removal;
+        skip_deusd_usdc_dex_auth_removal = skip_deusd_usdc_dex_auth_removal_;
         isExecutable = isExecutable_;
     }
 
