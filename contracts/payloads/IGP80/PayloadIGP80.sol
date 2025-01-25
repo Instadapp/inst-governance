@@ -90,6 +90,9 @@ contract PayloadIGP80 is PayloadIGPConstants, PayloadIGPHelpers {
         // Action 7: Update weETHs-ETH DEX Lower Range and Trading Fee
         action7();
 
+        // Action 8: Withdraw ETH from Reserve to team multisig
+        action8();
+
     }
 
     function verifyProposal() external view {}
@@ -346,6 +349,17 @@ contract PayloadIGP80 is PayloadIGPConstants, PayloadIGPHelpers {
                 0
             );
         }
+    }
+
+    // @notice Action 8: Withdraw ETH from Reserve to team multisig
+    function action8() internal {
+        address[] memory tokens = new address[](1);
+        uint256[] memory amounts = new uint256[](1);
+
+        tokens[0] = ETH_ADDRESS;
+        amounts[0] = address(FLUID_RESERVE).balance;
+
+        FLUID_RESERVE.withdrawFunds(tokens, amounts, TEAM_MULTISIG);
     }
 
     /**
