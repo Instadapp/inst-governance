@@ -87,7 +87,7 @@ contract PayloadIGP80 is PayloadIGPConstants, PayloadIGPHelpers {
         // Action 6: Update wstETH-ETH DEX Lower Range
         action6();
 
-        // Action 7: Update weETHs-ETH DEX Lower Range and Fee %
+        // Action 7: Update weETHs-ETH DEX Lower Range and Trading Fee
         action7();
 
     }
@@ -340,7 +340,7 @@ contract PayloadIGP80 is PayloadIGPConstants, PayloadIGPHelpers {
         }
         
         {
-            //Update Fee
+            //Update Trading Fee
             IFluidDex(weETHs_ETH_DEX_ADDRESS).updateFeeAndRevenueCut(
                 0.02 * 1e4,
                 0
