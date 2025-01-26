@@ -345,7 +345,7 @@ contract PayloadIGP80 is PayloadIGPConstants, PayloadIGPHelpers {
         {
             //Update Trading Fee
             IFluidDex(weETHs_ETH_DEX_ADDRESS).updateFeeAndRevenueCut(
-                0.02 * 1e4,
+                0.05 * 1e4,
                 0
             );
         }
