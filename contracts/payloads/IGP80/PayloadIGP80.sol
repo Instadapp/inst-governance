@@ -93,6 +93,12 @@ contract PayloadIGP80 is PayloadIGPConstants, PayloadIGPHelpers {
         // Action 8: Withdraw ETH from Reserve to team multisig
         action8();
 
+        // Action 9: Discontinue fGHO rewards
+        action9();
+
+        // Action 10: Double limits for sUSDe-USDT/USDT T2 Vault
+        action10();
+
     }
 
     function verifyProposal() external view {}
@@ -362,6 +368,52 @@ contract PayloadIGP80 is PayloadIGPConstants, PayloadIGPHelpers {
         amounts[0] = 500 ether; // 500 ETH
 
         FLUID_RESERVE.withdrawFunds(tokens, amounts, TEAM_MULTISIG);
+    }
+
+    // @notice Action 9: Discontinue fGHO rewards
+    function action9() internal {
+        address[] memory protocols = new address[](1);
+        address[] memory tokens = new address[](1);
+        uint256[] memory amounts = new uint256[](1);
+
+        address fGHO_REWARDS_ADDRESS = 0x95755A4552690a53d7360B7e16155867868ae964;
+
+        {
+            /// fGHO
+            IFTokenAdmin(F_GHO_ADDRESS).updateRewards(
+                fGHO_REWARDS_ADDRESS
+            );
+
+            uint256 allowance = 210_000 * 1e18; // 210K GHO
+
+            protocols[0] = F_GHO_ADDRESS;
+            tokens[0] = GHO_ADDRESS;
+            amounts[0] = allowance;
+        }
+
+        FLUID_RESERVE.approve(protocols, tokens, amounts);
+
+        ILendingRewards(fGHO_REWARDS_ADDRESS).start();
+    }
+
+    // @notice Action 10: Double limits for sUSDe-USDT/USDT T2 Vault
+    function action10() internal {
+        address sUSDe_USDT__USDT_VAULT = getVaultAddress(92);
+
+        {
+            // [TYPE 2] sUSDe-USDT<>USDT | smart collateral & debt
+            Vault memory VAULT_sUSDe_USDT = Vault({
+                vault: sUSDe_USDT__USDT_VAULT,
+                vaultType: TYPE.TYPE_2,
+                supplyToken: address(0),
+                borrowToken: USDT_ADDRESS,
+                baseWithdrawalLimitInUSD: 0,
+                baseBorrowLimitInUSD: 30_000_000, // $30M // 2x
+                maxBorrowLimitInUSD: 60_000_000 // $60M // 2x
+            });
+
+            setVaultLimits(VAULT_sUSDe_USDT); // TYPE_2 => 92
+        }
     }
 
     /**
