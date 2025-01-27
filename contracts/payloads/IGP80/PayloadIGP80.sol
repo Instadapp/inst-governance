@@ -289,7 +289,7 @@ contract PayloadIGP80 is PayloadIGPConstants, PayloadIGPHelpers {
                 user: USDe_USDT__USDC_USDT_VAULT_ADDRESS,
                 expandPercent: 25 * 1e2, // 25%
                 expandDuration: 12 hours, // 12 hours
-                baseWithdrawalLimit: 10_000 * 1e18 // 10k shares
+                baseWithdrawalLimit: 5_000 * 1e18 // 5k shares (10k)
             });
 
             IFluidDex(USDe_USDT_DEX_ADDRESS).updateUserSupplyConfigs(config_);
@@ -303,8 +303,8 @@ contract PayloadIGP80 is PayloadIGPConstants, PayloadIGPHelpers {
                 user: USDe_USDT__USDC_USDT_VAULT_ADDRESS,
                 expandPercent: 20 * 1e2, // 20%
                 expandDuration: 12 hours, // 12 hours
-                baseDebtCeiling: 10_000 * 1e18, // 10k shares
-                maxDebtCeiling: 20_000 * 1e18 // 20k shares
+                baseDebtCeiling: 5_000 * 1e18, // 5k shares ($10k)
+                maxDebtCeiling: 10_000 * 1e18 // 10k shares ($20k)
             });
 
             IFluidDex(USDC_USDT_DEX_ADDRESS).updateUserBorrowConfigs(config_);
@@ -359,7 +359,7 @@ contract PayloadIGP80 is PayloadIGPConstants, PayloadIGPHelpers {
         uint256[] memory amounts = new uint256[](1);
 
         tokens[0] = ETH_ADDRESS;
-        amounts[0] = 500 * 1e18; // 500 ETH
+        amounts[0] = 500 ether; // 500 ETH
 
         FLUID_RESERVE.withdrawFunds(tokens, amounts, TEAM_MULTISIG);
     }
