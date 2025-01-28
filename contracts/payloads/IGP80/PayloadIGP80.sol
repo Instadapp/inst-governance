@@ -402,8 +402,7 @@ contract PayloadIGP80 is PayloadIGPConstants, PayloadIGPHelpers {
                     0.05 * 1e4, // 0.05%
                     0
                 );
-           }
-            
+            }            
     }
 
     /**
