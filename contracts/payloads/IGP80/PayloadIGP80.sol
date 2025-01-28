@@ -381,7 +381,7 @@ contract PayloadIGP80 is PayloadIGPConstants, PayloadIGPHelpers {
         {
             /// fGHO
             IFTokenAdmin(F_GHO_ADDRESS).updateRewards(
-                fGHO_REWARDS_ADDRESS
+                address(0)
             );
 
             uint256 allowance = 210_000 * 1e18; // 210K GHO
