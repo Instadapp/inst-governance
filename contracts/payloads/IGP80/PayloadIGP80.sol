@@ -348,15 +348,15 @@ contract PayloadIGP80 is PayloadIGPConstants, PayloadIGPHelpers {
 
     // @notice Action 9: Discontinue fGHO rewards
     function action9() internal {
-        if (PayloadIGP80(ADDRESS_THIS).skipAction9()) return;
-        
         address[] memory protocols = new address[](1);
         address[] memory tokens = new address[](1);
         uint256[] memory amounts = new uint256[](1);
 
         {
-            /// fGHO
-            IFTokenAdmin(F_GHO_ADDRESS).updateRewards(address(0));
+            if (PayloadIGP80(ADDRESS_THIS).skipAction9()) {
+                /// removing fGHO rewards
+                IFTokenAdmin(F_GHO_ADDRESS).updateRewards(address(0));
+            }
 
             uint256 allowance = 210_000 * 1e18; // 210K GHO
 
