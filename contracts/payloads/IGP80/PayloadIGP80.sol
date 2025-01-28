@@ -267,8 +267,8 @@ contract PayloadIGP80 is PayloadIGPConstants, PayloadIGPHelpers {
                 user: sUSDe_USDT__USDC_USDT_VAULT_ADDRESS,
                 expandPercent: 20 * 1e2, // 20%
                 expandDuration: 12 hours, // 12 hours
-                baseDebtCeiling: 5_000 * 1e18, // 5k shares ($10k)
-                maxDebtCeiling: 10_000 * 1e18 // 10k shares ($20k)
+                baseDebtCeiling: 4_000 * 1e18, // 4k shares ($8k)
+                maxDebtCeiling: 5_000 * 1e18 // 5k shares ($10k)
             });
 
             IFluidDex(USDC_USDT_DEX_ADDRESS).updateUserBorrowConfigs(config_);
@@ -309,8 +309,8 @@ contract PayloadIGP80 is PayloadIGPConstants, PayloadIGPHelpers {
                 user: USDe_USDT__USDC_USDT_VAULT_ADDRESS,
                 expandPercent: 20 * 1e2, // 20%
                 expandDuration: 12 hours, // 12 hours
-                baseDebtCeiling: 5_000 * 1e18, // 5k shares ($10k)
-                maxDebtCeiling: 10_000 * 1e18 // 10k shares ($20k)
+                baseDebtCeiling: 4_000 * 1e18, // 4k shares ($8k)
+                maxDebtCeiling: 5_000 * 1e18 // 5k shares ($10k)
             });
 
             IFluidDex(USDC_USDT_DEX_ADDRESS).updateUserBorrowConfigs(config_);
@@ -330,8 +330,8 @@ contract PayloadIGP80 is PayloadIGPConstants, PayloadIGPHelpers {
         {
             // Update Lower Range
             IFluidDex(wstETH_ETH_DEX_ADDRESS).updateRangePercents(
-                0.0001 * 1e4,
-                0.075 * 1e4,
+                0.0001 * 1e4, // 0.0001%
+                0.075 * 1e4, // 0.075%
                 0
             );
         }
@@ -344,8 +344,8 @@ contract PayloadIGP80 is PayloadIGPConstants, PayloadIGPHelpers {
         {
             // Update Lower Range
             IFluidDex(weETHs_ETH_DEX_ADDRESS).updateRangePercents(
-                0.0001 * 1e4,
-                0.1 * 1e4,
+                0.0001 * 1e4, // 0.0001%
+                0.1 * 1e4, // 0.1%
                 5 days
             );
         }
@@ -353,7 +353,7 @@ contract PayloadIGP80 is PayloadIGPConstants, PayloadIGPHelpers {
         {
             //Update Trading Fee
             IFluidDex(weETHs_ETH_DEX_ADDRESS).updateFeeAndRevenueCut(
-                0.05 * 1e4,
+                0.05 * 1e4, // 0.05%
                 0
             );
         }
@@ -375,8 +375,6 @@ contract PayloadIGP80 is PayloadIGPConstants, PayloadIGPHelpers {
         address[] memory protocols = new address[](1);
         address[] memory tokens = new address[](1);
         uint256[] memory amounts = new uint256[](1);
-
-        address fGHO_REWARDS_ADDRESS = 0x95755A4552690a53d7360B7e16155867868ae964;
 
         {
             /// fGHO
@@ -529,10 +527,10 @@ contract PayloadIGP80 is PayloadIGPConstants, PayloadIGPHelpers {
     }
 
     // Token Prices Constants
-    uint256 public constant ETH_USD_PRICE = 3_330 * 1e2;
-    uint256 public constant wstETH_USD_PRICE = 3_950 * 1e2;
-    uint256 public constant weETH_USD_PRICE = 3_500 * 1e2;
-    uint256 public constant rsETH_USD_PRICE = 3_850 * 1e2;
+    uint256 public constant ETH_USD_PRICE = 3_150 * 1e2;
+    uint256 public constant wstETH_USD_PRICE = 3_750 * 1e2;
+    uint256 public constant weETH_USD_PRICE = 3_350 * 1e2;
+    uint256 public constant rsETH_USD_PRICE = 3_750 * 1e2;
     uint256 public constant weETHs_USD_PRICE = 3_750 * 1e2;
     uint256 public constant mETH_USD_PRICE = 3_850 * 1e2;
 

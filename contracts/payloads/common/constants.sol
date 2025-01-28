@@ -102,6 +102,8 @@ contract PayloadIGPConstants {
         0x40D16FC0246aD3160Ccc09B8D0D3A2cD28aE6C2f;
     address internal constant deUSD_ADDRESS = 
         0x15700B564Ca08D9439C58cA5053166E8317aa138;
+    address internal constant USR_ADDRESS =
+        0x66a1E37c9b0eAddca17d3662D6c05F4DECf3e110;
 
     address internal constant WBTC_ADDRESS =
         0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599;
