@@ -97,7 +97,7 @@ contract PayloadIGP80 is PayloadIGPConstants, PayloadIGPHelpers {
         // Action 9: Discontinue fGHO rewards
         action9();
 
-        // @notice Action 10: Update USDe-USDT DEX Lower Range and Fee %
+        // @notice Action 10: Update USDe-USDT DEX Range
         action10();
 
         // @notice Action 11: Update sUSDe-USDT DEX Trading Fee
@@ -376,7 +376,7 @@ contract PayloadIGP80 is PayloadIGPConstants, PayloadIGPHelpers {
         FLUID_RESERVE.approve(protocols, tokens, amounts);
     }
 
-    // @notice Action 10: Update USDe-USDT DEX Lower Range and Fee %
+    // @notice Action 10: Update USDe-USDT DEX Range
     function action10() internal {
         address USDe_USDT_DEX_ADDRESS = getDexAddress(18);
 
@@ -392,18 +392,18 @@ contract PayloadIGP80 is PayloadIGPConstants, PayloadIGPHelpers {
 
     // @notice Action 11: Update sUSDe-USDT DEX Trading Fee
     function action11() internal {
-     {
+        if (PayloadIGP80(ADDRESS_THIS).skipAction11()) return;
+
         address sUSDe_USDT_DEX_ADDRESS = getDexAddress(15);
         
-            if (!PayloadIGP80(ADDRESS_THIS).skipAction11()){
+           {
                 //Update Trading Fee
                 IFluidDex(sUSDe_USDT_DEX_ADDRESS).updateFeeAndRevenueCut(
                     0.05 * 1e4, // 0.05%
                     0
                 );
-            }
+           }
             
-        }
     }
 
     /**
