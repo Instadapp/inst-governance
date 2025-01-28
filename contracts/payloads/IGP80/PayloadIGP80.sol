@@ -66,7 +66,6 @@ contract PayloadIGP80 is PayloadIGPConstants, PayloadIGPHelpers {
     }
 
     function execute() external {
-
         require(address(this) == address(TIMELOCK), "not-valid-caller");
 
         // Action 1: Set dust limits for USDC collateral vaults
@@ -95,10 +94,6 @@ contract PayloadIGP80 is PayloadIGPConstants, PayloadIGPHelpers {
 
         // Action 9: Discontinue fGHO rewards
         action9();
-
-        // Action 10: Double limits for sUSDe-USDT/USDT T2 Vault
-        action10();
-
     }
 
     function verifyProposal() external view {}
@@ -108,9 +103,7 @@ contract PayloadIGP80 is PayloadIGPConstants, PayloadIGPHelpers {
      * |     Team Multisig Actions      |
      * |__________________________________
      */
-    function setState(
-        bool skip_deusd_usdc_dex_auth_removal_
-    ) external {
+    function setState(bool skip_deusd_usdc_dex_auth_removal_) external {
         if (msg.sender != TEAM_MULTISIG) {
             revert("not-team-multisig");
         }
@@ -142,11 +135,7 @@ contract PayloadIGP80 is PayloadIGPConstants, PayloadIGPHelpers {
 
             setVaultLimits(VAULT_USDC_ETH); // TYPE_1 => 100
 
-            VAULT_FACTORY.setVaultAuth(
-                USDC_ETH_VAULT, 
-                TEAM_MULTISIG, 
-                true
-            );
+            VAULT_FACTORY.setVaultAuth(USDC_ETH_VAULT, TEAM_MULTISIG, true);
         }
 
         {
@@ -165,11 +154,7 @@ contract PayloadIGP80 is PayloadIGPConstants, PayloadIGPHelpers {
 
             setVaultLimits(VAULT_USDC_WBTC); // TYPE_1 => 101
 
-            VAULT_FACTORY.setVaultAuth(
-                USDC_WBTC_VAULT, 
-                TEAM_MULTISIG, 
-                true
-            );
+            VAULT_FACTORY.setVaultAuth(USDC_WBTC_VAULT, TEAM_MULTISIG, true);
         }
 
         {
@@ -188,25 +173,16 @@ contract PayloadIGP80 is PayloadIGPConstants, PayloadIGPHelpers {
 
             setVaultLimits(VAULT_USDC_cbBTC); // TYPE_1 => 102
 
-            VAULT_FACTORY.setVaultAuth(
-                USDC_cbBTC_VAULT, 
-                TEAM_MULTISIG, 
-                true
-            );
+            VAULT_FACTORY.setVaultAuth(USDC_cbBTC_VAULT, TEAM_MULTISIG, true);
         }
     }
 
     // @notice Action 2: Remove Multisig as auth from deUSD-USDC DEX
     function action2() internal {
-
         address deUSD_USDC_DEX = getDexAddress(19);
 
         if (!PayloadIGP80(ADDRESS_THIS).skip_deusd_usdc_dex_auth_removal()) {
-            DEX_FACTORY.setDexAuth(
-                deUSD_USDC_DEX,
-                TEAM_MULTISIG,
-                false
-            );
+            DEX_FACTORY.setDexAuth(deUSD_USDC_DEX, TEAM_MULTISIG, false);
         }
     }
 
@@ -230,11 +206,7 @@ contract PayloadIGP80 is PayloadIGPConstants, PayloadIGPHelpers {
                 });
                 setDexLimits(DEX_USR_USDC); // Smart Collateral
 
-                DEX_FACTORY.setDexAuth(
-                    USR_USDC_DEX, 
-                    TEAM_MULTISIG, 
-                    true
-                );
+                DEX_FACTORY.setDexAuth(USR_USDC_DEX, TEAM_MULTISIG, true);
             }
         }
     }
@@ -275,12 +247,12 @@ contract PayloadIGP80 is PayloadIGPConstants, PayloadIGPHelpers {
         }
 
         VAULT_FACTORY.setVaultAuth(
-                sUSDe_USDT__USDC_USDT_VAULT_ADDRESS,
-                TEAM_MULTISIG,
-                true
-            );
+            sUSDe_USDT__USDC_USDT_VAULT_ADDRESS,
+            TEAM_MULTISIG,
+            true
+        );
     }
-    
+
     // @notice Action 5:  Set dust allowance for USDe-USDT<>USDC-USDT T4 vault
     function action5() internal {
         address USDe_USDT_DEX_ADDRESS = getDexAddress(18);
@@ -317,10 +289,10 @@ contract PayloadIGP80 is PayloadIGPConstants, PayloadIGPHelpers {
         }
 
         VAULT_FACTORY.setVaultAuth(
-                USDe_USDT__USDC_USDT_VAULT_ADDRESS,
-                TEAM_MULTISIG,
-                true
-            );
+            USDe_USDT__USDC_USDT_VAULT_ADDRESS,
+            TEAM_MULTISIG,
+            true
+        );
     }
 
     // @notice Action 6: Update wstETH-ETH DEX Lower Range
@@ -349,7 +321,7 @@ contract PayloadIGP80 is PayloadIGPConstants, PayloadIGPHelpers {
                 5 days
             );
         }
-        
+
         {
             //Update Trading Fee
             IFluidDex(weETHs_ETH_DEX_ADDRESS).updateFeeAndRevenueCut(
@@ -378,9 +350,7 @@ contract PayloadIGP80 is PayloadIGPConstants, PayloadIGPHelpers {
 
         {
             /// fGHO
-            IFTokenAdmin(F_GHO_ADDRESS).updateRewards(
-                address(0)
-            );
+            IFTokenAdmin(F_GHO_ADDRESS).updateRewards(address(0));
 
             uint256 allowance = 210_000 * 1e18; // 210K GHO
 
@@ -390,26 +360,6 @@ contract PayloadIGP80 is PayloadIGPConstants, PayloadIGPHelpers {
         }
 
         FLUID_RESERVE.approve(protocols, tokens, amounts);
-    }
-
-    // @notice Action 10: Double limits for sUSDe-USDT/USDT T2 Vault
-    function action10() internal {
-        address sUSDe_USDT__USDT_VAULT = getVaultAddress(92);
-
-        {
-            // [TYPE 2] sUSDe-USDT<>USDT | smart collateral & debt
-            Vault memory VAULT_sUSDe_USDT = Vault({
-                vault: sUSDe_USDT__USDT_VAULT,
-                vaultType: TYPE.TYPE_2,
-                supplyToken: address(0),
-                borrowToken: USDT_ADDRESS,
-                baseWithdrawalLimitInUSD: 0,
-                baseBorrowLimitInUSD: 30_000_000, // $30M // 2x
-                maxBorrowLimitInUSD: 60_000_000 // $60M // 2x
-            });
-
-            setVaultLimits(VAULT_sUSDe_USDT); // TYPE_2 => 92
-        }
     }
 
     /**
