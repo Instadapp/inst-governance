@@ -381,7 +381,7 @@ contract PayloadIGP80 is PayloadIGPConstants, PayloadIGPHelpers {
         address USDe_USDT_DEX_ADDRESS = getDexAddress(18);
 
         {
-            // Update Lower Range
+            // Update Ranges
             IFluidDex(USDe_USDT_DEX_ADDRESS).updateRangePercents(
                 0.15 * 1e4, // 0.15%
                 0.15 * 1e4, // 0.15%
@@ -395,14 +395,12 @@ contract PayloadIGP80 is PayloadIGPConstants, PayloadIGPHelpers {
         if (PayloadIGP80(ADDRESS_THIS).skipAction11()) return;
 
         address sUSDe_USDT_DEX_ADDRESS = getDexAddress(15);
-        
-           {
-                //Update Trading Fee
-                IFluidDex(sUSDe_USDT_DEX_ADDRESS).updateFeeAndRevenueCut(
-                    0.05 * 1e4, // 0.05%
-                    0
-                );
-            }            
+
+        // Update Trading Fee
+        IFluidDex(sUSDe_USDT_DEX_ADDRESS).updateFeeAndRevenueCut(
+            0.05 * 1e4, // 0.05%
+            0
+        );
     }
 
     /**
