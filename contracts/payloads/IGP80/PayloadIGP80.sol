@@ -29,6 +29,7 @@ import {PayloadIGPHelpers} from "../common/helpers.sol";
 contract PayloadIGP80 is PayloadIGPConstants, PayloadIGPHelpers {
     uint256 public constant PROPOSAL_ID = 80;
 
+    bool public skipAction9;
     bool public skip_deusd_usdc_dex_auth_removal;
 
     function propose(string memory description) external {
@@ -103,11 +104,14 @@ contract PayloadIGP80 is PayloadIGPConstants, PayloadIGPHelpers {
      * |     Team Multisig Actions      |
      * |__________________________________
      */
-    function setState(bool skip_deusd_usdc_dex_auth_removal_) external {
+    function setState(
+        bool skipAction9_,
+        bool skip_deusd_usdc_dex_auth_removal_
+    ) external {
         if (msg.sender != TEAM_MULTISIG) {
             revert("not-team-multisig");
         }
-
+        skipAction9 = skipAction9_;
         skip_deusd_usdc_dex_auth_removal = skip_deusd_usdc_dex_auth_removal_;
     }
 
@@ -344,6 +348,8 @@ contract PayloadIGP80 is PayloadIGPConstants, PayloadIGPHelpers {
 
     // @notice Action 9: Discontinue fGHO rewards
     function action9() internal {
+        if (PayloadIGP80(ADDRESS_THIS).skipAction9()) return;
+        
         address[] memory protocols = new address[](1);
         address[] memory tokens = new address[](1);
         uint256[] memory amounts = new uint256[](1);
