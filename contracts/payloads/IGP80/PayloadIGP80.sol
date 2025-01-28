@@ -30,6 +30,7 @@ contract PayloadIGP80 is PayloadIGPConstants, PayloadIGPHelpers {
     uint256 public constant PROPOSAL_ID = 80;
 
     bool public skipAction9;
+    bool public skipAction11;
     bool public skip_deusd_usdc_dex_auth_removal;
 
     function propose(string memory description) external {
@@ -95,6 +96,12 @@ contract PayloadIGP80 is PayloadIGPConstants, PayloadIGPHelpers {
 
         // Action 9: Discontinue fGHO rewards
         action9();
+
+        // @notice Action 10: Update USDe-USDT DEX Lower Range and Fee %
+        action10();
+
+        // @notice Action 11: Update sUSDe-USDT DEX Trading Fee
+        action11();
     }
 
     function verifyProposal() external view {}
@@ -106,12 +113,14 @@ contract PayloadIGP80 is PayloadIGPConstants, PayloadIGPHelpers {
      */
     function setState(
         bool skipAction9_,
+        bool skipAction11_,
         bool skip_deusd_usdc_dex_auth_removal_
     ) external {
         if (msg.sender != TEAM_MULTISIG) {
             revert("not-team-multisig");
         }
         skipAction9 = skipAction9_;
+        skipAction11 = skipAction11_;
         skip_deusd_usdc_dex_auth_removal = skip_deusd_usdc_dex_auth_removal_;
     }
 
@@ -348,15 +357,14 @@ contract PayloadIGP80 is PayloadIGPConstants, PayloadIGPHelpers {
 
     // @notice Action 9: Discontinue fGHO rewards
     function action9() internal {
+        if (PayloadIGP80(ADDRESS_THIS).skipAction9()) return;
+
         address[] memory protocols = new address[](1);
         address[] memory tokens = new address[](1);
         uint256[] memory amounts = new uint256[](1);
 
         {
-            if (!PayloadIGP80(ADDRESS_THIS).skipAction9()) {
-                /// removing fGHO rewards
-                IFTokenAdmin(F_GHO_ADDRESS).updateRewards(address(0));
-            }
+            IFTokenAdmin(F_GHO_ADDRESS).updateRewards(address(0));
 
             uint256 allowance = 210_000 * 1e18; // 210K GHO
 
@@ -366,6 +374,36 @@ contract PayloadIGP80 is PayloadIGPConstants, PayloadIGPHelpers {
         }
 
         FLUID_RESERVE.approve(protocols, tokens, amounts);
+    }
+
+    // @notice Action 10: Update USDe-USDT DEX Lower Range and Fee %
+    function action10() internal {
+        address USDe_USDT_DEX_ADDRESS = getDexAddress(18);
+
+        {
+            // Update Lower Range
+            IFluidDex(USDe_USDT_DEX_ADDRESS).updateRangePercents(
+                0.15 * 1e4, // 0.15%
+                0.15 * 1e4, // 0.15%
+                2 days
+            );
+        }
+    }
+
+    // @notice Action 11: Update sUSDe-USDT DEX Trading Fee
+    function action11() internal {
+     {
+        address sUSDe_USDT_DEX_ADDRESS = getDexAddress(15);
+        
+            if (!PayloadIGP80(ADDRESS_THIS).skipAction11()){
+                //Update Trading Fee
+                IFluidDex(sUSDe_USDT_DEX_ADDRESS).updateFeeAndRevenueCut(
+                    0.05 * 1e4, // 0.05%
+                    0
+                );
+            }
+            
+        }
     }
 
     /**
