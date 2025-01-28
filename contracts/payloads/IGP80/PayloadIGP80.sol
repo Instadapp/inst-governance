@@ -353,7 +353,7 @@ contract PayloadIGP80 is PayloadIGPConstants, PayloadIGPHelpers {
         uint256[] memory amounts = new uint256[](1);
 
         {
-            if (PayloadIGP80(ADDRESS_THIS).skipAction9()) {
+            if (!PayloadIGP80(ADDRESS_THIS).skipAction9()) {
                 /// removing fGHO rewards
                 IFTokenAdmin(F_GHO_ADDRESS).updateRewards(address(0));
             }
