@@ -392,8 +392,6 @@ contract PayloadIGP80 is PayloadIGPConstants, PayloadIGPHelpers {
         }
 
         FLUID_RESERVE.approve(protocols, tokens, amounts);
-
-        ILendingRewards(fGHO_REWARDS_ADDRESS).start();
     }
 
     // @notice Action 10: Double limits for sUSDe-USDT/USDT T2 Vault
