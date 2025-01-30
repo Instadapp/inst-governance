@@ -66,19 +66,19 @@ contract PayloadIGP81 is PayloadIGPConstants, PayloadIGPHelpers {
     function execute() external {
         require(address(this) == address(TIMELOCK), "not-valid-caller");
 
-        // Action 1: Set dust limits for ezETH-ETH DEX and ezETH | wstETH T1 & ezETH-ETH | wstETH T2 vaults
+        // Action 1: Set dust limits for ezETH-ETH DEX and ezETH<>wstETH T1 & ezETH-ETH<>wstETH T2 vaults
         action1();
 
-        // Action 2: Increase sUSDe-USDT | USDT supply and borrow cap 
+        // Action 2: Increase sUSDe-USDT<>USDT supply and borrow cap 
         action2();
 
         // Action 3: Set dust allowance for cbBTC-USDT DEX T4 vault
         action3();
 
-        // Action 4: Reduce max supply shares and max borrow limit for USDe-USDT | USDT
+        // Action 4: Reduce max supply shares and max borrow limit for USDe-USDT<>USDT
         action4();
 
-        // Action 5: Increase LTV & LT for USDe
+        // Action 5: Increase LTV & LT for USDe-USDT<>USDT
         action5();
     }
 
@@ -88,7 +88,7 @@ contract PayloadIGP81 is PayloadIGPConstants, PayloadIGPHelpers {
      * |__________________________________
      */
 
-    // @notice Action 1: Set dust limits for ezETH-ETH DEX and ezETH | wstETH T1 & ezETH-ETH | wstETH T2 vaults
+    // @notice Action 1: Set dust limits for ezETH-ETH DEX and ezETH<>wstETH T1 & ezETH-ETH<>wstETH T2 vaults
     function action1() internal {
         address ezETH_ETH_DEX = getDexAddress(21);
         address ezETH__wstETH_VAULT = getVaultAddress(103);
@@ -153,7 +153,7 @@ contract PayloadIGP81 is PayloadIGPConstants, PayloadIGPHelpers {
         }
     }
 
-    // @notice Action 2: Increase sUSDe-USDT | USDT supply and borrow cap
+    // @notice Action 2: Increase sUSDe-USDT<>USDT supply and borrow cap
     function action2() internal {
         address sUSDe_USDT_DEX_ADDRESS = getDexAddress(15);
         address sUSDe_USDT__USDT_VAULT = getVaultAddress(92);
@@ -166,7 +166,7 @@ contract PayloadIGP81 is PayloadIGPConstants, PayloadIGPHelpers {
         }
 
         {
-            // Update sUSDe-USDT | USDT vault supply shares limit
+            // Update sUSDe-USDT<>USDT vault supply shares limit
             IFluidAdminDex.UserSupplyConfig[]
                 memory config_ = new IFluidAdminDex.UserSupplyConfig[](1);
             config_[0] = IFluidAdminDex.UserSupplyConfig({
@@ -199,6 +199,7 @@ contract PayloadIGP81 is PayloadIGPConstants, PayloadIGPHelpers {
     // @notice Action 3: Set dust allowance for cbBTC-USDT DEX T4 vault
     function action3() internal {
         address cbBTC_USDT_DEX_ADDRESS = getDexAddress(22);
+        address cbBTC_USDT__cbBTC_USDT_VAULT_ADRESS = getVaultAddress(105);
 
         {
             // dust limits
@@ -216,6 +217,14 @@ contract PayloadIGP81 is PayloadIGPConstants, PayloadIGPHelpers {
 
             DEX_FACTORY.setDexAuth(cbBTC_USDT_DEX_ADDRESS, TEAM_MULTISIG, true);
         }
+        
+        {// Set team multisig as vault auth for cbBTC_USDT T4 Vault
+            VAULT_FACTORY.setVaultAuth(
+                cbBTC_USDT__cbBTC_USDT_VAULT_ADRESS,
+                TEAM_MULTISIG,
+                true
+            );
+        }
 
     }
 
@@ -232,7 +241,7 @@ contract PayloadIGP81 is PayloadIGPConstants, PayloadIGPHelpers {
         }
 
         {
-            // Update USDe-USDT | USDT vault supply shares limit
+            // Update USDe-USDT<>USDT vault supply shares limit
             IFluidAdminDex.UserSupplyConfig[]
                 memory config_ = new IFluidAdminDex.UserSupplyConfig[](1);
             config_[0] = IFluidAdminDex.UserSupplyConfig({
