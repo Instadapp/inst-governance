@@ -252,7 +252,7 @@ contract PayloadIGP81 is PayloadIGPConstants, PayloadIGPHelpers {
                 user: USDe_USDT__USDT_VAULT,
                 expandPercent: 25 * 1e2, // 25%
                 expandDuration: 12 hours, // 12 hours
-                baseWithdrawalLimit: 10_000_000 * 1e18 // 10M shares // $20M
+                baseWithdrawalLimit: 5_000_000 * 1e18 // 5M shares // $10M
             });
 
             IFluidDex(USDe_USDT_DEX_ADDRESS).updateUserSupplyConfigs(config_);
