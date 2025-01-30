@@ -90,11 +90,9 @@ contract PayloadIGP81 is PayloadIGPConstants, PayloadIGPHelpers {
 
     // @notice Action 1: Set dust limits for ezETH-ETH DEX and ezETH<>wstETH T1 & ezETH-ETH<>wstETH T2 vaults
     function action1() internal {
-        address ezETH_ETH_DEX = getDexAddress(21);
-        address ezETH__wstETH_VAULT = getVaultAddress(103);
-        address ezETH_ETH__wstETH_VAULT = getVaultAddress(104);
-
+        
         {
+            address ezETH_ETH_DEX = getDexAddress(21);
             // ezETH-ETH DEX
             {
                 // ezETH-ETH Dex
@@ -115,6 +113,8 @@ contract PayloadIGP81 is PayloadIGPConstants, PayloadIGPHelpers {
         }
 
         {
+            address ezETH__wstETH_VAULT = getVaultAddress(103);
+
             // [TYPE 1] ezETH<>wstETH | normal collateral & normal debt
             Vault memory VAULT_ezETH_wstETH = Vault({
                 vault: ezETH__wstETH_VAULT,
@@ -132,6 +132,8 @@ contract PayloadIGP81 is PayloadIGPConstants, PayloadIGPHelpers {
         }
 
         {
+            address ezETH_ETH__wstETH_VAULT = getVaultAddress(104);
+
             // [TYPE 2] ezETH-ETH<>wstETH | smart collateral & normal debt
             Vault memory VAULT_ezETH_ETH_wstETH = Vault({
                 vault: ezETH_ETH__wstETH_VAULT,
@@ -199,7 +201,6 @@ contract PayloadIGP81 is PayloadIGPConstants, PayloadIGPHelpers {
     // @notice Action 3: Set dust allowance for cbBTC-USDT DEX T4 vault
     function action3() internal {
         address cbBTC_USDT_DEX_ADDRESS = getDexAddress(22);
-        address cbBTC_USDT__cbBTC_USDT_VAULT_ADRESS = getVaultAddress(105);
 
         {
             // dust limits
@@ -210,15 +211,18 @@ contract PayloadIGP81 is PayloadIGPConstants, PayloadIGPHelpers {
                 smartCollateral: true,
                 smartDebt: true,
                 baseWithdrawalLimitInUSD: 10_000, // $10k
-                baseBorrowLimitInUSD: 10_000, // $10k
-                maxBorrowLimitInUSD: 20_000 // $20k
+                baseBorrowLimitInUSD: 8_000, // $8k
+                maxBorrowLimitInUSD: 10_000 // $10k
             });
             setDexLimits(DEX_cbBTC_USDT); // Smart Collateral & Smart Debt
 
             DEX_FACTORY.setDexAuth(cbBTC_USDT_DEX_ADDRESS, TEAM_MULTISIG, true);
         }
         
-        {// Set team multisig as vault auth for cbBTC_USDT T4 Vault
+        {
+            address cbBTC_USDT__cbBTC_USDT_VAULT_ADRESS = getVaultAddress(105);
+            
+            // Set team multisig as vault auth for cbBTC_USDT T4 Vault
             VAULT_FACTORY.setVaultAuth(
                 cbBTC_USDT__cbBTC_USDT_VAULT_ADRESS,
                 TEAM_MULTISIG,
