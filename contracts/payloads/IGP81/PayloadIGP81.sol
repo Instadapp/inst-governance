@@ -228,7 +228,7 @@ contract PayloadIGP81 is PayloadIGPConstants, PayloadIGPHelpers {
 
     }
 
-    // @notice Action 4:  Set dust allowance for sUSDe-USDT<>USDC-USDT T4 vault
+    // @notice Action 4:  Reduce max supply shares and max borrow limit for USDe-USDT<>USDT
     function action4() internal {
         address USDe_USDT_DEX_ADDRESS = getDexAddress(18);
         address USDe_USDT__USDT_VAULT = getVaultAddress(93);
