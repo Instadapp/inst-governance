@@ -339,7 +339,7 @@ contract PayloadIGP81 is PayloadIGPConstants, PayloadIGPHelpers {
         );
     }
 
-    // @notice Action 7: Remove Multisig as auth from deUSD-USDC DEX
+    // @notice Action 7: Remove Multisig as auth from USR-USDC DEX
     function action7() internal {
         address USR_USDC_DEX = getDexAddress(20);
 
