@@ -108,9 +108,9 @@ contract PayloadIGP81 is PayloadIGPConstants, PayloadIGPHelpers {
      */
     function setState(
         bool skipAction4_,
-    bool skipAction7_,
+        bool skipAction7_,
         bool skipAction8_,
-        bool skipAction9_,
+        bool skipAction9_
     ) external {
         if (msg.sender != TEAM_MULTISIG) {
             revert("not-team-multisig");
