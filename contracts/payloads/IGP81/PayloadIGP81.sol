@@ -553,21 +553,21 @@ contract PayloadIGP81 is PayloadIGPConstants, PayloadIGPHelpers {
     }
 
     // Token Prices Constants
-    uint256 public constant ETH_USD_PRICE = 3_150 * 1e2;
-    uint256 public constant wstETH_USD_PRICE = 3_750 * 1e2;
+    uint256 public constant ETH_USD_PRICE = 3_320 * 1e2;
+    uint256 public constant wstETH_USD_PRICE = 3_950 * 1e2;
     uint256 public constant weETH_USD_PRICE = 3_350 * 1e2;
     uint256 public constant rsETH_USD_PRICE = 3_750 * 1e2;
     uint256 public constant weETHs_USD_PRICE = 3_750 * 1e2;
     uint256 public constant mETH_USD_PRICE = 3_850 * 1e2;
-    uint256 public constant ezETH_USD_PRICE = 3_750 * 1e2;
+    uint256 public constant ezETH_USD_PRICE = 3_450 * 1e2;
 
-    uint256 public constant BTC_USD_PRICE = 106_000 * 1e2;
+    uint256 public constant BTC_USD_PRICE = 102_000 * 1e2;
 
     uint256 public constant STABLE_USD_PRICE = 1 * 1e2;
     uint256 public constant sUSDe_USD_PRICE = 1.15 * 1e2;
     uint256 public constant sUSDs_USD_PRICE = 1.02 * 1e2;
 
-    uint256 public constant FLUID_USD_PRICE = 6 * 1e2;
+    uint256 public constant FLUID_USD_PRICE = 7.2 * 1e2;
 
     function getRawAmount(
         address token,
@@ -637,8 +637,7 @@ contract PayloadIGP81 is PayloadIGPConstants, PayloadIGPHelpers {
             token == GHO_ADDRESS ||
             token == USDe_ADDRESS ||
             token == deUSD_ADDRESS ||
-            token == USR_ADDRESS ||
-            token == ezETH_ADDRESS
+            token == USR_ADDRESS
         ) {
             usdPrice = STABLE_USD_PRICE;
             decimals = 18;
