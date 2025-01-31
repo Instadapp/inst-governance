@@ -30,9 +30,9 @@ contract PayloadIGP81 is PayloadIGPConstants, PayloadIGPHelpers {
     uint256 public constant PROPOSAL_ID = 81;
 
     bool public skipAction4;
+    bool public skipAction7;
     bool public skipAction8;
     bool public skipAction9;
-    bool public skip_usr_usdc_dex_auth_removal;
 
     function propose(string memory description) external {
         require(
@@ -108,17 +108,17 @@ contract PayloadIGP81 is PayloadIGPConstants, PayloadIGPHelpers {
      */
     function setState(
         bool skipAction4_,
+    bool skipAction7_,
         bool skipAction8_,
         bool skipAction9_,
-        bool skip_usr_usdc_dex_auth_removal_
     ) external {
         if (msg.sender != TEAM_MULTISIG) {
             revert("not-team-multisig");
         }
         skipAction4 = skipAction4_;
+        skipAction7 = skipAction7_;
         skipAction8 = skipAction8_;
         skipAction9 = skipAction9_;
-        skip_usr_usdc_dex_auth_removal = skip_usr_usdc_dex_auth_removal_;
     }
 
     /**
@@ -324,9 +324,9 @@ contract PayloadIGP81 is PayloadIGPConstants, PayloadIGPHelpers {
         uint256 LT = 95 * 1e2;
         uint256 LML = 96 * 1e2;
 
-        IFluidVaultT1(USDe_USDT__USDT_VAULT).updateCollateralFactor(CF);
-        IFluidVaultT1(USDe_USDT__USDT_VAULT).updateLiquidationThreshold(LT);
         IFluidVaultT1(USDe_USDT__USDT_VAULT).updateLiquidationMaxLimit(LML);
+        IFluidVaultT1(USDe_USDT__USDT_VAULT).updateLiquidationThreshold(LT);
+        IFluidVaultT1(USDe_USDT__USDT_VAULT).updateCollateralFactor(CF);
     }
 
     // Action 6: Update the upper and lower range of LBTC<>cbBTC DEX
@@ -343,7 +343,7 @@ contract PayloadIGP81 is PayloadIGPConstants, PayloadIGPHelpers {
 
     // @notice Action 7: Remove Multisig as auth from USR-USDC DEX
     function action7() internal {
-        if (PayloadIGP80(ADDRESS_THIS).skip_usr_usdc_dex_auth_removal()) return;
+        if (PayloadIGP81(ADDRESS_THIS).skip_usr_usdc_dex_auth_removal()) return;
 
         address USR_USDC_DEX = getDexAddress(20);
 
