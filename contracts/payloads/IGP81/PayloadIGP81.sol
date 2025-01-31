@@ -92,10 +92,10 @@ contract PayloadIGP81 is PayloadIGPConstants, PayloadIGPHelpers {
         // Action 7: Remove Multisig as auth from USR-USDC DEX
         action7();
 
-        // Action 8:  Update allowance for sUSDe-USDT<>USDC-USDT T4 vault
+        // Action 8: Update allowance for sUSDe-USDT<>USDC-USDT T4 vault
         action8();
 
-        // Action 9:  Update allowance for USDe-USDT<>USDC-USDT T4 vault
+        // Action 9: Update allowance for USDe-USDT<>USDC-USDT T4 vault
         action9();
     }
 
@@ -272,7 +272,7 @@ contract PayloadIGP81 is PayloadIGPConstants, PayloadIGPHelpers {
         }
     }
 
-    // @notice Action 4:  Reduce max supply shares and max borrow limit for USDe-USDT<>USDT
+    // @notice Action 4: Reduce max supply shares and max borrow limit for USDe-USDT<>USDT
     function action4() internal {
         if (PayloadIGP81(ADDRESS_THIS).skipAction4()) return;
 
@@ -316,7 +316,7 @@ contract PayloadIGP81 is PayloadIGPConstants, PayloadIGPHelpers {
         }
     }
 
-    // @notice Action 5:  Increase LTV, LT and LML for USDe-USDT<>USDT
+    // @notice Action 5: Increase LTV, LT and LML for USDe-USDT<>USDT
     function action5() internal {
         address USDe_USDT__USDT_VAULT = getVaultAddress(93);
 
@@ -343,14 +343,14 @@ contract PayloadIGP81 is PayloadIGPConstants, PayloadIGPHelpers {
 
     // @notice Action 7: Remove Multisig as auth from USR-USDC DEX
     function action7() internal {
-        if (PayloadIGP81(ADDRESS_THIS).skip_usr_usdc_dex_auth_removal()) return;
+        if (PayloadIGP81(ADDRESS_THIS).skipAction7()) return;
 
         address USR_USDC_DEX = getDexAddress(20);
 
         DEX_FACTORY.setDexAuth(USR_USDC_DEX, TEAM_MULTISIG, false);
     }
 
-    // @notice Action 8:  Update allowance for sUSDe-USDT<>USDC-USDT T4 vault
+    // @notice Action 8: Update allowance for sUSDe-USDT<>USDC-USDT T4 vault
     function action8() internal {
         if (PayloadIGP81(ADDRESS_THIS).skipAction8()) return;
 
