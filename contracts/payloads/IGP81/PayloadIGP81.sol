@@ -280,9 +280,11 @@ contract PayloadIGP81 is PayloadIGPConstants, PayloadIGPHelpers {
 
         uint256 CF = 92 * 1e2;
         uint256 LT = 95 * 1e2;
+        uint256 LML = 96 * 1e2;
 
         IFluidVaultT1(USDe_USDT__USDT_VAULT).updateCollateralFactor(CF);
         IFluidVaultT1(USDe_USDT__USDT_VAULT).updateLiquidationThreshold(LT);
+        IFluidVaultT1(USDe_USDT__USDT_VAULT).updateLiquidationMaxLimit(LML);
     }
 
     /**
