@@ -74,7 +74,7 @@ contract PayloadIGP81 is PayloadIGPConstants, PayloadIGPHelpers {
         // Action 1: Set dust limits for ezETH-ETH DEX and ezETH<>wstETH T1 & ezETH-ETH<>wstETH T2 vaults
         action1();
 
-        // Action 2: Increase sUSDe-USDT<>USDT supply and borrow cap 
+        // Action 2: Increase sUSDe-USDT<>USDT supply and borrow cap
         action2();
 
         // Action 3: Set dust allowance for cbBTC-USDT DEX T4 vault
@@ -94,11 +94,11 @@ contract PayloadIGP81 is PayloadIGPConstants, PayloadIGPHelpers {
 
         // Action 8:  Update allowance for sUSDe-USDT<>USDC-USDT T4 vault
         action8();
-        
+
         // Action 9:  Update allowance for USDe-USDT<>USDC-USDT T4 vault
         action9();
     }
-    
+
     function verifyProposal() external view {}
 
     /**
@@ -129,7 +129,6 @@ contract PayloadIGP81 is PayloadIGPConstants, PayloadIGPHelpers {
 
     // @notice Action 1: Set dust limits for ezETH-ETH DEX and ezETH<>wstETH T1 & ezETH-ETH<>wstETH T2 vaults
     function action1() internal {
-        
         {
             address ezETH_ETH_DEX = getDexAddress(21);
             // ezETH-ETH DEX
@@ -167,7 +166,11 @@ contract PayloadIGP81 is PayloadIGPConstants, PayloadIGPHelpers {
 
             setVaultLimits(VAULT_ezETH_wstETH); // TYPE_1 => 103
 
-            VAULT_FACTORY.setVaultAuth(ezETH__wstETH_VAULT, TEAM_MULTISIG, true);
+            VAULT_FACTORY.setVaultAuth(
+                ezETH__wstETH_VAULT,
+                TEAM_MULTISIG,
+                true
+            );
         }
 
         {
@@ -198,7 +201,7 @@ contract PayloadIGP81 is PayloadIGPConstants, PayloadIGPHelpers {
     function action2() internal {
         address sUSDe_USDT_DEX_ADDRESS = getDexAddress(15);
         address sUSDe_USDT__USDT_VAULT = getVaultAddress(92);
-        
+
         {
             // Increase Max Supply Shares
             IFluidDex(sUSDe_USDT_DEX_ADDRESS).updateMaxSupplyShares(
@@ -234,7 +237,6 @@ contract PayloadIGP81 is PayloadIGPConstants, PayloadIGPHelpers {
 
             setVaultLimits(VAULT_sUSDe_USDT_USDT); // TYPE_2 => 92
         }
-
     }
 
     // @notice Action 3: Set dust allowance for cbBTC-USDT DEX T4 vault
@@ -257,10 +259,10 @@ contract PayloadIGP81 is PayloadIGPConstants, PayloadIGPHelpers {
 
             DEX_FACTORY.setDexAuth(cbBTC_USDT_DEX_ADDRESS, TEAM_MULTISIG, true);
         }
-        
+
         {
             address cbBTC_USDT__cbBTC_USDT_VAULT_ADRESS = getVaultAddress(105);
-            
+
             // Set team multisig as vault auth for cbBTC_USDT T4 Vault
             VAULT_FACTORY.setVaultAuth(
                 cbBTC_USDT__cbBTC_USDT_VAULT_ADRESS,
@@ -268,7 +270,6 @@ contract PayloadIGP81 is PayloadIGPConstants, PayloadIGPHelpers {
                 true
             );
         }
-
     }
 
     // @notice Action 4:  Reduce max supply shares and max borrow limit for USDe-USDT<>USDT
@@ -277,7 +278,7 @@ contract PayloadIGP81 is PayloadIGPConstants, PayloadIGPHelpers {
 
         address USDe_USDT_DEX_ADDRESS = getDexAddress(18);
         address USDe_USDT__USDT_VAULT = getVaultAddress(93);
-        
+
         {
             // Dexcrease Max Supply Shares
             IFluidDex(USDe_USDT_DEX_ADDRESS).updateMaxSupplyShares(
@@ -327,9 +328,10 @@ contract PayloadIGP81 is PayloadIGPConstants, PayloadIGPHelpers {
         IFluidVaultT1(USDe_USDT__USDT_VAULT).updateLiquidationThreshold(LT);
         IFluidVaultT1(USDe_USDT__USDT_VAULT).updateLiquidationMaxLimit(LML);
     }
-        // Action 6: Update the upper and lower range of LBTC<>cbBTC DEX
+
+    // Action 6: Update the upper and lower range of LBTC<>cbBTC DEX
     function action6() internal {
-         address LBTC_cbBTC_DEX = getDexAddress(17);
+        address LBTC_cbBTC_DEX = getDexAddress(17);
 
         // updates the upper and lower range
         IFluidDex(LBTC_cbBTC_DEX).updateRangePercents(
@@ -341,11 +343,11 @@ contract PayloadIGP81 is PayloadIGPConstants, PayloadIGPHelpers {
 
     // @notice Action 7: Remove Multisig as auth from USR-USDC DEX
     function action7() internal {
+        if (PayloadIGP80(ADDRESS_THIS).skip_usr_usdc_dex_auth_removal()) return;
+
         address USR_USDC_DEX = getDexAddress(20);
 
-        if (!PayloadIGP80(ADDRESS_THIS).skip_usr_usdc_dex_auth_removal()) {
-            DEX_FACTORY.setDexAuth(USR_USDC_DEX, TEAM_MULTISIG, false);
-        }
+        DEX_FACTORY.setDexAuth(USR_USDC_DEX, TEAM_MULTISIG, false);
     }
 
     // @notice Action 8:  Update allowance for sUSDe-USDT<>USDC-USDT T4 vault
