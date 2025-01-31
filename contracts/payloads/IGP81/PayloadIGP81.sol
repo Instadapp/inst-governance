@@ -343,7 +343,7 @@ contract PayloadIGP81 is PayloadIGPConstants, PayloadIGPHelpers {
     function action7() internal {
         address USR_USDC_DEX = getDexAddress(20);
 
-        if (!PayloadIGP80(ADDRESS_THIS).skip_usr_usdc_dex_auth_removal()) {
+        if (!PayloadIGP81(ADDRESS_THIS).skip_usr_usdc_dex_auth_removal()) {
             DEX_FACTORY.setDexAuth(USR_USDC_DEX, TEAM_MULTISIG, false);
         }
     }
@@ -557,6 +557,7 @@ contract PayloadIGP81 is PayloadIGPConstants, PayloadIGPHelpers {
     uint256 public constant rsETH_USD_PRICE = 3_750 * 1e2;
     uint256 public constant weETHs_USD_PRICE = 3_750 * 1e2;
     uint256 public constant mETH_USD_PRICE = 3_850 * 1e2;
+    uint256 public constant ezETH_USD_PRICE = 3_750 * 1e2;
 
     uint256 public constant BTC_USD_PRICE = 106_000 * 1e2;
 
@@ -606,6 +607,9 @@ contract PayloadIGP81 is PayloadIGPConstants, PayloadIGPHelpers {
             decimals = 18;
         } else if (token == mETH_ADDRESS) {
             usdPrice = mETH_USD_PRICE;
+            decimals = 18;
+        } else if (token == ezETH_ADDRESS) {
+            usdPrice = ezETH_USD_PRICE;
             decimals = 18;
         } else if (
             token == cbBTC_ADDRESS ||
