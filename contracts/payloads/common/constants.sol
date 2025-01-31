@@ -87,6 +87,8 @@ contract PayloadIGPConstants {
         0x917ceE801a67f933F2e6b33fC0cD1ED2d5909D88;
     address internal constant mETH_ADDRESS =
         0xd5F7838F5C461fefF7FE49ea5ebaF7728bB0ADfa;
+    address internal constant ezETH_ADDRESS =
+        0xbf5495Efe5DB9ce00f80364C8B423567e58d2110;
 
     address internal constant USDC_ADDRESS =
         0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
