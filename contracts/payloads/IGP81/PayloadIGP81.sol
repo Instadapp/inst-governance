@@ -335,7 +335,7 @@ contract PayloadIGP81 is PayloadIGPConstants, PayloadIGPHelpers {
         IFluidDex(LBTC_cbBTC_DEX).updateRangePercents(
             0.1 * 1e4, // +0.1%
             0.3 * 1e4, // -0.3%
-            0
+            2 days
         );
     }
 
