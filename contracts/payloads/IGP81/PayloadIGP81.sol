@@ -80,6 +80,9 @@ contract PayloadIGP81 is PayloadIGPConstants, PayloadIGPHelpers {
 
         // Action 5: Increase LTV & LT for USDe-USDT<>USDT
         action5();
+
+        // Action 6: Update the range of LBTC<>cbBTC DEX
+        action6();
     }
 
     /**
@@ -285,6 +288,17 @@ contract PayloadIGP81 is PayloadIGPConstants, PayloadIGPHelpers {
         IFluidVaultT1(USDe_USDT__USDT_VAULT).updateCollateralFactor(CF);
         IFluidVaultT1(USDe_USDT__USDT_VAULT).updateLiquidationThreshold(LT);
         IFluidVaultT1(USDe_USDT__USDT_VAULT).updateLiquidationMaxLimit(LML);
+    }
+        // Action 6: Update the range of LBTC<>cbBTC DEX
+    function action6() internal {
+         address LBTC_cbBTC_DEX = getDexAddress(17);
+
+        // updates the upper to +0.1% and lower range -0.3%
+        IFluidDex(LBTC_cbBTC_DEX).updateRangePercents(
+            0.1 * 1e4,
+            0.3 * 1e4,
+            0
+        );
     }
 
     /**
