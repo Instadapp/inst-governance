@@ -29,6 +29,9 @@ import {PayloadIGPHelpers} from "../common/helpers.sol";
 contract PayloadIGP81 is PayloadIGPConstants, PayloadIGPHelpers {
     uint256 public constant PROPOSAL_ID = 81;
 
+    bool public skipAction4;
+    bool public skip_usr_usdc_dex_auth_removal;
+
     function propose(string memory description) external {
         require(
             msg.sender == PROPOSER ||
@@ -81,8 +84,29 @@ contract PayloadIGP81 is PayloadIGPConstants, PayloadIGPHelpers {
         // Action 5: Increase LTV & LT for USDe-USDT<>USDT
         action5();
 
-        // Action 6: Update the range of LBTC<>cbBTC DEX
+        // Action 6: Update the upper and lower range of LBTC<>cbBTC DEX
         action6();
+
+        // @notice Action 7: Remove Multisig as auth from deUSD-USDC DEX
+        action7();
+    }
+    
+    function verifyProposal() external view {}
+
+    /**
+     * |
+     * |     Team Multisig Actions      |
+     * |__________________________________
+     */
+    function setState(
+        bool skipAction4_,
+        bool skip_usr_usdc_dex_auth_removal_
+    ) external {
+        if (msg.sender != TEAM_MULTISIG) {
+            revert("not-team-multisig");
+        }
+        skipAction4 = skipAction4_;
+        skip_usr_usdc_dex_auth_removal = skip_usr_usdc_dex_auth_removal_;
     }
 
     /**
@@ -237,6 +261,8 @@ contract PayloadIGP81 is PayloadIGPConstants, PayloadIGPHelpers {
 
     // @notice Action 4:  Reduce max supply shares and max borrow limit for USDe-USDT<>USDT
     function action4() internal {
+        if (PayloadIGP81(ADDRESS_THIS).skipAction4()) return;
+
         address USDe_USDT_DEX_ADDRESS = getDexAddress(18);
         address USDe_USDT__USDT_VAULT = getVaultAddress(93);
         
@@ -281,7 +307,7 @@ contract PayloadIGP81 is PayloadIGPConstants, PayloadIGPHelpers {
     function action5() internal {
         address USDe_USDT__USDT_VAULT = getVaultAddress(93);
 
-        uint256 CF = 92 * 1e2;
+        uint256 CF = 94 * 1e2;
         uint256 LT = 95 * 1e2;
         uint256 LML = 96 * 1e2;
 
@@ -289,16 +315,25 @@ contract PayloadIGP81 is PayloadIGPConstants, PayloadIGPHelpers {
         IFluidVaultT1(USDe_USDT__USDT_VAULT).updateLiquidationThreshold(LT);
         IFluidVaultT1(USDe_USDT__USDT_VAULT).updateLiquidationMaxLimit(LML);
     }
-        // Action 6: Update the range of LBTC<>cbBTC DEX
+        // Action 6: Update the upper and lower range of LBTC<>cbBTC DEX
     function action6() internal {
          address LBTC_cbBTC_DEX = getDexAddress(17);
 
-        // updates the upper to +0.1% and lower range -0.3%
+        // updates the upper and lower range
         IFluidDex(LBTC_cbBTC_DEX).updateRangePercents(
-            0.1 * 1e4,
-            0.3 * 1e4,
+            0.1 * 1e4, // +0.1%
+            0.3 * 1e4, // -0.3%
             0
         );
+    }
+
+    // @notice Action 7: Remove Multisig as auth from deUSD-USDC DEX
+    function action7() internal {
+        address USR_USDC_DEX = getDexAddress(20);
+
+        if (!PayloadIGP80(ADDRESS_THIS).skip_usr_usdc_dex_auth_removal()) {
+            DEX_FACTORY.setDexAuth(USR_USDC_DEX, TEAM_MULTISIG, false);
+        }
     }
 
     /**
