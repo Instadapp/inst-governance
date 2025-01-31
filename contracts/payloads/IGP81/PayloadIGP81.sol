@@ -30,6 +30,8 @@ contract PayloadIGP81 is PayloadIGPConstants, PayloadIGPHelpers {
     uint256 public constant PROPOSAL_ID = 81;
 
     bool public skipAction4;
+    bool public skipAction8;
+    bool public skipAction9;
     bool public skip_usr_usdc_dex_auth_removal;
 
     function propose(string memory description) external {
@@ -81,14 +83,20 @@ contract PayloadIGP81 is PayloadIGPConstants, PayloadIGPHelpers {
         // Action 4: Reduce max supply shares and max borrow limit for USDe-USDT<>USDT
         action4();
 
-        // Action 5: Increase LTV & LT for USDe-USDT<>USDT
+        // Action 5: Increase LTV, LT and LML for USDe-USDT<>USDT
         action5();
 
         // Action 6: Update the upper and lower range of LBTC<>cbBTC DEX
         action6();
 
-        // @notice Action 7: Remove Multisig as auth from deUSD-USDC DEX
+        // Action 7: Remove Multisig as auth from USR-USDC DEX
         action7();
+
+        // Action 8:  Update allowance for sUSDe-USDT<>USDC-USDT T4 vault
+        action8();
+        
+        // Action 9:  Update allowance for USDe-USDT<>USDC-USDT T4 vault
+        action9();
     }
     
     function verifyProposal() external view {}
@@ -100,12 +108,16 @@ contract PayloadIGP81 is PayloadIGPConstants, PayloadIGPHelpers {
      */
     function setState(
         bool skipAction4_,
+        bool skipAction8_,
+        bool skipAction9_,
         bool skip_usr_usdc_dex_auth_removal_
     ) external {
         if (msg.sender != TEAM_MULTISIG) {
             revert("not-team-multisig");
         }
         skipAction4 = skipAction4_;
+        skipAction8 = skipAction8_;
+        skipAction9 = skipAction9_;
         skip_usr_usdc_dex_auth_removal = skip_usr_usdc_dex_auth_removal_;
     }
 
@@ -303,7 +315,7 @@ contract PayloadIGP81 is PayloadIGPConstants, PayloadIGPHelpers {
         }
     }
 
-    // @notice Action 5:  Increase LTV & LT for USDe-USDT<>USDT
+    // @notice Action 5:  Increase LTV, LT and LML for USDe-USDT<>USDT
     function action5() internal {
         address USDe_USDT__USDT_VAULT = getVaultAddress(93);
 
@@ -334,6 +346,94 @@ contract PayloadIGP81 is PayloadIGPConstants, PayloadIGPHelpers {
         if (!PayloadIGP80(ADDRESS_THIS).skip_usr_usdc_dex_auth_removal()) {
             DEX_FACTORY.setDexAuth(USR_USDC_DEX, TEAM_MULTISIG, false);
         }
+    }
+
+    // @notice Action 8:  Update allowance for sUSDe-USDT<>USDC-USDT T4 vault
+    function action8() internal {
+        if (PayloadIGP81(ADDRESS_THIS).skipAction8()) return;
+
+        address sUSDe_USDT_DEX_ADDRESS = getDexAddress(15);
+        address USDC_USDT_DEX_ADDRESS = getDexAddress(2);
+        address sUSDe_USDT__USDC_USDT_VAULT_ADDRESS = getVaultAddress(98);
+
+        {
+            // Update sUSDe-USDT<>USDC-USDT vault supply shares limit
+            IFluidAdminDex.UserSupplyConfig[]
+                memory config_ = new IFluidAdminDex.UserSupplyConfig[](1);
+            config_[0] = IFluidAdminDex.UserSupplyConfig({
+                user: sUSDe_USDT__USDC_USDT_VAULT_ADDRESS,
+                expandPercent: 25 * 1e2, // 25%
+                expandDuration: 12 hours, // 12 hours
+                baseWithdrawalLimit: 5_000_000 * 1e18 // 5M shares
+            });
+
+            IFluidDex(sUSDe_USDT_DEX_ADDRESS).updateUserSupplyConfigs(config_);
+        }
+
+        {
+            // Update sUSDe-USDT<>USDC-USDT vault borrow shares limit
+            IFluidAdminDex.UserBorrowConfig[]
+                memory config_ = new IFluidAdminDex.UserBorrowConfig[](1);
+            config_[0] = IFluidAdminDex.UserBorrowConfig({
+                user: sUSDe_USDT__USDC_USDT_VAULT_ADDRESS,
+                expandPercent: 20 * 1e2, // 20%
+                expandDuration: 12 hours, // 12 hours
+                baseDebtCeiling: 5_000_000 * 1e18, // 5M shares
+                maxDebtCeiling: 15_000_000 * 1e18 // 15M shares
+            });
+
+            IFluidDex(USDC_USDT_DEX_ADDRESS).updateUserBorrowConfigs(config_);
+        }
+
+        VAULT_FACTORY.setVaultAuth(
+            sUSDe_USDT__USDC_USDT_VAULT_ADDRESS,
+            TEAM_MULTISIG,
+            false
+        );
+    }
+
+    // @notice Action 9:  Update allowance for USDe-USDT<>USDC-USDT T4 vault
+    function action9() internal {
+        if (PayloadIGP81(ADDRESS_THIS).skipAction9()) return;
+
+        address USDe_USDT_DEX_ADDRESS = getDexAddress(18);
+        address USDC_USDT_DEX_ADDRESS = getDexAddress(2);
+        address USDe_USDT__USDC_USDT_VAULT_ADDRESS = getVaultAddress(99);
+
+        {
+            // Update USDe-USDT<>USDC-USDT vault supply shares limit
+            IFluidAdminDex.UserSupplyConfig[]
+                memory config_ = new IFluidAdminDex.UserSupplyConfig[](1);
+            config_[0] = IFluidAdminDex.UserSupplyConfig({
+                user: USDe_USDT__USDC_USDT_VAULT_ADDRESS,
+                expandPercent: 25 * 1e2, // 25%
+                expandDuration: 12 hours, // 12 hours
+                baseWithdrawalLimit: 5_000_000 * 1e18 // 5M shares
+            });
+
+            IFluidDex(USDe_USDT_DEX_ADDRESS).updateUserSupplyConfigs(config_);
+        }
+
+        {
+            // Update USDe-USDT<>USDC-USDT vault borrow shares limit
+            IFluidAdminDex.UserBorrowConfig[]
+                memory config_ = new IFluidAdminDex.UserBorrowConfig[](1);
+            config_[0] = IFluidAdminDex.UserBorrowConfig({
+                user: USDe_USDT__USDC_USDT_VAULT_ADDRESS,
+                expandPercent: 20 * 1e2, // 20%
+                expandDuration: 12 hours, // 12 hours
+                baseDebtCeiling: 5_000_000 * 1e18, // 5M shares
+                maxDebtCeiling: 10_000_000 * 1e18 // 10M shares
+            });
+
+            IFluidDex(USDC_USDT_DEX_ADDRESS).updateUserBorrowConfigs(config_);
+        }
+
+        VAULT_FACTORY.setVaultAuth(
+            USDe_USDT__USDC_USDT_VAULT_ADDRESS,
+            TEAM_MULTISIG,
+            false
+        );
     }
 
     /**
