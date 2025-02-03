@@ -180,7 +180,7 @@ contract PayloadIGP82 is PayloadIGPConstants, PayloadIGPHelpers {
         uint256 expandPercentForNormalVault_ = 50 * 1e2; // 50%
         uint256 expandDurationForNormalVault_ = 6 hours; // 6 hours
 
-        uint256 expandPercentForSmartVault_ = 30 * 1e2; // 30%
+        uint256 expandPercentForSmartVault_ = 50 * 1e2; // 50%
         uint256 expandDurationForSmartVault_ = 6 hours; // 6 hours
         
         if (vaultType_ == FluidProtocolTypes.VAULT_T1_TYPE) {
