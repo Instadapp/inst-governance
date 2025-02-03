@@ -95,7 +95,10 @@ contract PayloadIGP82 is PayloadIGPConstants, PayloadIGPHelpers {
             if (
                 (i >= 34 && i <= 43) || // Skipping the vaults that are deployed with old dex factory
                 (i >= 63 && i <= 65) || // skipping the vault as this is not initialized yet
+                i == 62 || // skipping old ETH-USDC T4
+                i == 75 || // skipping old INST-ETH 2
                 i == 87 || // Skipping the vault as this limits from dex to vault is not set T4, sUSDe-USDT<>sUSDe-USDT
+                (i >= 100 && i <= 102) || // Skipping these USDC collateral based vaults as there limits will be set IGP-83
                 (i >= 103 && i <= 105) // Skipping these vaults as they are just set with initial limits on IGP-81
             ) {
                 // Skip vaults
