@@ -180,7 +180,8 @@ contract PayloadIGP82 is PayloadIGPConstants, PayloadIGPHelpers {
         uint256 expandPercentForNormalVault_ = 50 * 1e2; // 50%
         uint256 expandDurationForNormalVault_ = 6 hours; // 6 hours
 
-        uint256 expandPercentForSmartVault_ = 50 * 1e2; // 50%
+        uint256 expandPercentForSmartVaultCollateral_ = 35 * 1e2; // 35%
+        uint256 expandPercentForSmartVaultDebt_ = 30 * 1e2; // 30%
         uint256 expandDurationForSmartVault_ = 6 hours; // 6 hours
         
         if (vaultType_ == FluidProtocolTypes.VAULT_T1_TYPE) {
@@ -193,19 +194,19 @@ contract PayloadIGP82 is PayloadIGPConstants, PayloadIGPHelpers {
             // Collateral
             if (vaultType_ == FluidProtocolTypes.VAULT_T2_SMART_COL_TYPE || vaultType_ == FluidProtocolTypes.VAULT_T4_SMART_COL_SMART_DEBT_TYPE) {
                 // Smart Collateral
-                getDexSupplyDataAndSetExpandConfig(c_.supply, vault_, expandPercentForSmartVault_, expandDurationForSmartVault_);
+                getDexSupplyDataAndSetExpandConfig(c_.supply, vault_, expandPercentForSmartVaultCollateral_, expandDurationForSmartVault_);
             } else {
                 // Normal Collateral
-                getLiquiditySupplyDataAndSetExpandConfig(c_.supplyToken.token0, vault_, expandPercentForNormalVault_, expandDurationForNormalVault_);
+                getLiquiditySupplyDataAndSetExpandConfig(c_.supplyToken.token0, vault_, expandPercentForSmartVaultCollateral_, expandDurationForSmartVault_);
             }
 
             // Debt
             if (vaultType_ == FluidProtocolTypes.VAULT_T3_SMART_DEBT_TYPE || vaultType_ == FluidProtocolTypes.VAULT_T4_SMART_COL_SMART_DEBT_TYPE) {
                 // Smart Debt
-                getDexBorrowDataAndSetExpandConfig(c_.borrow, vault_, expandPercentForSmartVault_, expandDurationForSmartVault_);
+                getDexBorrowDataAndSetExpandConfig(c_.borrow, vault_, expandPercentForSmartVaultDebt_, expandDurationForSmartVault_);
             } else  {
                 // Normal Debt
-                getLiquidityBorrowDataAndSetExpandConfig(c_.borrowToken.token0, vault_, expandPercentForNormalVault_, expandDurationForNormalVault_);
+                getLiquidityBorrowDataAndSetExpandConfig(c_.borrowToken.token0, vault_, expandPercentForSmartVaultDebt_, expandDurationForSmartVault_);
             }
         }
     }
