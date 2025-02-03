@@ -75,6 +75,9 @@ contract PayloadIGP82 is PayloadIGPConstants, PayloadIGPHelpers {
 
         // Action 1: Increase Expand Percent and Expand Duration for vaults
         action1();
+
+        // Action 2: Increase withdrawal limits for vaults 24, 25, 26
+        action2();
     }
 
     function verifyProposal() external view {}
@@ -87,12 +90,65 @@ contract PayloadIGP82 is PayloadIGPConstants, PayloadIGPHelpers {
 
     // @notice Action 1: Increase Expand Percent and Expand Duration for vaults
     function action1() internal {
-        for (uint256 i = 11; i < 104; i++) {
-            if (i == 1) {
+        // Increase Expand Percent and Expand Duration for vaults
+        for (uint256 i = 11; i <= 105; i++) {
+            if (
+                (i >= 34 && i <= 43) || // Skipping the vaults that are deployed with old dex factory
+                (i >= 63 && i <= 65) || // skipping the vault as this is not initialized yet
+                i == 87 || // Skipping the vault as this limits from dex to vault is not set T4, sUSDe-USDT<>sUSDe-USDT
+                (i >= 103 && i <= 105) // Skipping these vaults as they are just set with initial limits on IGP-81
+            ) {
                 // Skip vaults
                 continue;
             }
             increaseExpandConfig(i);
+        }
+    }
+
+    // @notice Action 2: Increase withdrawal limits for vaults 24, 25, 26
+    function action2() internal {
+        // Increase withdrawal limits for vaults 24, 25, 26
+        
+        { // ETH<>WBTC 24
+            address vault_ = getVaultAddress(24);
+
+            SupplyProtocolConfig memory protocolConfig_ = SupplyProtocolConfig({
+                protocol: vault_,
+                supplyToken: ETH_ADDRESS,
+                expandPercent: 50 * 1e2, // 50%
+                expandDuration: 6 hours, // 6 hours
+                baseWithdrawalLimitInUSD: 7_500_000 // 7.5M
+            });
+
+            setSupplyProtocolLimits(protocolConfig_);
+        }
+
+        { // wstETH<>WBTC 25
+            address vault_ = getVaultAddress(25);
+
+            SupplyProtocolConfig memory protocolConfig_ = SupplyProtocolConfig({
+                protocol: vault_,
+                supplyToken: wstETH_ADDRESS,
+                expandPercent: 50 * 1e2, // 50%
+                expandDuration: 6 hours, // 6 hours
+                baseWithdrawalLimitInUSD: 7_500_000 // 7.5M
+            });
+
+            setSupplyProtocolLimits(protocolConfig_);
+        }
+
+        { // weETH<>WBTC 26
+            address vault_ = getVaultAddress(26);
+
+            SupplyProtocolConfig memory protocolConfig_ = SupplyProtocolConfig({
+                protocol: vault_,
+                supplyToken: weETH_ADDRESS,
+                expandPercent: 50 * 1e2, // 50%
+                expandDuration: 6 hours, // 6 hours
+                baseWithdrawalLimitInUSD: 7_500_000 // 7.5M
+            });
+
+            setSupplyProtocolLimits(protocolConfig_);
         }
     }
 
@@ -275,5 +331,114 @@ contract PayloadIGP82 is PayloadIGPConstants, PayloadIGPHelpers {
         });
 
         IFluidAdminDex(dex_).updateUserBorrowConfigs(configs_);
+    }
+
+    // Token Prices Constants
+    uint256 public constant ETH_USD_PRICE = 2_720 * 1e2;
+    uint256 public constant wstETH_USD_PRICE = 3_250 * 1e2;
+    uint256 public constant weETH_USD_PRICE = 2_950 * 1e2;
+    uint256 public constant rsETH_USD_PRICE = 3_750 * 1e2;
+    uint256 public constant weETHs_USD_PRICE = 3_750 * 1e2;
+    uint256 public constant mETH_USD_PRICE = 3_850 * 1e2;
+    uint256 public constant ezETH_USD_PRICE = 3_450 * 1e2;
+
+    uint256 public constant BTC_USD_PRICE = 102_000 * 1e2;
+
+    uint256 public constant STABLE_USD_PRICE = 1 * 1e2;
+    uint256 public constant sUSDe_USD_PRICE = 1.15 * 1e2;
+    uint256 public constant sUSDs_USD_PRICE = 1.02 * 1e2;
+
+    uint256 public constant FLUID_USD_PRICE = 7.2 * 1e2;
+
+    function getRawAmount(
+        address token,
+        uint256 amount,
+        uint256 amountInUSD,
+        bool isSupply
+    ) public view override returns (uint256) {
+        if (amount > 0 && amountInUSD > 0) {
+            revert("both usd and amount are not zero");
+        }
+        uint256 exchangePriceAndConfig_ = LIQUIDITY.readFromStorage(
+            LiquiditySlotsLink.calculateMappingStorageSlot(
+                LiquiditySlotsLink.LIQUIDITY_EXCHANGE_PRICES_MAPPING_SLOT,
+                token
+            )
+        );
+
+        (
+            uint256 supplyExchangePrice,
+            uint256 borrowExchangePrice
+        ) = LiquidityCalcs.calcExchangePrices(exchangePriceAndConfig_);
+
+        uint256 usdPrice = 0;
+        uint256 decimals = 18;
+        if (token == ETH_ADDRESS) {
+            usdPrice = ETH_USD_PRICE;
+            decimals = 18;
+        } else if (token == wstETH_ADDRESS) {
+            usdPrice = wstETH_USD_PRICE;
+            decimals = 18;
+        } else if (token == weETH_ADDRESS) {
+            usdPrice = weETH_USD_PRICE;
+            decimals = 18;
+        } else if (token == rsETH_ADDRESS) {
+            usdPrice = rsETH_USD_PRICE;
+            decimals = 18;
+        } else if (token == weETHs_ADDRESS) {
+            usdPrice = weETHs_USD_PRICE;
+            decimals = 18;
+        } else if (token == mETH_ADDRESS) {
+            usdPrice = mETH_USD_PRICE;
+            decimals = 18;
+        } else if (token == ezETH_ADDRESS) {
+            usdPrice = ezETH_USD_PRICE;
+            decimals = 18;
+        } else if (
+            token == cbBTC_ADDRESS ||
+            token == WBTC_ADDRESS ||
+            token == eBTC_ADDRESS ||
+            token == lBTC_ADDRESS
+        ) {
+            usdPrice = BTC_USD_PRICE;
+            decimals = 8;
+        } else if (token == tBTC_ADDRESS) {
+            usdPrice = BTC_USD_PRICE;
+            decimals = 18;
+        } else if (token == USDC_ADDRESS || token == USDT_ADDRESS) {
+            usdPrice = STABLE_USD_PRICE;
+            decimals = 6;
+        } else if (token == sUSDe_ADDRESS) {
+            usdPrice = sUSDe_USD_PRICE;
+            decimals = 18;
+        } else if (token == sUSDs_ADDRESS) {
+            usdPrice = sUSDs_USD_PRICE;
+            decimals = 18;
+        } else if (
+            token == GHO_ADDRESS ||
+            token == USDe_ADDRESS ||
+            token == deUSD_ADDRESS ||
+            token == USR_ADDRESS
+        ) {
+            usdPrice = STABLE_USD_PRICE;
+            decimals = 18;
+        } else if (token == INST_ADDRESS) {
+            usdPrice = FLUID_USD_PRICE;
+            decimals = 18;
+        } else {
+            revert("not-found");
+        }
+
+        uint256 exchangePrice = isSupply
+            ? supplyExchangePrice
+            : borrowExchangePrice;
+
+        if (amount > 0) {
+            return (amount * 1e12) / exchangePrice;
+        } else {
+            return
+                (amountInUSD * 1e12 * (10 ** decimals)) /
+                ((usdPrice * exchangePrice) / 1e2);
+        }
     }
 }
