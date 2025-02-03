@@ -26,8 +26,8 @@ import {IProxy} from "../common/interfaces/IProxy.sol";
 import {PayloadIGPConstants} from "../common/constants.sol";
 import {PayloadIGPHelpers} from "../common/helpers.sol";
 
-contract PayloadIGP82 is PayloadIGPConstants, PayloadIGPHelpers {
-    uint256 public constant PROPOSAL_ID = 82;
+contract PayloadIGP83 is PayloadIGPConstants, PayloadIGPHelpers {
+    uint256 public constant PROPOSAL_ID = 83;
 
     bool public skipAction3;
     bool public skipAction4;
@@ -184,7 +184,7 @@ contract PayloadIGP82 is PayloadIGPConstants, PayloadIGPHelpers {
 
     // @notice Action 3: Set launch limits for USDC collateral vaults
     function action3() internal {
-        if (PayloadIGP82(ADDRESS_THIS).skipAction3()) return;
+        if (PayloadIGP83(ADDRESS_THIS).skipAction3()) return;
 
         {
             address USDC_ETH_VAULT = getVaultAddress(100);
@@ -246,7 +246,7 @@ contract PayloadIGP82 is PayloadIGPConstants, PayloadIGPHelpers {
 
     // @notice Action 4: Set launch limits for ezETH-ETH DEX and ezETH<>wstETH T1 & ezETH-ETH<>wstETH T2 vaults
     function action4() internal {
-        if (PayloadIGP82(ADDRESS_THIS).skipAction4()) return;
+        if (PayloadIGP83(ADDRESS_THIS).skipAction4()) return;
 
         {
             address ezETH_ETH_DEX = getDexAddress(21);
