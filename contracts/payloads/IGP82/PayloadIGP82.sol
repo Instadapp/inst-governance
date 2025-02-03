@@ -29,6 +29,9 @@ import {PayloadIGPHelpers} from "../common/helpers.sol";
 contract PayloadIGP82 is PayloadIGPConstants, PayloadIGPHelpers {
     uint256 public constant PROPOSAL_ID = 82;
 
+    bool public skipAction3;
+    bool public skipAction4;
+
     function propose(string memory description) external {
         require(
             msg.sender == PROPOSER ||
@@ -66,9 +69,48 @@ contract PayloadIGP82 is PayloadIGPConstants, PayloadIGPHelpers {
     function execute() external {
         require(address(this) == address(TIMELOCK), "not-valid-caller");
 
-        // Action 1: Readjust sUSDe-USDT<>USDT supply limit
+        // Action 1: Readjust sUSDe-USDT<>USDT witdhrawal limit
         action1();
 
+        // Action 2: Raise fUSDC and fUSDT Rewards Allowance
+        action2();
+
+        // Action 3: Set launch limits for USDC collateral vaults
+        action3();
+
+        // Action 4: Set launch limits for ezETH-ETH DEX and ezETH<>wstETH T1 & ezETH-ETH<>wstETH T2 vaults
+        action4();
+        
+        // Action 5: Update cbBTC-WBTC DEX configs
+        action5();
+
+        // Action 6: Update wstETH-ETH DEX and weETH-ETH DEX configs
+        action6();
+
+        // Action 7: Update withdrawal limits expansion for T1 vaults and Other vaults
+        action7(); // TO DO
+
+        // Action 8: Adjust Base limits on all vaults
+        action8(); // TO DO
+
+    }
+
+    function verifyProposal() external view {}
+
+    /**
+     * |
+     * |     Team Multisig Actions      |
+     * |__________________________________
+     */
+    function setState(
+        bool skipAction3_,
+        bool skipAction4_
+    ) external {
+        if (msg.sender != TEAM_MULTISIG) {
+            revert("not-team-multisig");
+        }
+        skipAction3 = skipAction3_;
+        skipAction4 = skipAction4_;
     }
 
     /**
@@ -77,7 +119,7 @@ contract PayloadIGP82 is PayloadIGPConstants, PayloadIGPHelpers {
      * |__________________________________
      */
 
-    // @notice Action 1: Readjust sUSDe-USDT<>USDT supply limit
+    // @notice Action 1: Readjust sUSDe-USDT<>USDT withdrawal limit
     function action1() internal {
         address sUSDe_USDT_DEX_ADDRESS = getDexAddress(15);
         address sUSDe_USDT__USDT_VAULT = getVaultAddress(92);
@@ -90,13 +132,242 @@ contract PayloadIGP82 is PayloadIGPConstants, PayloadIGPHelpers {
                 user: sUSDe_USDT__USDT_VAULT,
                 expandPercent: 25 * 1e2, // 25%
                 expandDuration: 12 hours, // 12 hours
-                baseWithdrawalLimit: 10_000_000 * 1e18 // 10M shares // $50M
+                baseWithdrawalLimit: 10_000_000 * 1e18 // 10M shares
             });
 
             IFluidDex(sUSDe_USDT_DEX_ADDRESS).updateUserSupplyConfigs(config_);
         }
     }
 
+    // @notice Action 2: Raise fUSDC and fUSDT Rewards Allowance
+    function action2() internal {
+        address[] memory protocols = new address[](2);
+        address[] memory tokens = new address[](2);
+        uint256[] memory amounts = new uint256[](2);
+
+        address fSTABLES_REWARDS_ADDRESS = 0xb75Ec31fd7ad0D823A801be8740B9Fad299ce6d6;
+
+        {
+            /// fUSDC
+            IFTokenAdmin(F_USDC_ADDRESS).updateRewards(
+                fSTABLES_REWARDS_ADDRESS
+            );
+
+            uint256 allowance = IERC20(USDC_ADDRESS).allowance(
+                address(FLUID_RESERVE),
+                F_USDC_ADDRESS
+            );
+
+            protocols[0] = F_USDC_ADDRESS;
+            tokens[0] = USDC_ADDRESS;
+            amounts[0] = allowance + (400_000 * 1e6); // 400K
+        }
+
+        {
+            /// fUSDT
+            IFTokenAdmin(F_USDT_ADDRESS).updateRewards(
+                fSTABLES_REWARDS_ADDRESS
+            );
+
+            uint256 allowance = IERC20(USDT_ADDRESS).allowance(
+                address(FLUID_RESERVE),
+                F_USDT_ADDRESS
+            );
+
+            protocols[1] = F_USDT_ADDRESS;
+            tokens[1] = USDT_ADDRESS;
+            amounts[1] = allowance + (400_000 * 1e6); // 400K
+        }
+
+        FLUID_RESERVE.approve(protocols, tokens, amounts);
+    }
+
+    // @notice Action 3: Set launch limits for USDC collateral vaults
+    function action3() internal {
+        if (PayloadIGP82(ADDRESS_THIS).skipAction3()) return;
+
+        {
+            address USDC_ETH_VAULT = getVaultAddress(100);
+
+            // [TYPE 1] USDC<>ETH | collateral & debt
+            Vault memory VAULT_USDC_ETH = Vault({
+                vault: USDC_ETH_VAULT,
+                vaultType: TYPE.TYPE_1,
+                supplyToken: USDC_ADDRESS,
+                borrowToken: ETH_ADDRESS,
+                baseWithdrawalLimitInUSD: 8_000_000, // $8M
+                baseBorrowLimitInUSD: 8_000_000, // $8M
+                maxBorrowLimitInUSD: 60_000_000 // $60M
+            });
+
+            setVaultLimits(VAULT_USDC_ETH); // TYPE_1 => 100
+
+            VAULT_FACTORY.setVaultAuth(USDC_ETH_VAULT, TEAM_MULTISIG, false);
+        }
+
+        {
+            address USDC_WBTC_VAULT = getVaultAddress(101);
+
+            // [TYPE 1] USDC<>WBTC | collateral & debt
+            Vault memory VAULT_USDC_WBTC = Vault({
+                vault: USDC_WBTC_VAULT,
+                vaultType: TYPE.TYPE_1,
+                supplyToken: USDC_ADDRESS,
+                borrowToken: WBTC_ADDRESS,
+                baseWithdrawalLimitInUSD: 8_000_000, // $8M
+                baseBorrowLimitInUSD: 8_000_000, // $8M
+                maxBorrowLimitInUSD: 30_000_000 // $30M
+            });
+
+            setVaultLimits(VAULT_USDC_WBTC); // TYPE_1 => 101
+
+            VAULT_FACTORY.setVaultAuth(USDC_WBTC_VAULT, TEAM_MULTISIG, false);
+        }
+
+        {
+            address USDC_cbBTC_VAULT = getVaultAddress(102);
+
+            // [TYPE 1] USDC<>cbBTC | collateral & debt
+            Vault memory VAULT_USDC_cbBTC = Vault({
+                vault: USDC_cbBTC_VAULT,
+                vaultType: TYPE.TYPE_1,
+                supplyToken: USDC_ADDRESS,
+                borrowToken: cbBTC_ADDRESS,
+                baseWithdrawalLimitInUSD: 8_000_000, // $8M
+                baseBorrowLimitInUSD: 8_000_000, // $8M
+                maxBorrowLimitInUSD: 30_000_000 // $30M
+            });
+
+            setVaultLimits(VAULT_USDC_cbBTC); // TYPE_1 => 102
+
+            VAULT_FACTORY.setVaultAuth(USDC_cbBTC_VAULT, TEAM_MULTISIG, false);
+        }
+    }
+
+    // @notice Action 4: Set launch limits for ezETH-ETH DEX and ezETH<>wstETH T1 & ezETH-ETH<>wstETH T2 vaults
+    function action4() internal {
+        if (PayloadIGP82(ADDRESS_THIS).skipAction4()) return;
+
+        {
+            address ezETH_ETH_DEX = getDexAddress(21);
+            // ezETH-ETH DEX
+            {
+                // ezETH-ETH Dex
+                Dex memory DEX_ezETH_ETH = Dex({
+                    dex: ezETH_ETH_DEX,
+                    tokenA: ezETH_ADDRESS,
+                    tokenB: ETH_ADDRESS,
+                    smartCollateral: true,
+                    smartDebt: false,
+                    baseWithdrawalLimitInUSD: 7_500_000, // $7.5M
+                    baseBorrowLimitInUSD: 0, // $0
+                    maxBorrowLimitInUSD: 0 // $0
+                });
+                setDexLimits(DEX_ezETH_ETH); // Smart Collateral
+
+                DEX_FACTORY.setDexAuth(ezETH_ETH_DEX, TEAM_MULTISIG, false);
+            }
+        }
+
+        {
+            address ezETH__wstETH_VAULT = getVaultAddress(103);
+
+            // [TYPE 1] ezETH<>wstETH | normal collateral & normal debt
+            Vault memory VAULT_ezETH_wstETH = Vault({
+                vault: ezETH__wstETH_VAULT,
+                vaultType: TYPE.TYPE_1,
+                supplyToken: ezETH_ADDRESS,
+                borrowToken: wstETH_ADDRESS,
+                baseWithdrawalLimitInUSD: 10_000_000, // $10M
+                baseBorrowLimitInUSD: 10_000_000, // $10M
+                maxBorrowLimitInUSD: 30_000_000 // $30M
+            });
+
+            setVaultLimits(VAULT_ezETH_wstETH); // TYPE_1 => 103
+
+            VAULT_FACTORY.setVaultAuth(
+                ezETH__wstETH_VAULT,
+                TEAM_MULTISIG,
+                false
+            );
+        }
+
+        {
+            address ezETH_ETH__wstETH_VAULT = getVaultAddress(104);
+
+            // [TYPE 2] ezETH-ETH<>wstETH | smart collateral & normal debt
+            Vault memory VAULT_ezETH_ETH_wstETH = Vault({
+                vault: ezETH_ETH__wstETH_VAULT,
+                vaultType: TYPE.TYPE_2,
+                supplyToken: address(0),
+                borrowToken: wstETH_ADDRESS,
+                baseWithdrawalLimitInUSD: 0,
+                baseBorrowLimitInUSD: 7_500_000, // $7.5M
+                maxBorrowLimitInUSD: 15_000_000 // $15M
+            });
+
+            setVaultLimits(VAULT_ezETH_ETH_wstETH); // TYPE_2 => 104
+
+            VAULT_FACTORY.setVaultAuth(
+                ezETH_ETH__wstETH_VAULT,
+                TEAM_MULTISIG,
+                false
+            );
+        }
+    }
+
+    // @notice Action 5: Update cbBTC-wBTC DEX configs
+    function action5() internal {
+
+        address cbBTC_wBTC_DEX_ADDRESS = getDexAddress(3);
+
+        // update the threshold to 20%
+        IFluidDex(cbBTC_wBTC_DEX_ADDRESS).updateThresholdPercent(
+            20 * 1e4,
+            20 * 1e4,
+            9 hours,
+            1 days
+        );
+
+        // update the upper and lower range +-0.25%
+        IFluidDex(cbBTC_wBTC_DEX_ADDRESS).updateRangePercents(
+            0.25 * 1e4,
+            0.25 * 1e4,
+            1 days
+        );
+    }
+
+    // @notice Action 6: Update wstETH-ETH DEX and weETH-ETH DEX configs
+    function action6() internal {
+
+        address wstETH_ETH_DEX_ADDRESS = getDexAddress(1);
+        address weETH_ETH_DEX_ADDRESS = getDexAddress(9);
+
+        // update the upper and lower range for wstETH-ETH DEX
+        IFluidDex(wstETH_ETH_DEX_ADDRESS).updateRangePercents(
+            0.08 * 1e4, // +0.08%
+            0.0001 * 1e4, // -0.0001%
+            0
+        );
+
+        // update the upper and lower range for weETH-ETH DEX
+        IFluidDex(weETH_ETH_DEX_ADDRESS).updateRangePercents(
+            0.06 * 1e4, // +0.06%
+            0.0001 * 1e4, // -0.0001%
+            0
+        );
+    }
+
+    // @notice Action 7: Update withdrawal limits expansion for T1 vaults and Other vaults
+    function action7() internal {
+        // TO DO
+    }
+
+    // @notice Action 8: Adjust Base limits on all vaults
+    function action8() internal {
+        // TO DO
+    }
+    
     /**
      * |
      * |     Proposal Payload Helpers      |
