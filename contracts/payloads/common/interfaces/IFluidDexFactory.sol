@@ -8,6 +8,12 @@ interface IFluidDexFactory {
 
     function setDexAuth(address dex_, address dexAuth_, bool allowed_) external;
 
+    /// @notice                         Sets an address (`globalAuth_`) as a global authorization or not.
+    ///                                 This function can only be called by the owner.
+    /// @param globalAuth_              The address to be set as global authorization.
+    /// @param allowed_                 A boolean indicating whether the specified address is allowed to update any dex config.
+    function setGlobalAuth(address globalAuth_, bool allowed_) external;
+
     function owner() external view returns (address);
 
     function setDexDeploymentLogic(
