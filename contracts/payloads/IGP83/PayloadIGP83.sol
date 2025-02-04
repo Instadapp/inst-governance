@@ -84,9 +84,12 @@ contract PayloadIGP83 is PayloadIGPConstants, PayloadIGPHelpers {
         // Action 5: Update cbBTC-WBTC DEX configs
         action5();
 
-        // Action 6: Update wstETH-ETH DEX and weETH-ETH DEX configs
+        // Action 6: Update wstETH-ETH, weETH-ETH, rsETH-ETH DEX configs
         action6();
 
+        // Action 7:Update USDC-USDT DEX limits
+        action7();
+        
     }
 
     function verifyProposal() external view {}
@@ -331,11 +334,12 @@ contract PayloadIGP83 is PayloadIGPConstants, PayloadIGPHelpers {
         );
     }
 
-    // @notice Action 6: Update wstETH-ETH DEX and weETH-ETH DEX configs
+    // @notice Action 6: Update wstETH-ETH, weETH-ETH, rsETH-ETH DEX configs
     function action6() internal {
 
         address wstETH_ETH_DEX_ADDRESS = getDexAddress(1);
         address weETH_ETH_DEX_ADDRESS = getDexAddress(9);
+        address rsETH_ETH_DEX_ADDRESS = getDexAddress(13);
 
         // update the upper and lower range for wstETH-ETH DEX
         IFluidDex(wstETH_ETH_DEX_ADDRESS).updateRangePercents(
@@ -350,6 +354,39 @@ contract PayloadIGP83 is PayloadIGPConstants, PayloadIGPHelpers {
             0.0001 * 1e4, // -0.0001%
             0
         );
+
+        // update the upper and lower range for rsETH-ETH DEX
+        IFluidDex(weETH_ETH_DEX_ADDRESS).updateRangePercents(
+            0.1 * 1e4, // +0.1%
+            0.0001 * 1e4, // -0.0001%
+            5 days
+        );
+    }
+
+    // @notice Action 7: Update USDC-USDT DEX limits
+    function action7() internal {
+       address USDC_USDT_DEX_ADDRESS = getDexAddress(2);
+
+        {
+            Dex memory DEX_USDC_USDT = Dex({
+                dex: USDC_USDT_DEX_ADDRESS,
+                tokenA: USDC_ADDRESS,
+                tokenB: USDT_ADDRESS,
+                smartCollateral: false,
+                smartDebt: true,
+                baseWithdrawalLimitInUSD: 0, // $0
+                baseBorrowLimitInUSD: 10_000_000, // $10M
+                maxBorrowLimitInUSD: 60_000_000 // $60M
+            });
+            setDexLimits(DEX_USDC_USDT); // Smart Debt
+        }
+
+        {
+            // Set max borrow shares
+            IFluidDex(USDC_USDT_DEX_ADDRESS).updateMaxBorrowShares(
+                60_000_000 * 1e18
+            ); // Current 20_000_000 * 1e18
+        }
     }
     
     /**
@@ -437,13 +474,13 @@ contract PayloadIGP83 is PayloadIGPConstants, PayloadIGPHelpers {
 
     function setVaultLimits(Vault memory vault_) internal {
         if (
-            vault_.vaultType == TYPE.TYPE_3 || vault_.vaultType == TYPE.TYPE_1
+            vault_.vaultType == TYPE.TYPE_1
         ) {
             SupplyProtocolConfig memory protocolConfig_ = SupplyProtocolConfig({
                 protocol: vault_.vault,
                 supplyToken: vault_.supplyToken,
-                expandPercent: 25 * 1e2, // 25%
-                expandDuration: 12 hours, // 12 hours
+                expandPercent: 50 * 1e2, // 50%
+                expandDuration: 6 hours, // 6 hours
                 baseWithdrawalLimitInUSD: vault_.baseWithdrawalLimitInUSD
             });
 
@@ -451,19 +488,49 @@ contract PayloadIGP83 is PayloadIGPConstants, PayloadIGPHelpers {
         }
 
         if (
-            vault_.vaultType == TYPE.TYPE_2 || vault_.vaultType == TYPE.TYPE_1
+            vault_.vaultType == TYPE.TYPE_1
         ) {
             BorrowProtocolConfig memory protocolConfig_ = BorrowProtocolConfig({
                 protocol: vault_.vault,
                 borrowToken: vault_.borrowToken,
-                expandPercent: 20 * 1e2, // 20%
-                expandDuration: 12 hours, // 12 hours
+                expandPercent: 50 * 1e2, // 50%
+                expandDuration: 6 hours, // 6 hours
                 baseBorrowLimitInUSD: vault_.baseBorrowLimitInUSD,
                 maxBorrowLimitInUSD: vault_.maxBorrowLimitInUSD
             });
 
             setBorrowProtocolLimits(protocolConfig_);
         }
+        
+        if (
+            vault_.vaultType == TYPE.TYPE_2
+        ) {
+            BorrowProtocolConfig memory protocolConfig_ = BorrowProtocolConfig({
+                protocol: vault_.vault,
+                borrowToken: vault_.borrowToken,
+                expandPercent: 30 * 1e2, // 30%
+                expandDuration: 6 hours, // 6 hours
+                baseBorrowLimitInUSD: vault_.baseBorrowLimitInUSD,
+                maxBorrowLimitInUSD: vault_.maxBorrowLimitInUSD
+            });
+
+            setBorrowProtocolLimits(protocolConfig_);
+        }
+
+        if (
+            vault_.vaultType == TYPE.TYPE_3
+        ) {
+            SupplyProtocolConfig memory protocolConfig_ = SupplyProtocolConfig({
+                protocol: vault_.vault,
+                supplyToken: vault_.supplyToken,
+                expandPercent: 35 * 1e2, // 35%
+                expandDuration: 6 hours, // 6 hours
+                baseWithdrawalLimitInUSD: vault_.baseWithdrawalLimitInUSD
+            });
+
+            setSupplyProtocolLimits(protocolConfig_);
+        }
+
     }
 
     // Token Prices Constants
