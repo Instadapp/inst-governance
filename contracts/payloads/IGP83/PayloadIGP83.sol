@@ -87,12 +87,6 @@ contract PayloadIGP83 is PayloadIGPConstants, PayloadIGPHelpers {
         // Action 6: Update wstETH-ETH DEX and weETH-ETH DEX configs
         action6();
 
-        // Action 7: Update withdrawal limits expansion for T1 vaults and Other vaults
-        action7(); // TO DO
-
-        // Action 8: Adjust Base limits on all vaults
-        action8(); // TO DO
-
     }
 
     function verifyProposal() external view {}
@@ -356,16 +350,6 @@ contract PayloadIGP83 is PayloadIGPConstants, PayloadIGPHelpers {
             0.0001 * 1e4, // -0.0001%
             0
         );
-    }
-
-    // @notice Action 7: Update withdrawal limits expansion for T1 vaults and Other vaults
-    function action7() internal {
-        // TO DO
-    }
-
-    // @notice Action 8: Adjust Base limits on all vaults
-    function action8() internal {
-        // TO DO
     }
     
     /**
