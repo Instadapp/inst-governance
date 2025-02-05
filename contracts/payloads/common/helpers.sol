@@ -34,17 +34,19 @@ contract PayloadIGPHelpers is PayloadIGPConstants {
      * |     State Variables      |
      * |__________________________
      */
+    /// @notice The unix time when the proposal was created
+    uint40 internal proposalCreationTime_;
 
     /// @notice Time when the proposal will be executable
-    uint256 public executableTime;
+    uint256 internal executableTime_;
 
     /// @notice Actions that can be skipped
-    mapping(uint256 => bool) public skipAction;
+    mapping(uint256 => bool) internal skipAction_;
 
     /// @notice Modifier to check if an action can be skipped
     modifier isActionSkippable(uint256 action_) {
         // If function is not skippable, then execute
-        if (!skipAction[action_]) {
+        if (!PayloadIGPHelpers(ADDRESS_THIS).actionStatus(action_)) {
             _;
         }
     }
@@ -62,7 +64,7 @@ contract PayloadIGPHelpers is PayloadIGPConstants {
         }
 
         for (uint256 i = 0; i < actionsToSkip_.length; i++) {
-            skipAction[actionsToSkip_[i]] = true;
+            skipAction_[actionsToSkip_[i]] = true;
         }
     }
 
@@ -70,8 +72,9 @@ contract PayloadIGPHelpers is PayloadIGPConstants {
     // @param executableUnixTime_ The unix time when the proposal will be executable
     function setExecutionDelay(uint256 executableUnixTime_) external {
         require(msg.sender == TEAM_MULTISIG, "not-team-multisig");
-        require(executableUnixTime_ <= block.timestamp + 5 days, "delay exceeds 5 days");
-        executableTime = executableUnixTime_;
+        // 9 days (4 days FLUID governance process + 5 days team multisig delay)
+        require(executableUnixTime_ <= proposalCreationTime_ + 9 days, "execution delay exceeds 9 days from proposal creation");
+        executableTime_ = executableUnixTime_;
     }
 
     /**
@@ -81,7 +84,19 @@ contract PayloadIGPHelpers is PayloadIGPConstants {
      */
 
     function isProposalExecutable() public view returns (bool) {
-        return block.timestamp >= executableTime;
+        return block.timestamp >= executableTime_ || executableTime_ == 0;
+    }
+
+    function getProposalCreationTime() public view returns (uint40) {
+        return proposalCreationTime_;
+    }
+
+    function getExecutableTime() public view returns (uint256) {
+        return executableTime_;
+    }
+
+    function actionStatus(uint256 action_) public view returns (bool) {
+        return skipAction_[action_];
     }
 
     function getVaultAddress(uint256 vaultId_) public view returns (address) {

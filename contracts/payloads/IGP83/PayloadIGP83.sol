@@ -61,11 +61,13 @@ contract PayloadIGP83 is PayloadIGPConstants, PayloadIGPHelpers {
         );
 
         require(proposedId == PROPOSAL_ID, "PROPOSAL_IS_NOT_SAME");
+
+        proposalCreationTime_ = block.timestamp;
     }
 
     function execute() external {
         require(address(this) == address(TIMELOCK), "not-valid-caller");
-        require(block.timestamp >= delaySetTime + delayTime, "delay not yet passed");
+        require(PayloadIGPHelpers(ADDRESS_THIS).isProposalExecutable(), "proposal-not-executable");
 
         // Action 1: Readjust sUSDe-USDT<>USDT witdhrawal limit
         action1();
