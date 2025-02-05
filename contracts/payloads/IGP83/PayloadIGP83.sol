@@ -227,7 +227,6 @@ contract PayloadIGP83 is PayloadIGPConstants, PayloadIGPHelpers {
 
     // @notice Action 4: Set launch limits for ezETH-ETH DEX and ezETH<>wstETH T1 & ezETH-ETH<>wstETH T2 vaults
     function action4() internal isActionSkippable(4) {
-
         {
             address ezETH_ETH_DEX = getDexAddress(21);
             // ezETH-ETH DEX
@@ -339,7 +338,7 @@ contract PayloadIGP83 is PayloadIGPConstants, PayloadIGPHelpers {
         );
 
         // update the upper and lower range for rsETH-ETH DEX
-        IFluidDex(weETH_ETH_DEX_ADDRESS).updateRangePercents(
+        IFluidDex(rsETH_ETH_DEX_ADDRESS).updateRangePercents(
             0.1 * 1e4, // +0.1%
             0.0001 * 1e4, // -0.0001%
             5 days
