@@ -51,7 +51,7 @@ contract PayloadIGP83 is PayloadIGPMain {
         // Action 6: Update wstETH-ETH, weETH-ETH, rsETH-ETH DEX configs
         action6();
 
-        // Action 7:Update USDC-USDT DEX limits
+        // Action 7: Update USDC-USDT DEX limits
         action7();
 
         // Action 8: Set dust limits for USD0-USDC, fxUSD-USDC, USDC-BOLD DEX
@@ -227,7 +227,7 @@ contract PayloadIGP83 is PayloadIGPMain {
                 borrowToken: wstETH_ADDRESS,
                 baseWithdrawalLimitInUSD: 10_000_000, // $10M
                 baseBorrowLimitInUSD: 10_000_000, // $10M
-                maxBorrowLimitInUSD: 30_000_000 // $30M
+                maxBorrowLimitInUSD: 20_000_000 // $20M
             });
 
             setVaultLimits(VAULT_ezETH_wstETH); // TYPE_1 => 103
