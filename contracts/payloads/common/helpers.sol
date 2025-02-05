@@ -38,7 +38,7 @@ contract PayloadIGPHelpers is PayloadIGPConstants {
     uint40 internal proposalCreationTime_;
 
     /// @notice Time when the proposal will be executable
-    uint256 internal executableTime_;
+    uint40 internal executableTime_;
 
     /// @notice Actions that can be skipped
     mapping(uint256 => bool) internal skipAction_;
