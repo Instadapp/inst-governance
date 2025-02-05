@@ -56,6 +56,9 @@ contract PayloadIGP83 is PayloadIGPMain {
 
         // Action 8: Set dust limits for USD0-USDC, fxUSD-USDC, USDC-BOLD DEX
         action8();
+
+        // Action 9: Discontinue fGHO rewards
+        action9();
     }
 
     function verifyProposal() public view override {}
@@ -111,7 +114,7 @@ contract PayloadIGP83 is PayloadIGPMain {
 
             protocols[0] = F_USDC_ADDRESS;
             tokens[0] = USDC_ADDRESS;
-            amounts[0] = allowance + (400_000 * 1e6); // 400K
+            amounts[0] = allowance + (1_500_000 * 1e6); // 1.5M
         }
 
         {
@@ -127,7 +130,7 @@ contract PayloadIGP83 is PayloadIGPMain {
 
             protocols[1] = F_USDT_ADDRESS;
             tokens[1] = USDT_ADDRESS;
-            amounts[1] = allowance + (400_000 * 1e6); // 400K
+            amounts[1] = allowance + (1_500_000 * 1e6); // 1.5M
         }
 
         FLUID_RESERVE.approve(protocols, tokens, amounts);
@@ -388,8 +391,8 @@ contract PayloadIGP83 is PayloadIGPMain {
                 // USDC-BOLD Dex
                 Dex memory DEX_USDC_BOLD = Dex({
                     dex: USDC_BOLD_DEX,
-                    tokenA: USD0_ADDRESS,
-                    tokenB: USDC_ADDRESS,
+                    tokenA: USDC_ADDRESS,
+                    tokenB: BOLD_ADDRESS,
                     smartCollateral: true,
                     smartDebt: false,
                     baseWithdrawalLimitInUSD: 10_000, // $10k
@@ -401,6 +404,26 @@ contract PayloadIGP83 is PayloadIGPMain {
                 DEX_FACTORY.setDexAuth(USDC_BOLD_DEX, TEAM_MULTISIG, true);
             }
         }
+    }
+
+
+    // @notice Action 9: Discontinue fGHO rewards
+    function action9() internal isActionSkippable(9) {
+        address[] memory protocols = new address[](1);
+        address[] memory tokens = new address[](1);
+        uint256[] memory amounts = new uint256[](1);
+
+        {
+            IFTokenAdmin(F_GHO_ADDRESS).updateRewards(address(0));
+
+            uint256 allowance = 210_000 * 1e18; // 210K GHO
+
+            protocols[0] = F_GHO_ADDRESS;
+            tokens[0] = GHO_ADDRESS;
+            amounts[0] = allowance;
+        }
+
+        FLUID_RESERVE.approve(protocols, tokens, amounts);
     }
 
     /**
