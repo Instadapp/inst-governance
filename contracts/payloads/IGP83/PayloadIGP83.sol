@@ -44,7 +44,7 @@ contract PayloadIGP83 is PayloadIGPMain {
 
         // Action 4: Set launch limits for ezETH-ETH DEX and ezETH<>wstETH T1 & ezETH-ETH<>wstETH T2 vaults
         action4();
-        
+
         // Action 5: Update cbBTC-WBTC DEX configs
         action5();
 
@@ -56,12 +56,11 @@ contract PayloadIGP83 is PayloadIGPMain {
 
         // Action 8: Set dust limits for USD0-USDC, fxUSD-USDC, USDC-BOLD DEX
         action8();
-        
     }
 
     function verifyProposal() public view override {}
 
-    function _PROPOSAL_ID() internal view override returns(uint256) {
+    function _PROPOSAL_ID() internal view override returns (uint256) {
         return PROPOSAL_ID;
     }
 
@@ -136,7 +135,6 @@ contract PayloadIGP83 is PayloadIGPMain {
 
     // @notice Action 3: Set launch limits for USDC collateral vaults
     function action3() internal isActionSkippable(3) {
-
         {
             address USDC_ETH_VAULT = getVaultAddress(100);
 
@@ -146,8 +144,8 @@ contract PayloadIGP83 is PayloadIGPMain {
                 vaultType: TYPE.TYPE_1,
                 supplyToken: USDC_ADDRESS,
                 borrowToken: ETH_ADDRESS,
-                baseWithdrawalLimitInUSD: 8_000_000, // $8M
-                baseBorrowLimitInUSD: 8_000_000, // $8M
+                baseWithdrawalLimitInUSD: 10_000_000, // $10M
+                baseBorrowLimitInUSD: 10_000_000, // $10M
                 maxBorrowLimitInUSD: 60_000_000 // $60M
             });
 
@@ -165,8 +163,8 @@ contract PayloadIGP83 is PayloadIGPMain {
                 vaultType: TYPE.TYPE_1,
                 supplyToken: USDC_ADDRESS,
                 borrowToken: WBTC_ADDRESS,
-                baseWithdrawalLimitInUSD: 8_000_000, // $8M
-                baseBorrowLimitInUSD: 8_000_000, // $8M
+                baseWithdrawalLimitInUSD: 10_000_000, // $10M
+                baseBorrowLimitInUSD: 10_000_000, // $10M
                 maxBorrowLimitInUSD: 30_000_000 // $30M
             });
 
@@ -184,8 +182,8 @@ contract PayloadIGP83 is PayloadIGPMain {
                 vaultType: TYPE.TYPE_1,
                 supplyToken: USDC_ADDRESS,
                 borrowToken: cbBTC_ADDRESS,
-                baseWithdrawalLimitInUSD: 8_000_000, // $8M
-                baseBorrowLimitInUSD: 8_000_000, // $8M
+                baseWithdrawalLimitInUSD: 10_000_000, // $10M
+                baseBorrowLimitInUSD: 10_000_000, // $10M
                 maxBorrowLimitInUSD: 30_000_000 // $30M
             });
 
@@ -267,7 +265,6 @@ contract PayloadIGP83 is PayloadIGPMain {
 
     // @notice Action 5: Update cbBTC-wBTC DEX configs
     function action5() internal isActionSkippable(5) {
-
         address cbBTC_wBTC_DEX_ADDRESS = getDexAddress(3);
 
         // update the threshold to 20%
@@ -288,7 +285,6 @@ contract PayloadIGP83 is PayloadIGPMain {
 
     // @notice Action 6: Update wstETH-ETH, weETH-ETH, rsETH-ETH DEX configs
     function action6() internal isActionSkippable(6) {
-
         address wstETH_ETH_DEX_ADDRESS = getDexAddress(1);
         address weETH_ETH_DEX_ADDRESS = getDexAddress(9);
         address rsETH_ETH_DEX_ADDRESS = getDexAddress(13);
@@ -317,7 +313,7 @@ contract PayloadIGP83 is PayloadIGPMain {
 
     // @notice Action 7: Update USDC-USDT DEX limits
     function action7() internal isActionSkippable(7) {
-       address USDC_USDT_DEX_ADDRESS = getDexAddress(2);
+        address USDC_USDT_DEX_ADDRESS = getDexAddress(2);
 
         {
             Dex memory DEX_USDC_USDT = Dex({
@@ -343,7 +339,6 @@ contract PayloadIGP83 is PayloadIGPMain {
 
     // @notice Action 8: Set dust limits for USD0-USDC, fxUSD-USDC, USDC-BOLD DEX
     function action8() internal isActionSkippable(8) {
-        
         {
             address USD0_USDC_DEX = getDexAddress(23);
             // USD0-USDC DEX
@@ -407,7 +402,7 @@ contract PayloadIGP83 is PayloadIGPMain {
             }
         }
     }
-    
+
     /**
      * |
      * |     Proposal Payload Helpers      |
@@ -492,9 +487,7 @@ contract PayloadIGP83 is PayloadIGPMain {
     }
 
     function setVaultLimits(Vault memory vault_) internal {
-        if (
-            vault_.vaultType == TYPE.TYPE_1
-        ) {
+        if (vault_.vaultType == TYPE.TYPE_1) {
             SupplyProtocolConfig memory protocolConfig_ = SupplyProtocolConfig({
                 protocol: vault_.vault,
                 supplyToken: vault_.supplyToken,
@@ -506,9 +499,7 @@ contract PayloadIGP83 is PayloadIGPMain {
             setSupplyProtocolLimits(protocolConfig_);
         }
 
-        if (
-            vault_.vaultType == TYPE.TYPE_1
-        ) {
+        if (vault_.vaultType == TYPE.TYPE_1) {
             BorrowProtocolConfig memory protocolConfig_ = BorrowProtocolConfig({
                 protocol: vault_.vault,
                 borrowToken: vault_.borrowToken,
@@ -520,10 +511,8 @@ contract PayloadIGP83 is PayloadIGPMain {
 
             setBorrowProtocolLimits(protocolConfig_);
         }
-        
-        if (
-            vault_.vaultType == TYPE.TYPE_2
-        ) {
+
+        if (vault_.vaultType == TYPE.TYPE_2) {
             BorrowProtocolConfig memory protocolConfig_ = BorrowProtocolConfig({
                 protocol: vault_.vault,
                 borrowToken: vault_.borrowToken,
@@ -536,9 +525,7 @@ contract PayloadIGP83 is PayloadIGPMain {
             setBorrowProtocolLimits(protocolConfig_);
         }
 
-        if (
-            vault_.vaultType == TYPE.TYPE_3
-        ) {
+        if (vault_.vaultType == TYPE.TYPE_3) {
             SupplyProtocolConfig memory protocolConfig_ = SupplyProtocolConfig({
                 protocol: vault_.vault,
                 supplyToken: vault_.supplyToken,
@@ -549,7 +536,6 @@ contract PayloadIGP83 is PayloadIGPMain {
 
             setSupplyProtocolLimits(protocolConfig_);
         }
-
     }
 
     // Token Prices Constants
