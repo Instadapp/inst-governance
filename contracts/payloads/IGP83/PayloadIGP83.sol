@@ -270,20 +270,36 @@ contract PayloadIGP83 is PayloadIGPMain {
     function action5() internal isActionSkippable(5) {
         address cbBTC_wBTC_DEX_ADDRESS = getDexAddress(3);
 
-        // update the threshold to 20%
-        IFluidDex(cbBTC_wBTC_DEX_ADDRESS).updateThresholdPercent(
-            20 * 1e4,
-            20 * 1e4,
-            16 hours,
-            1 days
-        );
+        {
+            // update the threshold to 20%
+            IFluidDex(cbBTC_wBTC_DEX_ADDRESS).updateThresholdPercent(
+                20 * 1e4,
+                20 * 1e4,
+                16 hours,
+                1 days
+            );
+        }
 
-        // update the upper and lower range +-0.25%
-        IFluidDex(cbBTC_wBTC_DEX_ADDRESS).updateRangePercents(
-            0.25 * 1e4,
-            0.25 * 1e4,
-            5 days
-        );
+        {
+            // update the upper and lower range +-0.25%
+            IFluidDex(cbBTC_wBTC_DEX_ADDRESS).updateRangePercents(
+                0.25 * 1e4,
+                0.25 * 1e4,
+                5 days
+            );
+        }
+
+        {   // Set max supply shares
+            IFluidDex(cbBTC_wBTC_DEX_ADDRESS).updateMaxSupplyShares(
+                175 * 1e18
+            ); // Current 150 * 1e18
+        }
+
+        {   // Set max borrow shares
+            IFluidDex(cbBTC_wBTC_DEX_ADDRESS).updateMaxBorrowShares(
+                125 * 1e18
+            ); // Current 120 * 1e18
+        }
     }
 
     // @notice Action 6: Update wstETH-ETH, weETH-ETH, rsETH-ETH DEX configs
