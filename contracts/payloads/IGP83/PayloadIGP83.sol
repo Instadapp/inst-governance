@@ -310,22 +310,22 @@ contract PayloadIGP83 is PayloadIGPMain {
 
         // update the upper and lower range for wstETH-ETH DEX
         IFluidDex(wstETH_ETH_DEX_ADDRESS).updateRangePercents(
-            0.08 * 1e4, // +0.08%
-            0.0001 * 1e4, // -0.0001%
+            0.0001 * 1e4, // +0.0001%
+            0.08 * 1e4, // -0.08%
             0
         );
 
         // update the upper and lower range for weETH-ETH DEX
         IFluidDex(weETH_ETH_DEX_ADDRESS).updateRangePercents(
-            0.06 * 1e4, // +0.06%
-            0.0001 * 1e4, // -0.0001%
+            0.0001 * 1e4, // +0.0001%
+            0.06 * 1e4, // -0.06%
             0
         );
 
         // update the upper and lower range for rsETH-ETH DEX
         IFluidDex(rsETH_ETH_DEX_ADDRESS).updateRangePercents(
-            0.1 * 1e4, // +0.1%
-            0.0001 * 1e4, // -0.0001%
+            0.0001 * 1e4, // +0.0001%
+            0.1 * 1e4, // -0.1%
             5 days
         );
     }
