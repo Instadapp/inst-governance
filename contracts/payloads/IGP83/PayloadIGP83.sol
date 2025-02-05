@@ -29,19 +29,6 @@ import {PayloadIGPHelpers} from "../common/helpers.sol";
 contract PayloadIGP83 is PayloadIGPConstants, PayloadIGPHelpers {
     uint256 public constant PROPOSAL_ID = 83;
 
-    // New state variables for delay
-    uint256 public delayTime;
-    uint256 public delaySetTime;
-
-    mapping(uint256 => bool) public setActionSkippable;
-
-    modifier isSkippable(uint256 action_) {
-        // If function is not skippable, then execute
-        if (setActionSkippable[action_] == false) {
-            _;
-        }
-    }
-
     function propose(string memory description) external {
         require(
             msg.sender == PROPOSER ||
@@ -110,37 +97,12 @@ contract PayloadIGP83 is PayloadIGPConstants, PayloadIGPHelpers {
 
     /**
      * |
-     * |     Team Multisig Actions      |
-     * |__________________________________
-     */
-    function setState(
-        uint256[] calldata actionsToSkip_
-    ) external {
-        if (msg.sender != TEAM_MULTISIG) {
-            revert("not-team-multisig");
-        }
-
-        for (uint256 i = 0; i < actionsToSkip_.length; i++) {
-            setActionSkippable[actionsToSkip_[i]] = true;
-        }
-    }
-
-     // Allows the team multisig to set a delay(max 5 days) for execution
-    function setDelayTime(uint256 _delayTime) external {
-        require(msg.sender == TEAM_MULTISIG, "not-team-multisig");
-        require(_delayTime <= 5 days, "delay exceeds 5 days");
-        delayTime = _delayTime;
-        delaySetTime = block.timestamp;
-    }
-
-    /**
-     * |
      * |     Proposal Payload Actions      |
      * |__________________________________
      */
 
     // @notice Action 1: Readjust sUSDe-USDT<>USDT withdrawal limit
-    function action1() internal isSkippable(1) {
+    function action1() internal isActionSkippable(1) {
         address sUSDe_USDT_DEX_ADDRESS = getDexAddress(15);
         address sUSDe_USDT__USDT_VAULT = getVaultAddress(92);
 
@@ -160,7 +122,7 @@ contract PayloadIGP83 is PayloadIGPConstants, PayloadIGPHelpers {
     }
 
     // @notice Action 2: Raise fUSDC and fUSDT Rewards Allowance
-    function action2() internal isSkippable(2) {
+    function action2() internal isActionSkippable(2) {
         address[] memory protocols = new address[](2);
         address[] memory tokens = new address[](2);
         uint256[] memory amounts = new uint256[](2);
@@ -203,8 +165,7 @@ contract PayloadIGP83 is PayloadIGPConstants, PayloadIGPHelpers {
     }
 
     // @notice Action 3: Set launch limits for USDC collateral vaults
-    function action3() internal isSkippable(3) {
-        if (PayloadIGP83(ADDRESS_THIS).skipAction3()) return;
+    function action3() internal isActionSkippable(3) {
 
         {
             address USDC_ETH_VAULT = getVaultAddress(100);
@@ -265,8 +226,7 @@ contract PayloadIGP83 is PayloadIGPConstants, PayloadIGPHelpers {
     }
 
     // @notice Action 4: Set launch limits for ezETH-ETH DEX and ezETH<>wstETH T1 & ezETH-ETH<>wstETH T2 vaults
-    function action4() internal isSkippable(4) {
-        if (PayloadIGP83(ADDRESS_THIS).skipAction4()) return;
+    function action4() internal isActionSkippable(4) {
 
         {
             address ezETH_ETH_DEX = getDexAddress(21);
@@ -337,7 +297,7 @@ contract PayloadIGP83 is PayloadIGPConstants, PayloadIGPHelpers {
     }
 
     // @notice Action 5: Update cbBTC-wBTC DEX configs
-    function action5() internal isSkippable(5) {
+    function action5() internal isActionSkippable(5) {
 
         address cbBTC_wBTC_DEX_ADDRESS = getDexAddress(3);
 
@@ -358,7 +318,7 @@ contract PayloadIGP83 is PayloadIGPConstants, PayloadIGPHelpers {
     }
 
     // @notice Action 6: Update wstETH-ETH, weETH-ETH, rsETH-ETH DEX configs
-    function action6() internal isSkippable(6) {
+    function action6() internal isActionSkippable(6) {
 
         address wstETH_ETH_DEX_ADDRESS = getDexAddress(1);
         address weETH_ETH_DEX_ADDRESS = getDexAddress(9);
@@ -387,7 +347,7 @@ contract PayloadIGP83 is PayloadIGPConstants, PayloadIGPHelpers {
     }
 
     // @notice Action 7: Update USDC-USDT DEX limits
-    function action7() internal isSkippable(7) {
+    function action7() internal isActionSkippable(7) {
        address USDC_USDT_DEX_ADDRESS = getDexAddress(2);
 
         {
@@ -413,7 +373,7 @@ contract PayloadIGP83 is PayloadIGPConstants, PayloadIGPHelpers {
     }
 
     // @notice Action 8: Set dust limits for USD0-USDC, fxUSD-USDC, USDC-BOLD DEX
-    function action8() internal isSkippable(8) {
+    function action8() internal isActionSkippable(8) {
         
         {
             address USD0_USDC_DEX = getDexAddress(23);
