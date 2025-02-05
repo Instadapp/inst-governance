@@ -432,7 +432,7 @@ contract PayloadIGP83 is PayloadIGPMain {
         {
             IFTokenAdmin(F_GHO_ADDRESS).updateRewards(address(0));
 
-            uint256 allowance = 210_000 * 1e18; // 210K GHO
+            uint256 allowance = 240_000 * 1e18; // 240K GHO
 
             protocols[0] = F_GHO_ADDRESS;
             tokens[0] = GHO_ADDRESS;
