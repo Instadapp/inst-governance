@@ -82,8 +82,8 @@ contract PayloadIGP83 is PayloadIGPMain {
                 memory config_ = new IFluidAdminDex.UserSupplyConfig[](1);
             config_[0] = IFluidAdminDex.UserSupplyConfig({
                 user: sUSDe_USDT__USDT_VAULT,
-                expandPercent: 25 * 1e2, // 25%
-                expandDuration: 12 hours, // 12 hours
+                expandPercent: 35 * 1e2, // 35%
+                expandDuration: 6 hours, // 6 hours
                 baseWithdrawalLimit: 10_000_000 * 1e18 // 10M shares
             });
 
@@ -97,14 +97,8 @@ contract PayloadIGP83 is PayloadIGPMain {
         address[] memory tokens = new address[](2);
         uint256[] memory amounts = new uint256[](2);
 
-        address fSTABLES_REWARDS_ADDRESS = 0xb75Ec31fd7ad0D823A801be8740B9Fad299ce6d6;
-
         {
             /// fUSDC
-            IFTokenAdmin(F_USDC_ADDRESS).updateRewards(
-                fSTABLES_REWARDS_ADDRESS
-            );
-
             uint256 allowance = IERC20(USDC_ADDRESS).allowance(
                 address(FLUID_RESERVE),
                 F_USDC_ADDRESS
@@ -117,10 +111,6 @@ contract PayloadIGP83 is PayloadIGPMain {
 
         {
             /// fUSDT
-            IFTokenAdmin(F_USDT_ADDRESS).updateRewards(
-                fSTABLES_REWARDS_ADDRESS
-            );
-
             uint256 allowance = IERC20(USDT_ADDRESS).allowance(
                 address(FLUID_RESERVE),
                 F_USDT_ADDRESS

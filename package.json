@@ -1,5 +1,5 @@
 {
-  "name": "inst-governance",
+  "name": "fluid-governance",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -10,18 +10,19 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@nomiclabs/hardhat-ethers": "^2.0.2",
-    "@nomiclabs/hardhat-waffle": "^2.0.1",
-    "chai": "^4.3.4",
-    "ethereum-waffle": "^3.3.0",
-    "ethers": "^5.0.32",
-    "hardhat": "^2.1.1",
-    "solc": "^0.7.0"
+    "@nomicfoundation/hardhat-ethers": "^3.0.8",
+    "@nomicfoundation/hardhat-ignition": "^0.15.9",
+    "@nomicfoundation/hardhat-ignition-ethers": "^0.15.9",
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "@nomicfoundation/hardhat-verify": "^2.0.12",
+    "@nomicfoundation/ignition-core": "^0.15.9",
+    "dotenv": "^16.4.7",
+    "ethers": "^6.13.5",
+    "hardhat": "^2.22.10",
+    "rlp": "^2.2.6",
+    "typescript": "^5.6.2"
   },
   "dependencies": {
-    "@nomiclabs/hardhat-etherscan": "^2.1.1",
-    "@tenderly/hardhat-tenderly": "^2.2.1",
-    "dotenv": "^8.2.0",
-    "rlp": "^2.2.6"
+    "@tenderly/hardhat-tenderly": "^2.5.2"
   }
 }
