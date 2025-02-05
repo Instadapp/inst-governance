@@ -28,7 +28,7 @@ import { IDSAV2 } from "./interfaces/IDSA.sol";
 import { PayloadIGPConstants } from "./constants.sol";
 
 
-contract PayloadIGPHelpers is PayloadIGPConstants {
+abstract contract PayloadIGPHelpers is PayloadIGPConstants {
     /**
      * |
      * |     State Variables      |
@@ -117,7 +117,7 @@ contract PayloadIGPHelpers is PayloadIGPConstants {
 
         require(proposedId == _PROPOSAL_ID(), "PROPOSAL_IS_NOT_SAME");
 
-        proposalCreationTime_ = block.timestamp;
+        proposalCreationTime_ = uint40(block.timestamp);
     }
 
     function execute() external virtual {}

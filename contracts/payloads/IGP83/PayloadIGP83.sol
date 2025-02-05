@@ -637,7 +637,10 @@ contract PayloadIGP83 is PayloadIGPConstants, PayloadIGPHelpers {
             token == GHO_ADDRESS ||
             token == USDe_ADDRESS ||
             token == deUSD_ADDRESS ||
-            token == USR_ADDRESS
+            token == USR_ADDRESS ||
+            token == USD0_ADDRESS ||
+            token == fxUSD_ADDRESS ||
+            token == BOLD_ADDRESS
         ) {
             usdPrice = STABLE_USD_PRICE;
             decimals = 18;
