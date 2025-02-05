@@ -25,13 +25,13 @@ import {IERC20} from "../common/interfaces/IERC20.sol";
 import {IProxy} from "../common/interfaces/IProxy.sol";
 import {PayloadIGPConstants} from "../common/constants.sol";
 import {PayloadIGPHelpers} from "../common/helpers.sol";
+import {PayloadIGPMain} from "../common/main.sol";
 
-contract PayloadIGP83 is PayloadIGPConstants, PayloadIGPHelpers {
+contract PayloadIGP83 is PayloadIGPMain {
     uint256 public constant PROPOSAL_ID = 83;
 
-    function execute() external override {
-        require(address(this) == address(TIMELOCK), "not-valid-caller");
-        require(PayloadIGPHelpers(ADDRESS_THIS).isProposalExecutable(), "proposal-not-executable");
+    function execute() public virtual override {
+        super.execute();
 
         // Action 1: Readjust sUSDe-USDT<>USDT witdhrawal limit
         action1();
@@ -59,7 +59,7 @@ contract PayloadIGP83 is PayloadIGPConstants, PayloadIGPHelpers {
         
     }
 
-    function verifyProposal() external view override {}
+    function verifyProposal() public view override {}
 
     function _PROPOSAL_ID() internal view override returns(uint256) {
         return PROPOSAL_ID;
