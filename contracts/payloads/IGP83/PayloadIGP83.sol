@@ -279,7 +279,7 @@ contract PayloadIGP83 is PayloadIGPMain {
         IFluidDex(cbBTC_wBTC_DEX_ADDRESS).updateRangePercents(
             0.25 * 1e4,
             0.25 * 1e4,
-            1 days
+            5 days
         );
     }
 
