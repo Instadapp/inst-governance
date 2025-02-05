@@ -30,8 +30,8 @@ contract PayloadIGP83 is PayloadIGPConstants, PayloadIGPHelpers {
     uint256 public constant PROPOSAL_ID = 83;
 
     // New state variables for delay
-+    uint256 public delayTime;
-+    uint256 public delaySetTime;
+    uint256 public delayTime;
+    uint256 public delaySetTime;
 
     mapping(uint256 => bool) public setActionSkippable;
 
@@ -125,13 +125,13 @@ contract PayloadIGP83 is PayloadIGPConstants, PayloadIGPHelpers {
         }
     }
 
-+     // Allows the team multisig to set a delay(max 5 days) for execution
-+    function setDelayTime(uint256 _delayTime) external {
-+        require(msg.sender == TEAM_MULTISIG, "not-team-multisig");
-+        require(_delayTime <= 5 days, "delay exceeds 5 days");
-+        delayTime = _delayTime;
-+        delaySetTime = block.timestamp;
-+    }
+     // Allows the team multisig to set a delay(max 5 days) for execution
+    function setDelayTime(uint256 _delayTime) external {
+        require(msg.sender == TEAM_MULTISIG, "not-team-multisig");
+        require(_delayTime <= 5 days, "delay exceeds 5 days");
+        delayTime = _delayTime;
+        delaySetTime = block.timestamp;
+    }
 
     /**
      * |
