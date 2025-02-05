@@ -84,8 +84,8 @@ contract PayloadIGP83 is PayloadIGPMain {
                 memory config_ = new IFluidAdminDex.UserSupplyConfig[](1);
             config_[0] = IFluidAdminDex.UserSupplyConfig({
                 user: sUSDe_USDT__USDT_VAULT,
-                expandPercent: 25 * 1e2, // 25%
-                expandDuration: 12 hours, // 12 hours
+                expandPercent: 35 * 1e2, // 35%
+                expandDuration: 6 hours, // 6 hours
                 baseWithdrawalLimit: 10_000_000 * 1e18 // 10M shares
             });
 
