@@ -134,9 +134,7 @@ abstract contract PayloadIGPMain is PayloadIGPHelpers {
      * |__________________________________
      */
 
-    function _PROPOSAL_ID() internal view virtual returns(uint256) {
-        return 0;
-    }
+    function _PROPOSAL_ID() internal view virtual returns(uint256) {}
 
 
     function isProposalExecutable() public view returns (bool) {

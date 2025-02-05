@@ -15,13 +15,26 @@ const PRIVATE_KEY = process.env.PRIVATE_KEY;
 module.exports = {
   defaultNetwork: "hardhat",
   solidity: {
-    version: "0.7.3",
-    settings: {
-      optimizer: {
-        enabled: true,
-        runs: 200
+    compilers: [
+      {
+        version: "0.7.3",
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200
+          }
+        },
+      },
+      {
+        version: "0.8.21",
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200
+          }
+        },
       }
-    }
+    ]
   },
   networks: {
     hardhat: {
