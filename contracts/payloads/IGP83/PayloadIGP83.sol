@@ -29,43 +29,7 @@ import {PayloadIGPHelpers} from "../common/helpers.sol";
 contract PayloadIGP83 is PayloadIGPConstants, PayloadIGPHelpers {
     uint256 public constant PROPOSAL_ID = 83;
 
-    function propose(string memory description) external {
-        require(
-            msg.sender == PROPOSER ||
-                msg.sender == TEAM_MULTISIG ||
-                address(this) == PROPOSER_AVO_MULTISIG ||
-                address(this) == PROPOSER_AVO_MULTISIG_2 ||
-                address(this) == PROPOSER_AVO_MULTISIG_3 ||
-                address(this) == PROPOSER_AVO_MULTISIG_4 ||
-                address(this) == PROPOSER_AVO_MULTISIG_5,
-            "msg.sender-not-allowed"
-        );
-
-        uint256 totalActions = 1;
-        address[] memory targets = new address[](totalActions);
-        uint256[] memory values = new uint256[](totalActions);
-        string[] memory signatures = new string[](totalActions);
-        bytes[] memory calldatas = new bytes[](totalActions);
-
-        targets[0] = address(TIMELOCK);
-        values[0] = 0;
-        signatures[0] = "executePayload(address,string,bytes)";
-        calldatas[0] = abi.encode(ADDRESS_THIS, "execute()", abi.encode());
-
-        uint256 proposedId = GOVERNOR.propose(
-            targets,
-            values,
-            signatures,
-            calldatas,
-            description
-        );
-
-        require(proposedId == PROPOSAL_ID, "PROPOSAL_IS_NOT_SAME");
-
-        proposalCreationTime_ = block.timestamp;
-    }
-
-    function execute() external {
+    function execute() external override {
         require(address(this) == address(TIMELOCK), "not-valid-caller");
         require(PayloadIGPHelpers(ADDRESS_THIS).isProposalExecutable(), "proposal-not-executable");
 
@@ -95,7 +59,11 @@ contract PayloadIGP83 is PayloadIGPConstants, PayloadIGPHelpers {
         
     }
 
-    function verifyProposal() external view {}
+    function verifyProposal() external view override {}
+
+    function _PROPOSAL_ID() internal view override returns(uint256) {
+        return PROPOSAL_ID;
+    }
 
     /**
      * |

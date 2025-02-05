@@ -74,14 +74,63 @@ contract PayloadIGPHelpers is PayloadIGPConstants {
         require(msg.sender == TEAM_MULTISIG, "not-team-multisig");
         // 9 days (4 days FLUID governance process + 5 days team multisig delay)
         require(executableUnixTime_ <= proposalCreationTime_ + 9 days, "execution delay exceeds 9 days from proposal creation");
-        executableTime_ = executableUnixTime_;
+        executableTime_ = uint40(executableUnixTime_);
     }
+
+
+    /**
+     * |
+     * |     Proposal Structure           |
+     * |__________________________________
+     */
+
+     function propose(string memory description) external {
+        require(
+            msg.sender == PROPOSER ||
+                msg.sender == TEAM_MULTISIG ||
+                address(this) == PROPOSER_AVO_MULTISIG ||
+                address(this) == PROPOSER_AVO_MULTISIG_2 ||
+                address(this) == PROPOSER_AVO_MULTISIG_3 ||
+                address(this) == PROPOSER_AVO_MULTISIG_4 ||
+                address(this) == PROPOSER_AVO_MULTISIG_5,
+            "msg.sender-not-allowed"
+        );
+
+        uint256 totalActions = 1;
+        address[] memory targets = new address[](totalActions);
+        uint256[] memory values = new uint256[](totalActions);
+        string[] memory signatures = new string[](totalActions);
+        bytes[] memory calldatas = new bytes[](totalActions);
+
+        targets[0] = address(TIMELOCK);
+        values[0] = 0;
+        signatures[0] = "executePayload(address,string,bytes)";
+        calldatas[0] = abi.encode(ADDRESS_THIS, "execute()", abi.encode());
+
+        uint256 proposedId = GOVERNOR.propose(
+            targets,
+            values,
+            signatures,
+            calldatas,
+            description
+        );
+
+        require(proposedId == _PROPOSAL_ID(), "PROPOSAL_IS_NOT_SAME");
+
+        proposalCreationTime_ = block.timestamp;
+    }
+
+    function execute() external virtual {}
+
+    function verifyProposal() external virtual {}
 
     /**
      * |
      * |     Proposal Payload Helpers      |
      * |__________________________________
      */
+
+    function _PROPOSAL_ID() internal view virtual returns(uint256); 
 
     function isProposalExecutable() public view returns (bool) {
         return block.timestamp >= executableTime_ || executableTime_ == 0;
