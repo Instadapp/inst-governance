@@ -31,9 +31,59 @@ import { PayloadIGPConstants } from "./constants.sol";
 contract PayloadIGPHelpers is PayloadIGPConstants {
     /**
      * |
+     * |     State Variables      |
+     * |__________________________
+     */
+
+    /// @notice Time when the proposal will be executable
+    uint256 public executableTime;
+
+    /// @notice Actions that can be skipped
+    mapping(uint256 => bool) public skipAction;
+
+    /// @notice Modifier to check if an action can be skipped
+    modifier isActionSkippable(uint256 action_) {
+        // If function is not skippable, then execute
+        if (!skipAction[action_]) {
+            _;
+        }
+    }
+
+     /**
+     * |
+     * |     Team Multisig Actions      |
+     * |__________________________________
+     */
+    function setActionsToSkip(
+        uint256[] calldata actionsToSkip_
+    ) external {
+        if (msg.sender != TEAM_MULTISIG) {
+            revert("not-team-multisig");
+        }
+
+        for (uint256 i = 0; i < actionsToSkip_.length; i++) {
+            skipAction[actionsToSkip_[i]] = true;
+        }
+    }
+
+    // @notice Allows the team multisig to set a delay(max 5 days) for execution
+    // @param executableUnixTime_ The unix time when the proposal will be executable
+    function setExecutionDelay(uint256 executableUnixTime_) external {
+        require(msg.sender == TEAM_MULTISIG, "not-team-multisig");
+        require(executableUnixTime_ <= block.timestamp + 5 days, "delay exceeds 5 days");
+        executableTime = executableUnixTime_;
+    }
+
+    /**
+     * |
      * |     Proposal Payload Helpers      |
      * |__________________________________
      */
+
+    function isProposalExecutable() public view returns (bool) {
+        return block.timestamp >= executableTime;
+    }
+
     function getVaultAddress(uint256 vaultId_) public view returns (address) {
         return VAULT_FACTORY.getVaultAddress(vaultId_);
     }
