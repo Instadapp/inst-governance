@@ -323,7 +323,7 @@ contract PayloadIGP83 is PayloadIGPMain {
                 smartCollateral: false,
                 smartDebt: true,
                 baseWithdrawalLimitInUSD: 0, // $0
-                baseBorrowLimitInUSD: 10_000_000, // $10M
+                baseBorrowLimitInUSD: 20_000_000, // $20M
                 maxBorrowLimitInUSD: 60_000_000 // $60M
             });
             setDexLimits(DEX_USDC_USDT); // Smart Debt
@@ -332,7 +332,7 @@ contract PayloadIGP83 is PayloadIGPMain {
         {
             // Set max borrow shares
             IFluidDex(USDC_USDT_DEX_ADDRESS).updateMaxBorrowShares(
-                60_000_000 * 1e18
+                25_000_000 * 1e18
             ); // Current 20_000_000 * 1e18
         }
     }
