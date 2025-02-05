@@ -204,7 +204,6 @@ contract PayloadIGP83 is PayloadIGPConstants, PayloadIGPHelpers {
 
     // @notice Action 3: Set launch limits for USDC collateral vaults
     function action3() internal isSkippable(3) {
-        if (PayloadIGP83(ADDRESS_THIS).skipAction3()) return;
 
         {
             address USDC_ETH_VAULT = getVaultAddress(100);
@@ -266,7 +265,6 @@ contract PayloadIGP83 is PayloadIGPConstants, PayloadIGPHelpers {
 
     // @notice Action 4: Set launch limits for ezETH-ETH DEX and ezETH<>wstETH T1 & ezETH-ETH<>wstETH T2 vaults
     function action4() internal isSkippable(4) {
-        if (PayloadIGP83(ADDRESS_THIS).skipAction4()) return;
 
         {
             address ezETH_ETH_DEX = getDexAddress(21);
@@ -379,7 +377,7 @@ contract PayloadIGP83 is PayloadIGPConstants, PayloadIGPHelpers {
         );
 
         // update the upper and lower range for rsETH-ETH DEX
-        IFluidDex(weETH_ETH_DEX_ADDRESS).updateRangePercents(
+        IFluidDex(rsETH_ETH_DEX_ADDRESS).updateRangePercents(
             0.1 * 1e4, // +0.1%
             0.0001 * 1e4, // -0.0001%
             5 days
