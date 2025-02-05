@@ -48,6 +48,9 @@ module.exports = {
       url: `https://1rpc.io/eth`,
       accounts: !PRIVATE_KEY ? [] : [ `0x${PRIVATE_KEY}`],
     },
+    // mainnet: {
+    //   url: ""
+    // }
   },
   etherscan: {
     apiKey: process.env.ETHERSCAN

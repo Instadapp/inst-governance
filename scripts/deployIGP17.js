@@ -2,14 +2,14 @@ const hre = require("hardhat");
 const { ethers } = hre;
 
 async function main() {
-  const PayloadIGP17 = await ethers.getContractFactory("PayloadIGP17")
-  const payloadIGP17 = await PayloadIGP17.deploy()
-  await payloadIGP17.deployed()
+  const PayloadIGP83 = await ethers.getContractFactory("PayloadIGP83")
+  const payloadIGP83 = await PayloadIGP83.deploy()
+  await payloadIGP83.deployed()
 
-  console.log("PayloadIGP17: ", payloadIGP17.address)
+  console.log("PayloadIGP83: ", payloadIGP83.address)
 
   await hre.run("verify:verify", {
-    address: payloadIGP17.address,
+    address: payloadIGP83.address,
     constructorArguments: []
   })
 }
