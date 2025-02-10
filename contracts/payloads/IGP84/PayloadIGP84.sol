@@ -36,6 +36,12 @@ contract PayloadIGP84 is PayloadIGPMain {
         // Action 1: Readjust sUSDe-USDT<>USDT witdhrawal limit
         action1();
 
+        // Action 2: Update oracles for USDC collateral vaults
+        action2();
+
+        // Action 3: Reset dust limits for ezETH-ETH DEX and ezETH<>wstETH T1 & ezETH-ETH<>wstETH T2 vaults
+        action3();
+
     }
 
     function verifyProposal() public view override {}
@@ -74,9 +80,102 @@ contract PayloadIGP84 is PayloadIGPMain {
         }
     }
 
-    // @notice Action 2:
+    // @notice Action 2: Update oracles for USDC collateral vaults
     function action2() internal isActionSkippable(2) {
         
+        {
+            address USDC_ETH_VAULT = getVaultAddress(100);
+    
+             IFluidVaultT1(USDC_ETH_VAULT).updateOracle(
+                    0x122bd7fbacef5d42cb178cba71df03d03d3e8821
+            );
+        }
+
+        {
+            address USDC_WBTC_VAULT = getVaultAddress(101);
+    
+             IFluidVaultT1(USDC_WBTC_VAULT).updateOracle(
+                    0x4446de5ba71dceeddec8715921199e9dadf55735
+            );
+        }
+
+        {
+            address USDC_cbBTC_VAULT = getVaultAddress(102);
+    
+             IFluidVaultT1(USDC_cbBTC_VAULT).updateOracle(
+                    0x4446de5ba71dceeddec8715921199e9dadf55735
+            );
+        }
+     }
+
+    // @notice Action 3: Reset dust limits for ezETH-ETH DEX and ezETH<>wstETH T1 & ezETH-ETH<>wstETH T2 vaults
+    function action3() internal isActionSkippable(3) {
+        {
+            address ezETH_ETH_DEX = getDexAddress(21);
+            // ezETH-ETH DEX
+            {
+                // ezETH-ETH Dex
+                Dex memory DEX_ezETH_ETH = Dex({
+                    dex: ezETH_ETH_DEX,
+                    tokenA: ezETH_ADDRESS,
+                    tokenB: ETH_ADDRESS,
+                    smartCollateral: true,
+                    smartDebt: false,
+                    baseWithdrawalLimitInUSD: 10_000, // $10k
+                    baseBorrowLimitInUSD: 0, // $0
+                    maxBorrowLimitInUSD: 0 // $0
+                });
+                setDexLimits(DEX_ezETH_ETH); // Smart Collateral
+
+                DEX_FACTORY.setDexAuth(ezETH_ETH_DEX, TEAM_MULTISIG, true);
+            }
+        }
+
+        {
+            address ezETH__wstETH_VAULT = getVaultAddress(103);
+
+            // [TYPE 1] ezETH<>wstETH | normal collateral & normal debt
+            Vault memory VAULT_ezETH_wstETH = Vault({
+                vault: ezETH__wstETH_VAULT,
+                vaultType: TYPE.TYPE_1,
+                supplyToken: ezETH_ADDRESS,
+                borrowToken: wstETH_ADDRESS,
+                baseWithdrawalLimitInUSD: 10_000, // $10k
+                baseBorrowLimitInUSD: 8_000, // $8k
+                maxBorrowLimitInUSD: 10_000 // $10k
+            });
+
+            setVaultLimits(VAULT_ezETH_wstETH); // TYPE_1 => 103
+
+            VAULT_FACTORY.setVaultAuth(
+                ezETH__wstETH_VAULT,
+                TEAM_MULTISIG,
+                true
+            );
+        }
+
+        {
+            address ezETH_ETH__wstETH_VAULT = getVaultAddress(104);
+
+            // [TYPE 2] ezETH-ETH<>wstETH | smart collateral & normal debt
+            Vault memory VAULT_ezETH_ETH_wstETH = Vault({
+                vault: ezETH_ETH__wstETH_VAULT,
+                vaultType: TYPE.TYPE_2,
+                supplyToken: address(0),
+                borrowToken: wstETH_ADDRESS,
+                baseWithdrawalLimitInUSD: 0,
+                baseBorrowLimitInUSD: 8_000, // $8k
+                maxBorrowLimitInUSD: 10_000 // $10k
+            });
+
+            setVaultLimits(VAULT_ezETH_ETH_wstETH); // TYPE_2 => 104
+
+            VAULT_FACTORY.setVaultAuth(
+                ezETH_ETH__wstETH_VAULT,
+                TEAM_MULTISIG,
+                true
+            );
+        }
     }
 
     /**
