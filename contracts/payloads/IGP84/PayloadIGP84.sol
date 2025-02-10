@@ -62,7 +62,7 @@ contract PayloadIGP84 is PayloadIGPMain {
         {// USR-USDC DEX
             address USR_USDC_DEX = getDexAddress(20);
             {
-                // Increase Max Supply Shares
+                // Decrease Max Supply Shares
                 IFluidDex(USR_USDC_DEX).updateMaxSupplyShares(
                     7_500_000 * 1e18 // $15M
             );
@@ -72,7 +72,7 @@ contract PayloadIGP84 is PayloadIGPMain {
         {// deUSD-USDC DEX
             address deUSD_USDC_DEX = getDexAddress(19);
             {
-                // Increase Max Supply Shares
+                // Decrease Max Supply Shares
                 IFluidDex(deUSD_USDC_DEX).updateMaxSupplyShares(
                     7_500_000 * 1e18 // $15M
             );
