@@ -33,7 +33,7 @@ contract PayloadIGP84 is PayloadIGPMain {
     function execute() public virtual override {
         super.execute();
 
-        // Action 1: Readjust sUSDe-USDT<>USDT witdhrawal limit
+        // Action 1: Set USR-USDC and deUSD-USDC Max Supply Limit
         action1();
 
         // Action 2: Update oracles for USDC collateral vaults
@@ -56,7 +56,7 @@ contract PayloadIGP84 is PayloadIGPMain {
      * |__________________________________
      */
 
-    // @notice Action 1: Readjust sUSDe-USDT<>USDT withdrawal limit
+    // @notice Action 1: Set USR-USDC and deUSD-USDC Max Supply Limit
     function action1() internal isActionSkippable(1) {
         
         {// USR-USDC DEX
