@@ -184,7 +184,7 @@ contract PayloadIGP84 is PayloadIGPMain {
     // @notice Action 4: Set team multisig as auth for USDC-USDT DEX
     function action4() internal isActionSkippable(4) {
         address USDC_USDT_DEX_ADDRESS = getDexAddress(2);
-        DEX_FACTORY.setDexAuth(USDC_USDT_DEX_ADDRESS, TEAM_MULTISIG, true);
+        DEX_FACTORY.setDexAuth(USDC_USDT_DEX_ADDRESS, FEE_HANDLER, true);
     }//helps to set dynamic fees
 
     /**
