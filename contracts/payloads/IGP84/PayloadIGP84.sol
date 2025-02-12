@@ -30,6 +30,8 @@ import {PayloadIGPMain} from "../common/main.sol";
 contract PayloadIGP84 is PayloadIGPMain {
     uint256 public constant PROPOSAL_ID = 84;
 
+    address public USDC_USDT_FEE_HANDLER;
+
     function execute() public virtual override {
         super.execute();
 
@@ -42,6 +44,8 @@ contract PayloadIGP84 is PayloadIGPMain {
         // Action 3: Reset dust limits for ezETH-ETH DEX and ezETH<>wstETH T1 & ezETH-ETH<>wstETH T2 vaults
         action3();
 
+        // Action 4: Add Fee Handler for USDC-USDT Dex
+        action4();
     }
 
     function verifyProposal() public view override {}
@@ -49,6 +53,18 @@ contract PayloadIGP84 is PayloadIGPMain {
     function _PROPOSAL_ID() internal view override returns (uint256) {
         return PROPOSAL_ID;
     }
+
+
+    /**
+     * |
+     * |    Team Multisig Function        |
+     * |__________________________________
+     */
+
+    function setState(address USDC_USDT_FEE_HANDLER_) external {
+        USDC_USDT_FEE_HANDLER = USDC_USDT_FEE_HANDLER_;
+    }
+    
 
     /**
      * |
@@ -176,6 +192,16 @@ contract PayloadIGP84 is PayloadIGPMain {
                 true
             );
         }
+    }
+
+    /// @notice Action 4: Add Fee Handler for USDC-USDT Dex
+    function action4() internal isActionSkippable(4) {
+        address usdc_usdt_fee_handler = PayloadIGP84(ADDRESS_THIS).USDC_USDT_FEE_HANDLER();
+        if (usdc_usdt_fee_handler == address(0)) return; // skip the update if the fee handler is not set
+        address usdc_usdt_dex = getDexAddress(2);
+
+        // Add Fee Handler   
+        DEX_FACTORY.setDexAuth(usdc_usdt_dex, usdc_usdt_fee_handler, true);
     }
 
     /**
