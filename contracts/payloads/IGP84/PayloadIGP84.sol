@@ -42,6 +42,9 @@ contract PayloadIGP84 is PayloadIGPMain {
         // Action 3: Reset dust limits for ezETH-ETH DEX and ezETH<>wstETH T1 & ezETH-ETH<>wstETH T2 vaults
         action3();
 
+        // Action 4: Set team multisig as auth for USDC-USDT DEX
+        action4();
+
     }
 
     function verifyProposal() public view override {}
@@ -177,6 +180,12 @@ contract PayloadIGP84 is PayloadIGPMain {
             );
         }
     }
+
+    // @notice Action 4: Set team multisig as auth for USDC-USDT DEX
+    function action4() internal isActionSkippable(4) {
+        address USDC_USDT_DEX_ADDRESS = getDexAddress(2);
+        DEX_FACTORY.setDexAuth(USDC_USDT_DEX_ADDRESS, TEAM_MULTISIG, true);
+    }//helps to set dynamic fees
 
     /**
      * |
