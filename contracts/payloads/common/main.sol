@@ -36,13 +36,13 @@ abstract contract PayloadIGPMain is PayloadIGPHelpers {
      * |__________________________
      */
     /// @notice The unix time when the proposal was created
-    uint40 internal proposalCreationTime_;
+    uint40 internal _proposalCreationTime;
 
     /// @notice Time when the proposal will be executable
-    uint40 internal executableTime_;
+    uint40 internal _executableTime;
 
     /// @notice Actions that can be skipped
-    mapping(uint256 => bool) internal skipAction_;
+    mapping(uint256 => bool) internal _skipAction;
 
     /// @notice Modifier to check if an action can be skipped
     modifier isActionSkippable(uint256 action_) {
@@ -65,7 +65,7 @@ abstract contract PayloadIGPMain is PayloadIGPHelpers {
         }
 
         for (uint256 i = 0; i < actionsToSkip_.length; i++) {
-            skipAction_[actionsToSkip_[i]] = true;
+            _skipAction[actionsToSkip_[i]] = true;
         }
     }
 
@@ -74,8 +74,8 @@ abstract contract PayloadIGPMain is PayloadIGPHelpers {
     function setExecutionDelay(uint256 executableUnixTime_) external {
         require(msg.sender == TEAM_MULTISIG, "not-team-multisig");
         // 9 days (4 days FLUID governance process + 5 days team multisig delay)
-        require(executableUnixTime_ <= proposalCreationTime_ + 9 days, "execution delay exceeds 9 days from proposal creation");
-        executableTime_ = uint40(executableUnixTime_);
+        require(executableUnixTime_ <= _proposalCreationTime + 9 days, "execution delay exceeds 9 days from proposal creation");
+        _executableTime = uint40(executableUnixTime_);
     }
 
 
@@ -118,7 +118,11 @@ abstract contract PayloadIGPMain is PayloadIGPHelpers {
 
         require(proposedId == _PROPOSAL_ID(), "PROPOSAL_IS_NOT_SAME");
 
-        proposalCreationTime_ = uint40(block.timestamp);
+        if (msg.sender == PROPOSER || msg.sender == TEAM_MULTISIG) {
+            setProposalCreationTime(uint40(block.timestamp));
+        } else {
+            PayloadIGPMain(ADDRESS_THIS).setProposalCreationTime(uint40(block.timestamp));
+        }
     }
 
     function execute() public virtual {
@@ -136,20 +140,34 @@ abstract contract PayloadIGPMain is PayloadIGPHelpers {
 
     function _PROPOSAL_ID() internal view virtual returns(uint256) {}
 
+    function setProposalCreationTime(uint40 proposalCreationTime_) public {
+        require(
+            msg.sender == PROPOSER ||
+                msg.sender == TEAM_MULTISIG ||
+                msg.sender == PROPOSER_AVO_MULTISIG ||
+                msg.sender == PROPOSER_AVO_MULTISIG_2 ||
+                msg.sender == PROPOSER_AVO_MULTISIG_3 ||
+                msg.sender == PROPOSER_AVO_MULTISIG_4 ||
+                msg.sender == PROPOSER_AVO_MULTISIG_5,
+            "msg.sender-not-allowed"
+        );
+        _proposalCreationTime = proposalCreationTime_;
+    }
+
 
     function isProposalExecutable() public view returns (bool) {
-        return block.timestamp >= executableTime_ || executableTime_ == 0;
+        return block.timestamp >= _executableTime || _executableTime == 0;
     }
 
     function getProposalCreationTime() public view returns (uint40) {
-        return proposalCreationTime_;
+        return _proposalCreationTime;
     }
 
     function getExecutableTime() public view returns (uint256) {
-        return executableTime_;
+        return _executableTime;
     }
 
     function actionStatus(uint256 action_) public view returns (bool) {
-        return skipAction_[action_];
+        return _skipAction[action_];
     }
 }
