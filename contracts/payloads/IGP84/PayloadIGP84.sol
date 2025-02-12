@@ -62,6 +62,9 @@ contract PayloadIGP84 is PayloadIGPMain {
      */
 
     function setState(address USDC_USDT_FEE_HANDLER_) external {
+        if (msg.sender != TEAM_MULTISIG) {
+            revert("not-team-multisig");
+        }
         USDC_USDT_FEE_HANDLER = USDC_USDT_FEE_HANDLER_;
     }
     
