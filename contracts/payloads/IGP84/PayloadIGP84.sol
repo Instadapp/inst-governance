@@ -87,7 +87,7 @@ contract PayloadIGP84 is PayloadIGPMain {
             address USDC_ETH_VAULT = getVaultAddress(100);
     
              IFluidVaultT1(USDC_ETH_VAULT).updateOracle(
-                    0x122bd7fbacef5d42cb178cba71df03d03d3e8821
+                    0x122Bd7fBacef5d42CB178CbA71DF03D03d3E8821
             );
         }
 
@@ -95,7 +95,7 @@ contract PayloadIGP84 is PayloadIGPMain {
             address USDC_WBTC_VAULT = getVaultAddress(101);
     
              IFluidVaultT1(USDC_WBTC_VAULT).updateOracle(
-                    0x4446de5ba71dceeddec8715921199e9dadf55735
+                    0x4446De5BA71dCEeDdEC8715921199E9dadF55735
             );
         }
 
@@ -103,7 +103,7 @@ contract PayloadIGP84 is PayloadIGPMain {
             address USDC_cbBTC_VAULT = getVaultAddress(102);
     
              IFluidVaultT1(USDC_cbBTC_VAULT).updateOracle(
-                    0x4446de5ba71dceeddec8715921199e9dadf55735
+                    0x4446De5BA71dCEeDdEC8715921199E9dadF55735
             );
         }
      }
