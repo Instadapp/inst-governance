@@ -57,21 +57,6 @@ contract PayloadIGP85 is PayloadIGPMain {
         return PROPOSAL_ID;
     }
 
-
-    /**
-     * |
-     * |    Team Multisig Function        |
-     * |__________________________________
-     */
-
-    function setState(address USDC_USDT_FEE_HANDLER_) external {
-        if (msg.sender != TEAM_MULTISIG) {
-            revert("not-team-multisig");
-        }
-        USDC_USDT_FEE_HANDLER = USDC_USDT_FEE_HANDLER_;
-    }
-    
-
     /**
      * |
      * |     Proposal Payload Actions      |
