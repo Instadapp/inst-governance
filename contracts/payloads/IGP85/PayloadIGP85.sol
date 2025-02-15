@@ -39,14 +39,11 @@ contract PayloadIGP85 is PayloadIGPMain {
         // Action 2: Set dust limits for cbBTC-ETH DEX T4 vault
         action2();
 
-        // Action 3: Reset launch limits for ezETH-ETH DEX and ezETH<>wstETH T1 & ezETH-ETH<>wstETH T2 vaults
+        // Action 3: Update rewards for fUSDC, fUSDT
         action3();
 
-        // Action 4: Update rewards for fUSDC, fUSDT
+        // Action 4: Constrict BOLD DEX 
         action4();
-
-        // Action 5: Constrict BOLD DEX 
-        action5();
     }
 
     function verifyProposal() public view override {}
@@ -126,78 +123,8 @@ contract PayloadIGP85 is PayloadIGPMain {
         }
     }
 
-    // @notice Action 3: Reset dust limits for ezETH-ETH DEX and ezETH<>wstETH T1 & ezETH-ETH<>wstETH T2 vaults
-    function action3() internal isActionSkippable(3) {
-        {
-            address ezETH_ETH_DEX = getDexAddress(21);
-            // ezETH-ETH DEX
-            {
-                // ezETH-ETH Dex
-                Dex memory DEX_ezETH_ETH = Dex({
-                    dex: ezETH_ETH_DEX,
-                    tokenA: ezETH_ADDRESS,
-                    tokenB: ETH_ADDRESS,
-                    smartCollateral: true,
-                    smartDebt: false,
-                    baseWithdrawalLimitInUSD: 7_500_000, // $7.5M
-                    baseBorrowLimitInUSD: 0, // $0
-                    maxBorrowLimitInUSD: 0 // $0
-                });
-                setDexLimits(DEX_ezETH_ETH); // Smart Collateral
-
-                DEX_FACTORY.setDexAuth(ezETH_ETH_DEX, TEAM_MULTISIG, false);
-            }
-        }
-
-        {
-            address ezETH__wstETH_VAULT = getVaultAddress(103);
-
-            // [TYPE 1] ezETH<>wstETH | normal collateral & normal debt
-            Vault memory VAULT_ezETH_wstETH = Vault({
-                vault: ezETH__wstETH_VAULT,
-                vaultType: TYPE.TYPE_1,
-                supplyToken: ezETH_ADDRESS,
-                borrowToken: wstETH_ADDRESS,
-                baseWithdrawalLimitInUSD: 10_000_000, // $10M
-                baseBorrowLimitInUSD: 10_000_000, // $10M
-                maxBorrowLimitInUSD: 20_000_000 // $20M
-            });
-
-            setVaultLimits(VAULT_ezETH_wstETH); // TYPE_1 => 103
-
-            VAULT_FACTORY.setVaultAuth(
-                ezETH__wstETH_VAULT,
-                TEAM_MULTISIG,
-                false
-            );
-        }
-
-        {
-            address ezETH_ETH__wstETH_VAULT = getVaultAddress(104);
-
-            // [TYPE 2] ezETH-ETH<>wstETH | smart collateral & normal debt
-            Vault memory VAULT_ezETH_ETH_wstETH = Vault({
-                vault: ezETH_ETH__wstETH_VAULT,
-                vaultType: TYPE.TYPE_2,
-                supplyToken: address(0),
-                borrowToken: wstETH_ADDRESS,
-                baseWithdrawalLimitInUSD: 0,
-                baseBorrowLimitInUSD: 7_500_000, // $7.5M
-                maxBorrowLimitInUSD: 15_000_000 // $15M
-            });
-
-            setVaultLimits(VAULT_ezETH_ETH_wstETH); // TYPE_2 => 104
-
-            VAULT_FACTORY.setVaultAuth(
-                ezETH_ETH__wstETH_VAULT,
-                TEAM_MULTISIG,
-                false
-            );
-        }
-    }
-
-    // @notice Action 4: Update rewards for fUSDC, fUSDT
-    function action4() internal isActionSkippable(4) {
+    // @notice Action 3: Update rewards for fUSDC, fUSDT
+    function action3() internal isActionSkippable(4) {
 
         address REWARDS_ADDRESS = address(
             //0x
@@ -217,8 +144,8 @@ contract PayloadIGP85 is PayloadIGPMain {
 
     }
 
-    // @notice Action 5: Constrict BOLD DEX
-    function action5(){
+    // @notice Action 4: Constrict BOLD DEX
+    function action4(){
         address USDC_BOLD_DEX = getDexAddress(25);
         {
             // USDC-BOLD DEX
