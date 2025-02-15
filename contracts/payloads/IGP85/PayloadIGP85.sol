@@ -176,7 +176,7 @@ contract PayloadIGP85 is PayloadIGPMain {
                     SupplyProtocolConfig memory protocolConfigBOLD = SupplyProtocolConfig({
                         protocol: USDC_BOLD_DEX,
                         supplyToken: BOLD_ADDRESS,
-                        expandPercent: 1, // 0.011%
+                        expandPercent: 1, // 0.01%
                         expandDuration: 16777215, // max time
                         baseWithdrawalLimitInUSD: 10 // $10
                     });
