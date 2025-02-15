@@ -30,8 +30,6 @@ import {PayloadIGPMain} from "../common/main.sol";
 contract PayloadIGP85 is PayloadIGPMain {
     uint256 public constant PROPOSAL_ID = 85;
 
-    address public USDC_USDT_FEE_HANDLER;
-
     function execute() public virtual override {
         super.execute();
 
@@ -87,7 +85,6 @@ contract PayloadIGP85 is PayloadIGPMain {
         {
             address cbBTC_USDT__cbBTC_USDT_VAULT_ADRESS = getVaultAddress(105);
 
-            // Set team multisig as vault auth for cbBTC_USDT T4 Vault
             VAULT_FACTORY.setVaultAuth(
                 cbBTC_USDT__cbBTC_USDT_VAULT_ADRESS,
                 TEAM_MULTISIG,
@@ -98,10 +95,10 @@ contract PayloadIGP85 is PayloadIGPMain {
 
     // @notice Action 2: Set dust limits for cbBTC-ETH DEX T4 vault
     function action2() internal {
-        address cbBTC_ETH_DEX_ADDRESS = getDexAddress(27);
+        address cbBTC_ETH_DEX_ADDRESS = getDexAddress(26);
 
         {
-            // dust limits
+            // launch limits
             Dex memory DEX_cbBTC_ETH = Dex({
                 dex: cbBTC_ETH_DEX_ADDRESS,
                 tokenA: cbBTC_ADDRESS,
@@ -201,9 +198,6 @@ contract PayloadIGP85 is PayloadIGPMain {
 
     // @notice Action 4: Update rewards for fUSDC, fUSDT
     function action4() internal isActionSkippable(4) {
-        address[] memory protocols = new address[](2);
-        address[] memory tokens = new address[](2);
-        uint256[] memory amounts = new uint256[](2);
 
         address REWARDS_ADDRESS = address(
             //0x
@@ -213,42 +207,20 @@ contract PayloadIGP85 is PayloadIGPMain {
             /// fUSDC
             IFTokenAdmin(F_USDC).updateRewards(REWARDS_ADDRESS);
 
-            uint256 allowance = IERC20(USDC_ADDRESS).allowance(
-                address(FLUID_RESERVE),
-                F_USDC
-            );
-
-            protocols[0] = F_USDC;
-            tokens[0] = USDC_ADDRESS;
-            amounts[0] = allowance ;
         }
 
         {
             /// fUSDT
             IFTokenAdmin(F_USDT).updateRewards(REWARDS_ADDRESS);
 
-            uint256 allowance = IERC20(USDT_ADDRESS).allowance(
-                address(FLUID_RESERVE),
-                F_USDT
-            );
-
-            protocols[1] = F_USDT;
-            tokens[1] = USDT_ADDRESS;
-            amounts[1] = allowance ;
         }
 
-        FLUID_RESERVE.approve(protocols, tokens, amounts);
-
-        {
-            ILendingRewards(REWARDS_ADDRESS).start();
-        }
     }
 
     // @notice Action 5: Constrict BOLD DEX
     function action5(){
-
+        address USDC_BOLD_DEX = getDexAddress(25);
         {
-            address USDC_BOLD_DEX = getDexAddress(25);
             // USDC-BOLD DEX
             {
                 // USDC-BOLD Dex
@@ -258,30 +230,48 @@ contract PayloadIGP85 is PayloadIGPMain {
                     tokenB: BOLD_ADDRESS,
                     smartCollateral: true,
                     smartDebt: false,
-                    baseWithdrawalLimitInUSD: 10, // $10
+                    baseWithdrawalLimitInUSD: 1, // $10
                     baseBorrowLimitInUSD: 0, // $0
                     maxBorrowLimitInUSD: 0 // $0
                 });
-                setDexLimits(DEX_USDC_BOLD); // Smart Collateral
+                {
+                    // Directly create and set supply protocol config for USDC
+                    SupplyProtocolConfig memory protocolConfigUSDC = SupplyProtocolConfig({
+                        protocol: USDC_BOLD_DEX,
+                        supplyToken: USDC_ADDRESS,
+                        expandPercent: 1, 0.01%
+                        expandDuration: 16777215, // max time
+                        baseWithdrawalLimitInUSD: 10 // $10
+                    });
+                    setSupplyProtocolLimits(protocolConfigUSDC);
+        
+                    // Directly create and set supply protocol config for BOLD
+                    SupplyProtocolConfig memory protocolConfigBOLD = SupplyProtocolConfig({
+                        protocol: USDC_BOLD_DEX,
+                        supplyToken: BOLD_ADDRESS,
+                        expandPercent: 1, // 0.011%
+                        expandDuration: 16777215, // max time
+                        baseWithdrawalLimitInUSD: 10 // $10
+                    });
+                    setSupplyProtocolLimits(protocolConfigBOLD);
+                }
 
                 DEX_FACTORY.setDexAuth(USDC_BOLD_DEX, TEAM_MULTISIG, false);
             }
         }
 
         {
-            address USDC_BOLD_fSL20 = 0x9b1f75ea07723F331996831f6d04AD4900d1A3B3;
+            // minimize supply shares
+            IFluidDex(USDC_BOLD_DEX).updateMaxSupplyShares(
+                1
+            );
+        }
 
-            // Update USDC-BOLD smart lending vault supply limit with minimum value
-            IFluidAdminDex.UserSupplyConfig[]
-                memory config_ = new IFluidAdminDex.UserSupplyConfig[](1);
-                config_[0] = IFluidAdminDex.UserSupplyConfig({
-                user: USDC_BOLD_fSL20,
-                expandPercent: 1 * 1e2, // 1%
-                expandDuration: 999 days, // max time
-                baseWithdrawalLimit: 1 * 1e18 // 1 shares
-            });
-
-            IFluidDex(USDC_BOLD_fSL20).updateUserSupplyConfigs(config_);
+        {
+            // minimize borrow shares
+            IFluidDex(USDC_BOLD_DEX).updateMaxBorrowShares(
+                1
+            );
         }
 
         {
@@ -290,12 +280,10 @@ contract PayloadIGP85 is PayloadIGPMain {
             supplyTokens[0] = USDC_ADDRESS;
             supplyTokens[1] = BOLD_ADDRESS;
 
-            address[] memory borrowTokens = new address[](2);
-            borrowTokens[0] = address(0);
-            borrowTokens[1] = address(0);;
+            address[] memory borrowTokens = new address[](0);
 
             // Pause the user operations
-            pauseUser(USDC_BOLD_DEX, supplyTokens, borrowTokens);
+            LIQUIDITY.pauseUser(USDC_BOLD_DEX, supplyTokens, borrowTokens);
         }
     }
 
