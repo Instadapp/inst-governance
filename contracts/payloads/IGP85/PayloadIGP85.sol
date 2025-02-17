@@ -44,6 +44,12 @@ contract PayloadIGP85 is PayloadIGPMain {
 
         // Action 4: Constrict BOLD DEX 
         action4();
+
+        // Action 5: Set Launch Limits for USD0-USDC & fxUSD-USDC
+        action5();
+
+        // Action 6: Set Rebalancers for USD0-USDC & fxUSD-USDC
+        action6();
     }
 
     function verifyProposal() public view override {}
@@ -91,7 +97,7 @@ contract PayloadIGP85 is PayloadIGPMain {
     }
 
     // @notice Action 2: Set dust limits for cbBTC-ETH DEX T4 vault
-    function action2() internal {
+    function action2() internal isActionSkippable(2) {
         address cbBTC_ETH_DEX_ADDRESS = getDexAddress(26);
 
         {
@@ -124,7 +130,7 @@ contract PayloadIGP85 is PayloadIGPMain {
     }
 
     // @notice Action 3: Update rewards for fUSDC, fUSDT
-    function action3() internal isActionSkippable(4) {
+    function action3() internal isActionSkippable(3) {
 
         address REWARDS_ADDRESS = address(
             //0x
@@ -145,7 +151,7 @@ contract PayloadIGP85 is PayloadIGPMain {
     }
 
     // @notice Action 4: Constrict BOLD DEX
-    function action4(){
+    function action4() internal isActionSkippable(4){
         address USDC_BOLD_DEX = getDexAddress(25);
         {
             // USDC-BOLD DEX
@@ -161,26 +167,11 @@ contract PayloadIGP85 is PayloadIGPMain {
                     baseBorrowLimitInUSD: 0, // $0
                     maxBorrowLimitInUSD: 0 // $0
                 });
+
                 {
-                    // Directly create and set supply protocol config for USDC
-                    SupplyProtocolConfig memory protocolConfigUSDC = SupplyProtocolConfig({
-                        protocol: USDC_BOLD_DEX,
-                        supplyToken: USDC_ADDRESS,
-                        expandPercent: 1, // 0.01%
-                        expandDuration: 16777215, // max time
-                        baseWithdrawalLimitInUSD: 10 // $10
-                    });
-                    setSupplyProtocolLimits(protocolConfigUSDC);
-        
-                    // Directly create and set supply protocol config for BOLD
-                    SupplyProtocolConfig memory protocolConfigBOLD = SupplyProtocolConfig({
-                        protocol: USDC_BOLD_DEX,
-                        supplyToken: BOLD_ADDRESS,
-                        expandPercent: 1, // 0.01%
-                        expandDuration: 16777215, // max time
-                        baseWithdrawalLimitInUSD: 10 // $10
-                    });
-                    setSupplyProtocolLimits(protocolConfigBOLD);
+                    setSupplyProtocolLimitsPaused(USDC_BOLD_DEX, USDC_ADDRESS);
+                    
+                    setSupplyProtocolLimitsPaused(USDC_BOLD_DEX, BOLD_ADDRESS);
                 }
 
                 DEX_FACTORY.setDexAuth(USDC_BOLD_DEX, TEAM_MULTISIG, false);
@@ -211,6 +202,80 @@ contract PayloadIGP85 is PayloadIGPMain {
 
             // Pause the user operations
             LIQUIDITY.pauseUser(USDC_BOLD_DEX, supplyTokens, borrowTokens);
+        }
+    }
+
+    // @notice Action 5: Set Launch Limits for USD0-USDC & fxUSD-USDC
+    function action5() internal isActionSkippable(5){
+        
+        {
+            address USD0_USDC_DEX = getDexAddress(23);
+            // USD0-USDC DEX
+            {
+                // USD0-USDC Dex
+                Dex memory DEX_USD0_USDC = Dex({
+                    dex: USD0_USDC_DEX,
+                    tokenA: USD0_ADDRESS,
+                    tokenB: USDC_ADDRESS,
+                    smartCollateral: true,
+                    smartDebt: false,
+                    baseWithdrawalLimitInUSD: 10_000_000, // $10M
+                    baseBorrowLimitInUSD: 0, // $0
+                    maxBorrowLimitInUSD: 0 // $0
+                });
+                setDexLimits(DEX_USD0_USDC); // Smart Collateral
+
+                DEX_FACTORY.setDexAuth(USD0_USDC_DEX, TEAM_MULTISIG, false);
+            }
+
+            IFluidDex(USD0_USDC_DEX).updateMaxSupplyShares(
+                    7_500_000 * 1e18 // $15M
+            );
+        }
+
+        {
+            address fxUSD_USDC_DEX = getDexAddress(24);
+            // fxUSD-USDC DEX
+            {
+                // fxUSD-USDC Dex
+                Dex memory DEX_fxUSD_USDC = Dex({
+                    dex: fxUSD_USDC_DEX,
+                    tokenA: fxUSD_ADDRESS,
+                    tokenB: USDC_ADDRESS,
+                    smartCollateral: true,
+                    smartDebt: false,
+                    baseWithdrawalLimitInUSD: 10_000_000, // $10M
+                    baseBorrowLimitInUSD: 0, // $0
+                    maxBorrowLimitInUSD: 0 // $0
+                });
+                setDexLimits(DEX_fxUSD_USDC); // Smart Collateral
+
+                DEX_FACTORY.setDexAuth(fxUSD_USDC_DEX, TEAM_MULTISIG, false);
+            }
+
+            IFluidDex(fxUSD_USDC_DEX).updateMaxSupplyShares(
+                    7_500_000 * 1e18 // $15M
+            );
+        }
+    }
+    // @notice Action 6: Set Rebalancers for USD0-USDC & fxUSD-USDC
+    function action6() internal isActionSkippable(6){
+        {
+            address fSL21_USD0_USDC = getDexAddress(23);
+
+            // set rebalancer at fSL21 to reserve contract proxy
+            IFTokenAdmin(fSL21_USD0_USDC).updateRebalancer(
+                0xD2245ee5C3099d65a3d0fdCecA0f71Cc4aA8f0FF
+            );
+        }
+
+        {
+            address fSL22_FXUSD_USDC = getDexAddress(24);
+
+            // set rebalancer at fSL22 to reserve contract proxy
+            IFTokenAdmin(fSL22_FXUSD_USDC).updateRebalancer(
+                0x44aE65F0d82E339c31c3Db9d4f82aB4D5d2B06B2
+            );
         }
     }
 
