@@ -20,6 +20,8 @@ import {IFluidVault, IFluidVaultT1} from "../common/interfaces/IFluidVault.sol";
 
 import {IFTokenAdmin, ILendingRewards} from "../common/interfaces/IFToken.sol";
 
+import {ISmartLendingAdmin} from "../common/interfaces/ISmartLending.sol";
+
 import {IDSAV2} from "../common/interfaces/IDSA.sol";
 import {IERC20} from "../common/interfaces/IERC20.sol";
 import {IProxy} from "../common/interfaces/IProxy.sol";
@@ -156,23 +158,9 @@ contract PayloadIGP85 is PayloadIGPMain {
         {
             // USDC-BOLD DEX
             {
-                // USDC-BOLD Dex
-                Dex memory DEX_USDC_BOLD = Dex({
-                    dex: USDC_BOLD_DEX,
-                    tokenA: USDC_ADDRESS,
-                    tokenB: BOLD_ADDRESS,
-                    smartCollateral: true,
-                    smartDebt: false,
-                    baseWithdrawalLimitInUSD: 1, // $10
-                    baseBorrowLimitInUSD: 0, // $0
-                    maxBorrowLimitInUSD: 0 // $0
-                });
-
-                {
-                    setSupplyProtocolLimitsPaused(USDC_BOLD_DEX, USDC_ADDRESS);
+                setSupplyProtocolLimitsPaused(USDC_BOLD_DEX, USDC_ADDRESS);
                     
-                    setSupplyProtocolLimitsPaused(USDC_BOLD_DEX, BOLD_ADDRESS);
-                }
+                setSupplyProtocolLimitsPaused(USDC_BOLD_DEX, BOLD_ADDRESS);
 
                 DEX_FACTORY.setDexAuth(USDC_BOLD_DEX, TEAM_MULTISIG, false);
             }
@@ -261,20 +249,20 @@ contract PayloadIGP85 is PayloadIGPMain {
     // @notice Action 6: Set Rebalancers for USD0-USDC & fxUSD-USDC
     function action6() internal isActionSkippable(6){
         {
-            address fSL21_USD0_USDC = getDexAddress(23);
+            address fSL21_USD0_USDC = 0xD2245ee5C3099d65a3d0fdCecA0f71Cc4aA8f0FF;
 
             // set rebalancer at fSL21 to reserve contract proxy
-            IFTokenAdmin(fSL21_USD0_USDC).updateRebalancer(
-                0xD2245ee5C3099d65a3d0fdCecA0f71Cc4aA8f0FF
+            ISmartLendingAdmin(fSL21_USD0_USDC).updateRebalancer(
+                0x264786EF916af64a1DB19F513F24a3681734ce92
             );
         }
 
         {
-            address fSL22_FXUSD_USDC = getDexAddress(24);
+            address fSL22_FXUSD_USDC = 0x44aE65F0d82E339c31c3Db9d4f82aB4D5d2B06B2;
 
             // set rebalancer at fSL22 to reserve contract proxy
-            IFTokenAdmin(fSL22_FXUSD_USDC).updateRebalancer(
-                0x44aE65F0d82E339c31c3Db9d4f82aB4D5d2B06B2
+            ISmartLendingAdmin(fSL22_FXUSD_USDC).updateRebalancer(
+                0x264786EF916af64a1DB19F513F24a3681734ce92
             );
         }
     }

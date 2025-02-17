@@ -23,6 +23,8 @@ import { IFluidVaultT1 } from "./interfaces/IFluidVault.sol";
 import { IFTokenAdmin } from "./interfaces/IFToken.sol";
 import { ILendingRewards } from "./interfaces/IFToken.sol";
 
+import { ISmartLendingAdmin } from "./interfaces/ISmartLending.sol";
+
 import { IDSAV2 } from "./interfaces/IDSA.sol";
 
 import { PayloadIGPConstants } from "./constants.sol";
@@ -132,7 +134,7 @@ contract PayloadIGPHelpers is PayloadIGPConstants {
                 mode: 1,
                 expandPercent: 1, // 0.01%
                 expandDuration: 16777215, // max time
-                baseWithdrawalLimit: 10 // $10
+                baseWithdrawalLimit: 10
             });
 
             LIQUIDITY.updateUserSupplyConfigs(configs_);
