@@ -161,10 +161,6 @@ abstract contract PayloadIGPMain is PayloadIGPHelpers {
         return _proposalCreationTime;
     }
 
-    function getExecutableTime() public view returns (uint256) {
-        return _isProposalExecutable ? block.timestamp : 0;
-    }
-
     function actionStatus(uint256 action_) public view returns (bool) {
         return _skipAction[action_];
     }
