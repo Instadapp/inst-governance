@@ -32,6 +32,8 @@ import {PayloadIGPMain} from "../common/main.sol";
 contract PayloadIGP85 is PayloadIGPMain {
     uint256 public constant PROPOSAL_ID = 85;
 
+    address public USDC_USDT_REWARDS;
+
     function execute() public virtual override {
         super.execute();
 
@@ -58,6 +60,19 @@ contract PayloadIGP85 is PayloadIGPMain {
 
     function _PROPOSAL_ID() internal view override returns (uint256) {
         return PROPOSAL_ID;
+    }
+
+    /**
+     * |
+     * |    Team Multisig Function        |
+     * |__________________________________
+     */
+
+    function setState(address USDC_USDT_REWARDS_) external {
+        if (msg.sender != TEAM_MULTISIG) {
+            revert("not-team-multisig");
+        }
+        USDC_USDT_REWARDS = USDC_USDT_REWARDS_;
     }
 
     /**
@@ -137,17 +152,12 @@ contract PayloadIGP85 is PayloadIGPMain {
 
     // @notice Action 3: Update rewards for fUSDC, fUSDT
     function action3() internal isActionSkippable(3) {
-        address REWARDS_ADDRESS = address();
+        address REWARDS_CONTRACT = PayloadIGP85(ADDRESS_THIS)
+            .USDC_USDT_REWARDS();
+        if (rewardsContract == address(0)) return; // skip the update if the rewards contract is not set
 
-        {
-            /// fUSDC
-            IFTokenAdmin(F_USDC).updateRewards(REWARDS_ADDRESS);
-        }
-
-        {
-            /// fUSDT
-            IFTokenAdmin(F_USDT).updateRewards(REWARDS_ADDRESS);
-        }
+        IFTokenAdmin(F_USDC).updateRewards(REWARDS_CONTRACT);
+        IFTokenAdmin(F_USDT).updateRewards(REWARDS_CONTRACT);
     }
 
     // @notice Action 4: Constrict BOLD DEX
