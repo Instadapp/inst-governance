@@ -89,7 +89,7 @@ contract PayloadIGP85 is PayloadIGPMain {
         address cbBTC_USDT_DEX_ADDRESS = getDexAddress(22);
 
         {
-            // dust limits
+            // launch limits
             Dex memory DEX_cbBTC_USDT = Dex({
                 dex: cbBTC_USDT_DEX_ADDRESS,
                 tokenA: cbBTC_ADDRESS,
@@ -125,7 +125,7 @@ contract PayloadIGP85 is PayloadIGPMain {
         address cbBTC_ETH_DEX_ADDRESS = getDexAddress(26);
 
         {
-            // launch limits
+            // dust limits
             Dex memory DEX_cbBTC_ETH = Dex({
                 dex: cbBTC_ETH_DEX_ADDRESS,
                 tokenA: cbBTC_ADDRESS,
@@ -144,7 +144,7 @@ contract PayloadIGP85 is PayloadIGPMain {
         {
             address cbBTC_ETH__cbBTC_ETH_VAULT_ADRESS = getVaultAddress(106);
 
-            // Set team multisig as vault auth for cbBTC_USDT T4 Vault
+            // Set team multisig as vault auth for cbBTC-ETH T4 Vault
             VAULT_FACTORY.setVaultAuth(
                 cbBTC_ETH__cbBTC_ETH_VAULT_ADRESS,
                 TEAM_MULTISIG,
