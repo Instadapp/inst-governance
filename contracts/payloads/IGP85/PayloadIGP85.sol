@@ -32,7 +32,7 @@ import {PayloadIGPMain} from "../common/main.sol";
 contract PayloadIGP85 is PayloadIGPMain {
     uint256 public constant PROPOSAL_ID = 85;
 
-    address public USDC_USDT_REWARDS;
+    address public USDC_USDT_REWARDS_CONTRACT;
 
     function execute() public virtual override {
         super.execute();
@@ -71,11 +71,11 @@ contract PayloadIGP85 is PayloadIGPMain {
      * |__________________________________
      */
 
-    function setState(address USDC_USDT_REWARDS_) external {
+    function setState(address USDC_USDT_REWARDS_CONTRACT_) external {
         if (msg.sender != TEAM_MULTISIG) {
             revert("not-team-multisig");
         }
-        USDC_USDT_REWARDS = USDC_USDT_REWARDS_;
+        USDC_USDT_REWARDS_CONTRACT = USDC_USDT_REWARDS_CONTRACT_;
     }
 
     /**
@@ -89,7 +89,7 @@ contract PayloadIGP85 is PayloadIGPMain {
         address cbBTC_USDT_DEX_ADDRESS = getDexAddress(22);
 
         {
-            // dust limits
+            // launch limits
             Dex memory DEX_cbBTC_USDT = Dex({
                 dex: cbBTC_USDT_DEX_ADDRESS,
                 tokenA: cbBTC_ADDRESS,
@@ -125,7 +125,7 @@ contract PayloadIGP85 is PayloadIGPMain {
         address cbBTC_ETH_DEX_ADDRESS = getDexAddress(26);
 
         {
-            // launch limits
+            // dust limits
             Dex memory DEX_cbBTC_ETH = Dex({
                 dex: cbBTC_ETH_DEX_ADDRESS,
                 tokenA: cbBTC_ADDRESS,
@@ -155,12 +155,11 @@ contract PayloadIGP85 is PayloadIGPMain {
 
     // @notice Action 3: Update rewards for fUSDC, fUSDT
     function action3() internal isActionSkippable(3) {
-        address REWARDS_CONTRACT = PayloadIGP85(ADDRESS_THIS)
-            .USDC_USDT_REWARDS();
+        address REWARDS_CONTRACT = PayloadIGP85(ADDRESS_THIS).USDC_USDT_REWARDS_CONTRACT();
         if (REWARDS_CONTRACT == address(0)) return; // skip the update if the rewards contract is not set
 
-        IFTokenAdmin(F_USDC).updateRewards(REWARDS_CONTRACT);
-        IFTokenAdmin(F_USDT).updateRewards(REWARDS_CONTRACT);
+        IFTokenAdmin(F_USDC_ADDRESS).updateRewards(REWARDS_CONTRACT);
+        IFTokenAdmin(F_USDT_ADDRESS).updateRewards(REWARDS_CONTRACT);
     }
 
     // @notice Action 4: Constrict BOLD DEX
@@ -255,19 +254,19 @@ contract PayloadIGP85 is PayloadIGPMain {
     // @notice Action 6: Set Rebalancers for USD0-USDC & fxUSD-USDC
     function action6() internal isActionSkippable(6) {
         {
-            address fSL21_USD0_USDC = getSmartLendingAddress(21);
+            address fSL23_USD0_USDC = getSmartLendingAddress(23);
 
             // set rebalancer at fSL21 to reserve contract proxy
-            ISmartLendingAdmin(fSL21_USD0_USDC).updateRebalancer(
+            ISmartLendingAdmin(fSL23_USD0_USDC).updateRebalancer(
                 address(FLUID_RESERVE)
             );
         }
 
         {
-            address fSL22_FXUSD_USDC = getSmartLendingAddress(22);
+            address fSL24_FXUSD_USDC = getSmartLendingAddress(24);
 
-            // set rebalancer at fSL22 to reserve contract proxy
-            ISmartLendingAdmin(fSL22_FXUSD_USDC).updateRebalancer(
+            // set rebalancer at fSL24 to reserve contract proxy
+            ISmartLendingAdmin(fSL24_FXUSD_USDC).updateRebalancer(
                 address(FLUID_RESERVE)
             );
         }
