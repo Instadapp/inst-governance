@@ -13,6 +13,7 @@ import { IFluidReserveContract } from "./interfaces/IFluidReserveContract.sol";
 
 import { IFluidVaultFactory } from "./interfaces/IFluidVaultFactory.sol";
 import { IFluidDexFactory } from "./interfaces/IFluidDexFactory.sol";
+import { IFluidSmartLendingFactory } from "./interfaces/IFluidSmartLendingFactory.sol";
 
 import { IFluidDex } from "./interfaces/IFluidDex.sol";
 import { IFluidDexResolver } from "./interfaces/IFluidDex.sol";
@@ -68,6 +69,8 @@ contract PayloadIGPConstants {
         IFluidVaultFactory(0x324c5Dc1fC42c7a4D43d92df1eBA58a54d13Bf2d);
     IFluidDexFactory public constant DEX_FACTORY =
         IFluidDexFactory(0x91716C4EDA1Fb55e84Bf8b4c7085f84285c19085);
+    IFluidSmartLendingFactory public constant SMART_LENDING_FACTORY =
+        IFluidSmartLendingFactory(0xe57227C7d5900165344b190fc7aa580bceb53B9B);
 
     
     ILite public constant IETHV2 =
