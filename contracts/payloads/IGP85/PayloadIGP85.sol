@@ -154,7 +154,7 @@ contract PayloadIGP85 is PayloadIGPMain {
     function action3() internal isActionSkippable(3) {
         address REWARDS_CONTRACT = PayloadIGP85(ADDRESS_THIS)
             .USDC_USDT_REWARDS();
-        if (rewardsContract == address(0)) return; // skip the update if the rewards contract is not set
+        if (REWARDS_CONTRACT == address(0)) return; // skip the update if the rewards contract is not set
 
         IFTokenAdmin(F_USDC).updateRewards(REWARDS_CONTRACT);
         IFTokenAdmin(F_USDT).updateRewards(REWARDS_CONTRACT);
