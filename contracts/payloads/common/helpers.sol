@@ -44,6 +44,11 @@ contract PayloadIGPHelpers is PayloadIGPConstants {
         return DEX_FACTORY.getDexAddress(dexId_);
     }
 
+    /// @dev gets a smart lending address based on the underlying dexId
+    function getSmartLendingAddress(uint256 dexId_) public view returns (address) {
+        return SMART_LENDING_FACTORY.getSmartLendingAddress(dexId_);
+    }    
+
     struct SupplyProtocolConfig {
         address protocol;
         address supplyToken;

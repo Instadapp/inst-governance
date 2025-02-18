@@ -249,20 +249,20 @@ contract PayloadIGP85 is PayloadIGPMain {
     // @notice Action 6: Set Rebalancers for USD0-USDC & fxUSD-USDC
     function action6() internal isActionSkippable(6){
         {
-            address fSL21_USD0_USDC = 0xD2245ee5C3099d65a3d0fdCecA0f71Cc4aA8f0FF;
+            address fSL21_USD0_USDC = getSmartLendingAddress(21);
 
             // set rebalancer at fSL21 to reserve contract proxy
             ISmartLendingAdmin(fSL21_USD0_USDC).updateRebalancer(
-                0x264786EF916af64a1DB19F513F24a3681734ce92
+                address(FLUID_RESERVE)
             );
         }
 
         {
-            address fSL22_FXUSD_USDC = 0x44aE65F0d82E339c31c3Db9d4f82aB4D5d2B06B2;
+            address fSL22_FXUSD_USDC =  getSmartLendingAddress(22);
 
             // set rebalancer at fSL22 to reserve contract proxy
             ISmartLendingAdmin(fSL22_FXUSD_USDC).updateRebalancer(
-                0x264786EF916af64a1DB19F513F24a3681734ce92
+                address(FLUID_RESERVE)
             );
         }
     }
