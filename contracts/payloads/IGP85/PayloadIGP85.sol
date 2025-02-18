@@ -44,7 +44,7 @@ contract PayloadIGP85 is PayloadIGPMain {
         // Action 3: Update rewards for fUSDC, fUSDT
         action3();
 
-        // Action 4: Constrict BOLD DEX 
+        // Action 4: Constrict BOLD DEX
         action4();
 
         // Action 5: Set Launch Limits for USD0-USDC & fxUSD-USDC
@@ -84,7 +84,11 @@ contract PayloadIGP85 is PayloadIGPMain {
             });
             setDexLimits(DEX_cbBTC_USDT); // Smart Collateral & Smart Debt
 
-            DEX_FACTORY.setDexAuth(cbBTC_USDT_DEX_ADDRESS, TEAM_MULTISIG, false);
+            DEX_FACTORY.setDexAuth(
+                cbBTC_USDT_DEX_ADDRESS,
+                TEAM_MULTISIG,
+                false
+            );
         }
 
         {
@@ -133,33 +137,27 @@ contract PayloadIGP85 is PayloadIGPMain {
 
     // @notice Action 3: Update rewards for fUSDC, fUSDT
     function action3() internal isActionSkippable(3) {
-
-        address REWARDS_ADDRESS = address(
-            //0x
-        );
+        address REWARDS_ADDRESS = address();
 
         {
             /// fUSDC
             IFTokenAdmin(F_USDC).updateRewards(REWARDS_ADDRESS);
-
         }
 
         {
             /// fUSDT
             IFTokenAdmin(F_USDT).updateRewards(REWARDS_ADDRESS);
-
         }
-
     }
 
     // @notice Action 4: Constrict BOLD DEX
-    function action4() internal isActionSkippable(4){
+    function action4() internal isActionSkippable(4) {
         address USDC_BOLD_DEX = getDexAddress(25);
         {
             // USDC-BOLD DEX
             {
                 setSupplyProtocolLimitsPaused(USDC_BOLD_DEX, USDC_ADDRESS);
-                    
+
                 setSupplyProtocolLimitsPaused(USDC_BOLD_DEX, BOLD_ADDRESS);
 
                 DEX_FACTORY.setDexAuth(USDC_BOLD_DEX, TEAM_MULTISIG, false);
@@ -168,16 +166,12 @@ contract PayloadIGP85 is PayloadIGPMain {
 
         {
             // minimize supply shares
-            IFluidDex(USDC_BOLD_DEX).updateMaxSupplyShares(
-                1
-            );
+            IFluidDex(USDC_BOLD_DEX).updateMaxSupplyShares(1);
         }
 
         {
             // minimize borrow shares
-            IFluidDex(USDC_BOLD_DEX).updateMaxBorrowShares(
-                1
-            );
+            IFluidDex(USDC_BOLD_DEX).updateMaxBorrowShares(1);
         }
 
         {
@@ -194,8 +188,7 @@ contract PayloadIGP85 is PayloadIGPMain {
     }
 
     // @notice Action 5: Set Launch Limits for USD0-USDC & fxUSD-USDC
-    function action5() internal isActionSkippable(5){
-        
+    function action5() internal isActionSkippable(5) {
         {
             address USD0_USDC_DEX = getDexAddress(23);
             // USD0-USDC DEX
@@ -217,7 +210,7 @@ contract PayloadIGP85 is PayloadIGPMain {
             }
 
             IFluidDex(USD0_USDC_DEX).updateMaxSupplyShares(
-                    7_500_000 * 1e18 // $15M
+                7_500_000 * 1e18 // $15M
             );
         }
 
@@ -242,12 +235,12 @@ contract PayloadIGP85 is PayloadIGPMain {
             }
 
             IFluidDex(fxUSD_USDC_DEX).updateMaxSupplyShares(
-                    7_500_000 * 1e18 // $15M
+                7_500_000 * 1e18 // $15M
             );
         }
     }
     // @notice Action 6: Set Rebalancers for USD0-USDC & fxUSD-USDC
-    function action6() internal isActionSkippable(6){
+    function action6() internal isActionSkippable(6) {
         {
             address fSL21_USD0_USDC = getSmartLendingAddress(21);
 
@@ -258,7 +251,7 @@ contract PayloadIGP85 is PayloadIGPMain {
         }
 
         {
-            address fSL22_FXUSD_USDC =  getSmartLendingAddress(22);
+            address fSL22_FXUSD_USDC = getSmartLendingAddress(22);
 
             // set rebalancer at fSL22 to reserve contract proxy
             ISmartLendingAdmin(fSL22_FXUSD_USDC).updateRebalancer(
@@ -303,48 +296,52 @@ contract PayloadIGP85 is PayloadIGPMain {
     function setDexLimits(Dex memory dex_) internal {
         // Smart Collateral
         if (dex_.smartCollateral) {
-            SupplyProtocolConfig memory protocolConfigTokenA_ = SupplyProtocolConfig({
-                protocol: dex_.dex,
-                supplyToken: dex_.tokenA,
-                expandPercent: 50 * 1e2, // 50%
-                expandDuration: 1 hours, // 1 hour
-                baseWithdrawalLimitInUSD: dex_.baseWithdrawalLimitInUSD
-            });
+            SupplyProtocolConfig
+                memory protocolConfigTokenA_ = SupplyProtocolConfig({
+                    protocol: dex_.dex,
+                    supplyToken: dex_.tokenA,
+                    expandPercent: 50 * 1e2, // 50%
+                    expandDuration: 1 hours, // 1 hour
+                    baseWithdrawalLimitInUSD: dex_.baseWithdrawalLimitInUSD
+                });
 
             setSupplyProtocolLimits(protocolConfigTokenA_);
 
-            SupplyProtocolConfig memory protocolConfigTokenB_ = SupplyProtocolConfig({
-                protocol: dex_.dex,
-                supplyToken: dex_.tokenB,
-                expandPercent: 50 * 1e2, // 50%
-                expandDuration: 1 hours, // 1 hour
-                baseWithdrawalLimitInUSD: dex_.baseWithdrawalLimitInUSD
-            });
+            SupplyProtocolConfig
+                memory protocolConfigTokenB_ = SupplyProtocolConfig({
+                    protocol: dex_.dex,
+                    supplyToken: dex_.tokenB,
+                    expandPercent: 50 * 1e2, // 50%
+                    expandDuration: 1 hours, // 1 hour
+                    baseWithdrawalLimitInUSD: dex_.baseWithdrawalLimitInUSD
+                });
 
             setSupplyProtocolLimits(protocolConfigTokenB_);
         }
 
         // Smart Debt
         if (dex_.smartDebt) {
-            BorrowProtocolConfig memory protocolConfigTokenA_ = BorrowProtocolConfig({
-                protocol: dex_.dex,
-                borrowToken: dex_.tokenA,
-                expandPercent: 50 * 1e2, // 50%
-                expandDuration: 1 hours, // 1 hour
-                baseBorrowLimitInUSD: dex_.baseBorrowLimitInUSD,
-                maxBorrowLimitInUSD: dex_.maxBorrowLimitInUSD
-            });
+            BorrowProtocolConfig
+                memory protocolConfigTokenA_ = BorrowProtocolConfig({
+                    protocol: dex_.dex,
+                    borrowToken: dex_.tokenA,
+                    expandPercent: 50 * 1e2, // 50%
+                    expandDuration: 1 hours, // 1 hour
+                    baseBorrowLimitInUSD: dex_.baseBorrowLimitInUSD,
+                    maxBorrowLimitInUSD: dex_.maxBorrowLimitInUSD
+                });
 
             setBorrowProtocolLimits(protocolConfigTokenA_);
 
-            BorrowProtocolConfig memory protocolConfigTokenB_ = BorrowProtocolConfig({
-                protocol: dex_.dex,
-                borrowToken: dex_.tokenB,
-                expandPercent: 50 * 1e2, // 50%
-                expandDuration: 1 hours, // 1 hour
-                baseBorrowLimitInUSD: dex_.baseBorrowLimitInUSD,
-                maxBorrowLimitInUSD: dex_.maxBorrowLimitInUSD
-            });
+            BorrowProtocolConfig
+                memory protocolConfigTokenB_ = BorrowProtocolConfig({
+                    protocol: dex_.dex,
+                    borrowToken: dex_.tokenB,
+                    expandPercent: 50 * 1e2, // 50%
+                    expandDuration: 1 hours, // 1 hour
+                    baseBorrowLimitInUSD: dex_.baseBorrowLimitInUSD,
+                    maxBorrowLimitInUSD: dex_.maxBorrowLimitInUSD
+                });
 
             setBorrowProtocolLimits(protocolConfigTokenB_);
         }
