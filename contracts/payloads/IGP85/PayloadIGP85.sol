@@ -54,6 +54,9 @@ contract PayloadIGP85 is PayloadIGPMain {
 
         // Action 6: Set Rebalancers for USD0-USDC & fxUSD-USDC
         action6();
+
+        // Action 7: Increase weETH-ETH Supply Limits
+        action7();
     }
 
     function verifyProposal() public view override {}
@@ -266,6 +269,17 @@ contract PayloadIGP85 is PayloadIGPMain {
             // set rebalancer at fSL22 to reserve contract proxy
             ISmartLendingAdmin(fSL22_FXUSD_USDC).updateRebalancer(
                 address(FLUID_RESERVE)
+            );
+        }
+    }
+
+    // @notice Action 7: Increase weETH-ETH Supply Limits
+    function action7() internal isActionSkippable(7) {
+        address WEETH_ETH_WSTETH_DEX_ADDRESS = getDexAddress(9);
+
+        { // Increase Max Supply Shares
+            IFluidDex(WEETH_ETH_WSTETH_DEX_ADDRESS).updateMaxSupplyShares(
+                9_000 * 1e18 // 9k shares
             );
         }
     }
