@@ -98,7 +98,7 @@ contract PayloadIGP85 is PayloadIGPMain {
                 smartDebt: true,
                 baseWithdrawalLimitInUSD: 15_000_000, // $15M
                 baseBorrowLimitInUSD: 15_000_000, // $15M
-                maxBorrowLimitInUSD: 20_000_000 // $20M
+                maxBorrowLimitInUSD: 30_000_000 // $30M
             });
             setDexLimits(DEX_cbBTC_USDT); // Smart Collateral & Smart Debt
 
