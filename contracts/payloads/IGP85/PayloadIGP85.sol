@@ -144,7 +144,7 @@ contract PayloadIGP85 is PayloadIGPMain {
         {
             address cbBTC_ETH__cbBTC_ETH_VAULT_ADRESS = getVaultAddress(106);
 
-            // Set team multisig as vault auth for cbBTC_USDT T4 Vault
+            // Set team multisig as vault auth for cbBTC-ETH T4 Vault
             VAULT_FACTORY.setVaultAuth(
                 cbBTC_ETH__cbBTC_ETH_VAULT_ADRESS,
                 TEAM_MULTISIG,
