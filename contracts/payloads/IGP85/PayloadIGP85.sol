@@ -177,16 +177,6 @@ contract PayloadIGP85 is PayloadIGPMain {
         }
 
         {
-            // minimize supply shares
-            IFluidDex(USDC_BOLD_DEX).updateMaxSupplyShares(1);
-        }
-
-        {
-            // minimize borrow shares
-            IFluidDex(USDC_BOLD_DEX).updateMaxBorrowShares(1);
-        }
-
-        {
             // Pause user supply and borrow
             address[] memory supplyTokens = new address[](2);
             supplyTokens[0] = USDC_ADDRESS;
@@ -257,7 +247,7 @@ contract PayloadIGP85 is PayloadIGPMain {
             address fSL23_USD0_USDC = getSmartLendingAddress(23);
 
             // set rebalancer at fSL21 to reserve contract proxy
-            ISmartLendingAdmin(fSL23_USD0_USDC).updateRebalancer(
+            ISmartLendingAdmin(fSL23_USD0_USDC).setRebalancer(
                 address(FLUID_RESERVE)
             );
         }
@@ -266,7 +256,7 @@ contract PayloadIGP85 is PayloadIGPMain {
             address fSL24_FXUSD_USDC = getSmartLendingAddress(24);
 
             // set rebalancer at fSL24 to reserve contract proxy
-            ISmartLendingAdmin(fSL24_FXUSD_USDC).updateRebalancer(
+            ISmartLendingAdmin(fSL24_FXUSD_USDC).setRebalancer(
                 address(FLUID_RESERVE)
             );
         }
