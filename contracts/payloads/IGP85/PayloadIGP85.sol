@@ -275,10 +275,10 @@ contract PayloadIGP85 is PayloadIGPMain {
 
     // @notice Action 7: Increase weETH-ETH Supply Limits
     function action7() internal isActionSkippable(7) {
-        address WEETH_ETH_WSTETH_DEX_ADDRESS = getDexAddress(9);
+        address WEETH_ETH_DEX_ADDRESS = getDexAddress(9);
 
         { // Increase Max Supply Shares
-            IFluidDex(WEETH_ETH_WSTETH_DEX_ADDRESS).updateMaxSupplyShares(
+            IFluidDex(WEETH_ETH_DEX_ADDRESS).updateMaxSupplyShares(
                 9_000 * 1e18 // 9k shares
             );
         }
