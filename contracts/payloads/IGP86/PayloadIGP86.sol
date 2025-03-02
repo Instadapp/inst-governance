@@ -41,8 +41,8 @@ contract PayloadIGP86 is PayloadIGPMain {
         // Action 2: Set launch limits for cbBTC-ETH DEX T4 vault
         action2();
 
-        // Action 3:
-        // action3();
+        // Action 3: Update base limits for all DEXes according to their caps
+        action3();
 
     }
 
@@ -165,6 +165,16 @@ contract PayloadIGP86 is PayloadIGPMain {
         }
     }
 
+    // @notice Action 3: Update base limits for all DEXes according to their caps
+    function action3() internal isActionSkippable(3) {
+        uint8 totalDexes = 26;
+        // Loop through all DEX IDs and update their base limits
+        for (uint256 i = 1; i <= totalDexes; i++) {
+            // Skip DEXes 5 and 10
+            if (i == 5 || i == 10) continue;
+            updateDexBaseLimits(i);
+        }
+    }
 
     /**
      * |
@@ -303,6 +313,81 @@ contract PayloadIGP86 is PayloadIGPMain {
 
             setSupplyProtocolLimits(protocolConfig_);
         }
+    }
+
+    function updateDexBaseLimits(uint256 dexId) internal {
+
+        address dexAddress = getDexAddress(dexId);
+
+        address AddressTokenA = IFluidDex(dexAddress).tokenA();
+        address AddressTokenB = IFluidDex(dexAddress).tokenB();
+
+        // Check SC only DEX
+        if (IFluidDex(dexAddress).maxSupplyShares() > 0 && IFluidDex(dexAddress).maxBorrowShares() == 0) {
+            // Get current max supply shares
+            uint256 maxSupplyShares = IFluidDex(dexAddress).maxSupplyShares();
+            uint256 maxSupplyInUSD = getRawAmount(address(0), maxSupplyShares, 0, true);
+            // Update supply config for DEX (45% of max supply in USD)
+            uint256 newBaseWithdrawalLimitInUSD = (maxSupplyInUSD * 45) / 100;
+
+            Dex memory dex_ = Dex({
+            dex: dexAddress,
+            tokenA: AddressTokenA,
+            tokenB: AddressTokenB,
+            smartCollateral: true,
+            smartDebt: false,   
+            baseWithdrawalLimitInUSD: newBaseWithdrawalLimitInUSD,
+            baseBorrowLimitInUSD: 0,
+            maxBorrowLimitInUSD: 0
+            });
+            setDexLimits(dex_);
+        }
+
+        // Check SD only DEX
+        if (IFluidDex(dexAddress).maxSupplyShares() == 0 && IFluidDex(dexAddress).maxBorrowShares() > 0) {
+            // Get current max borrow shares
+            uint256 maxBorrowShares = IFluidDex(dexAddress).maxBorrowShares();
+            uint256 maxBorrowInUSD = getRawAmount(address(0), maxBorrowShares, 0, false);
+            // Update DEX borrow config (60% of max borrow)
+            uint256 newBaseBorrowLimitInUSD = (maxBorrowInUSD * 60) / 100;
+
+            Dex memory dex_ = Dex({
+                dex: dexAddress,
+                tokenA: AddressTokenA,
+                tokenB: AddressTokenB,
+                smartCollateral: false,
+                smartDebt: true,
+                baseWithdrawalLimitInUSD: 0,
+                baseBorrowLimitInUSD: newBaseBorrowLimitInUSD,
+                maxBorrowLimitInUSD: maxBorrowInUSD
+            });
+            setDexLimits(dex_);
+        }
+
+        // Check SC & SD DEX
+        if (IFluidDex(dexAddress).maxSupplyShares() > 0 && IFluidDex(dexAddress).maxBorrowShares() > 0) {
+            // Get current max supply shares
+            uint256 maxSupplyShares = IFluidDex(dexAddress).maxSupplyShares();
+            uint256 maxSupplyInUSD = getRawAmount(address(0), maxSupplyShares, 0, true);
+            // Get current max borrow shares
+            uint256 maxBorrowShares = IFluidDex(dexAddress).maxBorrowShares();
+            uint256 maxBorrowInUSD = getRawAmount(address(0), maxBorrowShares, 0, false);
+            // Update DEX config (45% of max supply and 60% of max borrow)
+            uint256 newBaseWithdrawalLimitInUSD = (maxSupplyInUSD * 45) / 100;
+            uint256 newBaseBorrowLimitInUSD = (maxBorrowInUSD * 60) / 100;
+            
+            Dex memory dex_ = Dex({
+                dex: dexAddress,
+                tokenA: AddressTokenA,
+                tokenB: AddressTokenB,
+                smartCollateral: true,
+                smartDebt: true,
+                baseWithdrawalLimitInUSD: newBaseWithdrawalLimitInUSD,
+                baseBorrowLimitInUSD: newBaseBorrowLimitInUSD,
+                maxBorrowLimitInUSD: maxBorrowInUSD
+            });
+            setDexLimits(dex_);
+        }   
     }
 
     // Token Prices Constants
