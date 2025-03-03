@@ -335,11 +335,14 @@ contract PayloadIGP86 is PayloadIGPMain {
         }
     }
 
-    function updateDexBaseLimits(uint256 dexId, uint256 maxSupplySharesInUSD, uint256 maxBorrowSharesInUSD) internal {
+    function updateDexBaseLimits(uint256 dexId, uint256 maxSupplyShares, uint256 maxBorrowShares) internal {
         address dexAddress = getDexAddress(dexId);
         if (dexAddress == address(0)) return;
 
         (address AddressTokenA, address AddressTokenB) = getDexTokens(dexAddress);
+
+        uint256 maxSupplySharesInUSD = getRawAmount(address(0), maxSupplyShares, 0, true);
+        uint256 maxBorrowSharesInUSD = getRawAmount(address(0), maxBorrowShares, 0, false);
 
         uint256 baseWithdrawalInUSD = (maxSupplySharesInUSD * 45) / 100; // 45% of supply cap
         uint256 baseBorrowInUSD = (maxBorrowSharesInUSD * 60) / 100; // 60% of max borrow cap
