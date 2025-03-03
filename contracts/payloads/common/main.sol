@@ -38,8 +38,8 @@ abstract contract PayloadIGPMain is PayloadIGPHelpers {
     /// @notice The unix time when the proposal was created
     uint40 internal _proposalCreationTime;
 
-    /// @notice Time when the proposal will be executable
-    uint40 internal _executableTime;
+    /// @notice Boolean value to check if the proposal is executable. Default is not executable.
+    bool internal _isProposalExecutable;
 
     /// @notice Actions that can be skipped
     mapping(uint256 => bool) internal _skipAction;
@@ -69,13 +69,11 @@ abstract contract PayloadIGPMain is PayloadIGPHelpers {
         }
     }
 
-    // @notice Allows the team multisig to set a delay(max 5 days) for execution
-    // @param executableUnixTime_ The unix time when the proposal will be executable
-    function setExecutionDelay(uint256 executableUnixTime_) external {
+    // @notice Allows the team multisig to toggle the proposal executable or not
+    // @param isExecutable_ The boolean value to set the proposal executable or not
+    function toggleExecutable(bool isExecutable_) external {
         require(msg.sender == TEAM_MULTISIG, "not-team-multisig");
-        // 9 days (4 days FLUID governance process + 5 days team multisig delay)
-        require(executableUnixTime_ <= _proposalCreationTime + 9 days, "execution delay exceeds 9 days from proposal creation");
-        _executableTime = uint40(executableUnixTime_);
+        _isProposalExecutable = isExecutable_;
     }
 
 
@@ -156,15 +154,11 @@ abstract contract PayloadIGPMain is PayloadIGPHelpers {
 
 
     function isProposalExecutable() public view returns (bool) {
-        return block.timestamp >= _executableTime || _executableTime == 0;
+        return _isProposalExecutable;
     }
 
     function getProposalCreationTime() public view returns (uint40) {
         return _proposalCreationTime;
-    }
-
-    function getExecutableTime() public view returns (uint256) {
-        return _executableTime;
     }
 
     function actionStatus(uint256 action_) public view returns (bool) {
