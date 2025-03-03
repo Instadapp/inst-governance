@@ -21,6 +21,9 @@ import {IFluidVault, IFluidVaultT1} from "../common/interfaces/IFluidVault.sol";
 import {IFTokenAdmin, ILendingRewards} from "../common/interfaces/IFToken.sol";
 
 import {ISmartLendingAdmin} from "../common/interfaces/ISmartLending.sol";
+import {ISmartLendingFactory} from "../common/interfaces/ISmartLendingFactory.sol";
+
+import {ICodeReader} from "../common/interfaces/ICodeReader.sol";
 
 import {IDSAV2} from "../common/interfaces/IDSA.sol";
 import {IERC20} from "../common/interfaces/IERC20.sol";
@@ -44,6 +47,8 @@ contract PayloadIGP86 is PayloadIGPMain {
         // Action 3: Update base limits for all DEXes according to their caps
         action3();
 
+        // Action 4: Set creation code for SmartLendingFactory
+        action4();
     }
 
     function verifyProposal() public view override {}
@@ -194,6 +199,19 @@ contract PayloadIGP86 is PayloadIGPMain {
         updateDexBaseLimits(24, 7_500_000, 0); // fxUSD-USDC DEX (Smart Collateral Only)
 //        updateDexBaseLimits(25, 0, 0);                    // Skip DEX 25
 //        updateDexBaseLimits(26, 0, 0);                    // Skip DEX 26
+    }
+
+    // @notice Action 4: Set creation code for SmartLendingFactory
+    function action4() internal isActionSkippable(4) {
+        address SMART_LENDING_FACTORY = 0xe57227C7d5900165344b190fc7aa580bceb53B9B;
+        address SSTORE2_POINTER = 0x99a516222A64c7F5FFdC760a3bc28905140e666D;
+        address SSTORE2_DEPLOYER = 0x94a58428980291Af59adfe96844FAff088737e8F;
+
+        // Get the creation code directly from the pointer
+        bytes memory creationCode = ICodeReader(SSTORE2_DEPLOYER).readCode(SSTORE2_POINTER);
+
+        // Set the creation code in the factory
+        ISmartLendingFactory(SMART_LENDING_FACTORY).setCreationCode(creationCode);
     }
 
     /**
