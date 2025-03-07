@@ -455,6 +455,29 @@ contract PayloadIGP86 is PayloadIGPMain {
         setDexLimits(dex_);
     }
 
+    function setBorrowProtocolLimitsPaused(
+        address protocol_,
+        address token_
+    ) internal {
+        {
+            // Borrow Limits
+            FluidLiquidityAdminStructs.UserBorrowConfig[]
+                memory configs_ = new FluidLiquidityAdminStructs.UserBorrowConfig[](1);
+
+            configs_[0] = FluidLiquidityAdminStructs.UserBorrowConfig({
+                user: protocol_,
+                token: token_,
+                mode: 1,
+                expandPercent: 1, // 0.01%
+                expandDuration: 16777215, // max time
+                baseBorrowLimit: 10,
+                maxBorrowLimit: 20
+            });
+
+            LIQUIDITY.updateUserBorrowConfigs(configs_);
+        }
+    }
+
     // Token Prices Constants
     uint256 public constant ETH_USD_PRICE = 3_320 * 1e2;
     uint256 public constant wstETH_USD_PRICE = 3_950 * 1e2;
