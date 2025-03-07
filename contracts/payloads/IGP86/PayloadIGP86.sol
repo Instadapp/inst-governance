@@ -247,52 +247,46 @@ contract PayloadIGP86 is PayloadIGPMain {
 
     // @notice Action 6: Delist mETH vaults
     function action6() internal isActionSkippable(6){
+        // Delist mETH<>USDC vault
         {
-            address mETH_USDC_VAULT = getVaultAddress(81);
-            address mETH_USDT_VAULT = getVaultAddress(82); 
-            address mETH_GHO_VAULT = getVaultAddress(83);
+            address vault_meth_usdc = getVaultAddress(81);
+            // Pause supply and borrow limits
+            setSupplyProtocolLimitsPaused(vault_meth_usdc, mETH_ADDRESS);
+            setBorrowProtocolLimitsPaused(vault_meth_usdc, USDC_ADDRESS);
+            // Pause user operations for both tokens
+            address[] memory supplyTokens = new address[](1);
+            address[] memory borrowTokens = new address[](1);
+            supplyTokens[0] = mETH_ADDRESS;
+            borrowTokens[0] = USDC_ADDRESS;
+            LIQUIDITY.pauseUser(vault_meth_usdc, supplyTokens, borrowTokens);
+        }
 
-            // [TYPE 1] mETH<>USDC | collateral & debt
-            {
-                Vault memory VAULT_mETH_USDC = Vault({
-                    vault: mETH_USDC_VAULT,
-                    vaultType: TYPE.TYPE_1,
-                    supplyToken: mETH_ADDRESS,
-                    borrowToken: USDC_ADDRESS,
-                    baseWithdrawalLimitInUSD: 10, // $10
-                    baseBorrowLimitInUSD: 10, // $10
-                    maxBorrowLimitInUSD: 20 // $20
-                });
-                setVaultLimits(VAULT_mETH_USDC);
-            }
+        // Delist mETH<>USDT vault
+        {
+            address vault_meth_usdt = getVaultAddress(82);
+            // Pause supply and borrow limits
+            setSupplyProtocolLimitsPaused(vault_meth_usdt, mETH_ADDRESS);
+            setBorrowProtocolLimitsPaused(vault_meth_usdt, USDT_ADDRESS);
+            // Pause user operations for both tokens
+            address[] memory supplyTokens = new address[](1);
+            address[] memory borrowTokens = new address[](1);
+            supplyTokens[0] = mETH_ADDRESS;
+            borrowTokens[0] = USDT_ADDRESS;
+            LIQUIDITY.pauseUser(vault_meth_usdt, supplyTokens, borrowTokens);
+        }
 
-            // [TYPE 1] mETH<>USDT | collateral & debt
-            {
-                Vault memory VAULT_mETH_USDT = Vault({
-                    vault: mETH_USDT_VAULT,
-                    vaultType: TYPE.TYPE_1,
-                    supplyToken: mETH_ADDRESS,
-                    borrowToken: USDT_ADDRESS,
-                    baseWithdrawalLimitInUSD: 10, // $10
-                    baseBorrowLimitInUSD: 10, // $10
-                    maxBorrowLimitInUSD: 20 // $20
-                });
-                setVaultLimits(VAULT_mETH_USDT);
-            }
-
-            // [TYPE 1] mETH<>GHO | collateral & debt
-            {
-                Vault memory VAULT_mETH_GHO = Vault({
-                    vault: mETH_GHO_VAULT,
-                    vaultType: TYPE.TYPE_1,
-                    supplyToken: mETH_ADDRESS,
-                    borrowToken: GHO_ADDRESS,
-                    baseWithdrawalLimitInUSD: 10, // $10
-                    baseBorrowLimitInUSD: 10, // $10
-                    maxBorrowLimitInUSD: 20 // $20
-                });
-                setVaultLimits(VAULT_mETH_GHO);
-            }
+        // Delist mETH<>GHO vault
+        {
+            address vault_meth_gho = getVaultAddress(83);
+            // Pause supply and borrow limits
+            setSupplyProtocolLimitsPaused(vault_meth_gho, mETH_ADDRESS);
+            setBorrowProtocolLimitsPaused(vault_meth_gho, GHO_ADDRESS);
+            // Pause user operations for both tokens
+            address[] memory supplyTokens = new address[](1);
+            address[] memory borrowTokens = new address[](1);
+            supplyTokens[0] = mETH_ADDRESS;
+            borrowTokens[0] = GHO_ADDRESS;
+            LIQUIDITY.pauseUser(vault_meth_gho, supplyTokens, borrowTokens);
         }
     }
 
