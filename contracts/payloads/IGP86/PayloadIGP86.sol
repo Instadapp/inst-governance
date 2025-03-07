@@ -49,6 +49,12 @@ contract PayloadIGP86 is PayloadIGPMain {
 
         // Action 4: Set creation code for SmartLendingFactory
         action4();
+
+        // Action 5: Transfer 500k FLUID to Team Multisig
+        action5();
+
+        // Action 6: Delist mETH vaults
+        action6();
     }
 
     function verifyProposal() public view override {}
@@ -212,6 +218,82 @@ contract PayloadIGP86 is PayloadIGPMain {
 
         // Set the creation code in the factory
         ISmartLendingFactory(SMART_LENDING_FACTORY).setCreationCode(creationCode);
+    }
+
+    // @notice Action 5: Transfer 500k FLUID to Team Multisig
+    function action5() internal isActionSkippable(5){
+        string[] memory targets = new string[](1);
+        bytes[] memory encodedSpells = new bytes[](1);
+
+        string
+            memory withdrawSignature = "withdraw(address,uint256,address,uint256,uint256)";
+
+        // Spell 1: Transfer INST to Team Multisig
+        {
+            uint256 FLUID_AMOUNT = 500_000 * 1e18; // 500k FLUID
+            targets[0] = "BASIC-A";
+            encodedSpells[0] = abi.encodeWithSignature(
+                withdrawSignature,
+                FLUID_ADDRESS,
+                FLUID_AMOUNT,
+                TEAM_MULTISIG,
+                0,
+                0
+            );
+        }
+
+        IDSAV2(TREASURY).cast(targets, encodedSpells, address(this));
+    }
+
+    // @notice Action 6: Delist mETH vaults
+    function action6() internal isActionSkippable(6){
+        {
+            address mETH_USDC_VAULT = getVaultAddress(81);
+            address mETH_USDT_VAULT = getVaultAddress(82); 
+            address mETH_GHO_VAULT = getVaultAddress(83);
+
+            // [TYPE 1] mETH<>USDC | collateral & debt
+            {
+                Vault memory VAULT_mETH_USDC = Vault({
+                    vault: mETH_USDC_VAULT,
+                    vaultType: TYPE.TYPE_1,
+                    supplyToken: mETH_ADDRESS,
+                    borrowToken: USDC_ADDRESS,
+                    baseWithdrawalLimitInUSD: 10, // $10
+                    baseBorrowLimitInUSD: 10, // $10
+                    maxBorrowLimitInUSD: 20 // $20
+                });
+                setVaultLimits(VAULT_mETH_USDC);
+            }
+
+            // [TYPE 1] mETH<>USDT | collateral & debt
+            {
+                Vault memory VAULT_mETH_USDT = Vault({
+                    vault: mETH_USDT_VAULT,
+                    vaultType: TYPE.TYPE_1,
+                    supplyToken: mETH_ADDRESS,
+                    borrowToken: USDT_ADDRESS,
+                    baseWithdrawalLimitInUSD: 10, // $10
+                    baseBorrowLimitInUSD: 10, // $10
+                    maxBorrowLimitInUSD: 20 // $20
+                });
+                setVaultLimits(VAULT_mETH_USDT);
+            }
+
+            // [TYPE 1] mETH<>GHO | collateral & debt
+            {
+                Vault memory VAULT_mETH_GHO = Vault({
+                    vault: mETH_GHO_VAULT,
+                    vaultType: TYPE.TYPE_1,
+                    supplyToken: mETH_ADDRESS,
+                    borrowToken: GHO_ADDRESS,
+                    baseWithdrawalLimitInUSD: 10, // $10
+                    baseBorrowLimitInUSD: 10, // $10
+                    maxBorrowLimitInUSD: 20 // $20
+                });
+                setVaultLimits(VAULT_mETH_GHO);
+            }
+        }
     }
 
     /**
