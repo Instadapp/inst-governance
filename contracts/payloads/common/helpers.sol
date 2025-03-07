@@ -23,6 +23,8 @@ import { IFluidVaultT1 } from "./interfaces/IFluidVault.sol";
 import { IFTokenAdmin } from "./interfaces/IFToken.sol";
 import { ILendingRewards } from "./interfaces/IFToken.sol";
 
+import { ISmartLendingAdmin } from "./interfaces/ISmartLending.sol";
+
 import { IDSAV2 } from "./interfaces/IDSA.sol";
 
 import { PayloadIGPConstants } from "./constants.sol";
@@ -41,6 +43,11 @@ contract PayloadIGPHelpers is PayloadIGPConstants {
     function getDexAddress(uint256 dexId_) public view returns (address) {
         return DEX_FACTORY.getDexAddress(dexId_);
     }
+
+    /// @dev gets a smart lending address based on the underlying dexId
+    function getSmartLendingAddress(uint256 dexId_) public view returns (address) {
+        return SMART_LENDING_FACTORY.getSmartLendingAddress(dexId_);
+    }    
 
     struct SupplyProtocolConfig {
         address protocol;
