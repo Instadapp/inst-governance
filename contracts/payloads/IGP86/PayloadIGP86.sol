@@ -50,11 +50,14 @@ contract PayloadIGP86 is PayloadIGPMain {
         // Action 4: Set creation code for SmartLendingFactory
         action4();
 
-        // Action 5: Transfer 500k FLUID to Team Multisig
+        // Action 5: Transfer 311k FLUID to Team Multisig
         action5();
 
         // Action 6: Delist mETH vaults
         action6();
+
+        // Action 7: Increase weETH-ETH / wstETH borrow limits
+        action7();
     }
 
     function verifyProposal() public view override {}
@@ -144,7 +147,7 @@ contract PayloadIGP86 is PayloadIGPMain {
         address cbBTC_ETH_DEX_ADDRESS = getDexAddress(26);
 
         {
-            // dust limits
+            // launch limits
             Dex memory DEX_cbBTC_ETH = Dex({
                 dex: cbBTC_ETH_DEX_ADDRESS,
                 tokenA: cbBTC_ADDRESS,
@@ -167,7 +170,7 @@ contract PayloadIGP86 is PayloadIGPMain {
         {
             address cbBTC_ETH__cbBTC_ETH_VAULT_ADRESS = getVaultAddress(106);
 
-            // Set team multisig as vault auth for cbBTC-ETH T4 Vault
+            // Remove team multisig as vault auth for cbBTC-ETH T4 Vault
             VAULT_FACTORY.setVaultAuth(
                 cbBTC_ETH__cbBTC_ETH_VAULT_ADRESS,
                 TEAM_MULTISIG,
@@ -179,30 +182,30 @@ contract PayloadIGP86 is PayloadIGPMain {
     // @notice Action 3: Update base limits for all DEXes according to their caps
     function action3() internal isActionSkippable(3) {
         // Update each DEX individually with their specific USD caps
-        updateDexBaseLimits(1, 8_000, 7_200);    // wstETH-ETH DEX (Smart Collateral & Smart Debt)
-        updateDexBaseLimits(2, 0, 25_000_000);             // USDC-USDT DEX (Smart Debt only)
-        updateDexBaseLimits(3, 175, 125);             // cbBTC-WBTC DEX (Smart Collateral & Smart Debt)
-        updateDexBaseLimits(4, 5_000_000, 4_000_000);  // GHO-USDC DEX (Smart Collateral & Smart Debt)
+        updateDexBaseLimits(1, 35_719_688, 31_964_753);    // wstETH-ETH DEX (Smart Collateral & Smart Debt)
+        updateDexBaseLimits(2, 0, 51_940_134);             // USDC-USDT DEX (Smart Debt only)
+        updateDexBaseLimits(3, 30_014_962, 21_672_447);             // cbBTC-WBTC DEX (Smart Collateral & Smart Debt)
+        updateDexBaseLimits(4, 10_380_445, 8_264_211);  // GHO-USDC DEX (Smart Collateral & Smart Debt)
 //        updateDexBaseLimits(5, 0, 0);                     // Skip DEX 5
 //        updateDexBaseLimits(6, 0, 0);                     // Skip DEX 6
 //        updateDexBaseLimits(7, 0, 0);                     // Skip DEX 7
 //        updateDexBaseLimits(8, 0, 0);                     // Skip DEX 8
-        updateDexBaseLimits(9, 9_000, 0);    // weETH-ETH DEX (Smart Collateral Only)
+        updateDexBaseLimits(9, 40_198_694, 0);    // weETH-ETH DEX (Smart Collateral Only)
 //        updateDexBaseLimits(10, 0, 0);                    // Skip DEX 10
-        updateDexBaseLimits(11, 1_415_000, 0); // FLUID-ETH DEX (-)
-        updateDexBaseLimits(12, 30_000_000, 20_000_000); // USDC-ETH DEX (Smart Collateral & Smart Debt)
-        updateDexBaseLimits(13, 3_200, 0); // rsETH-ETH DEX (Smart Collateral Only)
-        updateDexBaseLimits(14, 1_600, 0); // weETHs-ETH DEX (Smart Collateral Only)
-        updateDexBaseLimits(15, 25_000_000, 0); // sUSDe-USDT DEX (Smart Collateral Only)
-        updateDexBaseLimits(16, 110, 0); // eBTC-cbBTC DEX (Smart Collateral Only)
-        updateDexBaseLimits(17, 110, 0); // LBTC-cbBTC DEX (Smart Collateral Only)
-        updateDexBaseLimits(18, 10_000_000, 0); // USDe-USDT DEX (Smart Collateral Only)
-        updateDexBaseLimits(19, 7_500_000, 0); // deUSD-USDC DEX (Smart Collateral Only)
-        updateDexBaseLimits(20, 7_500_000, 0); // USR-USDC DEX (Smart Collateral Only)
+        updateDexBaseLimits(11, 14_248_502, 0); // FLUID-ETH DEX (-)
+        updateDexBaseLimits(12, 41_067_529, 34_437_485); // USDC-ETH DEX (Smart Collateral & Smart Debt)
+        updateDexBaseLimits(13, 34_437_485, 0); // rsETH-ETH DEX (Smart Collateral Only)
+        updateDexBaseLimits(14, 7_084_187, 0); // weETHs-ETH DEX (Smart Collateral Only)
+        updateDexBaseLimits(15, 50_509_930, 0); // sUSDe-USDT DEX (Smart Collateral Only)
+        updateDexBaseLimits(16, 19_017_882, 0); // eBTC-cbBTC DEX (Smart Collateral Only)
+        updateDexBaseLimits(17, 18_898_700, 0); // LBTC-cbBTC DEX (Smart Collateral Only)
+        updateDexBaseLimits(18, 20_191_825, 0); // USDe-USDT DEX (Smart Collateral Only)
+        updateDexBaseLimits(19, 15_083_531, 0); // deUSD-USDC DEX (Smart Collateral Only)
+        updateDexBaseLimits(20, 15_106_031, 0); // USR-USDC DEX (Smart Collateral Only)
 //        updateDexBaseLimits(21, 0, 0);                    // Skip DEX 21
-        updateDexBaseLimits(22, 14_000_000, 10_000_000); // cbBTC-USDT DEX (Smart Collateral & Smart Debt)
-        updateDexBaseLimits(23, 7_500_000, 0);  // USD0-USDC DEX (Smart Collateral Only)
-        updateDexBaseLimits(24, 7_500_000, 0); // fxUSD-USDC DEX (Smart Collateral Only)
+        updateDexBaseLimits(22, 24_281_313, 20_395_734); // cbBTC-USDT DEX (Smart Collateral & Smart Debt)
+        updateDexBaseLimits(23, 14_987_359, 0);  // USD0-USDC DEX (Smart Collateral Only)
+        updateDexBaseLimits(24, 15_010_656, 0); // fxUSD-USDC DEX (Smart Collateral Only)
 //        updateDexBaseLimits(25, 0, 0);                    // Skip DEX 25
 //        updateDexBaseLimits(26, 0, 0);                    // Skip DEX 26
     }
@@ -220,7 +223,7 @@ contract PayloadIGP86 is PayloadIGPMain {
         ISmartLendingFactory(SMART_LENDING_FACTORY).setCreationCode(creationCode);
     }
 
-    // @notice Action 5: Transfer 500k FLUID to Team Multisig
+    // @notice Action 5: Transfer 311k FLUID to Team Multisig
     function action5() internal isActionSkippable(5){
         string[] memory targets = new string[](1);
         bytes[] memory encodedSpells = new bytes[](1);
@@ -230,7 +233,7 @@ contract PayloadIGP86 is PayloadIGPMain {
 
         // Spell 1: Transfer INST to Team Multisig
         {
-            uint256 FLUID_AMOUNT = 500_000 * 1e18; // 500k FLUID
+            uint256 FLUID_AMOUNT = 311_000 * 1e18; // 311k FLUID
             targets[0] = "BASIC-A";
             encodedSpells[0] = abi.encodeWithSignature(
                 withdrawSignature,
@@ -253,12 +256,6 @@ contract PayloadIGP86 is PayloadIGPMain {
             // Pause supply and borrow limits
             setSupplyProtocolLimitsPaused(vault_meth_usdc, mETH_ADDRESS);
             setBorrowProtocolLimitsPaused(vault_meth_usdc, USDC_ADDRESS);
-            // Pause user operations for both tokens
-            address[] memory supplyTokens = new address[](1);
-            address[] memory borrowTokens = new address[](1);
-            supplyTokens[0] = mETH_ADDRESS;
-            borrowTokens[0] = USDC_ADDRESS;
-            LIQUIDITY.pauseUser(vault_meth_usdc, supplyTokens, borrowTokens);
         }
 
         // Delist mETH<>USDT vault
@@ -267,12 +264,6 @@ contract PayloadIGP86 is PayloadIGPMain {
             // Pause supply and borrow limits
             setSupplyProtocolLimitsPaused(vault_meth_usdt, mETH_ADDRESS);
             setBorrowProtocolLimitsPaused(vault_meth_usdt, USDT_ADDRESS);
-            // Pause user operations for both tokens
-            address[] memory supplyTokens = new address[](1);
-            address[] memory borrowTokens = new address[](1);
-            supplyTokens[0] = mETH_ADDRESS;
-            borrowTokens[0] = USDT_ADDRESS;
-            LIQUIDITY.pauseUser(vault_meth_usdt, supplyTokens, borrowTokens);
         }
 
         // Delist mETH<>GHO vault
@@ -281,179 +272,32 @@ contract PayloadIGP86 is PayloadIGPMain {
             // Pause supply and borrow limits
             setSupplyProtocolLimitsPaused(vault_meth_gho, mETH_ADDRESS);
             setBorrowProtocolLimitsPaused(vault_meth_gho, GHO_ADDRESS);
-            // Pause user operations for both tokens
-            address[] memory supplyTokens = new address[](1);
-            address[] memory borrowTokens = new address[](1);
-            supplyTokens[0] = mETH_ADDRESS;
-            borrowTokens[0] = GHO_ADDRESS;
-            LIQUIDITY.pauseUser(vault_meth_gho, supplyTokens, borrowTokens);
         }
+    }
+
+    // @notice Action 7: Increase weETH-ETH / wstETH borrow limits
+    function action7() internal isActionSkippable(7){
+        {
+            // [TYPE 2] ETH-weETH  | wstETH | Smart collateral & debt
+            Vault memory VAULT_weETH_ETH_AND_wsETH = Vault({
+                vault: getVaultAddress(74),
+                vaultType: TYPE.TYPE_2,
+                supplyToken: address(0),
+                borrowToken: wstETH_ADDRESS,
+                baseWithdrawalLimitInUSD: 0, // set at Dex
+                baseBorrowLimitInUSD: 12_500_000, // $12.5M
+                maxBorrowLimitInUSD: 37_000_000 // $37M
+            });
+
+            setVaultLimits(VAULT_weETH_ETH_AND_wsETH); // TYPE_2 => 74
     }
 
     /**
      * |
-     * |     Proposal Payload Helpers      |
+     * |     Payload Actions End Here      |
      * |__________________________________
      */
-    struct Dex {
-        address dex;
-        address tokenA;
-        address tokenB;
-        bool smartCollateral;
-        bool smartDebt;
-        uint256 baseWithdrawalLimitInUSD;
-        uint256 baseBorrowLimitInUSD;
-        uint256 maxBorrowLimitInUSD;
-    }
 
-    enum TYPE {
-        TYPE_1,
-        TYPE_2,
-        TYPE_3,
-        TYPE_4
-    }
-
-    struct Vault {
-        address vault;
-        TYPE vaultType;
-        address supplyToken;
-        address borrowToken;
-        uint256 baseWithdrawalLimitInUSD;
-        uint256 baseBorrowLimitInUSD;
-        uint256 maxBorrowLimitInUSD;
-    }
-
-    function setDexLimits(Dex memory dex_) internal {
-        // Smart Collateral
-        if (dex_.smartCollateral) {
-            SupplyProtocolConfig
-                memory protocolConfigTokenA_ = SupplyProtocolConfig({
-                    protocol: dex_.dex,
-                    supplyToken: dex_.tokenA,
-                    expandPercent: 50 * 1e2, // 50%
-                    expandDuration: 1 hours, // 1 hour
-                    baseWithdrawalLimitInUSD: dex_.baseWithdrawalLimitInUSD
-                });
-
-            setSupplyProtocolLimits(protocolConfigTokenA_);
-
-            SupplyProtocolConfig
-                memory protocolConfigTokenB_ = SupplyProtocolConfig({
-                    protocol: dex_.dex,
-                    supplyToken: dex_.tokenB,
-                    expandPercent: 50 * 1e2, // 50%
-                    expandDuration: 1 hours, // 1 hour
-                    baseWithdrawalLimitInUSD: dex_.baseWithdrawalLimitInUSD
-                });
-
-            setSupplyProtocolLimits(protocolConfigTokenB_);
-        }
-
-        // Smart Debt
-        if (dex_.smartDebt) {
-            BorrowProtocolConfig
-                memory protocolConfigTokenA_ = BorrowProtocolConfig({
-                    protocol: dex_.dex,
-                    borrowToken: dex_.tokenA,
-                    expandPercent: 50 * 1e2, // 50%
-                    expandDuration: 1 hours, // 1 hour
-                    baseBorrowLimitInUSD: dex_.baseBorrowLimitInUSD,
-                    maxBorrowLimitInUSD: dex_.maxBorrowLimitInUSD
-                });
-
-            setBorrowProtocolLimits(protocolConfigTokenA_);
-
-            BorrowProtocolConfig
-                memory protocolConfigTokenB_ = BorrowProtocolConfig({
-                    protocol: dex_.dex,
-                    borrowToken: dex_.tokenB,
-                    expandPercent: 50 * 1e2, // 50%
-                    expandDuration: 1 hours, // 1 hour
-                    baseBorrowLimitInUSD: dex_.baseBorrowLimitInUSD,
-                    maxBorrowLimitInUSD: dex_.maxBorrowLimitInUSD
-                });
-
-            setBorrowProtocolLimits(protocolConfigTokenB_);
-        }
-    }
-
-    function setVaultLimits(Vault memory vault_) internal {
-        if (vault_.vaultType == TYPE.TYPE_1) {
-            SupplyProtocolConfig memory protocolConfig_ = SupplyProtocolConfig({
-                protocol: vault_.vault,
-                supplyToken: vault_.supplyToken,
-                expandPercent: 50 * 1e2, // 50%
-                expandDuration: 6 hours, // 6 hours
-                baseWithdrawalLimitInUSD: vault_.baseWithdrawalLimitInUSD
-            });
-
-            setSupplyProtocolLimits(protocolConfig_);
-        }
-
-        if (vault_.vaultType == TYPE.TYPE_1) {
-            BorrowProtocolConfig memory protocolConfig_ = BorrowProtocolConfig({
-                protocol: vault_.vault,
-                borrowToken: vault_.borrowToken,
-                expandPercent: 50 * 1e2, // 50%
-                expandDuration: 6 hours, // 6 hours
-                baseBorrowLimitInUSD: vault_.baseBorrowLimitInUSD,
-                maxBorrowLimitInUSD: vault_.maxBorrowLimitInUSD
-            });
-
-            setBorrowProtocolLimits(protocolConfig_);
-        }
-
-        if (vault_.vaultType == TYPE.TYPE_2) {
-            BorrowProtocolConfig memory protocolConfig_ = BorrowProtocolConfig({
-                protocol: vault_.vault,
-                borrowToken: vault_.borrowToken,
-                expandPercent: 30 * 1e2, // 30%
-                expandDuration: 6 hours, // 6 hours
-                baseBorrowLimitInUSD: vault_.baseBorrowLimitInUSD,
-                maxBorrowLimitInUSD: vault_.maxBorrowLimitInUSD
-            });
-
-            setBorrowProtocolLimits(protocolConfig_);
-        }
-
-        if (vault_.vaultType == TYPE.TYPE_3) {
-            SupplyProtocolConfig memory protocolConfig_ = SupplyProtocolConfig({
-                protocol: vault_.vault,
-                supplyToken: vault_.supplyToken,
-                expandPercent: 35 * 1e2, // 35%
-                expandDuration: 6 hours, // 6 hours
-                baseWithdrawalLimitInUSD: vault_.baseWithdrawalLimitInUSD
-            });
-
-            setSupplyProtocolLimits(protocolConfig_);
-        }
-    }
-
-    function updateDexBaseLimits(uint256 dexId, uint256 maxSupplyShares, uint256 maxBorrowShares) internal {
-        address dexAddress = getDexAddress(dexId);
-        if (dexAddress == address(0)) return;
-
-        (address AddressTokenA, address AddressTokenB) = getDexTokens(dexAddress);
-
-        uint256 maxSupplySharesInUSD = getRawAmount(address(0), maxSupplyShares, 0, true);
-        uint256 maxBorrowSharesInUSD = getRawAmount(address(0), maxBorrowShares, 0, false);
-
-        uint256 baseWithdrawalInUSD = (maxSupplySharesInUSD * 45) / 100; // 45% of supply cap
-        uint256 baseBorrowInUSD = (maxBorrowSharesInUSD * 60) / 100; // 60% of max borrow cap
-        uint256 maxBorrowInUSD = maxBorrowSharesInUSD * 11 / 10; // 10% increase
-
-        Dex memory dex_ = Dex({
-            dex: dexAddress,
-            tokenA: AddressTokenA,
-            tokenB: AddressTokenB,
-            smartCollateral: maxSupplySharesInUSD > 0,
-            smartDebt: maxBorrowSharesInUSD > 0,
-            baseWithdrawalLimitInUSD: baseWithdrawalInUSD,
-            baseBorrowLimitInUSD: baseBorrowInUSD,
-            maxBorrowLimitInUSD: maxBorrowInUSD
-        });
-        setDexLimits(dex_);
-    }
     // Token Prices Constants
     uint256 public constant ETH_USD_PRICE = 3_320 * 1e2;
     uint256 public constant wstETH_USD_PRICE = 3_950 * 1e2;

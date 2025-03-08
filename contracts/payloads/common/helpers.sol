@@ -204,4 +204,161 @@ contract PayloadIGPHelpers is PayloadIGPConstants {
     ) public virtual view returns (uint256) {
         return 0;
     }
+
+    struct Dex {
+        address dex;
+        address tokenA;
+        address tokenB;
+        bool smartCollateral;
+        bool smartDebt;
+        uint256 baseWithdrawalLimitInUSD;
+        uint256 baseBorrowLimitInUSD;
+        uint256 maxBorrowLimitInUSD;
+    }
+
+    enum TYPE {
+        TYPE_1,
+        TYPE_2,
+        TYPE_3,
+        TYPE_4
+    }
+
+    struct Vault {
+        address vault;
+        TYPE vaultType;
+        address supplyToken;
+        address borrowToken;
+        uint256 baseWithdrawalLimitInUSD;
+        uint256 baseBorrowLimitInUSD;
+        uint256 maxBorrowLimitInUSD;
+    }
+
+    function setDexLimits(Dex memory dex_) internal {
+        // Smart Collateral
+        if (dex_.smartCollateral) {
+            SupplyProtocolConfig
+                memory protocolConfigTokenA_ = SupplyProtocolConfig({
+                    protocol: dex_.dex,
+                    supplyToken: dex_.tokenA,
+                    expandPercent: 50 * 1e2, // 50%
+                    expandDuration: 1 hours, // 1 hour
+                    baseWithdrawalLimitInUSD: dex_.baseWithdrawalLimitInUSD
+                });
+
+            setSupplyProtocolLimits(protocolConfigTokenA_);
+
+            SupplyProtocolConfig
+                memory protocolConfigTokenB_ = SupplyProtocolConfig({
+                    protocol: dex_.dex,
+                    supplyToken: dex_.tokenB,
+                    expandPercent: 50 * 1e2, // 50%
+                    expandDuration: 1 hours, // 1 hour
+                    baseWithdrawalLimitInUSD: dex_.baseWithdrawalLimitInUSD
+                });
+
+            setSupplyProtocolLimits(protocolConfigTokenB_);
+        }
+
+        // Smart Debt
+        if (dex_.smartDebt) {
+            BorrowProtocolConfig
+                memory protocolConfigTokenA_ = BorrowProtocolConfig({
+                    protocol: dex_.dex,
+                    borrowToken: dex_.tokenA,
+                    expandPercent: 50 * 1e2, // 50%
+                    expandDuration: 1 hours, // 1 hour
+                    baseBorrowLimitInUSD: dex_.baseBorrowLimitInUSD,
+                    maxBorrowLimitInUSD: dex_.maxBorrowLimitInUSD
+                });
+
+            setBorrowProtocolLimits(protocolConfigTokenA_);
+
+            BorrowProtocolConfig
+                memory protocolConfigTokenB_ = BorrowProtocolConfig({
+                    protocol: dex_.dex,
+                    borrowToken: dex_.tokenB,
+                    expandPercent: 50 * 1e2, // 50%
+                    expandDuration: 1 hours, // 1 hour
+                    baseBorrowLimitInUSD: dex_.baseBorrowLimitInUSD,
+                    maxBorrowLimitInUSD: dex_.maxBorrowLimitInUSD
+                });
+
+            setBorrowProtocolLimits(protocolConfigTokenB_);
+        }
+    }
+
+    function setVaultLimits(Vault memory vault_) internal {
+        if (vault_.vaultType == TYPE.TYPE_1) {
+            SupplyProtocolConfig memory protocolConfig_ = SupplyProtocolConfig({
+                protocol: vault_.vault,
+                supplyToken: vault_.supplyToken,
+                expandPercent: 50 * 1e2, // 50%
+                expandDuration: 6 hours, // 6 hours
+                baseWithdrawalLimitInUSD: vault_.baseWithdrawalLimitInUSD
+            });
+
+            setSupplyProtocolLimits(protocolConfig_);
+        }
+
+        if (vault_.vaultType == TYPE.TYPE_1) {
+            BorrowProtocolConfig memory protocolConfig_ = BorrowProtocolConfig({
+                protocol: vault_.vault,
+                borrowToken: vault_.borrowToken,
+                expandPercent: 50 * 1e2, // 50%
+                expandDuration: 6 hours, // 6 hours
+                baseBorrowLimitInUSD: vault_.baseBorrowLimitInUSD,
+                maxBorrowLimitInUSD: vault_.maxBorrowLimitInUSD
+            });
+
+            setBorrowProtocolLimits(protocolConfig_);
+        }
+
+        if (vault_.vaultType == TYPE.TYPE_2) {
+            BorrowProtocolConfig memory protocolConfig_ = BorrowProtocolConfig({
+                protocol: vault_.vault,
+                borrowToken: vault_.borrowToken,
+                expandPercent: 30 * 1e2, // 30%
+                expandDuration: 6 hours, // 6 hours
+                baseBorrowLimitInUSD: vault_.baseBorrowLimitInUSD,
+                maxBorrowLimitInUSD: vault_.maxBorrowLimitInUSD
+            });
+
+            setBorrowProtocolLimits(protocolConfig_);
+        }
+
+        if (vault_.vaultType == TYPE.TYPE_3) {
+            SupplyProtocolConfig memory protocolConfig_ = SupplyProtocolConfig({
+                protocol: vault_.vault,
+                supplyToken: vault_.supplyToken,
+                expandPercent: 35 * 1e2, // 35%
+                expandDuration: 6 hours, // 6 hours
+                baseWithdrawalLimitInUSD: vault_.baseWithdrawalLimitInUSD
+            });
+
+            setSupplyProtocolLimits(protocolConfig_);
+        }
+    }
+
+    function updateDexBaseLimits(uint256 dexId, uint256 maxSupplySharesinUSD, uint256 maxBorrowSharesinUSD) internal {
+        address dexAddress = getDexAddress(dexId);
+        if (dexAddress == address(0)) return;
+
+        (address AddressTokenA, address AddressTokenB) = getDexTokens(dexAddress);
+
+        uint256 baseWithdrawalInUSD = (maxSupplySharesInUSD * 45) / 100; // 45% of supply cap
+        uint256 baseBorrowInUSD = (maxBorrowSharesInUSD * 60) / 100; // 60% of max borrow cap
+        uint256 maxBorrowInUSD = maxBorrowSharesInUSD * 15 / 10; // 50% increase
+
+        Dex memory dex_ = Dex({
+            dex: dexAddress,
+            tokenA: AddressTokenA,
+            tokenB: AddressTokenB,
+            smartCollateral: maxSupplySharesInUSD > 0,
+            smartDebt: maxBorrowSharesInUSD > 0,
+            baseWithdrawalLimitInUSD: baseWithdrawalInUSD,
+            baseBorrowLimitInUSD: baseBorrowInUSD,
+            maxBorrowLimitInUSD: maxBorrowInUSD
+        });
+        setDexLimits(dex_);
+    }
 }
