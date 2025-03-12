@@ -58,6 +58,12 @@ contract PayloadIGP86 is PayloadIGPMain {
 
         // Action 7: Increase weETH-ETH / wstETH borrow limits
         action7();
+
+        // Action 8: Increase Caps on sUSDe-USDT, USDe-USDT & USDC-USDT DEX Pools 
+        action8();
+
+        // Action 9: Adjust CF, LT, LML for rsETH Vaults
+        action9();
     }
 
     function verifyProposal() public view override {}
@@ -183,7 +189,7 @@ contract PayloadIGP86 is PayloadIGPMain {
     function action3() internal isActionSkippable(3) {
         // Update each DEX individually with their specific USD caps
         updateDexBaseLimits(1, 35_719_688, 31_964_753);    // wstETH-ETH DEX (Smart Collateral & Smart Debt)
-        updateDexBaseLimits(2, 0, 51_940_134);             // USDC-USDT DEX (Smart Debt only)
+        updateDexBaseLimits(2, 0, 60_000_000);             // USDC-USDT DEX (Smart Debt only)
         updateDexBaseLimits(3, 30_014_962, 21_672_447);             // cbBTC-WBTC DEX (Smart Collateral & Smart Debt)
         updateDexBaseLimits(4, 10_380_445, 8_264_211);  // GHO-USDC DEX (Smart Collateral & Smart Debt)
 //        updateDexBaseLimits(5, 0, 0);                     // Skip DEX 5
@@ -196,10 +202,10 @@ contract PayloadIGP86 is PayloadIGPMain {
         updateDexBaseLimits(12, 41_067_529, 34_437_485); // USDC-ETH DEX (Smart Collateral & Smart Debt)
         updateDexBaseLimits(13, 34_437_485, 0); // rsETH-ETH DEX (Smart Collateral Only)
         updateDexBaseLimits(14, 7_084_187, 0); // weETHs-ETH DEX (Smart Collateral Only)
-        updateDexBaseLimits(15, 50_509_930, 0); // sUSDe-USDT DEX (Smart Collateral Only)
+        updateDexBaseLimits(15, 60_000_000, 0); // sUSDe-USDT DEX (Smart Collateral Only)
         updateDexBaseLimits(16, 19_017_882, 0); // eBTC-cbBTC DEX (Smart Collateral Only)
         updateDexBaseLimits(17, 18_898_700, 0); // LBTC-cbBTC DEX (Smart Collateral Only)
-        updateDexBaseLimits(18, 20_191_825, 0); // USDe-USDT DEX (Smart Collateral Only)
+        updateDexBaseLimits(18, 25_000_000, 0); // USDe-USDT DEX (Smart Collateral Only)
         updateDexBaseLimits(19, 15_083_531, 0); // deUSD-USDC DEX (Smart Collateral Only)
         updateDexBaseLimits(20, 15_106_031, 0); // USR-USDC DEX (Smart Collateral Only)
 //        updateDexBaseLimits(21, 0, 0);                    // Skip DEX 21
@@ -290,6 +296,59 @@ contract PayloadIGP86 is PayloadIGPMain {
             });
 
             setVaultLimits(VAULT_weETH_ETH_AND_wsETH); // TYPE_2 => 74
+    }
+
+    // @notice Action 8: Increase Caps on sUSDe-USDT, USDe-USDT & USDC-USDT DEX Pools 
+    function action8() internal isActionSkippable(8){
+        {
+            address USDC_USDT_DEX = getDexAddress(2);
+                {
+                    // Set max borrow shares
+                    IFluidDex(USDC_USDT_DEX).updateMaxBorrowShares(
+                        28_000_000 * 1e18
+                    );
+                }
+        }
+
+        {
+            address sUSDe_USDT_DEX = getDexAddress(15);
+                {
+                    // Set max sypply shares
+                    IFluidDex(sUSDe_USDT_DEX).updateMaxSypplyShares(
+                        30_000_000 * 1e18
+                    );
+                }
+        }
+
+        {
+            address USDe_USDT_DEX = getDexAddress(18);
+                {
+                    // Set max supply shares
+                    IFluidDex(USDe_USDT_DEX).updateMaxSupplyShares(
+                        12_500_000 * 1e18
+                    );
+                }
+        }
+    }
+
+    // @notice Action 9: Adjust CF, LT, LML for rsETH Vaults
+    function action9() internal isActionSkippable(9){
+        {
+            address rsETH_ETH__wstETH = getVaultAddress(78);
+            address rsETH_wstETH = getVaultAddress(79);
+
+            uint256 CF = 94 * 1e2;
+            uint256 LT = 96 * 1e2;
+            uint256 LML = 97 * 1e2;
+
+            IFluidVaultT1(rsETH_ETH__wstETH).updateLiquidationMaxLimit(LML);
+            IFluidVaultT1(rsETH_ETH__wstETH).updateLiquidationThreshold(LT);
+            IFluidVaultT1(rsETH_ETH__wstETH).updateCollateralFactor(CF);
+
+            IFluidVaultT1(rsETH_wstETH).updateLiquidationMaxLimit(LML);
+            IFluidVaultT1(rsETH_wstETH).updateLiquidationThreshold(LT);
+            IFluidVaultT1(rsETH_wstETH).updateCollateralFactor(CF);
+        }
     }
 
     /**
