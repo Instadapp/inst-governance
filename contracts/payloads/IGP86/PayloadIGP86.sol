@@ -296,6 +296,7 @@ contract PayloadIGP86 is PayloadIGPMain {
             });
 
             setVaultLimits(VAULT_weETH_ETH_AND_wsETH); // TYPE_2 => 74
+        }
     }
 
     // @notice Action 8: Increase Caps on sUSDe-USDT, USDe-USDT & USDC-USDT DEX Pools 
