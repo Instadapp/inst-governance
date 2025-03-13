@@ -59,7 +59,7 @@ contract PayloadIGP86 is PayloadIGPMain {
         // Action 7: Increase weETH-ETH / wstETH borrow limits
         action7();
 
-        // Action 8: Increase Caps on sUSDe-USDT, USDe-USDT & USDC-USDT DEX Pools 
+        // Action 8: Increase Caps on sUSDe-USDT, USDe-USDT & USDC-USDT DEX Pools
         action8();
 
         // Action 9: Adjust CF, LT, LML for rsETH Vaults
@@ -166,11 +166,7 @@ contract PayloadIGP86 is PayloadIGPMain {
             });
             setDexLimits(DEX_cbBTC_ETH); // Smart Collateral & Smart Debt
 
-            DEX_FACTORY.setDexAuth(
-                cbBTC_ETH_DEX_ADDRESS, 
-                TEAM_MULTISIG, 
-                false
-            );
+            DEX_FACTORY.setDexAuth(cbBTC_ETH_DEX_ADDRESS, TEAM_MULTISIG, false);
         }
 
         {
@@ -188,16 +184,16 @@ contract PayloadIGP86 is PayloadIGPMain {
     // @notice Action 3: Update base limits for all DEXes according to their caps
     function action3() internal isActionSkippable(3) {
         // Update each DEX individually with their specific USD caps
-        updateDexBaseLimits(1, 35_719_688, 31_964_753);    // wstETH-ETH DEX (Smart Collateral & Smart Debt)
-        updateDexBaseLimits(2, 0, 60_000_000);             // USDC-USDT DEX (Smart Debt only)
-        updateDexBaseLimits(3, 30_014_962, 21_672_447);             // cbBTC-WBTC DEX (Smart Collateral & Smart Debt)
-        updateDexBaseLimits(4, 10_380_445, 8_264_211);  // GHO-USDC DEX (Smart Collateral & Smart Debt)
-//        updateDexBaseLimits(5, 0, 0);                     // Skip DEX 5
-//        updateDexBaseLimits(6, 0, 0);                     // Skip DEX 6
-//        updateDexBaseLimits(7, 0, 0);                     // Skip DEX 7
-//        updateDexBaseLimits(8, 0, 0);                     // Skip DEX 8
-        updateDexBaseLimits(9, 40_198_694, 0);    // weETH-ETH DEX (Smart Collateral Only)
-//        updateDexBaseLimits(10, 0, 0);                    // Skip DEX 10
+        updateDexBaseLimits(1, 35_719_688, 31_964_753); // wstETH-ETH DEX (Smart Collateral & Smart Debt)
+        updateDexBaseLimits(2, 0, 60_000_000); // USDC-USDT DEX (Smart Debt only)
+        updateDexBaseLimits(3, 30_014_962, 21_672_447); // cbBTC-WBTC DEX (Smart Collateral & Smart Debt)
+        updateDexBaseLimits(4, 10_380_445, 8_264_211); // GHO-USDC DEX (Smart Collateral & Smart Debt)
+        //        updateDexBaseLimits(5, 0, 0);                     // Skip DEX 5
+        //        updateDexBaseLimits(6, 0, 0);                     // Skip DEX 6
+        //        updateDexBaseLimits(7, 0, 0);                     // Skip DEX 7
+        //        updateDexBaseLimits(8, 0, 0);                     // Skip DEX 8
+        updateDexBaseLimits(9, 40_198_694, 0); // weETH-ETH DEX (Smart Collateral Only)
+        //        updateDexBaseLimits(10, 0, 0);                    // Skip DEX 10
         updateDexBaseLimits(11, 14_248_502, 0); // FLUID-ETH DEX (-)
         updateDexBaseLimits(12, 41_067_529, 34_437_485); // USDC-ETH DEX (Smart Collateral & Smart Debt)
         updateDexBaseLimits(13, 34_437_485, 0); // rsETH-ETH DEX (Smart Collateral Only)
@@ -208,12 +204,12 @@ contract PayloadIGP86 is PayloadIGPMain {
         updateDexBaseLimits(18, 25_000_000, 0); // USDe-USDT DEX (Smart Collateral Only)
         updateDexBaseLimits(19, 15_083_531, 0); // deUSD-USDC DEX (Smart Collateral Only)
         updateDexBaseLimits(20, 15_106_031, 0); // USR-USDC DEX (Smart Collateral Only)
-//        updateDexBaseLimits(21, 0, 0);                    // Skip DEX 21
+        //        updateDexBaseLimits(21, 0, 0);                    // Skip DEX 21
         updateDexBaseLimits(22, 24_281_313, 20_395_734); // cbBTC-USDT DEX (Smart Collateral & Smart Debt)
-        updateDexBaseLimits(23, 14_987_359, 0);  // USD0-USDC DEX (Smart Collateral Only)
+        updateDexBaseLimits(23, 14_987_359, 0); // USD0-USDC DEX (Smart Collateral Only)
         updateDexBaseLimits(24, 15_010_656, 0); // fxUSD-USDC DEX (Smart Collateral Only)
-//        updateDexBaseLimits(25, 0, 0);                    // Skip DEX 25
-//        updateDexBaseLimits(26, 0, 0);                    // Skip DEX 26
+        //        updateDexBaseLimits(25, 0, 0);                    // Skip DEX 25
+        //        updateDexBaseLimits(26, 0, 0);                    // Skip DEX 26
     }
 
     // @notice Action 4: Set creation code for SmartLendingFactory
@@ -223,14 +219,18 @@ contract PayloadIGP86 is PayloadIGPMain {
         address SSTORE2_DEPLOYER = 0x94a58428980291Af59adfe96844FAff088737e8F;
 
         // Get the creation code directly from the pointer
-        bytes memory creationCode = ICodeReader(SSTORE2_DEPLOYER).readCode(SSTORE2_POINTER);
+        bytes memory creationCode = ICodeReader(SSTORE2_DEPLOYER).readCode(
+            SSTORE2_POINTER
+        );
 
         // Set the creation code in the factory
-        ISmartLendingFactory(SMART_LENDING_FACTORY).setCreationCode(creationCode);
+        ISmartLendingFactory(SMART_LENDING_FACTORY).setCreationCode(
+            creationCode
+        );
     }
 
     // @notice Action 5: Transfer 311k FLUID to Team Multisig
-    function action5() internal isActionSkippable(5){
+    function action5() internal isActionSkippable(5) {
         string[] memory targets = new string[](1);
         bytes[] memory encodedSpells = new bytes[](1);
 
@@ -255,7 +255,7 @@ contract PayloadIGP86 is PayloadIGPMain {
     }
 
     // @notice Action 6: Delist mETH vaults
-    function action6() internal isActionSkippable(6){
+    function action6() internal isActionSkippable(6) {
         // Delist mETH<>USDC vault
         {
             address vault_meth_usdc = getVaultAddress(81);
@@ -282,7 +282,7 @@ contract PayloadIGP86 is PayloadIGPMain {
     }
 
     // @notice Action 7: Increase weETH-ETH / wstETH borrow limits
-    function action7() internal isActionSkippable(7){
+    function action7() internal isActionSkippable(7) {
         {
             // [TYPE 2] ETH-weETH  | wstETH | Smart collateral & debt
             Vault memory VAULT_weETH_ETH_AND_wsETH = Vault({
@@ -299,41 +299,41 @@ contract PayloadIGP86 is PayloadIGPMain {
         }
     }
 
-    // @notice Action 8: Increase Caps on sUSDe-USDT, USDe-USDT & USDC-USDT DEX Pools 
-    function action8() internal isActionSkippable(8){
+    // @notice Action 8: Increase Caps on sUSDe-USDT, USDe-USDT & USDC-USDT DEX Pools
+    function action8() internal isActionSkippable(8) {
         {
             address USDC_USDT_DEX = getDexAddress(2);
-                {
-                    // Set max borrow shares
-                    IFluidDex(USDC_USDT_DEX).updateMaxBorrowShares(
-                        28_000_000 * 1e18
-                    );
-                }
+            {
+                // Set max borrow shares
+                IFluidDex(USDC_USDT_DEX).updateMaxBorrowShares(
+                    30_000_000 * 1e18
+                );
+            }
         }
 
         {
             address sUSDe_USDT_DEX = getDexAddress(15);
-                {
-                    // Set max sypply shares
-                    IFluidDex(sUSDe_USDT_DEX).updateMaxSypplyShares(
-                        30_000_000 * 1e18
-                    );
-                }
+            {
+                // Set max sypply shares
+                IFluidDex(sUSDe_USDT_DEX).updateMaxSypplyShares(
+                    30_000_000 * 1e18
+                );
+            }
         }
 
         {
             address USDe_USDT_DEX = getDexAddress(18);
-                {
-                    // Set max supply shares
-                    IFluidDex(USDe_USDT_DEX).updateMaxSupplyShares(
-                        12_500_000 * 1e18
-                    );
-                }
+            {
+                // Set max supply shares
+                IFluidDex(USDe_USDT_DEX).updateMaxSupplyShares(
+                    12_500_000 * 1e18
+                );
+            }
         }
     }
 
     // @notice Action 9: Adjust CF, LT, LML for rsETH Vaults
-    function action9() internal isActionSkippable(9){
+    function action9() internal isActionSkippable(9) {
         {
             address rsETH_ETH__wstETH = getVaultAddress(78);
             address rsETH_wstETH = getVaultAddress(79);
