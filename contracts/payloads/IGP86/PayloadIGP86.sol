@@ -184,30 +184,30 @@ contract PayloadIGP86 is PayloadIGPMain {
     // @notice Action 3: Update base limits for all DEXes according to their caps
     function action3() internal isActionSkippable(3) {
         // Update each DEX individually with their specific USD caps
-        updateDexBaseLimits(1, 35_719_688, 31_964_753); // wstETH-ETH DEX (Smart Collateral & Smart Debt)
-        updateDexBaseLimits(2, 0, 60_000_000); // USDC-USDT DEX (Smart Debt only)
-        updateDexBaseLimits(3, 30_014_962, 21_672_447); // cbBTC-WBTC DEX (Smart Collateral & Smart Debt)
+        updateDexBaseLimits(1, 40_000_000, 38_000_000); // wstETH-ETH DEX (Smart Collateral & Smart Debt)
+        updateDexBaseLimits(2, 0, 75_000_000); // USDC-USDT DEX (Smart Debt only)
+        updateDexBaseLimits(3, 40_000_000, 38_000_000); // cbBTC-WBTC DEX (Smart Collateral & Smart Debt)
         updateDexBaseLimits(4, 10_380_445, 8_264_211); // GHO-USDC DEX (Smart Collateral & Smart Debt)
         //        updateDexBaseLimits(5, 0, 0);                     // Skip DEX 5
         //        updateDexBaseLimits(6, 0, 0);                     // Skip DEX 6
         //        updateDexBaseLimits(7, 0, 0);                     // Skip DEX 7
         //        updateDexBaseLimits(8, 0, 0);                     // Skip DEX 8
-        updateDexBaseLimits(9, 40_198_694, 0); // weETH-ETH DEX (Smart Collateral Only)
+        updateDexBaseLimits(9, 42_000_000, 0); // weETH-ETH DEX (Smart Collateral Only)
         //        updateDexBaseLimits(10, 0, 0);                    // Skip DEX 10
-        updateDexBaseLimits(11, 14_248_502, 0); // FLUID-ETH DEX (-)
-        updateDexBaseLimits(12, 41_067_529, 34_437_485); // USDC-ETH DEX (Smart Collateral & Smart Debt)
-        updateDexBaseLimits(13, 34_437_485, 0); // rsETH-ETH DEX (Smart Collateral Only)
-        updateDexBaseLimits(14, 7_084_187, 0); // weETHs-ETH DEX (Smart Collateral Only)
+        updateDexBaseLimits(11, 15_000_000, 0); // FLUID-ETH DEX (-)
+        updateDexBaseLimits(12, 50_000_000, 40_000_000); // USDC-ETH DEX (Smart Collateral & Smart Debt)
+        updateDexBaseLimits(13, 20_000_000, 0); // rsETH-ETH DEX (Smart Collateral Only)
+        updateDexBaseLimits(14, 10_000_000, 0); // weETHs-ETH DEX (Smart Collateral Only)
         updateDexBaseLimits(15, 60_000_000, 0); // sUSDe-USDT DEX (Smart Collateral Only)
-        updateDexBaseLimits(16, 19_017_882, 0); // eBTC-cbBTC DEX (Smart Collateral Only)
-        updateDexBaseLimits(17, 18_898_700, 0); // LBTC-cbBTC DEX (Smart Collateral Only)
+        updateDexBaseLimits(16, 20_000_000, 0); // eBTC-cbBTC DEX (Smart Collateral Only)
+        updateDexBaseLimits(17, 20_000_000, 0); // LBTC-cbBTC DEX (Smart Collateral Only)
         updateDexBaseLimits(18, 25_000_000, 0); // USDe-USDT DEX (Smart Collateral Only)
-        updateDexBaseLimits(19, 15_083_531, 0); // deUSD-USDC DEX (Smart Collateral Only)
-        updateDexBaseLimits(20, 15_106_031, 0); // USR-USDC DEX (Smart Collateral Only)
+        updateDexBaseLimits(19, 15_000_000, 0); // deUSD-USDC DEX (Smart Collateral Only)
+        updateDexBaseLimits(20, 15_000_000, 0); // USR-USDC DEX (Smart Collateral Only)
         //        updateDexBaseLimits(21, 0, 0);                    // Skip DEX 21
-        updateDexBaseLimits(22, 24_281_313, 20_395_734); // cbBTC-USDT DEX (Smart Collateral & Smart Debt)
-        updateDexBaseLimits(23, 14_987_359, 0); // USD0-USDC DEX (Smart Collateral Only)
-        updateDexBaseLimits(24, 15_010_656, 0); // fxUSD-USDC DEX (Smart Collateral Only)
+        updateDexBaseLimits(22, 25_000_000, 20_000_000); // cbBTC-USDT DEX (Smart Collateral & Smart Debt)
+        updateDexBaseLimits(23, 15_000_000, 0); // USD0-USDC DEX (Smart Collateral Only)
+        updateDexBaseLimits(24, 15_000_000, 0); // fxUSD-USDC DEX (Smart Collateral Only)
         //        updateDexBaseLimits(25, 0, 0);                    // Skip DEX 25
         //        updateDexBaseLimits(26, 0, 0);                    // Skip DEX 26
     }
@@ -359,21 +359,21 @@ contract PayloadIGP86 is PayloadIGPMain {
      */
 
     // Token Prices Constants
-    uint256 public constant ETH_USD_PRICE = 3_320 * 1e2;
-    uint256 public constant wstETH_USD_PRICE = 3_950 * 1e2;
-    uint256 public constant weETH_USD_PRICE = 3_350 * 1e2;
-    uint256 public constant rsETH_USD_PRICE = 3_750 * 1e2;
-    uint256 public constant weETHs_USD_PRICE = 3_750 * 1e2;
-    uint256 public constant mETH_USD_PRICE = 3_850 * 1e2;
-    uint256 public constant ezETH_USD_PRICE = 3_450 * 1e2;
+    uint256 public constant ETH_USD_PRICE = 1_900 * 1e2;
+    uint256 public constant wstETH_USD_PRICE = 2_300 * 1e2;
+    uint256 public constant weETH_USD_PRICE = 2_000 * 1e2;
+    uint256 public constant rsETH_USD_PRICE = 1_975 * 1e2;
+    uint256 public constant weETHs_USD_PRICE = 1_930 * 1e2;
+    uint256 public constant mETH_USD_PRICE = 2_000 * 1e2;
+    uint256 public constant ezETH_USD_PRICE = 1_975 * 1e2;
 
-    uint256 public constant BTC_USD_PRICE = 102_000 * 1e2;
+    uint256 public constant BTC_USD_PRICE = 83_000 * 1e2;
 
     uint256 public constant STABLE_USD_PRICE = 1 * 1e2;
     uint256 public constant sUSDe_USD_PRICE = 1.15 * 1e2;
     uint256 public constant sUSDs_USD_PRICE = 1.02 * 1e2;
 
-    uint256 public constant FLUID_USD_PRICE = 7.2 * 1e2;
+    uint256 public constant FLUID_USD_PRICE = 5 * 1e2;
 
     function getRawAmount(
         address token,
