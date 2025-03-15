@@ -224,7 +224,7 @@ contract PayloadIGP86 is PayloadIGPMain {
         );
 
         // Set the creation code in the factory
-        ISmartLendingFactory(SMART_LENDING_FACTORY).setCreationCode(
+        ISmartLendingFactory(SMART_LENDING_FACTORY).setSmartLendingCreationCode(
             creationCode
         );
     }

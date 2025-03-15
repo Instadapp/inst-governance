@@ -2,5 +2,5 @@
 pragma solidity ^0.8.21;
 
 interface ISmartLendingFactory {
-    function setCreationCode(bytes memory creationCode) external;
+    function setSmartLendingCreationCode(bytes memory creationCode) external;
 } 
