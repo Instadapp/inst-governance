@@ -369,7 +369,7 @@ contract PayloadIGP86 is PayloadIGPMain {
                 expandPercent: 30 * 1e2, // 30%
                 expandDuration: 6 hours, // 6 hours
                 baseDebtCeiling: 5_000_000 * 1e18, // 5M shares
-                maxDebtCeiling: 25_000_000 * 1e18 // 15M shares
+                maxDebtCeiling: 25_000_000 * 1e18 // 25M shares
             });
 
             IFluidDex(USDC_USDT_DEX_ADDRESS).updateUserBorrowConfigs(config_);
