@@ -64,6 +64,9 @@ contract PayloadIGP86 is PayloadIGPMain {
 
         // Action 9: Adjust CF, LT, LML for rsETH Vaults
         action9();
+
+        // Action 10: Increase max borrow shares on sUSDe-USDT | USDC-USDT
+        action10();
     }
 
     function verifyProposal() public view override {}
@@ -349,6 +352,27 @@ contract PayloadIGP86 is PayloadIGPMain {
             IFluidVaultT1(rsETH_wstETH).updateLiquidationMaxLimit(LML);
             IFluidVaultT1(rsETH_wstETH).updateLiquidationThreshold(LT);
             IFluidVaultT1(rsETH_wstETH).updateCollateralFactor(CF);
+        }
+    }
+
+    // @notice Action 10: Increase max borrow shares on sUSDe-USDT | USDC-USDT
+    function action10() internal isActionSkippable(10) {
+        address USDC_USDT_DEX_ADDRESS = getDexAddress(2);
+        address sUSDe_USDT__USDC_USDT_VAULT_ADDRESS = getVaultAddress(98);
+
+        {
+            // Increase sUSDe-USDT<>USDC-USDT vault borrow shares limit
+            IFluidAdminDex.UserBorrowConfig[]
+                memory config_ = new IFluidAdminDex.UserBorrowConfig[](1);
+            config_[0] = IFluidAdminDex.UserBorrowConfig({
+                user: sUSDe_USDT__USDC_USDT_VAULT_ADDRESS,
+                expandPercent: 30 * 1e2, // 30%
+                expandDuration: 6 hours, // 6 hours
+                baseDebtCeiling: 5_000_000 * 1e18, // 5M shares
+                maxDebtCeiling: 25_000_000 * 1e18 // 15M shares
+            });
+
+            IFluidDex(USDC_USDT_DEX_ADDRESS).updateUserBorrowConfigs(config_);
         }
     }
 
