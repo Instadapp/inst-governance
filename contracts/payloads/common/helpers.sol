@@ -161,8 +161,8 @@ contract PayloadIGPHelpers is PayloadIGPConstants {
                 mode: 1,
                 expandPercent: 1, // 0.01%
                 expandDuration: 16777215, // max time
-                baseBorrowLimit: 10,
-                maxBorrowLimit: 20
+                baseDebtCeiling: 10,
+                maxDebtCeiling: 20
             });
 
             LIQUIDITY.updateUserBorrowConfigs(configs_);
@@ -205,7 +205,7 @@ contract PayloadIGPHelpers is PayloadIGPConstants {
         return 0;
     }
 
-    struct Dex {
+    struct DexConfig {
         address dex;
         address tokenA;
         address tokenB;
@@ -216,16 +216,16 @@ contract PayloadIGPHelpers is PayloadIGPConstants {
         uint256 maxBorrowLimitInUSD;
     }
 
-    enum TYPE {
+    enum VAULT_TYPE {
         TYPE_1,
         TYPE_2,
         TYPE_3,
         TYPE_4
     }
 
-    struct Vault {
+    struct VaultConfig {
         address vault;
-        TYPE vaultType;
+        VAULT_TYPE vaultType;
         address supplyToken;
         address borrowToken;
         uint256 baseWithdrawalLimitInUSD;
@@ -233,7 +233,7 @@ contract PayloadIGPHelpers is PayloadIGPConstants {
         uint256 maxBorrowLimitInUSD;
     }
 
-    function setDexLimits(Dex memory dex_) internal {
+    function setDexLimits(DexConfig memory dex_) internal {
         // Smart Collateral
         if (dex_.smartCollateral) {
             SupplyProtocolConfig
@@ -287,8 +287,8 @@ contract PayloadIGPHelpers is PayloadIGPConstants {
         }
     }
 
-    function setVaultLimits(Vault memory vault_) internal {
-        if (vault_.vaultType == TYPE.TYPE_1) {
+    function setVaultLimits(VaultConfig memory vault_) internal {
+        if (vault_.vaultType == VAULT_TYPE.TYPE_1) {
             SupplyProtocolConfig memory protocolConfig_ = SupplyProtocolConfig({
                 protocol: vault_.vault,
                 supplyToken: vault_.supplyToken,
@@ -300,7 +300,7 @@ contract PayloadIGPHelpers is PayloadIGPConstants {
             setSupplyProtocolLimits(protocolConfig_);
         }
 
-        if (vault_.vaultType == TYPE.TYPE_1) {
+        if (vault_.vaultType == VAULT_TYPE.TYPE_1) {
             BorrowProtocolConfig memory protocolConfig_ = BorrowProtocolConfig({
                 protocol: vault_.vault,
                 borrowToken: vault_.borrowToken,
@@ -313,7 +313,7 @@ contract PayloadIGPHelpers is PayloadIGPConstants {
             setBorrowProtocolLimits(protocolConfig_);
         }
 
-        if (vault_.vaultType == TYPE.TYPE_2) {
+        if (vault_.vaultType == VAULT_TYPE.TYPE_2) {
             BorrowProtocolConfig memory protocolConfig_ = BorrowProtocolConfig({
                 protocol: vault_.vault,
                 borrowToken: vault_.borrowToken,
@@ -326,7 +326,7 @@ contract PayloadIGPHelpers is PayloadIGPConstants {
             setBorrowProtocolLimits(protocolConfig_);
         }
 
-        if (vault_.vaultType == TYPE.TYPE_3) {
+        if (vault_.vaultType == VAULT_TYPE.TYPE_3) {
             SupplyProtocolConfig memory protocolConfig_ = SupplyProtocolConfig({
                 protocol: vault_.vault,
                 supplyToken: vault_.supplyToken,
@@ -339,7 +339,7 @@ contract PayloadIGPHelpers is PayloadIGPConstants {
         }
     }
 
-    function updateDexBaseLimits(uint256 dexId, uint256 maxSupplySharesinUSD, uint256 maxBorrowSharesinUSD) internal {
+    function updateDexBaseLimits(uint256 dexId, uint256 maxSupplySharesInUSD, uint256 maxBorrowSharesInUSD) internal {
         address dexAddress = getDexAddress(dexId);
         if (dexAddress == address(0)) return;
 
@@ -349,7 +349,7 @@ contract PayloadIGPHelpers is PayloadIGPConstants {
         uint256 baseBorrowInUSD = (maxBorrowSharesInUSD * 60) / 100; // 60% of max borrow cap
         uint256 maxBorrowInUSD = maxBorrowSharesInUSD * 15 / 10; // 50% increase
 
-        Dex memory dex_ = Dex({
+        DexConfig memory dex_ = DexConfig({
             dex: dexAddress,
             tokenA: AddressTokenA,
             tokenB: AddressTokenB,
@@ -360,5 +360,11 @@ contract PayloadIGPHelpers is PayloadIGPConstants {
             maxBorrowLimitInUSD: maxBorrowInUSD
         });
         setDexLimits(dex_);
+    }
+
+    function getDexTokens(address dexAddress_) internal view returns (address, address) {
+        IFluidDex.ConstantViews memory constantViews_ = IFluidDex(dexAddress_).constantsView();
+
+        return (constantViews_.token0, constantViews_.token1);
     }
 }

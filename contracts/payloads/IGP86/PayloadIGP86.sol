@@ -85,7 +85,7 @@ contract PayloadIGP86 is PayloadIGPMain {
             // ezETH-ETH DEX
             {
                 // ezETH-ETH Dex
-                Dex memory DEX_ezETH_ETH = Dex({
+                DexConfig memory DEX_ezETH_ETH = DexConfig({
                     dex: ezETH_ETH_DEX,
                     tokenA: ezETH_ADDRESS,
                     tokenB: ETH_ADDRESS,
@@ -105,9 +105,9 @@ contract PayloadIGP86 is PayloadIGPMain {
             address ezETH__wstETH_VAULT = getVaultAddress(103);
 
             // [TYPE 1] ezETH<>wstETH | normal collateral & normal debt
-            Vault memory VAULT_ezETH_wstETH = Vault({
+            VaultConfig memory VAULT_ezETH_wstETH = VaultConfig({
                 vault: ezETH__wstETH_VAULT,
-                vaultType: TYPE.TYPE_1,
+                vaultType: VAULT_TYPE.TYPE_1,
                 supplyToken: ezETH_ADDRESS,
                 borrowToken: wstETH_ADDRESS,
                 baseWithdrawalLimitInUSD: 10_000_000, // $10M
@@ -128,9 +128,9 @@ contract PayloadIGP86 is PayloadIGPMain {
             address ezETH_ETH__wstETH_VAULT = getVaultAddress(104);
 
             // [TYPE 2] ezETH-ETH<>wstETH | smart collateral & normal debt
-            Vault memory VAULT_ezETH_ETH_wstETH = Vault({
+            VaultConfig memory VAULT_ezETH_ETH_wstETH = VaultConfig({
                 vault: ezETH_ETH__wstETH_VAULT,
-                vaultType: TYPE.TYPE_2,
+                vaultType: VAULT_TYPE.TYPE_2,
                 supplyToken: address(0),
                 borrowToken: wstETH_ADDRESS,
                 baseWithdrawalLimitInUSD: 0,
@@ -154,7 +154,7 @@ contract PayloadIGP86 is PayloadIGPMain {
 
         {
             // launch limits
-            Dex memory DEX_cbBTC_ETH = Dex({
+            DexConfig memory DEX_cbBTC_ETH = DexConfig({
                 dex: cbBTC_ETH_DEX_ADDRESS,
                 tokenA: cbBTC_ADDRESS,
                 tokenB: ETH_ADDRESS,
@@ -285,9 +285,9 @@ contract PayloadIGP86 is PayloadIGPMain {
     function action7() internal isActionSkippable(7) {
         {
             // [TYPE 2] ETH-weETH  | wstETH | Smart collateral & debt
-            Vault memory VAULT_weETH_ETH_AND_wsETH = Vault({
+            VaultConfig memory VAULT_weETH_ETH_AND_wsETH = VaultConfig({
                 vault: getVaultAddress(74),
-                vaultType: TYPE.TYPE_2,
+                vaultType: VAULT_TYPE.TYPE_2,
                 supplyToken: address(0),
                 borrowToken: wstETH_ADDRESS,
                 baseWithdrawalLimitInUSD: 0, // set at Dex
@@ -315,7 +315,7 @@ contract PayloadIGP86 is PayloadIGPMain {
             address sUSDe_USDT_DEX = getDexAddress(15);
             {
                 // Set max sypply shares
-                IFluidDex(sUSDe_USDT_DEX).updateMaxSypplyShares(
+                IFluidDex(sUSDe_USDT_DEX).updateMaxSupplyShares(
                     30_000_000 * 1e18
                 );
             }
