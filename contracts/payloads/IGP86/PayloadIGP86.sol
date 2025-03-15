@@ -184,20 +184,20 @@ contract PayloadIGP86 is PayloadIGPMain {
     // @notice Action 3: Update base limits for all DEXes according to their caps
     function action3() internal isActionSkippable(3) {
         // Update each DEX individually with their specific USD caps
-        updateDexBaseLimits(1, 40_000_000, 38_000_000); // wstETH-ETH DEX (Smart Collateral & Smart Debt)
-        updateDexBaseLimits(2, 0, 75_000_000); // USDC-USDT DEX (Smart Debt only)
-        updateDexBaseLimits(3, 40_000_000, 38_000_000); // cbBTC-WBTC DEX (Smart Collateral & Smart Debt)
-        updateDexBaseLimits(4, 10_380_445, 8_264_211); // GHO-USDC DEX (Smart Collateral & Smart Debt)
+        updateDexBaseLimits(1, 32_000_000, 28_000_000); // wstETH-ETH DEX (Smart Collateral & Smart Debt)
+        updateDexBaseLimits(2, 0, 60_000_000); // USDC-USDT DEX (Smart Debt only)
+        updateDexBaseLimits(3, 30_000_000, 21_000_000); // cbBTC-WBTC DEX (Smart Collateral & Smart Debt)
+        updateDexBaseLimits(4, 10_000_000, 8_000_000); // GHO-USDC DEX (Smart Collateral & Smart Debt)
         //        updateDexBaseLimits(5, 0, 0);                     // Skip DEX 5
         //        updateDexBaseLimits(6, 0, 0);                     // Skip DEX 6
         //        updateDexBaseLimits(7, 0, 0);                     // Skip DEX 7
         //        updateDexBaseLimits(8, 0, 0);                     // Skip DEX 8
-        updateDexBaseLimits(9, 42_000_000, 0); // weETH-ETH DEX (Smart Collateral Only)
+        updateDexBaseLimits(9, 38_000_000, 0); // weETH-ETH DEX (Smart Collateral Only)
         //        updateDexBaseLimits(10, 0, 0);                    // Skip DEX 10
         updateDexBaseLimits(11, 15_000_000, 0); // FLUID-ETH DEX (-)
-        updateDexBaseLimits(12, 50_000_000, 40_000_000); // USDC-ETH DEX (Smart Collateral & Smart Debt)
-        updateDexBaseLimits(13, 20_000_000, 0); // rsETH-ETH DEX (Smart Collateral Only)
-        updateDexBaseLimits(14, 10_000_000, 0); // weETHs-ETH DEX (Smart Collateral Only)
+        updateDexBaseLimits(12, 70_000_000, 50_000_000); // USDC-ETH DEX (Smart Collateral & Smart Debt)
+        updateDexBaseLimits(13, 12_500_000, 0); // rsETH-ETH DEX (Smart Collateral Only)
+        updateDexBaseLimits(14, 6_500_000, 0); // weETHs-ETH DEX (Smart Collateral Only)
         updateDexBaseLimits(15, 60_000_000, 0); // sUSDe-USDT DEX (Smart Collateral Only)
         updateDexBaseLimits(16, 20_000_000, 0); // eBTC-cbBTC DEX (Smart Collateral Only)
         updateDexBaseLimits(17, 20_000_000, 0); // LBTC-cbBTC DEX (Smart Collateral Only)
@@ -225,8 +225,8 @@ contract PayloadIGP86 is PayloadIGPMain {
 
         // Set the creation code in the factory
         ISmartLendingFactory(SMART_LENDING_FACTORY).setSmartLendingCreationCode(
-            creationCode
-        );
+                creationCode
+            );
     }
 
     // @notice Action 5: Transfer 311k FLUID to Team Multisig
