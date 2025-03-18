@@ -82,7 +82,7 @@ contract PayloadIGP87 is PayloadIGPMain {
 
         // Update Trading Fee
         IFluidDex(sUSDe_USDT_DEX_ADDRESS).updateFeeAndRevenueCut(
-            0.01 * 1e4, // 0.01%
+            0.02 * 1e4, // 0.02%
             0
         );
     }
