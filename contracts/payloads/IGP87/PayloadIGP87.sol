@@ -41,14 +41,9 @@ contract PayloadIGP87 is PayloadIGPMain {
         // Action 1: Increase Borrow Cap for wstETH/ETH vault
         action1();
 
-        // Action 2: Set dust limits for LBTC<>stable vaults
+        // Action 2: Update sUSDe-USDT DEX pool fee
         action2();
 
-        // Action 3: Set dust limits for RLP/USDC vault
-        action3();
-
-        // Action 4: Set dust limits for wstUSR vaults and DEX
-        action4();
     }
 
     function verifyProposal() public view override {}
@@ -73,171 +68,23 @@ contract PayloadIGP87 is PayloadIGPMain {
             vaultType: VAULT_TYPE.TYPE_1,
             supplyToken: wstETH_ADDRESS,
             borrowToken: ETH_ADDRESS,
-            baseWithdrawalLimitInUSD: 15_000_000, // $15M
-            baseBorrowLimitInUSD: 15_000_000, // $15M
-            maxBorrowLimitInUSD: 175_000_000 // $175M
+            baseWithdrawalLimitInUSD: 20_000_000, // $20M
+            baseBorrowLimitInUSD: 20_000_000, // $20M
+            maxBorrowLimitInUSD: 400_000_000 // $400M
         });
 
         setVaultLimits(VAULT_wstETH_ETH); // TYPE_1 => 13
     }
 
-    // @notice Action 2: Set dust limits for LBTC<>stable vaults
+    // @notice Action 2: Update sUSDe-USDT pool fee
     function action2() internal isActionSkippable(2) {
-        {
-            address LBTC_USDC_VAULT = getVaultAddress(107);
+        address sUSDe_USDT_DEX_ADDRESS = getDexAddress(15);
 
-            // [TYPE 1] LBTC/USDC vault
-            VaultConfig memory VAULT_LBTC_USDC = VaultConfig({
-                vault: LBTC_USDC_VAULT,
-                vaultType: VAULT_TYPE.TYPE_1,
-                supplyToken: LBTC_ADDRESS,
-                borrowToken: USDC_ADDRESS,
-                baseWithdrawalLimitInUSD: 10_000, // $10k
-                baseBorrowLimitInUSD: 10_000, // $10k
-                maxBorrowLimitInUSD: 15_000 // $15k
-            });
-
-            setVaultLimits(VAULT_LBTC_USDC); // TYPE_1 => 107
-
-            VAULT_FACTORY.setVaultAuth(LBTC_USDC_VAULT, TEAM_MULTISIG, true);
-        }
-
-        {
-            address LBTC_USDT_VAULT = getVaultAddress(108);
-
-            // [TYPE 1] LBTC/USDT vault
-            VaultConfig memory VAULT_LBTC_USDT = VaultConfig({
-                vault: LBTC_USDT_VAULT,
-                vaultType: VAULT_TYPE.TYPE_1,
-                supplyToken: LBTC_ADDRESS,
-                borrowToken: USDT_ADDRESS,
-                baseWithdrawalLimitInUSD: 10_000, // $10k
-                baseBorrowLimitInUSD: 10_000, // $10k
-                maxBorrowLimitInUSD: 15_000 // $15k
-            });
-
-            setVaultLimits(VAULT_LBTC_USDT); // TYPE_1 => 108
-
-            VAULT_FACTORY.setVaultAuth(LBTC_USDT_VAULT, TEAM_MULTISIG, true);
-        }
-
-        {
-            address LBTC_GHO_VAULT = getVaultAddress(109);
-
-            // [TYPE 1] LBTC/GHO vault
-            VaultConfig memory VAULT_LBTC_GHO = VaultConfig({
-                vault: LBTC_GHO_VAULT,
-                vaultType: VAULT_TYPE.TYPE_1,
-                supplyToken: LBTC_ADDRESS,
-                borrowToken: GHO_ADDRESS,
-                baseWithdrawalLimitInUSD: 10_000, // $10k
-                baseBorrowLimitInUSD: 10_000, // $10k
-                maxBorrowLimitInUSD: 15_000 // $15k
-            });
-
-            setVaultLimits(VAULT_LBTC_GHO); // TYPE_1 => 109
-
-            VAULT_FACTORY.setVaultAuth(LBTC_GHO_VAULT, TEAM_MULTISIG, true);
-        }
-    }
-
-    // @notice Action 3: Set dust limits for RLP/USDC vault
-    function action3() internal isActionSkippable(3) {
-        address RLP_USDC_VAULT = getVaultAddress(110);
-
-        // [TYPE 1] RLP/USDC vault
-        VaultConfig memory VAULT_RLP_USDC = VaultConfig({
-            vault: RLP_USDC_VAULT,
-            vaultType: VAULT_TYPE.TYPE_1,
-            supplyToken: RLP_ADDRESS,
-            borrowToken: USDC_ADDRESS,
-            baseWithdrawalLimitInUSD: 10_000, // $10k
-            baseBorrowLimitInUSD: 10_000, // $10k
-            maxBorrowLimitInUSD: 15_000 // $15k
-        });
-
-        setVaultLimits(VAULT_RLP_USDC); // TYPE_1 => 110
-
-        VAULT_FACTORY.setVaultAuth(RLP_USDC_VAULT, TEAM_MULTISIG, true);
-    }
-
-    // @notice Action 4: Set dust limits for wstUSR vaults and DEX
-    function action4() internal isActionSkippable(4) {
-        {
-            address wstUSR_USDC_DEX = getDexAddress(27);
-
-            // wstUSR-USDC DEX
-            DexConfig memory DEX_wstUSR_USDC = DexConfig({
-                dex: wstUSR_USDC_DEX,
-                tokenA: wstUSR_ADDRESS,
-                tokenB: USDC_ADDRESS,
-                smartCollateral: true,
-                smartDebt: true,
-                baseWithdrawalLimitInUSD: 10_000, // $10k
-                baseBorrowLimitInUSD: 10_000, // $10k
-                maxBorrowLimitInUSD: 15_000 // $15k
-            });
-            setDexLimits(DEX_wstUSR_USDC); // Smart Collateral & Smart Debt
-
-            DEX_FACTORY.setDexAuth(wstUSR_USDC_DEX, TEAM_MULTISIG, true);
-        }
-
-        {
-            address wstUSR_USDC_VAULT = getVaultAddress(111);
-
-            // [TYPE 1] wstUSR/USDC vault
-            VaultConfig memory VAULT_wstUSR_USDC = VaultConfig({
-                vault: wstUSR_USDC_VAULT,
-                vaultType: VAULT_TYPE.TYPE_1,
-                supplyToken: wstUSR_ADDRESS,
-                borrowToken: USDC_ADDRESS,
-                baseWithdrawalLimitInUSD: 10_000, // $10k
-                baseBorrowLimitInUSD: 10_000, // $10k
-                maxBorrowLimitInUSD: 15_000 // $15k
-            });
-
-            setVaultLimits(VAULT_wstUSR_USDC); // TYPE_1 => 111
-
-            VAULT_FACTORY.setVaultAuth(wstUSR_USDC_VAULT, TEAM_MULTISIG, true);
-        }
-
-        {
-            address wstUSR_USDT_VAULT = getVaultAddress(112);
-
-            // [TYPE 1] wstUSR/USDT vault
-            VaultConfig memory VAULT_wstUSR_USDT = VaultConfig({
-                vault: wstUSR_USDT_VAULT,
-                vaultType: VAULT_TYPE.TYPE_1,
-                supplyToken: wstUSR_ADDRESS,
-                borrowToken: USDT_ADDRESS,
-                baseWithdrawalLimitInUSD: 10_000, // $10k
-                baseBorrowLimitInUSD: 10_000, // $10k
-                maxBorrowLimitInUSD: 15_000 // $15k
-            });
-
-            setVaultLimits(VAULT_wstUSR_USDT); // TYPE_1 => 112
-
-            VAULT_FACTORY.setVaultAuth(wstUSR_USDT_VAULT, TEAM_MULTISIG, true);
-        }
-
-        {
-            address wstUSR_USDC__USDT_VAULT = getVaultAddress(113);
-
-            // [TYPE 2] wstUSR-USDC<>USDT vault
-            VaultConfig memory VAULT_wstUSR_USDC_USDT = VaultConfig({
-                vault: wstUSR_USDC__USDT_VAULT,
-                vaultType: VAULT_TYPE.TYPE_2,
-                supplyToken: address(0),
-                borrowToken: USDT_ADDRESS,
-                baseWithdrawalLimitInUSD: 0, // set at DEX
-                baseBorrowLimitInUSD: 10_000, // $10k
-                maxBorrowLimitInUSD: 15_000 // $15k
-            });
-
-            setVaultLimits(VAULT_wstUSR_USDC_USDT); // TYPE_2 => 113
-
-            VAULT_FACTORY.setVaultAuth(wstUSR_USDC__USDT_VAULT, TEAM_MULTISIG, true);
-        }
+        // Update Trading Fee
+        IFluidDex(sUSDe_USDT_DEX_ADDRESS).updateFeeAndRevenueCut(
+            0.01 * 1e4, // 0.01%
+            0
+        );
     }
 
     /**
