@@ -46,6 +46,9 @@ contract PayloadIGP89 is PayloadIGPMain {
 
         // Action 3: Set dust limits for wstUSR vaults and DEX
         action3();
+
+        // Action 4: Update supply shares for cbBTC-wBTC Dex pool
+        action4();
     }
 
     function verifyProposal() public view override {}
@@ -199,7 +202,14 @@ contract PayloadIGP89 is PayloadIGPMain {
             VAULT_FACTORY.setVaultAuth(wstUSR_USDC__USDC_VAULT, TEAM_MULTISIG, true);
         }
     }
+    /// @notice Action 4: Update supply shares for cbBTC-wBTC Dex pool
+    function action4() internal isActionSkippable(4) {
+        address CBBTC_WBTC_DEX_ADDRESS = getDexAddress(3);
 
+        // Update max supply shares on dex
+        IFluidDex(CBBTC_WBTC_DEX_ADDRESS).updateMaxSupplyShares(
+            250 * 1e18 // 250 shares
+        );
     /**
      * |
      * |     Payload Actions End Here      |
