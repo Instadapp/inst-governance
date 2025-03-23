@@ -102,7 +102,28 @@ contract PayloadIGP89 is PayloadIGPMain {
 
             VAULT_FACTORY.setVaultAuth(LBTC_USDT_VAULT, TEAM_MULTISIG, true);
         }
+
+        {
+            address LBTC_GHO_VAULT = getVaultAddress(109);
+
+            // [TYPE 1] LBTC/GHO vault
+            VaultConfig memory VAULT_LBTC_GHO = VaultConfig({
+                vault: LBTC_GHO_VAULT,
+                vaultType: VAULT_TYPE.TYPE_1,
+                supplyToken: LBTC_ADDRESS,
+                borrowToken: GHO_ADDRESS,
+                baseWithdrawalLimitInUSD: 10_000, // $10k
+                baseBorrowLimitInUSD: 10_000, // $10k
+                maxBorrowLimitInUSD: 15_000 // $15k
+            });
+
+            setVaultLimits(VAULT_LBTC_GHO); // TYPE_1 => 109
+
+            VAULT_FACTORY.setVaultAuth(LBTC_GHO_VAULT, TEAM_MULTISIG, true);
+        }
     }
+
+
 
     // @notice Action 2: Set dust limits for RLP-USDC DEX
     function action2() internal isActionSkippable(2) {
@@ -146,7 +167,7 @@ contract PayloadIGP89 is PayloadIGPMain {
         }
 
         {
-            address wstUSR_USDC_VAULT = getVaultAddress(111);
+            address wstUSR_USDC_VAULT = getVaultAddress(110);
 
             // [TYPE 1] wstUSR/USDC vault
             VaultConfig memory VAULT_wstUSR_USDC = VaultConfig({
@@ -159,13 +180,13 @@ contract PayloadIGP89 is PayloadIGPMain {
                 maxBorrowLimitInUSD: 15_000 // $15k
             });
 
-            setVaultLimits(VAULT_wstUSR_USDC); // TYPE_1 => 111
+            setVaultLimits(VAULT_wstUSR_USDC); // TYPE_1 => 110
 
             VAULT_FACTORY.setVaultAuth(wstUSR_USDC_VAULT, TEAM_MULTISIG, true);
         }
 
         {
-            address wstUSR_USDT_VAULT = getVaultAddress(112);
+            address wstUSR_USDT_VAULT = getVaultAddress(111);
 
             // [TYPE 1] wstUSR/USDT vault
             VaultConfig memory VAULT_wstUSR_USDT = VaultConfig({
@@ -178,13 +199,13 @@ contract PayloadIGP89 is PayloadIGPMain {
                 maxBorrowLimitInUSD: 15_000 // $15k
             });
 
-            setVaultLimits(VAULT_wstUSR_USDT); // TYPE_1 => 112
+            setVaultLimits(VAULT_wstUSR_USDT); // TYPE_1 => 111
 
             VAULT_FACTORY.setVaultAuth(wstUSR_USDT_VAULT, TEAM_MULTISIG, true);
         }
 
         {
-            address wstUSR_USDC__USDC_VAULT = getVaultAddress(113);
+            address wstUSR_USDC__USDC_VAULT = getVaultAddress(112);
 
             // [TYPE 2] wstUSR-USDC<>USDC vault
             VaultConfig memory VAULT_wstUSR_USDC_USDC = VaultConfig({
@@ -197,7 +218,7 @@ contract PayloadIGP89 is PayloadIGPMain {
                 maxBorrowLimitInUSD: 15_000 // $15k
             });
 
-            setVaultLimits(VAULT_wstUSR_USDC_USDC); // TYPE_2 => 113
+            setVaultLimits(VAULT_wstUSR_USDC_USDC); // TYPE_2 => 112
 
             VAULT_FACTORY.setVaultAuth(wstUSR_USDC__USDC_VAULT, TEAM_MULTISIG, true);
         }
@@ -210,6 +231,7 @@ contract PayloadIGP89 is PayloadIGPMain {
         IFluidDex(CBBTC_WBTC_DEX_ADDRESS).updateMaxSupplyShares(
             250 * 1e18 // 250 shares
         );
+    }
     /**
      * |
      * |     Payload Actions End Here      |
