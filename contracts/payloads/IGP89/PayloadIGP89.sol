@@ -123,8 +123,6 @@ contract PayloadIGP89 is PayloadIGPMain {
         }
     }
 
-
-
     // @notice Action 2: Set dust limits for RLP-USDC DEX
     function action2() internal isActionSkippable(2) {
         address RLP_USDC_DEX = getDexAddress(27);
