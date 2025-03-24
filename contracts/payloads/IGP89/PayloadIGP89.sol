@@ -49,6 +49,9 @@ contract PayloadIGP89 is PayloadIGPMain {
 
         // Action 4: Update supply shares for cbBTC-wBTC Dex pool
         action4();
+
+        // Action 5: Update USDC-USDT Dex Fee Handler
+        action5();
     }
 
     function verifyProposal() public view override {}
@@ -230,6 +233,22 @@ contract PayloadIGP89 is PayloadIGPMain {
             250 * 1e18 // 250 shares
         );
     }
+
+    /// @notice Action 5: Update USDC-USDT Dex auth
+    function action5() internal isActionSkippable(5) {
+        address USDC_USDT_DEX = getDexAddress(2);
+
+        // Fee Handler Addresses
+        address oldFeeHandler = 0x30F509D6B5c33c15909D4B7257202c79b4dC1183;
+        address newFeeHandler = 0x65454D16A39c7b5b52A67116FC1cf0a5e5942EFd;
+
+        // Remove old handler as auth
+        DEX_FACTORY.setDexAuth(USDC_USDT_DEX, oldFeeHandler, false);
+
+        // Add new handler as auth
+        DEX_FACTORY.setDexAuth(USDC_USDT_DEX, newFeeHandler, true);
+    }
+    
     /**
      * |
      * |     Payload Actions End Here      |
