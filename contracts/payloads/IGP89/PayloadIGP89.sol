@@ -56,6 +56,9 @@ contract PayloadIGP89 is PayloadIGPMain {
         // Action 6: Set dust limits for WBTC<>LBTC DEX
         action6();
 
+        // Action 7: Update Min Max center price of cbBTC-WBTC DEX
+        action7();
+
     }
 
     function verifyProposal() public view override {}
@@ -314,6 +317,19 @@ contract PayloadIGP89 is PayloadIGPMain {
         }
     }
 
+    // @notice Action 7: Update Min Max center price of cbBTC-WBTC DEX
+    function action7() internal isActionSkippable(7) {
+        address cbBTC_wBTC_DEX_ADDRESS = getDexAddress(3);
+        {
+        // Update Min Max center prices from 0.2% to 0.15%
+            uint256 minCenterPrice_ = (998 * 1e27) / 1000;
+            uint256 maxCenterPrice_ = uint256(1e27 * 1000) / 998.5;
+            IFluidDex(cbBTC_wBTC_DEX_ADDRESS).updateCenterPriceLimits(
+                maxCenterPrice_,
+                minCenterPrice_
+            );
+        }
+    }
     /**
      * |
      * |     Payload Actions End Here      |
