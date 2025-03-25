@@ -408,7 +408,8 @@ contract PayloadIGP89 is PayloadIGPMain {
             token == USR_ADDRESS ||
             token == USD0_ADDRESS ||
             token == fxUSD_ADDRESS ||
-            token == BOLD_ADDRESS
+            token == BOLD_ADDRESS ||
+            token == wstUSR_ADDRESS
         ) {
             usdPrice = STABLE_USD_PRICE;
             decimals = 18;
