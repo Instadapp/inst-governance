@@ -44,7 +44,7 @@ contract PayloadIGP89 is PayloadIGPMain {
         // Action 2: Set dust limits for RLP-USDC DEX
         action2();
 
-        // Action 3: Set dust limits for wstUSR vaults and DEX
+        // Action 3: Set dust limits for wstUSR DEXes and vaults
         action3();
 
         // Action 4: Update supply shares for cbBTC-wBTC Dex pool
@@ -52,6 +52,10 @@ contract PayloadIGP89 is PayloadIGPMain {
 
         // Action 5: Update USDC-USDT Dex Fee Handler
         action5();
+
+        // Action 6: Set dust limits for WBTC<>LBTC DEX
+        action6();
+
     }
 
     function verifyProposal() public view override {}
@@ -75,7 +79,7 @@ contract PayloadIGP89 is PayloadIGPMain {
             VaultConfig memory VAULT_LBTC_USDC = VaultConfig({
                 vault: LBTC_USDC_VAULT,
                 vaultType: VAULT_TYPE.TYPE_1,
-                supplyToken: LBTC_ADDRESS,
+                supplyToken: lBTC_ADDRESS,
                 borrowToken: USDC_ADDRESS,
                 baseWithdrawalLimitInUSD: 10_000, // $10k
                 baseBorrowLimitInUSD: 10_000, // $10k
@@ -94,7 +98,7 @@ contract PayloadIGP89 is PayloadIGPMain {
             VaultConfig memory VAULT_LBTC_USDT = VaultConfig({
                 vault: LBTC_USDT_VAULT,
                 vaultType: VAULT_TYPE.TYPE_1,
-                supplyToken: LBTC_ADDRESS,
+                supplyToken: lBTC_ADDRESS,
                 borrowToken: USDT_ADDRESS,
                 baseWithdrawalLimitInUSD: 10_000, // $10k
                 baseBorrowLimitInUSD: 10_000, // $10k
@@ -113,7 +117,7 @@ contract PayloadIGP89 is PayloadIGPMain {
             VaultConfig memory VAULT_LBTC_GHO = VaultConfig({
                 vault: LBTC_GHO_VAULT,
                 vaultType: VAULT_TYPE.TYPE_1,
-                supplyToken: LBTC_ADDRESS,
+                supplyToken: lBTC_ADDRESS,
                 borrowToken: GHO_ADDRESS,
                 baseWithdrawalLimitInUSD: 10_000, // $10k
                 baseBorrowLimitInUSD: 10_000, // $10k
@@ -128,7 +132,7 @@ contract PayloadIGP89 is PayloadIGPMain {
 
     // @notice Action 2: Set dust limits for RLP-USDC DEX
     function action2() internal isActionSkippable(2) {
-        address RLP_USDC_DEX = getDexAddress(27);
+        address RLP_USDC_DEX = getDexAddress(28);
 
         // RLP-USDC DEX
         DexConfig memory DEX_RLP_USDC = DexConfig({
@@ -146,26 +150,8 @@ contract PayloadIGP89 is PayloadIGPMain {
         DEX_FACTORY.setDexAuth(RLP_USDC_DEX, TEAM_MULTISIG, true);
     }
 
-    // @notice Action 3: Set dust limits for wstUSR vaults and DEX
+    // @notice Action 3: Set dust limits for wstUSR DEXes and vaults
     function action3() internal isActionSkippable(3) {
-        {
-            address wstUSR_USDC_DEX = getDexAddress(28);
-
-            // wstUSR-USDC DEX
-            DexConfig memory DEX_wstUSR_USDC = DexConfig({
-                dex: wstUSR_USDC_DEX,
-                tokenA: wstUSR_ADDRESS,
-                tokenB: USDC_ADDRESS,
-                smartCollateral: true,
-                smartDebt: false,
-                baseWithdrawalLimitInUSD: 10_000, // $10k
-                baseBorrowLimitInUSD: 0, // $0
-                maxBorrowLimitInUSD: 0 // $0
-            });
-            setDexLimits(DEX_wstUSR_USDC); // Smart Collateral
-
-            DEX_FACTORY.setDexAuth(wstUSR_USDC_DEX, TEAM_MULTISIG, true);
-        }
 
         {
             address wstUSR_USDC_VAULT = getVaultAddress(110);
@@ -206,6 +192,25 @@ contract PayloadIGP89 is PayloadIGPMain {
         }
 
         {
+            address wstUSR_USDC_DEX = getDexAddress(27);
+
+            // wstUSR-USDC DEX
+            DexConfig memory DEX_wstUSR_USDC = DexConfig({
+                dex: wstUSR_USDC_DEX,
+                tokenA: wstUSR_ADDRESS,
+                tokenB: USDC_ADDRESS,
+                smartCollateral: true,
+                smartDebt: false,
+                baseWithdrawalLimitInUSD: 10_000, // $10k
+                baseBorrowLimitInUSD: 0, // $0
+                maxBorrowLimitInUSD: 0 // $0
+            });
+            setDexLimits(DEX_wstUSR_USDC); // Smart Collateral
+
+            DEX_FACTORY.setDexAuth(wstUSR_USDC_DEX, TEAM_MULTISIG, true);
+        }
+
+        {
             address wstUSR_USDC__USDC_VAULT = getVaultAddress(112);
 
             // [TYPE 2] wstUSR-USDC<>USDC vault
@@ -223,8 +228,46 @@ contract PayloadIGP89 is PayloadIGPMain {
 
             VAULT_FACTORY.setVaultAuth(wstUSR_USDC__USDC_VAULT, TEAM_MULTISIG, true);
         }
+
+        {
+            address wstUSR_USDT_DEX = getDexAddress(29);
+
+            // wstUSR-USDT DEX
+            DexConfig memory DEX_wstUSR_USDT = DexConfig({
+                dex: wstUSR_USDT_DEX,
+                tokenA: wstUSR_ADDRESS,
+                tokenB: USDT_ADDRESS,
+                smartCollateral: true,
+                smartDebt: false,
+                baseWithdrawalLimitInUSD: 10_000, // $10k
+                baseBorrowLimitInUSD: 0, // $0
+                maxBorrowLimitInUSD: 0 // $0
+            });
+            setDexLimits(DEX_wstUSR_USDT); // Smart Collateral
+            DEX_FACTORY.setDexAuth(wstUSR_USDT_DEX, TEAM_MULTISIG, true);
+        }
+
+        {
+            address wstUSR_USDT__USDT_VAULT = getVaultAddress(113);
+
+            // [TYPE 2] wstUSR-USDT<>USDT vault
+            VaultConfig memory VAULT_wstUSR_USDT_USDT = VaultConfig({
+                vault: wstUSR_USDT__USDT_VAULT,
+                vaultType: VAULT_TYPE.TYPE_2,
+                supplyToken: address(0),
+                borrowToken: USDT_ADDRESS,
+                baseWithdrawalLimitInUSD: 0, // set at DEX
+                baseBorrowLimitInUSD: 10_000, // $10k
+                maxBorrowLimitInUSD: 15_000 // $15k
+            });
+
+            setVaultLimits(VAULT_wstUSR_USDT_USDT); // TYPE_2 => 113
+
+            VAULT_FACTORY.setVaultAuth(wstUSR_USDT__USDT_VAULT, TEAM_MULTISIG, true);
+        }
     }
-    /// @notice Action 4: Update supply shares for cbBTC-wBTC Dex pool
+
+    // @notice Action 4: Update supply shares for cbBTC-wBTC Dex pool
     function action4() internal isActionSkippable(4) {
         address CBBTC_WBTC_DEX_ADDRESS = getDexAddress(3);
 
@@ -234,7 +277,7 @@ contract PayloadIGP89 is PayloadIGPMain {
         );
     }
 
-    /// @notice Action 5: Update USDC-USDT Dex auth
+    // @notice Action 5: Update USDC-USDT Dex auth
     function action5() internal isActionSkippable(5) {
         address USDC_USDT_DEX = getDexAddress(2);
 
@@ -248,7 +291,29 @@ contract PayloadIGP89 is PayloadIGPMain {
         // Add new handler as auth
         DEX_FACTORY.setDexAuth(USDC_USDT_DEX, newFeeHandler, true);
     }
-    
+
+    // @notice Action 6: Set dust limits for WBTC<>LBTC DEX
+    function action6() internal isActionSkippable(6) {
+        address WBTC_LBTC_DEX = getDexAddress(30);
+
+        {
+            // WBTC-LBTC Dex
+            DexConfig memory DEX_WBTC_LBTC = DexConfig({
+                dex: WBTC_LBTC_DEX,
+                tokenA: WBTC_ADDRESS,
+                tokenB: lBTC_ADDRESS,
+                smartCollateral: true,
+                smartDebt: false,
+                baseWithdrawalLimitInUSD: 10_000, // $10K
+                baseBorrowLimitInUSD: 0, // $0
+                maxBorrowLimitInUSD: 0 // $0
+            });
+            setDexLimits(DEX_WBTC_LBTC); // Smart Collateral
+
+            DEX_FACTORY.setDexAuth(WBTC_LBTC_DEX, TEAM_MULTISIG, true);
+        }
+    }
+
     /**
      * |
      * |     Payload Actions End Here      |
