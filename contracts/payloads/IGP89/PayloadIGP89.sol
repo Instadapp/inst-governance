@@ -53,12 +53,14 @@ contract PayloadIGP89 is PayloadIGPMain {
         // Action 5: Update USDC-USDT Dex Fee Handler
         action5();
 
-        // Action 6: Set dust limits for WBTC<>LBTC DEX
+        // Action 6: Set dust limits for WBTC<>LBTC DEX and vault
         action6();
 
         // Action 7: Update Min Max center price of cbBTC-WBTC DEX
         action7();
 
+        // Action 8: Set dust limits for LBTC-cbBTC DEX and vaults
+        action8();
     }
 
     function verifyProposal() public view override {}
@@ -295,9 +297,10 @@ contract PayloadIGP89 is PayloadIGPMain {
         DEX_FACTORY.setDexAuth(USDC_USDT_DEX, newFeeHandler, true);
     }
 
-    // @notice Action 6: Set dust limits for WBTC<>LBTC DEX
+    // @notice Action 6: Set dust limits for WBTC<>LBTC DEX and vault
     function action6() internal isActionSkippable(6) {
         address WBTC_LBTC_DEX = getDexAddress(30);
+        address WBTC_LBTC__WBTC_VAULT = getVaultAddress(116);
 
         {
             // WBTC-LBTC Dex
@@ -315,6 +318,22 @@ contract PayloadIGP89 is PayloadIGPMain {
 
             DEX_FACTORY.setDexAuth(WBTC_LBTC_DEX, TEAM_MULTISIG, true);
         }
+
+        {
+            // [TYPE 2] WBTC-LBTC<>WBTC vault
+            VaultConfig memory VAULT_WBTC_LBTC__WBTC = VaultConfig({
+                vault: WBTC_LBTC__WBTC_VAULT,
+                vaultType: VAULT_TYPE.TYPE_2,
+                supplyToken: address(0),
+                borrowToken: WBTC_ADDRESS,
+                baseWithdrawalLimitInUSD: 0,
+                baseBorrowLimitInUSD: 10_000, // $10K
+                maxBorrowLimitInUSD: 15_000 // $15K
+            });
+            setVaultLimits(VAULT_WBTC_LBTC__WBTC);
+
+            VAULT_FACTORY.setVaultAuth(WBTC_LBTC__WBTC_VAULT, TEAM_MULTISIG, true);
+        }
     }
 
     // @notice Action 7: Update Min Max center price of cbBTC-WBTC DEX
@@ -330,6 +349,64 @@ contract PayloadIGP89 is PayloadIGPMain {
             );
         }
     }
+
+    // @notice Action 8: Set dust limits for LBTC-cbBTC DEX and vaults
+    function action8() internal isActionSkippable(8) {
+        address LBTC_cbBTC_DEX = getDexAddress(31);
+        address LBTC_cbBTC__cbBTC_VAULT = getVaultAddress(114);
+        address LBTC_cbBTC__WBTC_VAULT = getVaultAddress(115);
+
+        {
+            // LBTC-cbBTC DEX
+            DexConfig memory DEX_LBTC_cbBTC = DexConfig({
+                dex: LBTC_cbBTC_DEX,
+                tokenA: lBTC_ADDRESS,
+                tokenB: cbBTC_ADDRESS,
+                smartCollateral: true,
+                smartDebt: false,
+                baseWithdrawalLimitInUSD: 10_000, // $10K
+                baseBorrowLimitInUSD: 0, // $0
+                maxBorrowLimitInUSD: 0 // $0
+            });
+            setDexLimits(DEX_LBTC_cbBTC); // Smart Collateral
+
+            DEX_FACTORY.setDexAuth(LBTC_cbBTC_DEX, TEAM_MULTISIG, true);
+        }
+
+        {
+            // [TYPE 2] LBTC-cbBTC<>cbBTC vault
+            VaultConfig memory VAULT_LBTC_cbBTC__cbBTC = VaultConfig({
+                vault: LBTC_cbBTC__cbBTC_VAULT,
+                vaultType: VAULT_TYPE.TYPE_2,
+                supplyToken: address(0),
+                borrowToken: cbBTC_ADDRESS,
+                baseWithdrawalLimitInUSD: 0,
+                baseBorrowLimitInUSD: 10_000, // $10K
+                maxBorrowLimitInUSD: 15_000 // $15K
+            });
+            setVaultLimits(VAULT_LBTC_cbBTC__cbBTC);
+
+            VAULT_FACTORY.setVaultAuth(LBTC_cbBTC__cbBTC_VAULT, TEAM_MULTISIG, true);
+        }
+
+        {
+            // [TYPE 2] LBTC-cbBTC<>WBTC vault
+            VaultConfig memory VAULT_LBTC_cbBTC__WBTC = VaultConfig({
+                vault: LBTC_cbBTC__WBTC_VAULT,
+                vaultType: VAULT_TYPE.TYPE_2,
+                supplyToken: address(0),
+                borrowToken: WBTC_ADDRESS,
+                baseWithdrawalLimitInUSD: 0,
+                baseBorrowLimitInUSD: 10_000, // $10K
+                maxBorrowLimitInUSD: 15_000 // $15K
+            });
+            setVaultLimits(VAULT_LBTC_cbBTC__WBTC);
+
+            VAULT_FACTORY.setVaultAuth(LBTC_cbBTC__WBTC_VAULT, TEAM_MULTISIG, true);
+        }
+    }
+
+    
     /**
      * |
      * |     Payload Actions End Here      |
