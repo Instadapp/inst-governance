@@ -358,7 +358,7 @@ contract PayloadIGP89 is PayloadIGPMain {
             IFluidAdminDex.UserSupplyConfig[]
                 memory config_ = new IFluidAdminDex.UserSupplyConfig[](1);
             config_[0] = IFluidAdminDex.UserSupplyConfig({
-                user: LBTC_cbBTC_DEX,
+                user: LBTC_cbBTC__cbBTC_VAULT,
                 expandPercent: 35 * 1e2, // 35%
                 expandDuration: 6 hours, // 6 hours
                 baseWithdrawalLimit: 0.05 * 1e8 // 0.05 shares
