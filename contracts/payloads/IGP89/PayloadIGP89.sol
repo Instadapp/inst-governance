@@ -361,7 +361,7 @@ contract PayloadIGP89 is PayloadIGPMain {
                 user: LBTC_cbBTC__cbBTC_VAULT,
                 expandPercent: 35 * 1e2, // 35%
                 expandDuration: 6 hours, // 6 hours
-                baseWithdrawalLimit: 0.05 * 1e8 // 0.05 shares
+                baseWithdrawalLimit: 0.05 * 1e18 // 0.05 shares
             });
 
             IFluidDex(LBTC_cbBTC_DEX).updateUserSupplyConfigs(config_);
