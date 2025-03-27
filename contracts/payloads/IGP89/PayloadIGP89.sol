@@ -200,7 +200,7 @@ contract PayloadIGP89 is PayloadIGPMain {
         {
             address wstUSR_GHO_VAULT = getVaultAddress(112);
 
-            // [TYPE 1] wstUSR/USDT vault
+            // [TYPE 1] wstUSR/GHO vault
             VaultConfig memory VAULT_wstUSR_GHO = VaultConfig({
                 vault: wstUSR_GHO_VAULT,
                 vaultType: VAULT_TYPE.TYPE_1,
@@ -358,10 +358,10 @@ contract PayloadIGP89 is PayloadIGPMain {
             IFluidAdminDex.UserSupplyConfig[]
                 memory config_ = new IFluidAdminDex.UserSupplyConfig[](1);
             config_[0] = IFluidAdminDex.UserSupplyConfig({
-                user: LBTC_cbBTC_DEX,
+                user: LBTC_cbBTC__cbBTC_VAULT,
                 expandPercent: 35 * 1e2, // 35%
                 expandDuration: 6 hours, // 6 hours
-                baseWithdrawalLimit: 110 * 1e8 // 110 shares
+                baseWithdrawalLimit: 0.05 * 1e8 // 0.05 shares
             });
 
             IFluidDex(LBTC_cbBTC_DEX).updateUserSupplyConfigs(config_);
