@@ -323,8 +323,8 @@ contract PayloadIGP89 is PayloadIGPMain {
         address cbBTC_wBTC_DEX_ADDRESS = getDexAddress(3);
         {
         // Update Min Max center prices from 0.2% to 0.15%
-            uint256 minCenterPrice_ = (998 * 1e27) / 1000;
-            uint256 maxCenterPrice_ = uint256(1e27 * 1000) / 998.5;
+            uint256 minCenterPrice_ = (9980 * 1e27) / 10000;
+            uint256 maxCenterPrice_ = uint256(1e27 * 10000) / 9985;
             IFluidDex(cbBTC_wBTC_DEX_ADDRESS).updateCenterPriceLimits(
                 maxCenterPrice_,
                 minCenterPrice_
@@ -392,6 +392,9 @@ contract PayloadIGP89 is PayloadIGPMain {
     uint256 public constant sUSDs_USD_PRICE = 1.02 * 1e2;
 
     uint256 public constant FLUID_USD_PRICE = 5 * 1e2;
+
+    uint256 public constant RLP_USD_PRICE = 1.16 * 1e2;
+    uint256 public constant wstUSR_USD_PRICE = 1.07 * 1e2;
 
     function getRawAmount(
         address token,
