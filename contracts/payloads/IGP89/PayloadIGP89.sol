@@ -322,7 +322,7 @@ contract PayloadIGP89 is PayloadIGPMain {
     function action7() internal isActionSkippable(7) {
         address cbBTC_wBTC_DEX_ADDRESS = getDexAddress(3);
         {
-        // Update Min Max center prices from 0.2% to 0.15%
+        // Update Min Max center prices from 0.15% to 0.15%
             uint256 minCenterPrice_ = (9985 * 1e27) / 10000;
             uint256 maxCenterPrice_ = uint256(1e27 * 10000) / 9985;
             IFluidDex(cbBTC_wBTC_DEX_ADDRESS).updateCenterPriceLimits(
