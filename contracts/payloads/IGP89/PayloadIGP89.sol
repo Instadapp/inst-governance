@@ -460,9 +460,6 @@ contract PayloadIGP89 is PayloadIGPMain {
         } else if (token == sUSDs_ADDRESS) {
             usdPrice = sUSDs_USD_PRICE;
             decimals = 18;
-        } else if (token == wstUSR_ADDRESS) {
-            usdPrice = wstUSR_USD_PRICE;
-            decimals = 18;
         } else if (
             token == GHO_ADDRESS ||
             token == USDe_ADDRESS ||
@@ -476,6 +473,12 @@ contract PayloadIGP89 is PayloadIGPMain {
             decimals = 18;
         } else if (token == INST_ADDRESS) {
             usdPrice = FLUID_USD_PRICE;
+            decimals = 18;
+        } else if (token == wstUSR_ADDRESS) {
+            usdPrice = wstUSR_USD_PRICE;
+            decimals = 18;
+        } else if (token == RLP_ADDRESS) {
+            usdPrice = RLP_USD_PRICE;
             decimals = 18;
         } else {
             revert("not-found");
