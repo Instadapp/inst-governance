@@ -377,7 +377,7 @@ contract PayloadIGP89 is PayloadIGPMain {
      */
 
     // Token Prices Constants
-    uint256 public constant ETH_USD_PRICE = 1_900 * 1e2;
+    uint256 public constant ETH_USD_PRICE = 2_000 * 1e2;
     uint256 public constant wstETH_USD_PRICE = 2_300 * 1e2;
     uint256 public constant weETH_USD_PRICE = 2_000 * 1e2;
     uint256 public constant rsETH_USD_PRICE = 1_975 * 1e2;
