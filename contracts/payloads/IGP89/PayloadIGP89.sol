@@ -389,7 +389,7 @@ contract PayloadIGP89 is PayloadIGPMain {
         }
     }
 
-    // @notice Action 10: Add wstETH-ETH Dex auth
+    // @notice Action 10: Add wstETH-ETH Dex Fee auth
     function action10() internal isActionSkippable(10) {
         address wstETH_ETH_DEX_ADDRESS = getDexAddress(1);
 
