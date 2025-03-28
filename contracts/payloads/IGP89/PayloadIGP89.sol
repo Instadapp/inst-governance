@@ -376,14 +376,14 @@ contract PayloadIGP89 is PayloadIGPMain {
 
     }
     // @notice Action 9: Update lower range of wstETH-ETH DEX
-    function action6() internal {
+    function action9() internal {
         address wstETH_ETH_DEX_ADDRESS = getDexAddress(1);
 
         {
             // Update Lower Range
             IFluidDex(wstETH_ETH_DEX_ADDRESS).updateRangePercents(
+                0.0001 * 1e4, // 0.0001%
                 0.09 * 1e4, // 0.09%
-                0.1 * 1e4, // 0.1%
                 0
             );
         }
