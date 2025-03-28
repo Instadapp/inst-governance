@@ -35,6 +35,8 @@ import {PayloadIGPMain} from "../common/main.sol";
 contract PayloadIGP89 is PayloadIGPMain {
     uint256 public constant PROPOSAL_ID = 89;
 
+    uint256 public FEE_AND_REVENUE_CUT_FEE = 0.1 * 1e4; // 0.1% fee
+
     function execute() public virtual override {
         super.execute();
 
@@ -67,13 +69,31 @@ contract PayloadIGP89 is PayloadIGPMain {
 
         // Action 10: Add wstETH-ETH Dex Fee Auth
         action10(); 
-        
+
+        // Action 11: Update fee of USDC-ETH DEX
+        action11();
     }
 
     function verifyProposal() public view override {}
 
     function _PROPOSAL_ID() internal view override returns (uint256) {
         return PROPOSAL_ID;
+    }
+
+    /**
+     * |
+     * |     Multisig Functions           |
+     * |__________________________________
+     */
+
+    function setState(uint256 USDC_ETH_FEE_) external {
+        require(msg.sender == TEAM_MULTISIG, "not multisig");
+
+        {
+            // Update Fee
+            if (USDC_ETH_FEE_ >= 0.05 * 1e4 && USDC_ETH_FEE_ <= 0.15 * 1e4) revert("invalid fee");
+            FEE_AND_REVENUE_CUT_FEE = USDC_ETH_FEE_;
+        }
     }
 
     /**
@@ -375,8 +395,9 @@ contract PayloadIGP89 is PayloadIGPMain {
         }
 
     }
+
     // @notice Action 9: Update lower range of wstETH-ETH DEX
-    function action9() internal {
+    function action9() internal isActionSkippable(9) {
         address wstETH_ETH_DEX_ADDRESS = getDexAddress(1);
 
         {
@@ -397,6 +418,19 @@ contract PayloadIGP89 is PayloadIGPMain {
 
         // Add new handler as auth
         DEX_FACTORY.setDexAuth(wstETH_ETH_DEX_ADDRESS, newFeeHandler, true);
+    }
+
+    // @notice Action 11: Update fee of USDC-ETH DEX
+    function action11() internal isActionSkippable(11) {
+        address USDC_ETH_DEX_ADDRESS = getDexAddress(12);
+
+        // default fee is 0.1%
+        uint256 fee_ = PayloadIGP89(address(this)).FEE_AND_REVENUE_CUT_FEE();
+
+        {
+            // Update Fee
+            IFluidDex(USDC_ETH_DEX_ADDRESS).updateFeeAndRevenueCut(fee_, 0);
+        }
     }
     
     /**
