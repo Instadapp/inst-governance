@@ -271,7 +271,7 @@ contract PayloadIGP89 is PayloadIGPMain {
         );
     }
 
-    // @notice Action 5: Update USDC-USDT Dex auth
+    // @notice Action 5: Update USDC-USDT Dex Fee auth
     function action5() internal isActionSkippable(5) {
         address USDC_USDT_DEX = getDexAddress(2);
 
