@@ -65,7 +65,7 @@ contract PayloadIGP89 is PayloadIGPMain {
         // Action 9: Update lower range of wstETH-ETH DEX
         action9();
 
-        // Action 10: Add wstETH-ETH Dex Auth
+        // Action 10: Add wstETH-ETH Dex Fee Auth
         action10(); 
         
     }
