@@ -35,7 +35,7 @@ import {PayloadIGPMain} from "../common/main.sol";
 contract PayloadIGP89 is PayloadIGPMain {
     uint256 public constant PROPOSAL_ID = 89;
 
-    uint256 public FEE_AND_REVENUE_CUT_FEE = 0.1 * 1e4; // 0.1% fee
+    uint256 public USDC_ETH_FEE = 0.1 * 1e4; // 0.1% fee
 
     function execute() public virtual override {
         super.execute();
@@ -92,7 +92,7 @@ contract PayloadIGP89 is PayloadIGPMain {
         {
             // Update Fee
             if (USDC_ETH_FEE_ >= 0.05 * 1e4 && USDC_ETH_FEE_ <= 0.15 * 1e4) revert("invalid fee");
-            FEE_AND_REVENUE_CUT_FEE = USDC_ETH_FEE_;
+            USDC_ETH_FEE = USDC_ETH_FEE_;
         }
     }
 
@@ -425,7 +425,7 @@ contract PayloadIGP89 is PayloadIGPMain {
         address USDC_ETH_DEX_ADDRESS = getDexAddress(12);
 
         // default fee is 0.1%
-        uint256 fee_ = PayloadIGP89(ADDRESS_THIS).FEE_AND_REVENUE_CUT_FEE();
+        uint256 fee_ = PayloadIGP89(ADDRESS_THIS).USDC_ETH_FEE();
 
         {
             // Update Fee
