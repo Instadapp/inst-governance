@@ -44,13 +44,10 @@ module.exports = {
       },
       blockGasLimit: 12000000,
     },
-    // mainnet: {
-    //   url: `https://eth.llamarpc.com`,
-    //   accounts: !PRIVATE_KEY ? [] : [ `0x${PRIVATE_KEY}`],
-    // },
     mainnet: {
-      url: "https://virtual.mainnet.rpc.tenderly.co/27fd1115-d23e-4fcc-82b8-3d417f57f457"
-    }
+      url: `https://eth.llamarpc.com`,
+      accounts: !PRIVATE_KEY ? [] : [ `0x${PRIVATE_KEY}`],
+    },
   },
   etherscan: {
     apiKey: process.env.ETHERSCAN
