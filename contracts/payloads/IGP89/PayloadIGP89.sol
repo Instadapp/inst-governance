@@ -368,7 +368,29 @@ contract PayloadIGP89 is PayloadIGPMain {
         }
 
     }
+    // @notice Action 9: Update lower range of wstETH-ETH DEX
+    function action6() internal {
+        address wstETH_ETH_DEX_ADDRESS = getDexAddress(1);
 
+        {
+            // Update Lower Range
+            IFluidDex(wstETH_ETH_DEX_ADDRESS).updateRangePercents(
+                0.09 * 1e4, // 0.09%
+                0.1 * 1e4, // 0.1%
+                0
+            );
+        }
+    }
+
+    // @notice Action 10: Add wstETH-ETH Dex auth
+    function action10() internal isActionSkippable(10) {
+        address wstETH_ETH_DEX_ADDRESS = getDexAddress(1);
+
+        address newFeeHandler = 0x1FAf33c33ce81DC86fe50ba5b6F3417aBEC01d6E;
+
+        // Add new handler as auth
+        DEX_FACTORY.setDexAuth(wstETH_ETH_DEX_ADDRESS, newFeeHandler, true);
+    }
     
     /**
      * |
