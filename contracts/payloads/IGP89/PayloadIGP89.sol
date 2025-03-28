@@ -61,6 +61,13 @@ contract PayloadIGP89 is PayloadIGPMain {
 
         // Action 8: Set dust limits for LBTC-cbBTC DEX and vaults
         action8();
+        
+        // Action 9: Update lower range of wstETH-ETH DEX
+        action9();
+
+        // Action 10: Add wstETH-ETH Dex Auth
+        action10(); 
+        
     }
 
     function verifyProposal() public view override {}
