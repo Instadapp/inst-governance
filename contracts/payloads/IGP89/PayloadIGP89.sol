@@ -425,7 +425,7 @@ contract PayloadIGP89 is PayloadIGPMain {
         address USDC_ETH_DEX_ADDRESS = getDexAddress(12);
 
         // default fee is 0.1%
-        uint256 fee_ = PayloadIGP89(address(this)).FEE_AND_REVENUE_CUT_FEE();
+        uint256 fee_ = PayloadIGP89(ADDRESS_THIS).FEE_AND_REVENUE_CUT_FEE();
 
         {
             // Update Fee
