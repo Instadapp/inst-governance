@@ -45,12 +45,9 @@ module.exports = {
       blockGasLimit: 12000000,
     },
     mainnet: {
-      url: `https://1rpc.io/eth`,
+      url: `https://eth.llamarpc.com`,
       accounts: !PRIVATE_KEY ? [] : [ `0x${PRIVATE_KEY}`],
     },
-    // mainnet: {
-    //   url: ""
-    // }
   },
   etherscan: {
     apiKey: process.env.ETHERSCAN

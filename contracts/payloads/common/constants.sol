@@ -132,6 +132,11 @@ contract PayloadIGPConstants {
     address internal constant FLUID_ADDRESS =
         0x6f40d4A6237C257fff2dB00FA0510DeEECd303eb;
 
+    address internal constant RLP_ADDRESS =
+        0x4956b52aE2fF65D74CA2d61207523288e4528f96;
+    address internal constant wstUSR_ADDRESS =
+        0x1202F5C7b4B9E47a1A484E8B270be34dbbC75055;
+
     // fTokens
     address internal constant F_USDT_ADDRESS = 0x5C20B550819128074FD538Edf79791733ccEdd18;
     address internal constant F_USDC_ADDRESS = 0x9Fb7b4477576Fe5B32be4C1843aFB1e55F251B33;
