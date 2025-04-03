@@ -42,7 +42,7 @@ contract PayloadIGP90 is PayloadIGPMain {
         action1();
 
         // Action 2: Add USDe-USDT Dex Fee Handler
-        action5();
+        action2();
 
     }
 
