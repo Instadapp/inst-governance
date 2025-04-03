@@ -43,6 +43,10 @@ contract PayloadIGPHelpers is PayloadIGPConstants {
         return DEX_FACTORY.getDexAddress(dexId_);
     }
 
+    function getTradingFees(uint256 dexId_) public view returns (uint256) {
+        return DEX_FACTORY.getTradingFees(dexId_);
+    }
+
     /// @dev gets a smart lending address based on the underlying dexId
     function getSmartLendingAddress(
         uint256 dexId_
