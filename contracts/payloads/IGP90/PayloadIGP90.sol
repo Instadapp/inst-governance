@@ -238,7 +238,7 @@ contract PayloadIGP90 is PayloadIGPMain {
         address USDe_USDT_DEX = getDexAddress(18);
 
         // Fee Handler Addresses
-        address FeeHandler = address(0); // <update address>
+        address FeeHandler = 0x855BaEf2EEBf4238e6e509c85a5277a3c5A38f9D;
 
         // Add new handler as auth
         DEX_FACTORY.setDexAuth(USDe_USDT_DEX, FeeHandler, true);
