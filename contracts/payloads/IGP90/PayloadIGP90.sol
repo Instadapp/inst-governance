@@ -59,7 +59,7 @@ contract PayloadIGP90 is PayloadIGPMain {
      */
 
 
-    // @notice Action 1: Update fee of USDC-ETH DEX
+    // @notice Action 1: Add 25% governance fee on all stable DEXes
     function action1() internal isActionSkippable(1) {
         {
             // wstETH-ETH DEX (Smart Collateral & Smart Debt)
@@ -67,7 +67,7 @@ contract PayloadIGP90 is PayloadIGPMain {
             uint256 fee_ = getTradingFees(1); // Fetch Current fee: dynamic
             IFluidDex(wstETH_ETH_DEX_ADDRESS).updateFeeAndRevenueCut(
                 fee_,
-                0.25 * fee_
+                25 * 1e4 * fee_
             );
         }
         
@@ -77,7 +77,7 @@ contract PayloadIGP90 is PayloadIGPMain {
             uint256 fee_ = getTradingFees(2); // Fetch Current fee: dynamic
             IFluidDex(USDC_USDT_DEX_ADDRESS).updateFeeAndRevenueCut(
                 fee_,
-                0.25 * fee_
+                25 * 1e4 * fee_
             );
         }
 
@@ -87,7 +87,7 @@ contract PayloadIGP90 is PayloadIGPMain {
             uint256 fee_ = getTradingFees(3); // Fetch Current fee: 0.01%
             IFluidDex(cbBTC_WBTC_DEX_ADDRESS).updateFeeAndRevenueCut(
                 fee_,
-                0.25 * fee_
+                25 * 1e4 * fee_
             );
         }
 
@@ -97,7 +97,7 @@ contract PayloadIGP90 is PayloadIGPMain {
             uint256 fee_ = getTradingFees(4); // Fetch Current fee: 0.05%
             IFluidDex(GHO_USDC_DEX_ADDRESS).updateFeeAndRevenueCut(
                 fee_,
-                0.25 * fee_
+                25 * 1e4 * fee_
             );
         }
 
@@ -107,7 +107,7 @@ contract PayloadIGP90 is PayloadIGPMain {
             uint256 fee_ = getTradingFees(9); // Fetch Current fee: 0.01%
             IFluidDex(weETH_ETH_DEX_ADDRESS).updateFeeAndRevenueCut(
                 fee_,
-                0.25 * fee_
+                25 * 1e4 * fee_
             );
         }
 
@@ -117,7 +117,7 @@ contract PayloadIGP90 is PayloadIGPMain {
             uint256 fee_ = getTradingFees(13); // Fetch Current fee: 0.01%
             IFluidDex(rsETH_ETH_DEX_ADDRESS).updateFeeAndRevenueCut(
                 fee_,
-                0.25 * fee_
+                25 * 1e4 * fee_
             );
         }
 
@@ -127,7 +127,7 @@ contract PayloadIGP90 is PayloadIGPMain {
             uint256 fee_ = getTradingFees(14); // Fetch Current fee: 0.05%
             IFluidDex(weETHs_ETH_DEX_ADDRESS).updateFeeAndRevenueCut(
                 fee_,
-                0.25 * fee_
+                25 * 1e4 * fee_
             );
         }
 
@@ -137,7 +137,7 @@ contract PayloadIGP90 is PayloadIGPMain {
             uint256 fee_ = getTradingFees(15); // Fetch Current fee: 0.02%
             IFluidDex(sUSDe_USDT_DEX_ADDRESS).updateFeeAndRevenueCut(
                 fee_,
-                0.25 * fee_
+                25 * 1e4 * fee_
             );
         }
 
@@ -147,7 +147,7 @@ contract PayloadIGP90 is PayloadIGPMain {
             uint256 fee_ = getTradingFees(16); // Fetch Current fee: 0.05%
             IFluidDex(eBTC_cbBTC_DEX_ADDRESS).updateFeeAndRevenueCut(
                 fee_,
-                0.25 * fee_
+                25 * 1e4 * fee_
             );
         }
 
@@ -157,7 +157,7 @@ contract PayloadIGP90 is PayloadIGPMain {
             uint256 fee_ = getTradingFees(17); // Fetch Current fee: 0.05%
             IFluidDex(LBTC_cbBTC_DEX_ADDRESS).updateFeeAndRevenueCut(
                 fee_,
-                0.25 * fee_
+                25 * 1e4 * fee_
             );
         }
 
@@ -167,7 +167,7 @@ contract PayloadIGP90 is PayloadIGPMain {
             uint256 fee_ = getTradingFees(18); // Fetch Current fee: 0.01%
             IFluidDex(USDe_USDT_DEX_ADDRESS).updateFeeAndRevenueCut(
                 fee_,
-                0.25 * fee_
+                25 * 1e4 * fee_
             );
         }
 
@@ -177,7 +177,7 @@ contract PayloadIGP90 is PayloadIGPMain {
             uint256 fee_ = getTradingFees(19); // Fetch Current fee: 0.01%
             IFluidDex(deUSD_USDC_DEX_ADDRESS).updateFeeAndRevenueCut(
                 fee_,
-                0.25 * fee_
+                25 * 1e4 * fee_
             );
         }
 
@@ -187,7 +187,7 @@ contract PayloadIGP90 is PayloadIGPMain {
             uint256 fee_ = getTradingFees(20); // Fetch Current fee: 0.01%
             IFluidDex(USR_USDC_DEX_ADDRESS).updateFeeAndRevenueCut(
                 fee_,
-                0.25 * fee_
+                25 * 1e4 * fee_
             );
         }
 
@@ -197,7 +197,7 @@ contract PayloadIGP90 is PayloadIGPMain {
             uint256 fee_ = getTradingFees(21); // Fetch Current fee: 0.05%
             IFluidDex(ezETH_ETH_DEX_ADDRESS).updateFeeAndRevenueCut(
                 fee_,
-                0.25 * fee_
+                25 * 1e4 * fee_
             );
         }
 
@@ -207,7 +207,7 @@ contract PayloadIGP90 is PayloadIGPMain {
             uint256 fee_ = getTradingFees(22); // Fetch Current fee: 0.05%
             IFluidDex(cbBTC_USDT_DEX_ADDRESS).updateFeeAndRevenueCut(
                 fee_,
-                0.25 * fee_
+                25 * 1e4 * fee_
             );
         }
 
@@ -217,7 +217,7 @@ contract PayloadIGP90 is PayloadIGPMain {
             uint256 fee_ = getTradingFees(23); // Fetch Current fee: 0.01%
             IFluidDex(USD0_USDC_DEX_ADDRESS).updateFeeAndRevenueCut(
                 fee_,
-                0.25 * fee_
+                25 * 1e4 * fee_
             );
         }
 
@@ -227,7 +227,7 @@ contract PayloadIGP90 is PayloadIGPMain {
             uint256 fee_ = getTradingFees(24); // Fetch Current fee: 0.01%
             IFluidDex(fxUSD_USDC_DEX_ADDRESS).updateFeeAndRevenueCut(
                 fee_,
-                0.25 * fee_
+                25 * 1e4 * fee_
             );
         }
 
