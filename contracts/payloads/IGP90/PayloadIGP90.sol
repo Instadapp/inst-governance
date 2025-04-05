@@ -61,176 +61,25 @@ contract PayloadIGP90 is PayloadIGPMain {
 
     // @notice Action 1: Add 25% governance fee on all stable DEXes
     function action1() internal isActionSkippable(1) {
-        {
-            // wstETH-ETH DEX (Smart Collateral & Smart Debt)
-            address wstETH_ETH_DEX_ADDRESS = getDexAddress(1);
-            uint256 fee_ = getTradingFees(1); // Fetch Current fee: dynamic
-            IFluidDex(wstETH_ETH_DEX_ADDRESS).updateFeeAndRevenueCut(
-                fee_,
-                25 * 1e4 * fee_
-            );
-        }
-        
-        {
-            // USDC-USDT DEX (Smart Debt only)
-            address USDC_USDT_DEX_ADDRESS = getDexAddress(2);
-            uint256 fee_ = getTradingFees(2); // Fetch Current fee: dynamic
-            IFluidDex(USDC_USDT_DEX_ADDRESS).updateFeeAndRevenueCut(
-                fee_,
-                25 * 1e4 * fee_
-            );
-        }
+        uint256 revenueCut = 25 * 1e4; // 25%
 
-        {
-            // cbBTC-WBTC DEX (Smart Collateral & Smart Debt)
-            address cbBTC_WBTC_DEX_ADDRESS = getDexAddress(3);
-            uint256 fee_ = getTradingFees(3); // Fetch Current fee: 0.01%
-            IFluidDex(cbBTC_WBTC_DEX_ADDRESS).updateFeeAndRevenueCut(
-                fee_,
-                25 * 1e4 * fee_
-            );
-        }
-
-        {
-            // GHO-USDC DEX (Smart Collateral & Smart Debt)
-            address GHO_USDC_DEX_ADDRESS = getDexAddress(4);
-            uint256 fee_ = getTradingFees(4); // Fetch Current fee: 0.05%
-            IFluidDex(GHO_USDC_DEX_ADDRESS).updateFeeAndRevenueCut(
-                fee_,
-                25 * 1e4 * fee_
-            );
-        }
-
-        {
-            // weETH-ETH DEX (Smart Collateral Only)
-            address weETH_ETH_DEX_ADDRESS = getDexAddress(9);
-            uint256 fee_ = getTradingFees(9); // Fetch Current fee: 0.01%
-            IFluidDex(weETH_ETH_DEX_ADDRESS).updateFeeAndRevenueCut(
-                fee_,
-                25 * 1e4 * fee_
-            );
-        }
-
-        {
-            // rsETH-ETH DEX (Smart Collateral Only)
-            address rsETH_ETH_DEX_ADDRESS = getDexAddress(13);
-            uint256 fee_ = getTradingFees(13); // Fetch Current fee: 0.01%
-            IFluidDex(rsETH_ETH_DEX_ADDRESS).updateFeeAndRevenueCut(
-                fee_,
-                25 * 1e4 * fee_
-            );
-        }
-
-        {
-            // weETHs-ETH DEX (Smart Collateral Only)
-            address weETHs_ETH_DEX_ADDRESS = getDexAddress(14);
-            uint256 fee_ = getTradingFees(14); // Fetch Current fee: 0.05%
-            IFluidDex(weETHs_ETH_DEX_ADDRESS).updateFeeAndRevenueCut(
-                fee_,
-                25 * 1e4 * fee_
-            );
-        }
-
-        {
-            // sUSDe-USDT DEX (Smart Collateral Only)
-            address sUSDe_USDT_DEX_ADDRESS = getDexAddress(15);
-            uint256 fee_ = getTradingFees(15); // Fetch Current fee: 0.02%
-            IFluidDex(sUSDe_USDT_DEX_ADDRESS).updateFeeAndRevenueCut(
-                fee_,
-                25 * 1e4 * fee_
-            );
-        }
-
-        {
-            // eBTC-cbBTC DEX (Smart Collateral Only)
-            address eBTC_cbBTC_DEX_ADDRESS = getDexAddress(16);
-            uint256 fee_ = getTradingFees(16); // Fetch Current fee: 0.05%
-            IFluidDex(eBTC_cbBTC_DEX_ADDRESS).updateFeeAndRevenueCut(
-                fee_,
-                25 * 1e4 * fee_
-            );
-        }
-
-        {
-            // LBTC-cbBTC DEX (Smart Collateral Only)
-            address LBTC_cbBTC_DEX_ADDRESS = getDexAddress(17);
-            uint256 fee_ = getTradingFees(17); // Fetch Current fee: 0.05%
-            IFluidDex(LBTC_cbBTC_DEX_ADDRESS).updateFeeAndRevenueCut(
-                fee_,
-                25 * 1e4 * fee_
-            );
-        }
-
-        {
-            // USDe-USDT DEX (Smart Collateral Only)
-            address USDe_USDT_DEX_ADDRESS = getDexAddress(18);
-            uint256 fee_ = getTradingFees(18); // Fetch Current fee: 0.01%
-            IFluidDex(USDe_USDT_DEX_ADDRESS).updateFeeAndRevenueCut(
-                fee_,
-                25 * 1e4 * fee_
-            );
-        }
-
-        {
-            // deUSD-USDC DEX (Smart Collateral Only)
-            address deUSD_USDC_DEX_ADDRESS = getDexAddress(19);
-            uint256 fee_ = getTradingFees(19); // Fetch Current fee: 0.01%
-            IFluidDex(deUSD_USDC_DEX_ADDRESS).updateFeeAndRevenueCut(
-                fee_,
-                25 * 1e4 * fee_
-            );
-        }
-
-        {
-            // USR-USDC DEX (Smart Collateral Only)
-            address USR_USDC_DEX_ADDRESS = getDexAddress(20);
-            uint256 fee_ = getTradingFees(20); // Fetch Current fee: 0.01%
-            IFluidDex(USR_USDC_DEX_ADDRESS).updateFeeAndRevenueCut(
-                fee_,
-                25 * 1e4 * fee_
-            );
-        }
-
-        {
-            // ezETH-ETH DEX (Smart Collateral Only)
-            address ezETH_ETH_DEX_ADDRESS = getDexAddress(21);
-            uint256 fee_ = getTradingFees(21); // Fetch Current fee: 0.05%
-            IFluidDex(ezETH_ETH_DEX_ADDRESS).updateFeeAndRevenueCut(
-                fee_,
-                25 * 1e4 * fee_
-            );
-        }
-
-        {
-            // cbBTC-USDT DEX (Smart Collateral & Smart Debt)
-            address cbBTC_USDT_DEX_ADDRESS = getDexAddress(22);
-            uint256 fee_ = getTradingFees(22); // Fetch Current fee: 0.05%
-            IFluidDex(cbBTC_USDT_DEX_ADDRESS).updateFeeAndRevenueCut(
-                fee_,
-                25 * 1e4 * fee_
-            );
-        }
-
-        {
-            // USD0-USDC DEX (Smart Collateral Only)
-            address USD0_USDC_DEX_ADDRESS = getDexAddress(23);
-            uint256 fee_ = getTradingFees(23); // Fetch Current fee: 0.01%
-            IFluidDex(USD0_USDC_DEX_ADDRESS).updateFeeAndRevenueCut(
-                fee_,
-                25 * 1e4 * fee_
-            );
-        }
-
-        {
-            // fxUSD-USDC DEX (Smart Collateral Only)
-            address fxUSD_USDC_DEX_ADDRESS = getDexAddress(24);
-            uint256 fee_ = getTradingFees(24); // Fetch Current fee: 0.01%
-            IFluidDex(fxUSD_USDC_DEX_ADDRESS).updateFeeAndRevenueCut(
-                fee_,
-                25 * 1e4 * fee_
-            );
-        }
-
+        updateDexRevenueCut(1, revenueCut); // WSTETH_ETH
+        updateDexRevenueCut(2, revenueCut); // USDC_USDT
+        updateDexRevenueCut(3, revenueCut); // CBBTC_WBTC
+        updateDexRevenueCut(4, revenueCut); // GHO_USDC
+        updateDexRevenueCut(9, revenueCut); // WEETH_ETH
+        updateDexRevenueCut(13, revenueCut); // RSETH_ETH
+        updateDexRevenueCut(14, revenueCut); // WEETHS_ETH
+        updateDexRevenueCut(15, revenueCut); // SUSDE_USDT
+        updateDexRevenueCut(16, revenueCut); // EBTC_CBBTC
+        updateDexRevenueCut(17, revenueCut); // LBTC_CBBTC
+        updateDexRevenueCut(18, revenueCut); // USDE_USDT
+        updateDexRevenueCut(19, revenueCut); // DEUSD_USDC
+        updateDexRevenueCut(20, revenueCut); // USR_USDC
+        updateDexRevenueCut(21, revenueCut); // EZETH_ETH
+        updateDexRevenueCut(22, revenueCut); // CBBTC_USDT
+        updateDexRevenueCut(23, revenueCut); // USD0_USDC
+        updateDexRevenueCut(24, revenueCut); // FXUSD_USDC
     }
 
     // @notice Action 2: Add USDe-USDT Dex Fee auth

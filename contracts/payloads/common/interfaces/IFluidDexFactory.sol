@@ -5,8 +5,6 @@ interface IFluidDexFactory {
     /// @param dexId_                   The ID of the dex.
     /// @return dex_                    Returns the computed address of the dex.
     function getDexAddress(uint256 dexId_) external view returns (address dex_);
-    
-    function getTradingFees(uint256 dexId_) external view returns (uint256 fee_);
 
     function setDexAuth(address dex_, address dexAuth_, bool allowed_) external;
 

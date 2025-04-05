@@ -43,10 +43,6 @@ contract PayloadIGPHelpers is PayloadIGPConstants {
         return DEX_FACTORY.getDexAddress(dexId_);
     }
 
-    function getTradingFees(uint256 dexId_) public view returns (uint256) {
-        return DEX_FACTORY.getTradingFees(dexId_);
-    }
-
     /// @dev gets a smart lending address based on the underlying dexId
     function getSmartLendingAddress(
         uint256 dexId_
@@ -382,5 +378,18 @@ contract PayloadIGPHelpers is PayloadIGPConstants {
             .constantsView();
 
         return (constantViews_.token0, constantViews_.token1);
+    }
+
+    function updateDexRevenueCut(uint256 dexId, uint256 revenueCut) internal {
+        uint256 dexAddress = getDexAddress(dexId);
+        uint256 dexVariables2_ = IFluidDexT1(dexAddress).readFromStorage(
+            bytes32(DexSlotsLink.DEX_VARIABLES2_SLOT)
+        );
+        uint256 fee_ = (dexVariables2_ >> 2) & X17;
+
+        IFluidDex(dexAddress).updateFeeAndRevenueCut(
+            fee_, // fee stays the same
+            revenueCut
+        );
     }
 }
