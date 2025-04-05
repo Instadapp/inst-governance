@@ -77,7 +77,6 @@ contract PayloadIGP90 is PayloadIGPMain {
         updateDexRevenueCut(19, revenueCut); // DEUSD_USDC
         updateDexRevenueCut(20, revenueCut); // USR_USDC
         updateDexRevenueCut(21, revenueCut); // EZETH_ETH
-        updateDexRevenueCut(22, revenueCut); // CBBTC_USDT
         updateDexRevenueCut(23, revenueCut); // USD0_USDC
         updateDexRevenueCut(24, revenueCut); // FXUSD_USDC
     }
