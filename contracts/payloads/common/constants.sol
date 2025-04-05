@@ -150,6 +150,7 @@ contract PayloadIGPConstants {
     uint256 internal constant X14 = 0x3fff;
     uint256 internal constant X15 = 0x7fff;
     uint256 internal constant X16 = 0xffff;
+    uint256 internal constant X17 = 0x1ffff;
     uint256 internal constant X18 = 0x3ffff;
     uint256 internal constant X24 = 0xffffff;
     uint256 internal constant X64 = 0xffffffffffffffff;
