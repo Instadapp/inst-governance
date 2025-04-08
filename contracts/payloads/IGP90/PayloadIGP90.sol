@@ -44,8 +44,11 @@ contract PayloadIGP90 is PayloadIGPMain {
         // Action 2: Add USDe-USDT Dex Fee Handler
         action2();
 
-        // Action 3: Set launch limits for LBTC-cbBTC <> cbBTC vault
+        // Action 3: Set launch limits for LBTC-cbBTC <> cbBTC vault and reduce limit of LBTC-cbBTC <> WBTC
         action3();
+
+        // Action 4: Set launch limits for LBTC-WBTC <> WBTC vault
+        action4();
     }
 
     function verifyProposal() public view override {}
@@ -94,7 +97,7 @@ contract PayloadIGP90 is PayloadIGPMain {
         DEX_FACTORY.setDexAuth(USDe_USDT_DEX, FeeHandler, true);
     }
 
-    // @notice Action 3: Set launch limits for LBTC-cbBTC <> cbBTC vault
+    // @notice Action 3: Set launch limits for LBTC-cbBTC <> cbBTC vault and reduce limit of LBTC-cbBTC <> WBTC
     function action3() internal isActionSkippable(3) {
         address LBTC_cbBTC_DEX = getDexAddress(17);
         address LBTC_cbBTC__cbBTC_VAULT = getVaultAddress(114);
@@ -129,6 +132,58 @@ contract PayloadIGP90 is PayloadIGPMain {
             IFluidDex(LBTC_cbBTC_DEX).updateUserSupplyConfigs(config_);
         }
 
+        address LBTC_cbBTC__WBTC_VAULT = getVaultAddress(97);
+
+        {
+            // [TYPE 2] LBTC-cbBTC<>WBTC | smart collateral & normal debt
+            Vault memory VAULT_LBTC_cbBTC_wBTC = Vault({
+                vault: LBTC_cbBTC__WBTC_VAULT,
+                vaultType: TYPE.TYPE_2,
+                supplyToken: address(0),
+                borrowToken: WBTC_ADDRESS,
+                baseWithdrawalLimitInUSD: 0,
+                baseBorrowLimitInUSD: 500_000, // $0.5M
+                maxBorrowLimitInUSD: 1_000_000 // $1M
+            });
+
+            setVaultLimits(VAULT_LBTC_cbBTC_wBTC); // TYPE_2 => 97
+        }
+    }
+
+    // @notice Action 4: Set launch limits for LBTC-WBTC <> WBTC vault
+    function action4() internal isActionSkippable(4) {
+        address LBTC_WBTC_DEX = getDexAddress(30);
+        address LBTC_WBTC__WBTC_VAULT = getVaultAddress(115);
+
+        {
+            // [TYPE 2] LBTC-WBTC<>WBTC vault
+            VaultConfig memory VAULT_LBTC_WBTC__WBTC = VaultConfig({
+                vault: LBTC_WBTC__WBTC_VAULT,
+                vaultType: VAULT_TYPE.TYPE_2,
+                supplyToken: address(0),
+                borrowToken: WBTC_ADDRESS,
+                baseWithdrawalLimitInUSD: 0, // set at dex
+                baseBorrowLimitInUSD: 10_000_000, // $10M
+                maxBorrowLimitInUSD: 15_000_000 // $15M
+            });
+            setVaultLimits(VAULT_LBTC_WBTC__WBTC);
+
+            VAULT_FACTORY.setVaultAuth(LBTC_WBTC__WBTC_VAULT, TEAM_MULTISIG, false);
+        }
+        
+        {
+            // Update LBTC-WBTC<>WBTC vault supply shares limit
+            IFluidAdminDex.UserSupplyConfig[]
+                memory config_ = new IFluidAdminDex.UserSupplyConfig[](1);
+            config_[0] = IFluidAdminDex.UserSupplyConfig({
+                user: LBTC_WBTC__WBTC_VAULT,
+                expandPercent: 35 * 1e2, // 35%
+                expandDuration: 6 hours, // 6 hours
+                baseWithdrawalLimit: 50 * 1e18 // 50 shares
+            });
+
+            IFluidDex(LBTC_WBTC_DEX).updateUserSupplyConfigs(config_);
+        }
     }
     
     /**
