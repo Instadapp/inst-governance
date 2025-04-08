@@ -44,6 +44,8 @@ contract PayloadIGP90 is PayloadIGPMain {
         // Action 2: Add USDe-USDT Dex Fee Handler
         action2();
 
+        // Action 3: Set launch limits for LBTC-cbBTC <> cbBTC vault
+        action3();
     }
 
     function verifyProposal() public view override {}
@@ -90,6 +92,43 @@ contract PayloadIGP90 is PayloadIGPMain {
 
         // Add new handler as auth
         DEX_FACTORY.setDexAuth(USDe_USDT_DEX, FeeHandler, true);
+    }
+
+    // @notice Action 3: Set launch limits for LBTC-cbBTC <> cbBTC vault
+    function action3() internal isActionSkippable(3) {
+        address LBTC_cbBTC_DEX = getDexAddress(17);
+        address LBTC_cbBTC__cbBTC_VAULT = getVaultAddress(114);
+
+        {
+            // [TYPE 2] LBTC-cbBTC<>cbBTC vault
+            VaultConfig memory VAULT_LBTC_cbBTC__cbBTC = VaultConfig({
+                vault: LBTC_cbBTC__cbBTC_VAULT,
+                vaultType: VAULT_TYPE.TYPE_2,
+                supplyToken: address(0),
+                borrowToken: cbBTC_ADDRESS,
+                baseWithdrawalLimitInUSD: 0, // set at dex
+                baseBorrowLimitInUSD: 10_000_000, // $10M
+                maxBorrowLimitInUSD: 15_000_000 // $15M
+            });
+            setVaultLimits(VAULT_LBTC_cbBTC__cbBTC);
+
+            VAULT_FACTORY.setVaultAuth(LBTC_cbBTC__cbBTC_VAULT, TEAM_MULTISIG, false);
+        }
+        
+        {
+            // Update LBTC-cbBTC<>cbBTC vault supply shares limit
+            IFluidAdminDex.UserSupplyConfig[]
+                memory config_ = new IFluidAdminDex.UserSupplyConfig[](1);
+            config_[0] = IFluidAdminDex.UserSupplyConfig({
+                user: LBTC_cbBTC__cbBTC_VAULT,
+                expandPercent: 35 * 1e2, // 35%
+                expandDuration: 6 hours, // 6 hours
+                baseWithdrawalLimit: 50 * 1e18 // 50 shares
+            });
+
+            IFluidDex(LBTC_cbBTC_DEX).updateUserSupplyConfigs(config_);
+        }
+
     }
     
     /**
