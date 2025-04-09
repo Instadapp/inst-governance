@@ -117,22 +117,18 @@ contract PayloadIGP90 is PayloadIGPMain {
 
             VAULT_FACTORY.setVaultAuth(LBTC_cbBTC__cbBTC_VAULT, TEAM_MULTISIG, false);
         }
-        
-        {
-            // LBTC-cbBTC Dex
-            DexConfig memory DEX_LBTC_cbBTC = DexConfig({
-                dex: LBTC_cbBTC_DEX,
-                tokenA: lBTC_ADDRESS,
-                tokenB: cbBTC_ADDRESS,
-                smartCollateral: true,
-                smartDebt: false,
-                baseWithdrawalLimitInUSD: 10_000_000, // $10M
-                baseBorrowLimitInUSD: 0, // $0
-                maxBorrowLimitInUSD: 0 // $0
-            });
-            setDexLimits(DEX_LBTC_cbBTC); // Smart Collateral
 
-            DEX_FACTORY.setDexAuth(WBTC_LBTC_DEX, TEAM_MULTISIG, false);
+        {
+            // Update LBTC-cbBTC<>cbBTC vault supply shares limit
+            IFluidAdminDex.UserSupplyConfig[]
+                memory config_ = new IFluidAdminDex.UserSupplyConfig[](1);
+            config_[0] = IFluidAdminDex.UserSupplyConfig({
+                user: LBTC_cbBTC__cbBTC_VAULT,
+                expandPercent: 35 * 1e2, // 35%
+                expandDuration: 6 hours, // 6 hours
+                baseWithdrawalLimit: 50 * 1e18 // 50 shares
+            });
+            IFluidDex(LBTC_cbBTC_DEX).updateUserSupplyConfigs(config_);
         }
 
         address LBTC_cbBTC__WBTC_VAULT = getVaultAddress(97);
@@ -175,17 +171,20 @@ contract PayloadIGP90 is PayloadIGPMain {
         }
         
         {
-            // Update LBTC-WBTC<>WBTC vault supply shares limit
-            IFluidAdminDex.UserSupplyConfig[]
-                memory config_ = new IFluidAdminDex.UserSupplyConfig[](1);
-            config_[0] = IFluidAdminDex.UserSupplyConfig({
-                user: LBTC_WBTC__WBTC_VAULT,
-                expandPercent: 35 * 1e2, // 35%
-                expandDuration: 6 hours, // 6 hours
-                baseWithdrawalLimit: 50 * 1e18 // 50 shares
+            // LBTC-WBTC Dex
+            DexConfig memory DEX_LBTC_WBTC = DexConfig({
+                dex: LBTC_WBTC_DEX,
+                tokenA: lBTC_ADDRESS,
+                tokenB: WBTC_ADDRESS,
+                smartCollateral: true,
+                smartDebt: false,
+                baseWithdrawalLimitInUSD: 10_000_000, // $10M
+                baseBorrowLimitInUSD: 0, // $0
+                maxBorrowLimitInUSD: 0 // $0
             });
+            setDexLimits(DEX_LBTC_WBTC); // Smart Collateral
 
-            IFluidDex(LBTC_WBTC_DEX).updateUserSupplyConfigs(config_);
+            DEX_FACTORY.setDexAuth(LBTC_WBTC_DEX, TEAM_MULTISIG, false);
         }
     }
     
