@@ -119,17 +119,20 @@ contract PayloadIGP90 is PayloadIGPMain {
         }
         
         {
-            // Update LBTC-cbBTC<>cbBTC vault supply shares limit
-            IFluidAdminDex.UserSupplyConfig[]
-                memory config_ = new IFluidAdminDex.UserSupplyConfig[](1);
-            config_[0] = IFluidAdminDex.UserSupplyConfig({
-                user: LBTC_cbBTC__cbBTC_VAULT,
-                expandPercent: 35 * 1e2, // 35%
-                expandDuration: 6 hours, // 6 hours
-                baseWithdrawalLimit: 50 * 1e18 // 50 shares
+            // LBTC-cbBTC Dex
+            DexConfig memory DEX_LBTC_cbBTC = DexConfig({
+                dex: LBTC_cbBTC_DEX,
+                tokenA: lBTC_ADDRESS,
+                tokenB: cbBTC_ADDRESS,
+                smartCollateral: true,
+                smartDebt: false,
+                baseWithdrawalLimitInUSD: 10_000_000, // $10M
+                baseBorrowLimitInUSD: 0, // $0
+                maxBorrowLimitInUSD: 0 // $0
             });
+            setDexLimits(DEX_LBTC_cbBTC); // Smart Collateral
 
-            IFluidDex(LBTC_cbBTC_DEX).updateUserSupplyConfigs(config_);
+            DEX_FACTORY.setDexAuth(WBTC_LBTC_DEX, TEAM_MULTISIG, false);
         }
 
         address LBTC_cbBTC__WBTC_VAULT = getVaultAddress(97);
