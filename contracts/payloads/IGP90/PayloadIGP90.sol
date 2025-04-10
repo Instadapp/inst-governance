@@ -49,6 +49,9 @@ contract PayloadIGP90 is PayloadIGPMain {
 
         // Action 4: Set launch limits for LBTC-WBTC <> WBTC vault
         action4();
+
+        // @notice Action 5: Update lower range of wstETH-ETH DEX
+        action5();
     }
 
     function verifyProposal() public view override {}
@@ -185,6 +188,20 @@ contract PayloadIGP90 is PayloadIGPMain {
             setDexLimits(DEX_LBTC_WBTC); // Smart Collateral
 
             DEX_FACTORY.setDexAuth(LBTC_WBTC_DEX, TEAM_MULTISIG, false);
+        }
+    }
+
+    // @notice Action 5: Update lower range of wstETH-ETH DEX
+    function action5() internal isActionSkippable(5) {
+        address wstETH_ETH_DEX_ADDRESS = getDexAddress(1);
+
+        {
+            // Update Lower Range
+            IFluidDex(wstETH_ETH_DEX_ADDRESS).updateRangePercents(
+                0.0001 * 1e4, // 0.0001%
+                0.1 * 1e4, // 0.1%
+                0
+            );
         }
     }
     
