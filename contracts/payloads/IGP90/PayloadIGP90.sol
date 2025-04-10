@@ -135,9 +135,9 @@ contract PayloadIGP90 is PayloadIGPMain {
 
         {
             // [TYPE 2] LBTC-cbBTC<>WBTC | smart collateral & normal debt
-            Vault memory VAULT_LBTC_cbBTC_wBTC = Vault({
+            VaultConfig memory VAULT_LBTC_cbBTC_wBTC = VaultConfig({
                 vault: LBTC_cbBTC__WBTC_VAULT,
-                vaultType: TYPE.TYPE_2,
+                vaultType: VAULT_TYPE.TYPE_2,
                 supplyToken: address(0),
                 borrowToken: WBTC_ADDRESS,
                 baseWithdrawalLimitInUSD: 0,
