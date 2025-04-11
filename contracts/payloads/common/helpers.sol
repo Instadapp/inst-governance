@@ -5,6 +5,8 @@ import {BigMathMinified} from "../libraries/bigMathMinified.sol";
 import {LiquidityCalcs} from "../libraries/liquidityCalcs.sol";
 import {LiquiditySlotsLink} from "../libraries/liquiditySlotsLink.sol";
 
+import {DexSlotsLink} from "../libraries/dexSlotsLink.sol";
+
 import {IGovernorBravo} from "./interfaces/IGovernorBravo.sol";
 import {ITimelock} from "./interfaces/ITimelock.sol";
 
@@ -378,5 +380,18 @@ contract PayloadIGPHelpers is PayloadIGPConstants {
             .constantsView();
 
         return (constantViews_.token0, constantViews_.token1);
+    }
+
+    function updateDexRevenueCut(uint256 dexId, uint256 revenueCut) internal {
+        address dexAddress = getDexAddress(dexId);
+        uint256 dexVariables2_ = IFluidDex(dexAddress).readFromStorage(
+            bytes32(DexSlotsLink.DEX_VARIABLES2_SLOT)
+        );
+        uint256 fee_ = (dexVariables2_ >> 2) & X17;
+
+        IFluidDex(dexAddress).updateFeeAndRevenueCut(
+            fee_, // fee stays the same
+            revenueCut
+        );
     }
 }
