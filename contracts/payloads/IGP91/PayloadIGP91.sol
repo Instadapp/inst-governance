@@ -68,57 +68,16 @@ contract PayloadIGP90 is PayloadIGPMain {
                 tokenB: USDT_ADDRESS,
                 smartCollateral: true,
                 smartDebt: true,
-                baseWithdrawalLimitInUSD: 10_000, // $10k
-                baseBorrowLimitInUSD: 10_000, // $10k
-                maxBorrowLimitInUSD: 15_000 // $15k
+                baseWithdrawalLimitInUSD: 8_000, // $8k
+                baseBorrowLimitInUSD: 8_000, // $8k
+                maxBorrowLimitInUSD: 10_000 // $10k
             });
             setDexLimits(DEX_SUSDS_USDT); // Smart Collateral & Smart Debt
 
             DEX_FACTORY.setDexAuth(SUSDS_USDT_DEX_ADDRESS, TEAM_MULTISIG, true);
         }
 
-        { // Set SUSDS-USDT Max Shares
-            IFluidDex(SUSDS_USDT_DEX_ADDRESS).updateMaxSupplyShares(
-                5_000 * 1e18 // 5k shares
-            );
-
-            IFluidDex(SUSDS_USDT_DEX_ADDRESS).updateMaxBorrowShares(
-                5_000 * 1e18 // 5k shares
-            );
-        }
-
-        { // Configure [TYPE 4] SUSDS-USDT | SUSDS-USDT | Smart collateral & smart debt
-            {
-                IFluidDex.UserSupplyConfig[]
-                    memory config_ = new IFluidDex.UserSupplyConfig[](1);
-                config_[0] = IFluidDex.UserSupplyConfig({
-                    user: SUSDS_USDT_VAULT_ADDRESS,
-                    expandPercent: 35 * 1e2, // 35%
-                    expandDuration: 6 hours, // 6 hours
-                    baseWithdrawalLimit: 5_000 * 1e18 // 5K shares
-                });
-
-                IFluidDex(SUSDS_USDT_DEX_ADDRESS).updateUserSupplyConfigs(
-                    config_
-                );
-            }
-
-            {
-                IFluidDex.UserBorrowConfig[]
-                    memory config_ = new IFluidDex.UserBorrowConfig[](1);
-                config_[0] = IFluidDex.UserBorrowConfig({
-                    user: SUSDS_USDT_VAULT_ADDRESS,
-                    expandPercent: 30 * 1e2, // 30%
-                    expandDuration: 6 hours, // 6 hours
-                    baseDebtCeiling: 5_000 * 1e18, // 5K shares
-                    maxDebtCeiling: 7_500 * 1e18 // 7.5K shares
-                });
-
-                IFluidDex(SUSDS_USDT_DEX_ADDRESS).updateUserBorrowConfigs(
-                    config_
-                );
-            }
-
+        { // set multisig as T4 vault auth
             VAULT_FACTORY.setVaultAuth(
                 SUSDS_USDT_VAULT_ADDRESS,
                 TEAM_MULTISIG,
