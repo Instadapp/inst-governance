@@ -38,7 +38,7 @@ contract PayloadIGP91 is PayloadIGPMain {
     function execute() public virtual override {
         super.execute();
 
-        // Action 1: Set dust allowance for sUSDS<>USDT DEX and T4 vault
+        // Action 1: Set launch allowance for sUSDS<>USDT DEX and T4 vault
         action1();
 
     }
@@ -56,7 +56,7 @@ contract PayloadIGP91 is PayloadIGPMain {
      */
 
 
-    // @notice Action 1: Set dust allowance for sUSDS<>USDT DEX and T4 vault
+    // @notice Action 1: Set launch allowance for sUSDS<>USDT DEX and T4 vault
     function action1() internal isActionSkippable(1) {
         address SUSDS_USDT_VAULT_ADDRESS = getVaultAddress(116);
         address SUSDS_USDT_DEX_ADDRESS = getDexAddress(31);
@@ -68,13 +68,27 @@ contract PayloadIGP91 is PayloadIGPMain {
                 tokenB: USDT_ADDRESS,
                 smartCollateral: true,
                 smartDebt: true,
-                baseWithdrawalLimitInUSD: 8_000, // $8k
-                baseBorrowLimitInUSD: 8_000, // $8k
-                maxBorrowLimitInUSD: 10_000 // $10k
+                baseWithdrawalLimitInUSD: 11_250_000, // $11.25M
+                baseBorrowLimitInUSD: 12_000_000, // $12M
+                maxBorrowLimitInUSD: 25_000_000 // $25M
             });
             setDexLimits(DEX_SUSDS_USDT); // Smart Collateral & Smart Debt
 
             DEX_FACTORY.setDexAuth(SUSDS_USDT_DEX_ADDRESS, TEAM_MULTISIG, true);
+        }
+
+        {
+            // Set Max Supply Shares
+            IFluidDex(SUSDS_USDT_DEX_ADDRESS).updateMaxSupplyShares(
+                25_000_000 * 1e18
+            ); // 25M
+        }
+
+        {
+            // Set Max Borrow Shares
+            IFluidDex(SUSDS_USDT_DEX_ADDRESS).updateMaxBorrowShares(
+                20_000_000 * 1e18
+            ); // 20M
         }
 
         { // set multisig as T4 vault auth
