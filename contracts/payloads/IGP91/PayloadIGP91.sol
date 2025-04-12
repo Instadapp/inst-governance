@@ -42,6 +42,7 @@ contract PayloadIGP91 is PayloadIGPMain {
         action1();
 
         // Action 2: Update GHO-USDC range percent and fee
+        action2();
 
     }
 
