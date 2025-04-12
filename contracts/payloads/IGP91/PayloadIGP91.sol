@@ -41,6 +41,8 @@ contract PayloadIGP91 is PayloadIGPMain {
         // Action 1: Set launch allowance for sUSDS<>USDT DEX and T4 vault
         action1();
 
+        // Action 2: Update GHO-USDC range percent and fee
+
     }
 
     function verifyProposal() public view override {}
@@ -100,6 +102,21 @@ contract PayloadIGP91 is PayloadIGPMain {
         }
     }
 
+    // @notice Action 2: Update GHO-USDC range percent and fee
+    function action2() internal isActionSkippable(2) {
+        address GHO_USDC_DEX_ADDRESS = getDexAddress(4);
+
+        IFluidDex(GHO_USDC_DEX_ADDRESS).updateRangePercents(
+            0.05 * 1e4, // upper range: 0.005%
+            0.2 * 1e4, // lower range: 0.2%
+            0
+        );
+
+        IFluidDex(GHO_USDC_DEX_ADDRESS).updateFeeAndRevenueCut(
+            0.01 * 1e4, // 0.01%
+            25 * 1e4 // 25%
+        );
+    }
   
     /**
      * |
