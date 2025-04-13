@@ -79,8 +79,7 @@ contract PayloadIGP91 is PayloadIGPMain {
                 maxBorrowLimitInUSD: 10_000 // $10k
             });
             setDexLimits(DEX_SUSDS_USDT); // Smart Collateral & Smart Debt
-
-
+        }
     }
 
     // @notice Action 2: Update GHO-USDC range percent and fee
@@ -99,8 +98,8 @@ contract PayloadIGP91 is PayloadIGPMain {
         );
     }
 
-        // @notice Action 3: Update Multisig Authorization for sUSDS<>USDT DEX and T4 vault
-        function action3() internal isActionSkippable(3) {
+    // @notice Action 3: Update Multisig Authorization for sUSDS<>USDT DEX and T4 vault
+    function action3() internal isActionSkippable(3) {
         address SUSDS_USDT_DEX_ADDRESS = getDexAddress(31);
 
         { // set multisig as DEX auth
@@ -114,7 +113,8 @@ contract PayloadIGP91 is PayloadIGPMain {
                 true
             );
         }
-        }
+    }
+}
   
     /**
      * |
