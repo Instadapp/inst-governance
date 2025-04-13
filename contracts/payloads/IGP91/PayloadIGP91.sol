@@ -80,20 +80,6 @@ contract PayloadIGP91 is PayloadIGPMain {
             DEX_FACTORY.setDexAuth(SUSDS_USDT_DEX_ADDRESS, TEAM_MULTISIG, true);
         }
 
-        {
-            // Set Max Supply Shares
-            IFluidDex(SUSDS_USDT_DEX_ADDRESS).updateMaxSupplyShares(
-                25_000_000 * 1e18
-            ); // 25M
-        }
-
-        {
-            // Set Max Borrow Shares
-            IFluidDex(SUSDS_USDT_DEX_ADDRESS).updateMaxBorrowShares(
-                20_000_000 * 1e18
-            ); // 20M
-        }
-
         { // set multisig as T4 vault auth
             VAULT_FACTORY.setVaultAuth(
                 SUSDS_USDT_VAULT_ADDRESS,
@@ -110,7 +96,7 @@ contract PayloadIGP91 is PayloadIGPMain {
         IFluidDex(GHO_USDC_DEX_ADDRESS).updateRangePercents(
             0.05 * 1e4, // upper range: 0.005%
             0.2 * 1e4, // lower range: 0.2%
-            0
+            2 days
         );
 
         IFluidDex(GHO_USDC_DEX_ADDRESS).updateFeeAndRevenueCut(
