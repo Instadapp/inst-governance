@@ -65,7 +65,7 @@ contract PayloadIGP91 is PayloadIGPMain {
         address SUSDS_USDT_DEX_ADDRESS = getDexAddress(31);
 
         {  // Set SUSDS-USDT Dex Pool Limits
-            Dex memory DEX_SUSDS_USDT = Dex({
+            DexConfig memory DEX_SUSDS_USDT = DexConfig({
                 dex: SUSDS_USDT_DEX_ADDRESS,
                 tokenA: sUSDs_ADDRESS,
                 tokenB: USDT_ADDRESS,
