@@ -44,6 +44,9 @@ contract PayloadIGP91 is PayloadIGPMain {
         // Action 2: Update GHO-USDC range percent and fee
         action2();
 
+        // Action3: Update Multisig Authorization for sUSDS<>USDT DEX and T4 vault
+        action3();
+
     }
 
     function verifyProposal() public view override {}
@@ -77,16 +80,7 @@ contract PayloadIGP91 is PayloadIGPMain {
             });
             setDexLimits(DEX_SUSDS_USDT); // Smart Collateral & Smart Debt
 
-            DEX_FACTORY.setDexAuth(SUSDS_USDT_DEX_ADDRESS, TEAM_MULTISIG, true);
-        }
 
-        { // set multisig as T4 vault auth
-            VAULT_FACTORY.setVaultAuth(
-                SUSDS_USDT_VAULT_ADDRESS,
-                TEAM_MULTISIG,
-                true
-            );
-        }
     }
 
     // @notice Action 2: Update GHO-USDC range percent and fee
@@ -104,6 +98,23 @@ contract PayloadIGP91 is PayloadIGPMain {
             25 * 1e4 // 25%
         );
     }
+
+        // @notice Action 3: Update Multisig Authorization for sUSDS<>USDT DEX and T4 vault
+        function action3() internal isActionSkippable(3) {
+        address SUSDS_USDT_DEX_ADDRESS = getDexAddress(31);
+
+        { // set multisig as DEX auth
+            DEX_FACTORY.setDexAuth(SUSDS_USDT_DEX_ADDRESS, TEAM_MULTISIG, true);
+        }
+
+        { // set multisig as T4 vault auth
+            VAULT_FACTORY.setVaultAuth(
+                SUSDS_USDT_VAULT_ADDRESS,
+                TEAM_MULTISIG,
+                true
+            );
+        }
+        }
   
     /**
      * |
