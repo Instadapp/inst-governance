@@ -94,7 +94,7 @@ contract PayloadIGP91 is PayloadIGPMain {
         address GHO_USDC_DEX_ADDRESS = getDexAddress(4);
 
         IFluidDex(GHO_USDC_DEX_ADDRESS).updateRangePercents(
-            0.05 * 1e4, // upper range: 0.005%
+            0.05 * 1e4, // upper range: 0.05%
             0.2 * 1e4, // lower range: 0.2%
             2 days
         );
