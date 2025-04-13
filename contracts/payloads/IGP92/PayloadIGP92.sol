@@ -32,8 +32,8 @@ import {PayloadIGPConstants} from "../common/constants.sol";
 import {PayloadIGPHelpers} from "../common/helpers.sol";
 import {PayloadIGPMain} from "../common/main.sol";
 
-contract PayloadIGP91 is PayloadIGPMain {
-    uint256 public constant PROPOSAL_ID = 91;
+contract PayloadIGP92 is PayloadIGPMain {
+    uint256 public constant PROPOSAL_ID = 92;
 
     function execute() public virtual override {
         super.execute();
