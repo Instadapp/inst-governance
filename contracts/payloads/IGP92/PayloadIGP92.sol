@@ -77,7 +77,7 @@ contract PayloadIGP92 is PayloadIGPMain {
             DEX_FACTORY.setDexAuth(SUSDS_USDT_DEX_ADDRESS, TEAM_MULTISIG, false);
         }
 
-        { // set multisig as T4 vault auth
+        { // remove multisig as T4 vault auth
             VAULT_FACTORY.setVaultAuth(
                 SUSDS_USDT_VAULT_ADDRESS,
                 TEAM_MULTISIG,
