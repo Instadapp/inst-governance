@@ -79,9 +79,10 @@ contract PayloadIGP92 is PayloadIGPMain {
         }
     }
 
-            // @notice Action 2: Update Multisig Authorization for sUSDS<>USDT DEX and T4 vault
-        function action2() internal isActionSkippable(2) {
+    // @notice Action 2: Update Multisig Authorization for sUSDS<>USDT DEX and T4 vault
+    function action2() internal isActionSkippable(2) {
         address SUSDS_USDT_DEX_ADDRESS = getDexAddress(31);
+        address SUSDS_USDT_VAULT_ADDRESS = getVaultAddress(116);
 
         { // remove multisig as DEX auth
             DEX_FACTORY.setDexAuth(SUSDS_USDT_DEX_ADDRESS, TEAM_MULTISIG, false);
@@ -95,7 +96,7 @@ contract PayloadIGP92 is PayloadIGPMain {
             );
         }
     }
-  
+
     /**
      * |
      * |     Payload Actions End Here      |
