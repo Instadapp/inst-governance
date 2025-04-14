@@ -101,6 +101,7 @@ contract PayloadIGP91 is PayloadIGPMain {
     // @notice Action 3: Update Multisig Authorization for sUSDS<>USDT DEX and T4 vault
     function action3() internal isActionSkippable(3) {
         address SUSDS_USDT_DEX_ADDRESS = getDexAddress(31);
+        address SUSDS_USDT_VAULT_ADDRESS = getVaultAddress(116);
 
         { // set multisig as DEX auth
             DEX_FACTORY.setDexAuth(SUSDS_USDT_DEX_ADDRESS, TEAM_MULTISIG, true);
@@ -114,7 +115,6 @@ contract PayloadIGP91 is PayloadIGPMain {
             );
         }
     }
-}
   
     /**
      * |
