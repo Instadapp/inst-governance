@@ -76,17 +76,17 @@ contract PayloadIGP92 is PayloadIGPMain {
                 maxBorrowLimitInUSD: 25_000_000 // $25M
             });
             setDexLimits(DEX_SUSDS_USDT); // Smart Collateral & Smart Debt
+
+            { // remove multisig as DEX auth
+                DEX_FACTORY.setDexAuth(SUSDS_USDT_DEX_ADDRESS, TEAM_MULTISIG, false);
+            }
         }
     }
 
-    // @notice Action 2: Update Multisig Authorization for sUSDS<>USDT DEX and T4 vault
+    // @notice Action 2: Update Multisig Authorization for sUSDS<>USDT T4 vault
     function action2() internal isActionSkippable(2) {
         address SUSDS_USDT_DEX_ADDRESS = getDexAddress(31);
         address SUSDS_USDT_VAULT_ADDRESS = getVaultAddress(116);
-
-        { // remove multisig as DEX auth
-            DEX_FACTORY.setDexAuth(SUSDS_USDT_DEX_ADDRESS, TEAM_MULTISIG, false);
-        }
 
         { // remove multisig as T4 vault auth
             VAULT_FACTORY.setVaultAuth(
