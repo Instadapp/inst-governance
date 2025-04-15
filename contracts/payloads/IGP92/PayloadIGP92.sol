@@ -38,11 +38,23 @@ contract PayloadIGP92 is PayloadIGPMain {
     function execute() public virtual override {
         super.execute();
 
-        // Action 1: Set launch allowance for sUSDS<>USDT DEX and T4 vault
+        // Action 1: Set launch allowance for sUSDS<>USDT DEX
         action1();
 
-        // Action 2: Update Multisig Authorization for sUSDS<>USDT DEX and T4 vault
-        action2(); 
+        // Action 2: Update Multisig Authorization for sUSDS<>USDT T4 vault
+        action2();
+
+        // Action 3: Set launch limits of LBTC-stable vaults
+        action3();
+
+        // Action 4: Set Rebalancer for sUSDS-USDT
+        action4();
+
+        // Action 5: Update supply and borrow shares for LBTC-cbBTC DEX
+        action5();
+
+        // Action 6: Update GHO-USDC range percent and fee
+        action6();
 
     }
 
@@ -59,7 +71,7 @@ contract PayloadIGP92 is PayloadIGPMain {
      */
 
 
-    // @notice Action 1: Set launch allowance for sUSDS<>USDT DEX and T4 vault
+    // @notice Action 1: Set launch allowance for sUSDS<>USDT DEX
     function action1() internal isActionSkippable(1) {
         address SUSDS_USDT_VAULT_ADDRESS = getVaultAddress(116);
         address SUSDS_USDT_DEX_ADDRESS = getDexAddress(31);
@@ -96,6 +108,164 @@ contract PayloadIGP92 is PayloadIGPMain {
         }
     }
 
+    // @notice Action 3: Set launch limits of LBTC-stable vaults
+    function action3() internal isActionSkippable(3){
+        {
+            address LBTC_USDC_VAULT = getVaultAddress(107);
+
+            // [TYPE 1] LBTC/USDC vault
+            VaultConfig memory VAULT_LBTC_USDC = VaultConfig({
+                vault: LBTC_USDC_VAULT,
+                vaultType: VAULT_TYPE.TYPE_1,
+                supplyToken: lBTC_ADDRESS,
+                borrowToken: USDC_ADDRESS,
+                baseWithdrawalLimitInUSD: 5_000_000, // $5M
+                baseBorrowLimitInUSD: 5_000_000, // $5M
+                maxBorrowLimitInUSD: 15_000_000 // $15M
+            });
+
+            setVaultLimits(VAULT_LBTC_USDC); // TYPE_1 => 107
+
+            VAULT_FACTORY.setVaultAuth(LBTC_USDC_VAULT, TEAM_MULTISIG, false);
+        }
+
+        {
+            address LBTC_USDT_VAULT = getVaultAddress(108);
+
+            // [TYPE 1] LBTC/USDT vault
+            VaultConfig memory VAULT_LBTC_USDT = VaultConfig({
+                vault: LBTC_USDT_VAULT,
+                vaultType: VAULT_TYPE.TYPE_1,
+                supplyToken: lBTC_ADDRESS,
+                borrowToken: USDT_ADDRESS,
+                baseWithdrawalLimitInUSD: 5_000_000, // $5M
+                baseBorrowLimitInUSD: 5_000_000, // $5M
+                maxBorrowLimitInUSD: 15_000_000 // $15M
+            });
+
+            setVaultLimits(VAULT_LBTC_USDT); // TYPE_1 => 108
+
+            VAULT_FACTORY.setVaultAuth(LBTC_USDT_VAULT, TEAM_MULTISIG, false);
+        }
+
+        {
+            address LBTC_GHO_VAULT = getVaultAddress(109);
+
+            // [TYPE 1] LBTC/GHO vault
+            VaultConfig memory VAULT_LBTC_GHO = VaultConfig({
+                vault: LBTC_GHO_VAULT,
+                vaultType: VAULT_TYPE.TYPE_1,
+                supplyToken: lBTC_ADDRESS,
+                borrowToken: GHO_ADDRESS,
+                baseWithdrawalLimitInUSD: 5_000_000, // $5M
+                baseBorrowLimitInUSD: 5_000_000, // $5M
+                maxBorrowLimitInUSD: 15_000_000 // $15M
+            });
+
+            setVaultLimits(VAULT_LBTC_GHO); // TYPE_1 => 109
+
+            VAULT_FACTORY.setVaultAuth(LBTC_GHO_VAULT, TEAM_MULTISIG, false);
+        }
+    }
+
+    // @notice Action 4: Set Rebalancer for sUSDS-USDT
+    function action4() internal isActionSkippable(4) {
+        {
+            address fSL31_SUSDS_USDT = getSmartLendingAddress(31);
+
+            // set rebalancer at fSL31 to reserve contract proxy
+            ISmartLendingAdmin(fSL31_SUSDS_USDT).setRebalancer(
+                address(FLUID_RESERVE)
+            );
+        }
+    }
+
+    // @notice Action 5: Update supply and borrow shares for LBTC-cbBTC DEX
+    function action5() internal isActionSkippable(5) {
+        address LBTC_cbBTC_DEX = getDexAddress(17);
+
+        // Update max supply shares on dex
+        IFluidDex(LBTC_cbBTC_DEX).updateMaxSupplyShares(
+            200 * 1e18 // 200 shares = 33M
+        );
+
+        // Update max borrow shares on dex
+        IFluidDex(LBTC_cbBTC_DEX).updateMaxBorrowShares(
+            150 * 1e18 // 150 shares = 25M
+        );
+    }
+
+    // @notice Action 6: Update GHO-USDC Caps and parameters
+    function action6() internal isActionSkippable(6) {
+        address GHO_USDC_VAULT_ADDRESS = getVaultAddress(61);
+        address GHO_USDC_DEX_ADDRESS = getDexAddress(4);
+
+        {  // Increase GHO-USDC Dex Pool Limits
+            Dex memory DEX_GHO_USDC = Dex({
+                dex: GHO_USDC_DEX_ADDRESS,
+                tokenA: GHO_ADDRESS,
+                tokenB: USDC_ADDRESS,
+                smartCollateral: true,
+                smartDebt: true,
+                baseWithdrawalLimitInUSD: 11_250_000, // $7.5M
+                baseBorrowLimitInUSD: 9_000_000, // $9M
+                maxBorrowLimitInUSD: 12_750_000 // $12.75M
+            });
+            setDexLimits(DEX_GHO_USDC); // Smart Collateral & Smart Debt
+        }
+
+        { // Increase GHO-USDC Max Shares
+            IFluidDex(GHO_USDC_DEX_ADDRESS).updateMaxSupplyShares(
+                7_500_000 * 1e18 // 7.5M shares
+            );
+
+            IFluidDex(GHO_USDC_DEX_ADDRESS).updateMaxBorrowShares(
+                6_000_000 * 1e18 // 6M shares
+            );
+        }
+
+
+        { // Increase [TYPE 4] GHO-USDC | GHO-USDC | Smart collateral & smart debt
+            {
+                IFluidDex.UserSupplyConfig[]
+                    memory config_ = new IFluidDex.UserSupplyConfig[](1);
+                config_[0] = IFluidDex.UserSupplyConfig({
+                    user: GHO_USDC_VAULT_ADDRESS,
+                    expandPercent: 35 * 1e2, // 35%
+                    expandDuration: 6 hours, // 6 hours
+                    baseWithdrawalLimit: 4_500_000 * 1e18 // 4.5M shares
+                });
+
+                IFluidDex(GHO_USDC_DEX_ADDRESS).updateUserSupplyConfigs(
+                    config_
+                );
+            }
+
+            {
+                IFluidDex.UserBorrowConfig[]
+                    memory config_ = new IFluidDex.UserBorrowConfig[](1);
+                config_[0] = IFluidDex.UserBorrowConfig({
+                    user: GHO_USDC_VAULT_ADDRESS,
+                    expandPercent: 30 * 1e2, // 30%
+                    expandDuration: 6 hours, // 6 hours
+                    baseDebtCeiling: 4_500_000 * 1e18, // 4.5M shares
+                    maxDebtCeiling: 6_000_000 * 1e18 // 6M shares
+                });
+
+                IFluidDex(GHO_USDC_DEX_ADDRESS).updateUserBorrowConfigs(
+                    config_
+                );
+            }
+        }
+
+        uint256 CF = 92 * 1e2;
+        uint256 LT = 95 * 1e2;
+        uint256 LML = 96 * 1e2;
+
+        IFluidVaultT1(GHO_USDC_VAULT_ADDRESS).updateLiquidationMaxLimit(LML);
+        IFluidVaultT1(GHO_USDC_VAULT_ADDRESS).updateLiquidationThreshold(LT);
+        IFluidVaultT1(GHO_USDC_VAULT_ADDRESS).updateCollateralFactor(CF);
+    }
     /**
      * |
      * |     Payload Actions End Here      |
