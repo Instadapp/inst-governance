@@ -50,7 +50,7 @@ contract PayloadIGP92 is PayloadIGPMain {
         // Action 4: Set Rebalancer for sUSDS-USDT
         action4();
 
-        // Action 5: Update supply and borrow shares for LBTC-cbBTC DEX
+        // Action 5: Update supply shares for LBTC-cbBTC DEX and borrow limits for LBTC-cbBTC | cbBTC
         action5();
 
         // Action 6: Update GHO-USDC Caps and parameters
