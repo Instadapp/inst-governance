@@ -53,7 +53,7 @@ contract PayloadIGP92 is PayloadIGPMain {
         // Action 5: Update supply and borrow shares for LBTC-cbBTC DEX
         action5();
 
-        // Action 6: Update GHO-USDC range percent and fee
+        // Action 6: Update GHO-USDC Caps and parameters
         action6();
 
     }
@@ -73,7 +73,6 @@ contract PayloadIGP92 is PayloadIGPMain {
 
     // @notice Action 1: Set launch allowance for sUSDS<>USDT DEX
     function action1() internal isActionSkippable(1) {
-        address SUSDS_USDT_VAULT_ADDRESS = getVaultAddress(116);
         address SUSDS_USDT_DEX_ADDRESS = getDexAddress(31);
 
         {  // Set SUSDS-USDT Dex Pool Limits
@@ -180,7 +179,7 @@ contract PayloadIGP92 is PayloadIGPMain {
         }
     }
 
-    // @notice Action 5: Update supply and borrow shares for LBTC-cbBTC DEX
+    // @notice Action 5: Update supply shares for LBTC-cbBTC DEX and borrow limits for LBTC-cbBTC | cbBTC
     function action5() internal isActionSkippable(5) {
         address LBTC_cbBTC_DEX = getDexAddress(17);
 
@@ -189,10 +188,22 @@ contract PayloadIGP92 is PayloadIGPMain {
             200 * 1e18 // 200 shares = 33M
         );
 
-        // Update max borrow shares on dex
-        IFluidDex(LBTC_cbBTC_DEX).updateMaxBorrowShares(
-            150 * 1e18 // 150 shares = 25M
-        );
+        address LBTC_cbBTC__cbBTC_VAULT = getVaultAddress(114);
+
+        {
+            // [TYPE 2] LBTC-cbBTC<>cbBTC vault
+            VaultConfig memory VAULT_LBTC_cbBTC__cbBTC = VaultConfig({
+                vault: LBTC_cbBTC__cbBTC_VAULT,
+                vaultType: VAULT_TYPE.TYPE_2,
+                supplyToken: address(0),
+                borrowToken: cbBTC_ADDRESS,
+                baseWithdrawalLimitInUSD: 0, // set at dex
+                baseBorrowLimitInUSD: 15_000_000, // $15M
+                maxBorrowLimitInUSD: 25_000_000 // $25M
+            });
+            setVaultLimits(VAULT_LBTC_cbBTC__cbBTC);
+        }
+
     }
 
     // @notice Action 6: Update GHO-USDC Caps and parameters
