@@ -198,7 +198,7 @@ contract PayloadIGP92 is PayloadIGPMain {
                 supplyToken: address(0),
                 borrowToken: cbBTC_ADDRESS,
                 baseWithdrawalLimitInUSD: 0, // set at dex
-                baseBorrowLimitInUSD: 15_000_000, // $15M
+                baseBorrowLimitInUSD: 12_000_000, // $12M
                 maxBorrowLimitInUSD: 25_000_000 // $25M
             });
             setVaultLimits(VAULT_LBTC_cbBTC__cbBTC);
