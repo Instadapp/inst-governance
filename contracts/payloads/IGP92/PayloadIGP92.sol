@@ -201,7 +201,7 @@ contract PayloadIGP92 is PayloadIGPMain {
         address GHO_USDC_DEX_ADDRESS = getDexAddress(4);
 
         {  // Increase GHO-USDC Dex Pool Limits
-            Dex memory DEX_GHO_USDC = Dex({
+            DexConfig memory DEX_GHO_USDC = DexConfig({
                 dex: GHO_USDC_DEX_ADDRESS,
                 tokenA: GHO_ADDRESS,
                 tokenB: USDC_ADDRESS,
@@ -229,7 +229,7 @@ contract PayloadIGP92 is PayloadIGPMain {
             {
                 IFluidDex.UserSupplyConfig[]
                     memory config_ = new IFluidDex.UserSupplyConfig[](1);
-                config_[0] = IFluidDex.UserSupplyConfig({
+                config_[0] = IFluidAdminDex.UserSupplyConfig({
                     user: GHO_USDC_VAULT_ADDRESS,
                     expandPercent: 35 * 1e2, // 35%
                     expandDuration: 6 hours, // 6 hours
@@ -244,7 +244,7 @@ contract PayloadIGP92 is PayloadIGPMain {
             {
                 IFluidDex.UserBorrowConfig[]
                     memory config_ = new IFluidDex.UserBorrowConfig[](1);
-                config_[0] = IFluidDex.UserBorrowConfig({
+                config_[0] = IFluidAdminDex.UserBorrowConfig({
                     user: GHO_USDC_VAULT_ADDRESS,
                     expandPercent: 30 * 1e2, // 30%
                     expandDuration: 6 hours, // 6 hours
@@ -273,7 +273,7 @@ contract PayloadIGP92 is PayloadIGPMain {
      */
 
     // Token Prices Constants
-    uint256 public constant ETH_USD_PRICE = 1_500 * 1e2;
+    uint256 public constant ETH_USD_PRICE = 1_600 * 1e2;
     uint256 public constant wstETH_USD_PRICE = 2_300 * 1e2;
     uint256 public constant weETH_USD_PRICE = 2_000 * 1e2;
     uint256 public constant rsETH_USD_PRICE = 1_975 * 1e2;
@@ -281,7 +281,7 @@ contract PayloadIGP92 is PayloadIGPMain {
     uint256 public constant mETH_USD_PRICE = 2_000 * 1e2;
     uint256 public constant ezETH_USD_PRICE = 1_975 * 1e2;
 
-    uint256 public constant BTC_USD_PRICE = 80_000 * 1e2;
+    uint256 public constant BTC_USD_PRICE = 82_000 * 1e2;
 
     uint256 public constant STABLE_USD_PRICE = 1 * 1e2;
     uint256 public constant sUSDe_USD_PRICE = 1.15 * 1e2;
