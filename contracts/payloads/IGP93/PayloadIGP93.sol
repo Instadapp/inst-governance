@@ -44,7 +44,7 @@ contract PayloadIGP93 is PayloadIGPMain {
         // Action 2: Update Borrow Rate Magnifier on LBTC-CBBTC / WBTC Vault 
         action2();
 
-        // Action 3: 
+        // Action 3: Adjust Rate curves of WBTC & cbBTC
         action3();
 
     }
@@ -84,12 +84,37 @@ contract PayloadIGP93 is PayloadIGPMain {
         IFluidVaultT1(lBTC_cbBTC__WBTC_VAULT).updateBorrowRateMagnifier(150 * 1e2); // 1.5x borrowRateMagnifier
     }
 
-    // @notice Action 3:
-        function action3() internal isActionSkippable(3){
+    // @notice Action 3: Adjust Rate curves of WBTC & cbBTC
+    function action3() internal isActionSkippable(3) {
         {
-        
-        }
+            // Update WBTC & cbBTC rate
+            FluidLiquidityAdminStructs.RateDataV2Params[]
+                memory params_ = new FluidLiquidityAdminStructs.RateDataV2Params[](
+                    2
+                );
 
+            params_[0] = FluidLiquidityAdminStructs.RateDataV2Params({
+                token: WBTC_ADDRESS, // WBTC
+                kink1: 80 * 1e2, // 80%
+                kink2: 90 * 1e2, // 90%
+                rateAtUtilizationZero: 0, // 0%
+                rateAtUtilizationKink1: 2 * 1e2, // 2%
+                rateAtUtilizationKink2: 10 * 1e2, // 10%
+                rateAtUtilizationMax: 100 * 1e2 // 100%
+            });
+
+            params_[1] = FluidLiquidityAdminStructs.RateDataV2Params({
+                token: cbBTC_ADDRESS, // cbBTC
+                kink1: 80 * 1e2, // 80%
+                kink2: 90 * 1e2, // 90%
+                rateAtUtilizationZero: 0, // 0%
+                rateAtUtilizationKink1: 2 * 1e2, // 2%
+                rateAtUtilizationKink2: 10 * 1e2, // 10%
+                rateAtUtilizationMax: 100 * 1e2 // 100%
+            });
+
+            LIQUIDITY.updateRateDataV2s(params_);
+        }
     }
 
     /**
