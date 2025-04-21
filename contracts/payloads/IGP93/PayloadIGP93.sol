@@ -228,6 +228,29 @@ contract PayloadIGP93 is PayloadIGPMain {
                 }
             }
         }
+
+        {
+            address USDe_GHO_DEX = getDexAddress(35);
+            {
+                // USDe-GHO DEX
+                {
+                    // USDe-GHO Dex
+                    Dex memory DEX_USDe_GHO = Dex({
+                        dex: USDe_GHO_DEX,
+                        tokenA: USDe_ADDRESS,
+                        tokenB: GHO_ADDRESS,
+                        smartCollateral: true,
+                        smartDebt: false,
+                        baseWithdrawalLimitInUSD: 10_000, // $10k
+                        baseBorrowLimitInUSD: 0, // $0
+                        maxBorrowLimitInUSD: 0 // $0
+                    });
+                    setDexLimits(DEX_USDe_GHO); // Smart Collateral
+
+                    DEX_FACTORY.setDexAuth(USDe_GHO_DEX, TEAM_MULTISIG, true);
+                }
+            }
+        }
     }
 
     // @notice Action 6: Set dust limits for GHO T4 vaults
