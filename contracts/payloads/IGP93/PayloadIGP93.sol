@@ -388,16 +388,18 @@ contract PayloadIGP93 is PayloadIGPMain {
 
     // @notice Action 7: Update expand percentage and duration for fTokens
     function action7() internal isActionSkippable(7) {
+        uint256 constant EXPAND_PERCENT = 35 * 1e2; // 35%
+        uint256 constant EXPAND_DURATION = 6 hours;
         // Update fUSDC
         {
             FluidLiquidityAdminStructs.UserSupplyConfig[] memory configs_ = new FluidLiquidityAdminStructs.UserSupplyConfig[](1);
             configs_[0] = FluidLiquidityAdminStructs.UserSupplyConfig({
-                user: address(0), // Protocol address or do we put Lending Factory = 0x54B91A0D94cb471F37f949c60F7Fa7935b551D03
-                token: 0x9Fb7b4477576Fe5B32be4C1843aFB1e55F251B33, // fToken_fUSDC
+                user: getFTokenAddress(USDC_ADDRESS), // fToken_fUSDC
+                token: USDC_ADDRESS,
                 mode: 1,
-                expandPercent: 35 * 1e2, // 35%
-                expandDuration: 6 hours,
-                baseWithdrawalLimit: 0 // Keep existing limit
+                expandPercent: EXPAND_PERCENT, // 35%
+                expandDuration: EXPAND_DURATION,
+                baseWithdrawalLimit: getCurrentBaseWithdrawalLimit(USDC_ADDRESS, getFTokenAddress(USDC_ADDRESS)) // Keep existing limit
             });
             LIQUIDITY.updateUserSupplyConfigs(configs_);
         }
@@ -406,12 +408,12 @@ contract PayloadIGP93 is PayloadIGPMain {
         {
             FluidLiquidityAdminStructs.UserSupplyConfig[] memory configs_ = new FluidLiquidityAdminStructs.UserSupplyConfig[](1);
             configs_[0] = FluidLiquidityAdminStructs.UserSupplyConfig({
-                user: address(0), // Protocol address or do we put Lending Factory = 0x54B91A0D94cb471F37f949c60F7Fa7935b551D03
-                token: 0x5C20B550819128074FD538Edf79791733ccEdd18, // fToken_fUSDT
+                user: getFTokenAddress(USDT_ADDRESS), // fToken_fUSDT
+                token: USDT_ADDRESS,
                 mode: 1,
-                expandPercent: 35 * 1e2, // 35%
-                expandDuration: 6 hours,
-                baseWithdrawalLimit: 0 // Keep existing limit
+                expandPercent: EXPAND_PERCENT, // 35%
+                expandDuration: EXPAND_DURATION,
+                baseWithdrawalLimit: getCurrentBaseWithdrawalLimit(USDT_ADDRESS, getFTokenAddress(USDT_ADDRESS)) // Keep existing limit
             });
             LIQUIDITY.updateUserSupplyConfigs(configs_);
         }
@@ -420,12 +422,12 @@ contract PayloadIGP93 is PayloadIGPMain {
         {
             FluidLiquidityAdminStructs.UserSupplyConfig[] memory configs_ = new FluidLiquidityAdminStructs.UserSupplyConfig[](1);
             configs_[0] = FluidLiquidityAdminStructs.UserSupplyConfig({
-                user: address(0), // Protocol address or do we put Lending Factory = 0x54B91A0D94cb471F37f949c60F7Fa7935b551D03
-                token: 0x90551c1795392094FE6D29B758EcCD233cFAa260, // fToken_fWETH
+                user: getFTokenAddress(ETH_ADDRESS), // fToken_fWETH
+                token: ETH_ADDRESS, 
                 mode: 1,
-                expandPercent: 35 * 1e2, // 35%
-                expandDuration: 6 hours,
-                baseWithdrawalLimit: 0 // Keep existing limit
+                expandPercent: EXPAND_PERCENT, // 35%
+                expandDuration: EXPAND_DURATION,
+                baseWithdrawalLimit: getCurrentBaseWithdrawalLimit(ETH_ADDRESS, getFTokenAddress(ETH_ADDRESS)) // Keep existing limit
             });
             LIQUIDITY.updateUserSupplyConfigs(configs_);
         }
@@ -434,12 +436,12 @@ contract PayloadIGP93 is PayloadIGPMain {
         {
             FluidLiquidityAdminStructs.UserSupplyConfig[] memory configs_ = new FluidLiquidityAdminStructs.UserSupplyConfig[](1);
             configs_[0] = FluidLiquidityAdminStructs.UserSupplyConfig({
-                user: address(0), // Protocol address or do we put Lending Factory = 0x54B91A0D94cb471F37f949c60F7Fa7935b551D03
-                token: 0x2411802D8BEA09be0aF8fD8D08314a63e706b29C, // fToken_fwstETH
+                user: getFTokenAddress(wstETH_ADDRESS), // fToken_fwstETH
+                token: wstETH_ADDRESS, 
                 mode: 1,
-                expandPercent: 35 * 1e2, // 35%
-                expandDuration: 6 hours,
-                baseWithdrawalLimit: 0 // Keep existing limit
+                expandPercent: EXPAND_PERCENT, // 35%
+                expandDuration: EXPAND_DURATION,
+                baseWithdrawalLimit: getCurrentBaseWithdrawalLimit(wstETH_ADDRESS, getFTokenAddress(wstETH_ADDRESS)) // Keep existing limit
             });
             LIQUIDITY.updateUserSupplyConfigs(configs_);
         }
@@ -448,12 +450,12 @@ contract PayloadIGP93 is PayloadIGPMain {
         {
             FluidLiquidityAdminStructs.UserSupplyConfig[] memory configs_ = new FluidLiquidityAdminStructs.UserSupplyConfig[](1);
             configs_[0] = FluidLiquidityAdminStructs.UserSupplyConfig({
-                user: address(0), // Protocol address or do we put Lending Factory = 0x54B91A0D94cb471F37f949c60F7Fa7935b551D03
-                token: 0x6A29A46E21C730DcA1d8b23d637c101cec605C5B, // fToken_fGHO
+                user: getFTokenAddress(GHO_ADDRESS), // fToken_fGHO
+                token: GHO_ADDRESS, 
                 mode: 1,
-                expandPercent: 35 * 1e2, // 35%
-                expandDuration: 6 hours,
-                baseWithdrawalLimit: 0 // Keep existing limit
+                expandPercent: EXPAND_PERCENT, // 35%
+                expandDuration: EXPAND_DURATION,
+                baseWithdrawalLimit: getCurrentBaseWithdrawalLimit(GHO_ADDRESS, getFTokenAddress(GHO_ADDRESS)) // Keep existing limit
             });
             LIQUIDITY.updateUserSupplyConfigs(configs_);
         }
@@ -462,12 +464,12 @@ contract PayloadIGP93 is PayloadIGPMain {
         {
             FluidLiquidityAdminStructs.UserSupplyConfig[] memory configs_ = new FluidLiquidityAdminStructs.UserSupplyConfig[](1);
             configs_[0] = FluidLiquidityAdminStructs.UserSupplyConfig({
-                user: address(0), // Protocol address or do we put Lending Factory = 0x54B91A0D94cb471F37f949c60F7Fa7935b551D03
-                token: 0x2BBE31d63E6813E3AC858C04dae43FB2a72B0D11, // fToken_fsUSDS
+                user: getFTokenAddress(sUSDs_ADDRESS), // fToken_fsUSDS
+                token: sUSDs_ADDRESS, 
                 mode: 1,
-                expandPercent: 35 * 1e2, // 35%
-                expandDuration: 6 hours,
-                baseWithdrawalLimit: 0 // Keep existing limit
+                expandPercent: EXPAND_PERCENT, // 35%
+                expandDuration: EXPAND_DURATION,
+                baseWithdrawalLimit: getCurrentBaseWithdrawalLimit(sUSDs_ADDRESS, getFTokenAddress(sUSDs_ADDRESS)) // Keep existing limit
             });
             LIQUIDITY.updateUserSupplyConfigs(configs_);
         }

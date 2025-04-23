@@ -45,6 +45,33 @@ contract PayloadIGPHelpers is PayloadIGPConstants {
         return DEX_FACTORY.getDexAddress(dexId_);
     }
 
+    function computeToken(address asset_, string calldata fTokenType_) public view returns (address token_) {
+        return CREATE3.getDeployed(_getSalt(asset_, fTokenType_));
+    }
+
+    function getFTokenAddress(address token) public view returns (address) {
+        if (token == ETH_ADDRESS) {
+            return computeToken(token, "NativeUnderlying");
+        }
+        return computeToken(token, "fToken");
+    }
+
+    function getCurrentBaseWithdrawalLimit(address token_, address user_) internal view returns (uint256) {
+        bytes32 _LIQUDITY_PROTOCOL_SUPPLY_SLOT = LiquiditySlotsLink.calculateDoubleMappingStorageSlot(
+            LiquiditySlotsLink.LIQUIDITY_USER_SUPPLY_DOUBLE_MAPPING_SLOT,
+            user_,
+            token_
+        );
+
+        uint256 userSupplyData_ = LIQUIDITY.readFromStorage(_LIQUDITY_PROTOCOL_SUPPLY_SLOT);
+        
+        return BigMathMinified.fromBigNumber(
+            (userSupplyData_ >> LiquiditySlotsLink.BITS_USER_SUPPLY_BASE_WITHDRAWAL_LIMIT) & X18,
+            DEFAULT_EXPONENT_SIZE,
+            DEFAULT_EXPONENT_MASK
+        );
+    }
+
     /// @dev gets a smart lending address based on the underlying dexId
     function getSmartLendingAddress(
         uint256 dexId_
