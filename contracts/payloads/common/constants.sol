@@ -71,6 +71,8 @@ contract PayloadIGPConstants {
         IFluidDexFactory(0x91716C4EDA1Fb55e84Bf8b4c7085f84285c19085);
     IFluidSmartLendingFactory public constant SMART_LENDING_FACTORY =
         IFluidSmartLendingFactory(0xe57227C7d5900165344b190fc7aa580bceb53B9B);
+    IFluidLendingFactory public constant LENDING_FACTORY =
+        IFluidLendingFactory(0x54B91A0D94cb471F37f949c60F7Fa7935b551D03);
 
     
     ILite public constant IETHV2 =
@@ -80,6 +82,8 @@ contract PayloadIGPConstants {
     // Tokens
     address internal constant ETH_ADDRESS =
         0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
+    address internal constant WETH_ADDRESS =
+        0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;  
     address internal constant wstETH_ADDRESS =
         0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0;
     address internal constant weETH_ADDRESS =

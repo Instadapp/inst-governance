@@ -50,10 +50,10 @@ contract PayloadIGPHelpers is PayloadIGPConstants {
     }
 
     function getFTokenAddress(address token) public view returns (address) {
-        if (token == ETH_ADDRESS) {
-            return computeToken(token, "NativeUnderlying");
+        if (token == WETH_ADDRESS) {
+            return LENDING_FACTORY.computeToken(token, "NativeUnderlying");
         }
-        return computeToken(token, "fToken");
+        return LENDING_FACTORY.computeToken(token, "fToken");
     }
 
     function getCurrentBaseWithdrawalLimit(address token_, address user_) internal view returns (uint256) {

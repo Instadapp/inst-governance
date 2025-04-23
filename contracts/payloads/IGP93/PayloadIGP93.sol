@@ -388,91 +388,55 @@ contract PayloadIGP93 is PayloadIGPMain {
 
     // @notice Action 7: Update expand percentage and duration for fTokens
     function action7() internal isActionSkippable(7) {
-        uint256 constant EXPAND_PERCENT = 35 * 1e2; // 35%
-        uint256 constant EXPAND_DURATION = 6 hours;
+        uint256 EXPAND_PERCENT = 35 * 1e2; // 35%
+        uint256 EXPAND_DURATION = 6 hours;
         // Update fUSDC
-        {
-            FluidLiquidityAdminStructs.UserSupplyConfig[] memory configs_ = new FluidLiquidityAdminStructs.UserSupplyConfig[](1);
-            configs_[0] = FluidLiquidityAdminStructs.UserSupplyConfig({
-                user: getFTokenAddress(USDC_ADDRESS), // fToken_fUSDC
-                token: USDC_ADDRESS,
-                mode: 1,
-                expandPercent: EXPAND_PERCENT, // 35%
-                expandDuration: EXPAND_DURATION,
-                baseWithdrawalLimit: getCurrentBaseWithdrawalLimit(USDC_ADDRESS, getFTokenAddress(USDC_ADDRESS)) // Keep existing limit
-            });
-            LIQUIDITY.updateUserSupplyConfigs(configs_);
-        }
+        setProtocolSupplyExpansion(
+            getFTokenAddress(USDC_ADDRESS),
+            USDC_ADDRESS,
+            EXPAND_PERCENT,
+            EXPAND_DURATION
+        );
 
         // Update fUSDT
-        {
-            FluidLiquidityAdminStructs.UserSupplyConfig[] memory configs_ = new FluidLiquidityAdminStructs.UserSupplyConfig[](1);
-            configs_[0] = FluidLiquidityAdminStructs.UserSupplyConfig({
-                user: getFTokenAddress(USDT_ADDRESS), // fToken_fUSDT
-                token: USDT_ADDRESS,
-                mode: 1,
-                expandPercent: EXPAND_PERCENT, // 35%
-                expandDuration: EXPAND_DURATION,
-                baseWithdrawalLimit: getCurrentBaseWithdrawalLimit(USDT_ADDRESS, getFTokenAddress(USDT_ADDRESS)) // Keep existing limit
-            });
-            LIQUIDITY.updateUserSupplyConfigs(configs_);
-        }
+        setProtocolSupplyExpansion(
+            getFTokenAddress(USDT_ADDRESS),
+            USDT_ADDRESS,
+            EXPAND_PERCENT,
+            EXPAND_DURATION
+        );
 
         // Update fWETH
-        {
-            FluidLiquidityAdminStructs.UserSupplyConfig[] memory configs_ = new FluidLiquidityAdminStructs.UserSupplyConfig[](1);
-            configs_[0] = FluidLiquidityAdminStructs.UserSupplyConfig({
-                user: getFTokenAddress(ETH_ADDRESS), // fToken_fWETH
-                token: ETH_ADDRESS, 
-                mode: 1,
-                expandPercent: EXPAND_PERCENT, // 35%
-                expandDuration: EXPAND_DURATION,
-                baseWithdrawalLimit: getCurrentBaseWithdrawalLimit(ETH_ADDRESS, getFTokenAddress(ETH_ADDRESS)) // Keep existing limit
-            });
-            LIQUIDITY.updateUserSupplyConfigs(configs_);
-        }
+        setProtocolSupplyExpansion(
+            getFTokenAddress(WETH_ADDRESS),
+            ETH_ADDRESS,
+            EXPAND_PERCENT,
+            EXPAND_DURATION
+        );
 
         // Update fwstETH
-        {
-            FluidLiquidityAdminStructs.UserSupplyConfig[] memory configs_ = new FluidLiquidityAdminStructs.UserSupplyConfig[](1);
-            configs_[0] = FluidLiquidityAdminStructs.UserSupplyConfig({
-                user: getFTokenAddress(wstETH_ADDRESS), // fToken_fwstETH
-                token: wstETH_ADDRESS, 
-                mode: 1,
-                expandPercent: EXPAND_PERCENT, // 35%
-                expandDuration: EXPAND_DURATION,
-                baseWithdrawalLimit: getCurrentBaseWithdrawalLimit(wstETH_ADDRESS, getFTokenAddress(wstETH_ADDRESS)) // Keep existing limit
-            });
-            LIQUIDITY.updateUserSupplyConfigs(configs_);
-        }
+        setProtocolSupplyExpansion(
+            getFTokenAddress(wstETH_ADDRESS),
+            wstETH_ADDRESS,
+            EXPAND_PERCENT,
+            EXPAND_DURATION
+        );
 
         // Update fGHO
-        {
-            FluidLiquidityAdminStructs.UserSupplyConfig[] memory configs_ = new FluidLiquidityAdminStructs.UserSupplyConfig[](1);
-            configs_[0] = FluidLiquidityAdminStructs.UserSupplyConfig({
-                user: getFTokenAddress(GHO_ADDRESS), // fToken_fGHO
-                token: GHO_ADDRESS, 
-                mode: 1,
-                expandPercent: EXPAND_PERCENT, // 35%
-                expandDuration: EXPAND_DURATION,
-                baseWithdrawalLimit: getCurrentBaseWithdrawalLimit(GHO_ADDRESS, getFTokenAddress(GHO_ADDRESS)) // Keep existing limit
-            });
-            LIQUIDITY.updateUserSupplyConfigs(configs_);
-        }
+        setProtocolSupplyExpansion(
+            getFTokenAddress(GHO_ADDRESS),
+            GHO_ADDRESS,
+            EXPAND_PERCENT,
+            EXPAND_DURATION
+        );
 
         // Update fsUSDS
-        {
-            FluidLiquidityAdminStructs.UserSupplyConfig[] memory configs_ = new FluidLiquidityAdminStructs.UserSupplyConfig[](1);
-            configs_[0] = FluidLiquidityAdminStructs.UserSupplyConfig({
-                user: getFTokenAddress(sUSDs_ADDRESS), // fToken_fsUSDS
-                token: sUSDs_ADDRESS, 
-                mode: 1,
-                expandPercent: EXPAND_PERCENT, // 35%
-                expandDuration: EXPAND_DURATION,
-                baseWithdrawalLimit: getCurrentBaseWithdrawalLimit(sUSDs_ADDRESS, getFTokenAddress(sUSDs_ADDRESS)) // Keep existing limit
-            });
-            LIQUIDITY.updateUserSupplyConfigs(configs_);
-        }
+        setProtocolSupplyExpansion(
+            getFTokenAddress(sUSDs_ADDRESS),
+            sUSDs_ADDRESS,
+            EXPAND_PERCENT,
+            EXPAND_DURATION
+        );
     }
 
     /**
