@@ -14,6 +14,7 @@ import { IFluidReserveContract } from "./interfaces/IFluidReserveContract.sol";
 import { IFluidVaultFactory } from "./interfaces/IFluidVaultFactory.sol";
 import { IFluidDexFactory } from "./interfaces/IFluidDexFactory.sol";
 import { IFluidSmartLendingFactory } from "./interfaces/IFluidSmartLendingFactory.sol";
+import { IFluidLendingFactory } from "./interfaces/IFluidLendingFactory.sol";
 
 import { IFluidDex } from "./interfaces/IFluidDex.sol";
 import { IFluidDexResolver } from "./interfaces/IFluidDex.sol";

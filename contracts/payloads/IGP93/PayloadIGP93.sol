@@ -23,6 +23,8 @@ import {IFTokenAdmin, ILendingRewards} from "../common/interfaces/IFToken.sol";
 import {ISmartLendingAdmin} from "../common/interfaces/ISmartLending.sol";
 import {ISmartLendingFactory} from "../common/interfaces/ISmartLendingFactory.sol";
 
+import { IFluidLendingFactory } from "./interfaces/IFluidLendingFactory.sol";
+
 import {ICodeReader} from "../common/interfaces/ICodeReader.sol";
 
 import {IDSAV2} from "../common/interfaces/IDSA.sol";

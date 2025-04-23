@@ -15,6 +15,8 @@ import {IFluidReserveContract} from "./interfaces/IFluidReserveContract.sol";
 
 import {IFluidVaultFactory} from "./interfaces/IFluidVaultFactory.sol";
 import {IFluidDexFactory} from "./interfaces/IFluidDexFactory.sol";
+import { IFluidLendingFactory } from "./interfaces/IFluidLendingFactory.sol";
+
 
 import {IFluidDex, IFluidAdminDex} from "./interfaces/IFluidDex.sol";
 import {IFluidDexResolver} from "./interfaces/IFluidDex.sol";
@@ -70,6 +72,24 @@ contract PayloadIGPHelpers is PayloadIGPConstants {
             DEFAULT_EXPONENT_SIZE,
             DEFAULT_EXPONENT_MASK
         );
+    }
+
+    function setProtocolSupplyExpansion(
+        address protocol,
+        address token,
+        uint256 expandPercent,
+        uint256 expandDuration
+    ) internal {
+        FluidLiquidityAdminStructs.UserSupplyConfig[] memory configs_ = new FluidLiquidityAdminStructs.UserSupplyConfig[](1);
+        configs_[0] = FluidLiquidityAdminStructs.UserSupplyConfig({
+            user: protocol,
+            token: token, 
+            mode: 1,
+            expandPercent: expandPercent,
+            expandDuration: expandDuration,
+            baseWithdrawalLimit: getCurrentBaseWithdrawalLimit(token, protocol) // Keep existing limit
+        });
+        LIQUIDITY.updateUserSupplyConfigs(configs_);
     }
 
     /// @dev gets a smart lending address based on the underlying dexId
