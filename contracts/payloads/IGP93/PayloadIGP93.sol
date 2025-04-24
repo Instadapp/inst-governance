@@ -22,8 +22,7 @@ import {IFTokenAdmin, ILendingRewards} from "../common/interfaces/IFToken.sol";
 
 import {ISmartLendingAdmin} from "../common/interfaces/ISmartLending.sol";
 import {ISmartLendingFactory} from "../common/interfaces/ISmartLendingFactory.sol";
-
-import { IFluidLendingFactory } from "./interfaces/IFluidLendingFactory.sol";
+import {IFluidLendingFactory} from "../common/interfaces/IFluidLendingFactory.sol";
 
 import {ICodeReader} from "../common/interfaces/ICodeReader.sol";
 
@@ -43,7 +42,7 @@ contract PayloadIGP93 is PayloadIGPMain {
         // Action 1: Collect ETH Revenue and Transfer to Multisig
         action1();
 
-        // Action 2: Update Borrow Rate Magnifier on LBTC-CBBTC / WBTC Vault 
+        // Action 2: Update Borrow Rate Magnifier on LBTC-CBBTC / WBTC Vault
         action2();
 
         // Action 3: Adjust Rate curves of WBTC & cbBTC
@@ -61,6 +60,14 @@ contract PayloadIGP93 is PayloadIGPMain {
         // Action7: Update expand percentage and duration for fTokens
         action7();
 
+        // Action 8: Pause unused USDE debt vaults
+        action8();
+
+        // Action 9: Readjust the Max Borrow Limit for LBTC-cbBTC<>cbBTC vault
+        action9();
+
+        // Action 10: Set dust limits for Gold based vaults and DEX
+        action10();
     }
 
     function verifyProposal() public view override {}
@@ -74,7 +81,6 @@ contract PayloadIGP93 is PayloadIGPMain {
      * |     Proposal Payload Actions      |
      * |__________________________________
      */
-
 
     // @notice Action 1: Collect ETH Revenue and Transfer to Multisig
     function action1() internal isActionSkippable(1) {
@@ -91,11 +97,13 @@ contract PayloadIGP93 is PayloadIGPMain {
         FLUID_RESERVE.withdrawFunds(tokens, amounts, TEAM_MULTISIG);
     }
 
-    // @notice Action 2: Update Borrow Rate Magnifier on LBTC-CBBTC / WBTC Vault 
+    // @notice Action 2: Update Borrow Rate Magnifier on LBTC-CBBTC / WBTC Vault
     function action2() internal isActionSkippable(2) {
         address lBTC_cbBTC__WBTC_VAULT = getVaultAddress(97);
 
-        IFluidVaultT1(lBTC_cbBTC__WBTC_VAULT).updateBorrowRateMagnifier(150 * 1e2); // 1.5x borrowRateMagnifier
+        IFluidVaultT1(lBTC_cbBTC__WBTC_VAULT).updateBorrowRateMagnifier(
+            150 * 1e2
+        ); // 1.5x borrowRateMagnifier
     }
 
     // @notice Action 3: Adjust Rate curves of WBTC & cbBTC
@@ -163,7 +171,7 @@ contract PayloadIGP93 is PayloadIGPMain {
         }
     }
 
-        // @notice Action 5: Set dust limits for new GHO DEXes
+    // @notice Action 5: Set dust limits for new GHO DEXes
     function action5() internal isActionSkippable(5) {
         {
             address sUSDe_GHO_DEX = getDexAddress(32);
@@ -277,7 +285,9 @@ contract PayloadIGP93 is PayloadIGPMain {
                     baseWithdrawalLimit: 5_000 * 1e18 // 5k shares ($10k)
                 });
 
-                IFluidDex(sUSDe_GHO_DEX_ADDRESS).updateUserSupplyConfigs(config_);
+                IFluidDex(sUSDe_GHO_DEX_ADDRESS).updateUserSupplyConfigs(
+                    config_
+                );
             }
 
             {
@@ -292,7 +302,9 @@ contract PayloadIGP93 is PayloadIGPMain {
                     maxDebtCeiling: 5_000 * 1e18 // 5k shares ($10k)
                 });
 
-                IFluidDex(USDT_GHO_DEX_ADDRESS).updateUserBorrowConfigs(config_);
+                IFluidDex(USDT_GHO_DEX_ADDRESS).updateUserBorrowConfigs(
+                    config_
+                );
             }
 
             VAULT_FACTORY.setVaultAuth(
@@ -319,7 +331,9 @@ contract PayloadIGP93 is PayloadIGPMain {
                     baseWithdrawalLimit: 5_000 * 1e18 // 5k shares ($10k)
                 });
 
-                IFluidDex(sUSDe_GHO_DEX_ADDRESS).updateUserSupplyConfigs(config_);
+                IFluidDex(sUSDe_GHO_DEX_ADDRESS).updateUserSupplyConfigs(
+                    config_
+                );
             }
 
             {
@@ -334,7 +348,9 @@ contract PayloadIGP93 is PayloadIGPMain {
                     maxDebtCeiling: 5_000 * 1e18 // 5k shares ($10k)
                 });
 
-                IFluidDex(USDC_GHO_DEX_ADDRESS).updateUserBorrowConfigs(config_);
+                IFluidDex(USDC_GHO_DEX_ADDRESS).updateUserBorrowConfigs(
+                    config_
+                );
             }
 
             VAULT_FACTORY.setVaultAuth(
@@ -361,7 +377,9 @@ contract PayloadIGP93 is PayloadIGPMain {
                     baseWithdrawalLimit: 5_000 * 1e18 // 5k shares ($10k)
                 });
 
-                IFluidDex(USDe_GHO_DEX_ADDRESS).updateUserSupplyConfigs(config_);
+                IFluidDex(USDe_GHO_DEX_ADDRESS).updateUserSupplyConfigs(
+                    config_
+                );
             }
 
             {
@@ -376,7 +394,9 @@ contract PayloadIGP93 is PayloadIGPMain {
                     maxDebtCeiling: 5_000 * 1e18 // 5k shares ($10k)
                 });
 
-                IFluidDex(USDT_GHO_DEX_ADDRESS).updateUserBorrowConfigs(config_);
+                IFluidDex(USDT_GHO_DEX_ADDRESS).updateUserBorrowConfigs(
+                    config_
+                );
             }
 
             VAULT_FACTORY.setVaultAuth(
@@ -385,7 +405,6 @@ contract PayloadIGP93 is PayloadIGPMain {
                 true
             );
         }
-
     }
 
     // @notice Action 7: Update expand percentage and duration for fTokens
@@ -439,6 +458,297 @@ contract PayloadIGP93 is PayloadIGPMain {
             EXPAND_PERCENT,
             EXPAND_DURATION
         );
+    }
+
+    // @notice Action 8: Pause unused USDE debt vaults
+    function action8() internal isActionSkippable(8) {
+        {
+            address vault_eth_usde = getVaultAddress(69);
+            // Pause supply and borrow limits
+            setSupplyProtocolLimitsPaused(vault_eth_usde, ETH_ADDRESS);
+            setBorrowProtocolLimitsPaused(vault_eth_usde, USDe_ADDRESS);
+        }
+
+        {
+            address vault_wsteth_usde = getVaultAddress(70);
+            // Pause supply and borrow limits
+            setSupplyProtocolLimitsPaused(vault_wsteth_usde, wstETH_ADDRESS);
+            setBorrowProtocolLimitsPaused(vault_wsteth_usde, USDe_ADDRESS);
+        }
+
+        {
+            address vault_weeth_usde = getVaultAddress(71);
+            // Pause supply and borrow limits
+            setSupplyProtocolLimitsPaused(vault_weeth_usde, weETH_ADDRESS);
+            setBorrowProtocolLimitsPaused(vault_weeth_usde, USDe_ADDRESS);
+        }
+
+        {
+            address vault_wbtc_usde = getVaultAddress(72);
+            // Pause supply and borrow limits
+            setSupplyProtocolLimitsPaused(vault_wbtc_usde, WBTC_ADDRESS);
+            setBorrowProtocolLimitsPaused(vault_wbtc_usde, USDe_ADDRESS);
+        }
+
+        {
+            address vault_cbbtc_usde = getVaultAddress(73);
+            // Pause supply and borrow limits
+            setSupplyProtocolLimitsPaused(vault_eth_usde, cbBTC_ADDRESS);
+            setBorrowProtocolLimitsPaused(vault_eth_usde, USDe_ADDRESS);
+        }
+    }
+
+    // @notice Action 9: Readjust the Max Borrow Limit for LBTC-cbBTC<>cbBTC vault
+    function action9() internal isActionSkippable(9) {
+        address LBTC_cbBTC__cbBTC_VAULT = getVaultAddress(114);
+
+        {
+            // [TYPE 2] LBTC-cbBTC<>cbBTC vault
+            VaultConfig memory VAULT_LBTC_cbBTC__cbBTC = VaultConfig({
+                vault: LBTC_cbBTC__cbBTC_VAULT,
+                vaultType: VAULT_TYPE.TYPE_2,
+                supplyToken: address(0),
+                borrowToken: cbBTC_ADDRESS,
+                baseWithdrawalLimitInUSD: 0, // set at dex
+                baseBorrowLimitInUSD: 12_000_000, // $12M
+                maxBorrowLimitInUSD: 35_000_000 // $35M = ~380 cbBTC
+            });
+            setVaultLimits(VAULT_LBTC_cbBTC__cbBTC);
+        }
+    }
+
+    // @notice Action 10: Set dust limits for Gold based vaults and DEX
+    function action10() internal isActionSkippable(10) {
+        {
+            // PAXG-XAUT DEX
+            address PAXG_XAUT_DEX = getDexAddress(35);
+            {
+                Dex memory DEX_PAXG_XAUT = Dex({
+                    dex: PAXG_XAUT_DEX,
+                    tokenA: PAXG_ADDRESS,
+                    tokenB: XAUT_ADDRESS,
+                    smartCollateral: true,
+                    smartDebt: false,
+                    baseWithdrawalLimitInUSD: 10_000, // $10k
+                    baseBorrowLimitInUSD: 0, // $0
+                    maxBorrowLimitInUSD: 0 // $0
+                });
+                setDexLimits(DEX_PAXG_XAUT); // Smart Collateral
+
+                DEX_FACTORY.setDexAuth(PAXG_XAUT_DEX, TEAM_MULTISIG, true);
+            }
+        }
+
+        {
+            // [TYPE 1] XAUT / USDC VAULT
+            address XAUT_USDC_VAULT = getVaultAddress(118);
+            {
+                Vault memory VAULT_XAUT_USDC = Vault({
+                    vault: XAUT_USDC_VAULT,
+                    vaultType: TYPE.TYPE_1,
+                    supplyToken: XAUT_ADDRESS,
+                    borrowToken: USDC_ADDRESS,
+                    baseWithdrawalLimitInUSD: 10_000, // $10k
+                    baseBorrowLimitInUSD: 8_000, // $8k
+                    maxBorrowLimitInUSD: 10_000 // $10k
+                });
+
+                setVaultLimits(VAULT_XAUT_USDC); // TYPE_1 => 118
+
+                VAULT_FACTORY.setVaultAuth(
+                    XAUT_USDC_VAULT,
+                    TEAM_MULTISIG,
+                    true
+                );
+            }
+        }
+
+        {
+            // [TYPE 1] XAUT / USDT VAULT
+            address XAUT_USDT_VAULT = getVaultAddress(119);
+            {
+                Vault memory VAULT_XAUT_USDT = Vault({
+                    vault: XAUT_USDT_VAULT,
+                    vaultType: TYPE.TYPE_1,
+                    supplyToken: XAUT_ADDRESS,
+                    borrowToken: USDT_ADDRESS,
+                    baseWithdrawalLimitInUSD: 10_000, // $10k
+                    baseBorrowLimitInUSD: 8_000, // $8k
+                    maxBorrowLimitInUSD: 10_000 // $10k
+                });
+
+                setVaultLimits(VAULT_XAUT_USDT); // TYPE_1 => 119
+
+                VAULT_FACTORY.setVaultAuth(
+                    XAUT_USDT_VAULT,
+                    TEAM_MULTISIG,
+                    true
+                );
+            }
+        }
+
+        {
+            // [TYPE 1] XAUT / GHO VAULT
+            address XAUT_GHO_VAULT = getVaultAddress(120);
+            {
+                Vault memory VAULT_XAUT_GHO = Vault({
+                    vault: XAUT_GHO_VAULT,
+                    vaultType: TYPE.TYPE_1,
+                    supplyToken: XAUT_ADDRESS,
+                    borrowToken: GHO_ADDRESS,
+                    baseWithdrawalLimitInUSD: 10_000, // $10k
+                    baseBorrowLimitInUSD: 8_000, // $8k
+                    maxBorrowLimitInUSD: 10_000 // $10k
+                });
+
+                setVaultLimits(VAULT_XAUT_GHO); // TYPE_1 => 120
+
+                VAULT_FACTORY.setVaultAuth(XAUT_GHO_VAULT, TEAM_MULTISIG, true);
+            }
+        }
+
+        {
+            // [TYPE 1] PAXG / USDC VAULT
+            address PAXG_USDC_VAULT = getVaultAddress(121);
+            {
+                Vault memory VAULT_PAXG_USDC = Vault({
+                    vault: PAXG_USDC_VAULT,
+                    vaultType: TYPE.TYPE_1,
+                    supplyToken: PAXG_ADDRESS,
+                    borrowToken: USDC_ADDRESS,
+                    baseWithdrawalLimitInUSD: 10_000, // $10k
+                    baseBorrowLimitInUSD: 8_000, // $8k
+                    maxBorrowLimitInUSD: 10_000 // $10k
+                });
+
+                setVaultLimits(VAULT_PAXG_USDC); // TYPE_1 => 120
+
+                VAULT_FACTORY.setVaultAuth(
+                    PAXG_USDC_VAULT,
+                    TEAM_MULTISIG,
+                    true
+                );
+            }
+        }
+
+        {
+            // [TYPE 1] PAXG / USDT VAULT
+            address PAXG_USDT_VAULT = getVaultAddress(122);
+            {
+                Vault memory VAULT_PAXG_USDT = Vault({
+                    vault: PAXG_USDT_VAULT,
+                    vaultType: TYPE.TYPE_1,
+                    supplyToken: PAXG_ADDRESS,
+                    borrowToken: USDT_ADDRESS,
+                    baseWithdrawalLimitInUSD: 10_000, // $10k
+                    baseBorrowLimitInUSD: 8_000, // $8k
+                    maxBorrowLimitInUSD: 10_000 // $10k
+                });
+
+                setVaultLimits(VAULT_PAXG_USDT); // TYPE_1 => 122
+
+                VAULT_FACTORY.setVaultAuth(
+                    PAXG_USDT_VAULT,
+                    TEAM_MULTISIG,
+                    true
+                );
+            }
+        }
+
+        {
+            // [TYPE 1] PAXG / GHO VAULT
+            address PAXG_GHO_VAULT = getVaultAddress(123);
+            {
+                Vault memory VAULT_PAXG_GHO = Vault({
+                    vault: PAXG_GHO_VAULT,
+                    vaultType: TYPE.TYPE_1,
+                    supplyToken: PAXG_ADDRESS,
+                    borrowToken: GHO_ADDRESS,
+                    baseWithdrawalLimitInUSD: 10_000, // $10k
+                    baseBorrowLimitInUSD: 8_000, // $8k
+                    maxBorrowLimitInUSD: 10_000 // $10k
+                });
+
+                setVaultLimits(VAULT_PAXG_GHO); // TYPE_1 => 123
+
+                VAULT_FACTORY.setVaultAuth(PAXG_GHO_VAULT, TEAM_MULTISIG, true);
+            }
+        }
+
+        {
+            // [TYPE 2] PAXG-XAUT<>USDC | smart collateral & normal debt
+            address PAXG_XAUT__USDC_VAULT = getVaultAddress(124);
+
+            {
+                Vault memory VAULT_PAXG_XAUT__USDC = Vault({
+                    vault: PAXG_XAUT__USDC_VAULT,
+                    vaultType: TYPE.TYPE_2,
+                    supplyToken: address(0),
+                    borrowToken: USDC_ADDRESS,
+                    baseWithdrawalLimitInUSD: 0,
+                    baseBorrowLimitInUSD: 8_000, // $8k
+                    maxBorrowLimitInUSD: 10_000 // $10k
+                });
+
+                setVaultLimits(VAULT_PAXG_XAUT__USDC); // TYPE_2 => 124
+
+                VAULT_FACTORY.setVaultAuth(
+                    PAXG_XAUT__USDC_VAULT,
+                    TEAM_MULTISIG,
+                    true
+                );
+            }
+        }
+
+        {
+            // [TYPE 2] PAXG-XAUT<>USDT | smart collateral & normal debt
+            address PAXG_XAUT__USDT_VAULT = getVaultAddress(125);
+
+            {
+                Vault memory VAULT_PAXG_XAUT__USDT = Vault({
+                    vault: PAXG_XAUT__USDT_VAULT,
+                    vaultType: TYPE.TYPE_2,
+                    supplyToken: address(0),
+                    borrowToken: USDT_ADDRESS,
+                    baseWithdrawalLimitInUSD: 0,
+                    baseBorrowLimitInUSD: 8_000, // $8k
+                    maxBorrowLimitInUSD: 10_000 // $10k
+                });
+
+                setVaultLimits(VAULT_PAXG_XAUT__USDT); // TYPE_2 => 125
+
+                VAULT_FACTORY.setVaultAuth(
+                    PAXG_XAUT__USDT_VAULT,
+                    TEAM_MULTISIG,
+                    true
+                );
+            }
+        }
+
+        {
+            // [TYPE 2] PAXG-XAUT<>GHO | smart collateral & normal debt
+            address PAXG_XAUT__GHO_VAULT = getVaultAddress(126);
+
+            {
+                Vault memory VAULT_PAXG_XAUT__GHO = Vault({
+                    vault: PAXG_XAUT__USDT_VAULT,
+                    vaultType: TYPE.TYPE_2,
+                    supplyToken: address(0),
+                    borrowToken: GHO_ADDRESS,
+                    baseWithdrawalLimitInUSD: 0,
+                    baseBorrowLimitInUSD: 8_000, // $8k
+                    maxBorrowLimitInUSD: 10_000 // $10k
+                });
+
+                setVaultLimits(VAULT_PAXG_XAUT__GHO); // TYPE_2 => 126
+
+                VAULT_FACTORY.setVaultAuth(
+                    PAXG_XAUT__GHO_VAULT,
+                    TEAM_MULTISIG,
+                    true
+                );
+            }
+        }
     }
 
     /**

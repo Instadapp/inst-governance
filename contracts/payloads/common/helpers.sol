@@ -47,10 +47,6 @@ contract PayloadIGPHelpers is PayloadIGPConstants {
         return DEX_FACTORY.getDexAddress(dexId_);
     }
 
-    function computeToken(address asset_, string calldata fTokenType_) public view returns (address token_) {
-        return CREATE3.getDeployed(_getSalt(asset_, fTokenType_));
-    }
-
     function getFTokenAddress(address token) public view returns (address) {
         if (token == WETH_ADDRESS) {
             return LENDING_FACTORY.computeToken(token, "NativeUnderlying");
