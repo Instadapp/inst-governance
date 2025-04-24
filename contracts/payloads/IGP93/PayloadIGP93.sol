@@ -777,6 +777,9 @@ contract PayloadIGP93 is PayloadIGPMain {
     uint256 public constant RLP_USD_PRICE = 1.16 * 1e2;
     uint256 public constant wstUSR_USD_PRICE = 1.07 * 1e2;
 
+    uint256 public constant XAUT_USD_PRICE = 3_400 * 1e2;
+    uint256 public constant PAXG_USD_PRICE = 3_400 * 1e2;
+
     function getRawAmount(
         address token,
         uint256 amount,
@@ -860,6 +863,12 @@ contract PayloadIGP93 is PayloadIGPMain {
             decimals = 18;
         } else if (token == RLP_ADDRESS) {
             usdPrice = RLP_USD_PRICE;
+            decimals = 18;
+        } else if (token == XAUT_ADDRESS) {
+            usdPrice = XAUT_USD_PRICE;
+            decimals = 6;
+        } else if (token == PAXG_ADDRESS) {
+            usdPrice = PAXG_USD_PRICE;
             decimals = 18;
         } else {
             revert("not-found");
