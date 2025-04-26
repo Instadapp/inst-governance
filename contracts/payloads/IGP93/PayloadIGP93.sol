@@ -526,7 +526,7 @@ contract PayloadIGP93 is PayloadIGPMain {
         string
             memory withdrawSignature = "withdraw(address,uint256,address,uint256,uint256)";
 
-        // Spell 1: Transfer INST to Team Multisig
+        // Spell 1: Transfer FLUID to Team Multisig
         {
             uint256 FLUID_AMOUNT = 400_000 * 1e18; // 400k FLUID
             targets[0] = "BASIC-A";
