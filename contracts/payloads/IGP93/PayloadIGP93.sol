@@ -524,7 +524,7 @@ contract PayloadIGP93 is PayloadIGPMain {
     uint256 public constant mETH_USD_PRICE = 2_000 * 1e2;
     uint256 public constant ezETH_USD_PRICE = 1_975 * 1e2;
 
-    uint256 public constant BTC_USD_PRICE = 82_000 * 1e2;
+    uint256 public constant BTC_USD_PRICE = 94_500 * 1e2;
 
     uint256 public constant STABLE_USD_PRICE = 1 * 1e2;
     uint256 public constant sUSDe_USD_PRICE = 1.15 * 1e2;
