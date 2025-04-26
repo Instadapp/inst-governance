@@ -62,6 +62,15 @@ contract PayloadIGP93 is PayloadIGPMain {
 
         // Action 8: Set dust limits for Gold based vaults and DEX
         action8();
+
+        // Action 9: Transfer $FLUID to Team Multisig for Rewards
+        action9();
+
+        // Action 10: Update borrow caps for cbBTC-wBTC Dex pool and USDC-USDT pool
+        action10();
+
+        // Action 11: Update lower range of weETHs-ETH & lower range and fees of rsETH-ETH
+        action11();
     }
 
     function verifyProposal() public view override {}
@@ -504,6 +513,87 @@ contract PayloadIGP93 is PayloadIGPMain {
                     PAXG_XAUT__GHO_VAULT,
                     TEAM_MULTISIG,
                     true
+                );
+            }
+        }
+    }
+
+    // @notice Action 9: Transfer $FLUID to Team Multisig for Rewards
+    function action9() internal isActionSkippable(9) {
+        string[] memory targets = new string[](1);
+        bytes[] memory encodedSpells = new bytes[](1);
+
+        string
+            memory withdrawSignature = "withdraw(address,uint256,address,uint256,uint256)";
+
+        // Spell 1: Transfer INST to Team Multisig
+        {
+            uint256 FLUID_AMOUNT = 440_000 * 1e18; // 440k FLUID
+            targets[0] = "BASIC-A";
+            encodedSpells[0] = abi.encodeWithSignature(
+                withdrawSignature,
+                FLUID_ADDRESS,
+                FLUID_AMOUNT,
+                TEAM_MULTISIG,
+                0,
+                0
+            );
+        }
+
+        IDSAV2(TREASURY).cast(targets, encodedSpells, address(this));
+    }
+
+    // @notice Action 10: Update borrow shares for cbBTC-wBTC Dex pool and USDC-USDT pool
+    function action10() internal isActionSkippable(10) {
+        {
+            address CBBTC_WBTC_DEX_ADDRESS = getDexAddress(3);
+
+            // Update max borrow shares on cbBTC-WBTC
+            IFluidDex(CBBTC_WBTC_DEX_ADDRESS).updateMaxBorrowShares(
+                150 * 1e18 // 150 shares
+            );
+        }
+
+        {
+            address USDC_USDT_DEX = getDexAddress(2);
+
+            // Update max borrow shares on USDC-USDT
+            IFluidDex(USDC_USDT_DEX).updateMaxBorrowShares(
+                35_000_000 * 1e18 // 35M shares
+            );
+        }
+    }
+
+    // @notice Action 11: Update lower range of weETHs-ETH & lower range and fees of rsETH-ETH
+    function action11() internal isActionSkippable(11) {
+        {
+            address weETHs_ETH_DEX_ADDRESS = getDexAddress(14);
+            {
+                // Update Lower Range
+                IFluidDex(weETHs_ETH_DEX_ADDRESS).updateRangePercents(
+                    0.0001 * 1e4, // +0.0001%
+                    0.2 * 1e4, // -0.2%
+                    10 days
+                );
+            }
+        }
+
+        {
+            address rsETH_ETH_DEX_ADDRESS = getDexAddress(13);
+            {
+                // update Lower Range
+                IFluidDex(rsETH_ETH_DEX_ADDRESS).updateRangePercents(
+                    0.0001 * 1e4, // +0.0001%
+                    0.2 * 1e4, // -0.2%
+                    10 days
+                );
+            }
+
+            {
+                //Update Trading Fee
+                IFluidDex(rsETH_ETH_DEX_ADDRESS).updateFeeAndRevenueCut(
+                    0.02 * 1e4, // 0.02%
+                    25 * 1e4 // 25%
                 );
             }
         }
