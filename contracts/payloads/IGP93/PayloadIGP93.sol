@@ -528,7 +528,7 @@ contract PayloadIGP93 is PayloadIGPMain {
 
         // Spell 1: Transfer FLUID to Team Multisig
         {
-            uint256 FLUID_AMOUNT = 400_000 * 1e18; // 400k FLUID
+            uint256 FLUID_AMOUNT = 582_222 * 1e18; // 400k FLUID
             targets[0] = "BASIC-A";
             encodedSpells[0] = abi.encodeWithSignature(
                 withdrawSignature,
