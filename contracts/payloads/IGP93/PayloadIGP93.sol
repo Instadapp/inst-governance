@@ -320,7 +320,7 @@ contract PayloadIGP93 is PayloadIGPMain {
                     maxBorrowLimitInUSD: 10_000 // $10k
                 });
 
-                setVaultLimits(VAULT_XAUT_USDC); // TYPE_1 => 118
+                setVaultLimits(VAULT_XAUT_USDC); // TYPE_1 => 116
 
                 VAULT_FACTORY.setVaultAuth(
                     XAUT_USDC_VAULT,
@@ -344,7 +344,7 @@ contract PayloadIGP93 is PayloadIGPMain {
                     maxBorrowLimitInUSD: 10_000 // $10k
                 });
 
-                setVaultLimits(VAULT_XAUT_USDT); // TYPE_1 => 119
+                setVaultLimits(VAULT_XAUT_USDT); // TYPE_1 => 117
 
                 VAULT_FACTORY.setVaultAuth(
                     XAUT_USDT_VAULT,
@@ -368,7 +368,7 @@ contract PayloadIGP93 is PayloadIGPMain {
                     maxBorrowLimitInUSD: 10_000 // $10k
                 });
 
-                setVaultLimits(VAULT_XAUT_GHO); // TYPE_1 => 120
+                setVaultLimits(VAULT_XAUT_GHO); // TYPE_1 => 118
 
                 VAULT_FACTORY.setVaultAuth(XAUT_GHO_VAULT, TEAM_MULTISIG, true);
             }
@@ -388,7 +388,7 @@ contract PayloadIGP93 is PayloadIGPMain {
                     maxBorrowLimitInUSD: 10_000 // $10k
                 });
 
-                setVaultLimits(VAULT_PAXG_USDC); // TYPE_1 => 120
+                setVaultLimits(VAULT_PAXG_USDC); // TYPE_1 => 119
 
                 VAULT_FACTORY.setVaultAuth(
                     PAXG_USDC_VAULT,
@@ -412,7 +412,7 @@ contract PayloadIGP93 is PayloadIGPMain {
                     maxBorrowLimitInUSD: 10_000 // $10k
                 });
 
-                setVaultLimits(VAULT_PAXG_USDT); // TYPE_1 => 122
+                setVaultLimits(VAULT_PAXG_USDT); // TYPE_1 => 120
 
                 VAULT_FACTORY.setVaultAuth(
                     PAXG_USDT_VAULT,
@@ -436,7 +436,7 @@ contract PayloadIGP93 is PayloadIGPMain {
                     maxBorrowLimitInUSD: 10_000 // $10k
                 });
 
-                setVaultLimits(VAULT_PAXG_GHO); // TYPE_1 => 123
+                setVaultLimits(VAULT_PAXG_GHO); // TYPE_1 => 121
 
                 VAULT_FACTORY.setVaultAuth(PAXG_GHO_VAULT, TEAM_MULTISIG, true);
             }
@@ -457,7 +457,7 @@ contract PayloadIGP93 is PayloadIGPMain {
                     maxBorrowLimitInUSD: 10_000 // $10k
                 });
 
-                setVaultLimits(VAULT_PAXG_XAUT__USDC); // TYPE_2 => 124
+                setVaultLimits(VAULT_PAXG_XAUT__USDC); // TYPE_2 => 122
 
                 VAULT_FACTORY.setVaultAuth(
                     PAXG_XAUT__USDC_VAULT,
@@ -482,7 +482,7 @@ contract PayloadIGP93 is PayloadIGPMain {
                     maxBorrowLimitInUSD: 10_000 // $10k
                 });
 
-                setVaultLimits(VAULT_PAXG_XAUT__USDT); // TYPE_2 => 125
+                setVaultLimits(VAULT_PAXG_XAUT__USDT); // TYPE_2 => 123
 
                 VAULT_FACTORY.setVaultAuth(
                     PAXG_XAUT__USDT_VAULT,
@@ -507,7 +507,7 @@ contract PayloadIGP93 is PayloadIGPMain {
                     maxBorrowLimitInUSD: 10_000 // $10k
                 });
 
-                setVaultLimits(VAULT_PAXG_XAUT__GHO); // TYPE_2 => 126
+                setVaultLimits(VAULT_PAXG_XAUT__GHO); // TYPE_2 => 124
 
                 VAULT_FACTORY.setVaultAuth(
                     PAXG_XAUT__GHO_VAULT,
@@ -528,7 +528,7 @@ contract PayloadIGP93 is PayloadIGPMain {
 
         // Spell 1: Transfer FLUID to Team Multisig
         {
-            uint256 FLUID_AMOUNT = 582_222 * 1e18; // 400k FLUID
+            uint256 FLUID_AMOUNT = 582_222 * 1e18;
             targets[0] = "BASIC-A";
             encodedSpells[0] = abi.encodeWithSignature(
                 withdrawSignature,
