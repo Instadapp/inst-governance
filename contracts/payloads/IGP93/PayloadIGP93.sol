@@ -152,9 +152,9 @@ contract PayloadIGP93 is PayloadIGPMain {
             uint256 LT = 92 * 1e2;
             uint256 LML = 95 * 1e2;
 
-            IFluidVaultT1(GHO_USDC__GHO_USDC).updateLiquidationMaxLimit(LML);
-            IFluidVaultT1(GHO_USDC__GHO_USDC).updateLiquidationThreshold(LT);
             IFluidVaultT1(GHO_USDC__GHO_USDC).updateCollateralFactor(CF);
+            IFluidVaultT1(GHO_USDC__GHO_USDC).updateLiquidationThreshold(LT);
+            IFluidVaultT1(GHO_USDC__GHO_USDC).updateLiquidationMaxLimit(LML);
 
             IFluidVaultT1(sUSDe_GHO).updateLiquidationMaxLimit(LML);
             IFluidVaultT1(sUSDe_GHO).updateLiquidationThreshold(LT);
