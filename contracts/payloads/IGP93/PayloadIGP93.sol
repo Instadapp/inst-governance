@@ -281,7 +281,7 @@ contract PayloadIGP93 is PayloadIGPMain {
             // PAXG-XAUT DEX
             address PAXG_XAUT_DEX = getDexAddress(32);
             {
-                Dex memory DEX_PAXG_XAUT = Dex({
+                DexConfig memory DEX_PAXG_XAUT = DexConfig({
                     dex: PAXG_XAUT_DEX,
                     tokenA: PAXG_ADDRESS,
                     tokenB: XAUT_ADDRESS,
@@ -301,9 +301,9 @@ contract PayloadIGP93 is PayloadIGPMain {
             // [TYPE 1] XAUT / USDC VAULT
             address XAUT_USDC_VAULT = getVaultAddress(116);
             {
-                Vault memory VAULT_XAUT_USDC = Vault({
+                VaultConfig memory VAULT_XAUT_USDC = VaultConfig({
                     vault: XAUT_USDC_VAULT,
-                    vaultType: TYPE.TYPE_1,
+                    vaultType: VAULT_TYPE.TYPE_1,
                     supplyToken: XAUT_ADDRESS,
                     borrowToken: USDC_ADDRESS,
                     baseWithdrawalLimitInUSD: 10_000, // $10k
@@ -325,9 +325,9 @@ contract PayloadIGP93 is PayloadIGPMain {
             // [TYPE 1] XAUT / USDT VAULT
             address XAUT_USDT_VAULT = getVaultAddress(117);
             {
-                Vault memory VAULT_XAUT_USDT = Vault({
+                VaultConfig memory VAULT_XAUT_USDT = VaultConfig({
                     vault: XAUT_USDT_VAULT,
-                    vaultType: TYPE.TYPE_1,
+                    vaultType: VAULT_TYPE.TYPE_1,
                     supplyToken: XAUT_ADDRESS,
                     borrowToken: USDT_ADDRESS,
                     baseWithdrawalLimitInUSD: 10_000, // $10k
@@ -349,9 +349,9 @@ contract PayloadIGP93 is PayloadIGPMain {
             // [TYPE 1] XAUT / GHO VAULT
             address XAUT_GHO_VAULT = getVaultAddress(118);
             {
-                Vault memory VAULT_XAUT_GHO = Vault({
+                VaultConfig memory VAULT_XAUT_GHO = VaultConfig({
                     vault: XAUT_GHO_VAULT,
-                    vaultType: TYPE.TYPE_1,
+                    vaultType: VAULT_TYPE.TYPE_1,
                     supplyToken: XAUT_ADDRESS,
                     borrowToken: GHO_ADDRESS,
                     baseWithdrawalLimitInUSD: 10_000, // $10k
@@ -369,9 +369,9 @@ contract PayloadIGP93 is PayloadIGPMain {
             // [TYPE 1] PAXG / USDC VAULT
             address PAXG_USDC_VAULT = getVaultAddress(119);
             {
-                Vault memory VAULT_PAXG_USDC = Vault({
+                VaultConfig memory VAULT_PAXG_USDC = VaultConfig({
                     vault: PAXG_USDC_VAULT,
-                    vaultType: TYPE.TYPE_1,
+                    vaultType: VAULT_TYPE.TYPE_1,
                     supplyToken: PAXG_ADDRESS,
                     borrowToken: USDC_ADDRESS,
                     baseWithdrawalLimitInUSD: 10_000, // $10k
@@ -393,9 +393,9 @@ contract PayloadIGP93 is PayloadIGPMain {
             // [TYPE 1] PAXG / USDT VAULT
             address PAXG_USDT_VAULT = getVaultAddress(120);
             {
-                Vault memory VAULT_PAXG_USDT = Vault({
+                VaultConfig memory VAULT_PAXG_USDT = VaultConfig({
                     vault: PAXG_USDT_VAULT,
-                    vaultType: TYPE.TYPE_1,
+                    vaultType: VAULT_TYPE.TYPE_1,
                     supplyToken: PAXG_ADDRESS,
                     borrowToken: USDT_ADDRESS,
                     baseWithdrawalLimitInUSD: 10_000, // $10k
@@ -417,9 +417,9 @@ contract PayloadIGP93 is PayloadIGPMain {
             // [TYPE 1] PAXG / GHO VAULT
             address PAXG_GHO_VAULT = getVaultAddress(121);
             {
-                Vault memory VAULT_PAXG_GHO = Vault({
+                VaultConfig memory VAULT_PAXG_GHO = VaultConfig({
                     vault: PAXG_GHO_VAULT,
-                    vaultType: TYPE.TYPE_1,
+                    vaultType: VAULT_TYPE.TYPE_1,
                     supplyToken: PAXG_ADDRESS,
                     borrowToken: GHO_ADDRESS,
                     baseWithdrawalLimitInUSD: 10_000, // $10k
@@ -438,9 +438,9 @@ contract PayloadIGP93 is PayloadIGPMain {
             address PAXG_XAUT__USDC_VAULT = getVaultAddress(122);
 
             {
-                Vault memory VAULT_PAXG_XAUT__USDC = Vault({
+                VaultConfig memory VAULT_PAXG_XAUT__USDC = VaultConfig({
                     vault: PAXG_XAUT__USDC_VAULT,
-                    vaultType: TYPE.TYPE_2,
+                    vaultType: VAULT_TYPE.TYPE_2,
                     supplyToken: address(0),
                     borrowToken: USDC_ADDRESS,
                     baseWithdrawalLimitInUSD: 0,
@@ -463,9 +463,9 @@ contract PayloadIGP93 is PayloadIGPMain {
             address PAXG_XAUT__USDT_VAULT = getVaultAddress(123);
 
             {
-                Vault memory VAULT_PAXG_XAUT__USDT = Vault({
+                VaultConfig memory VAULT_PAXG_XAUT__USDT = VaultConfig({
                     vault: PAXG_XAUT__USDT_VAULT,
-                    vaultType: TYPE.TYPE_2,
+                    vaultType: VAULT_TYPE.TYPE_2,
                     supplyToken: address(0),
                     borrowToken: USDT_ADDRESS,
                     baseWithdrawalLimitInUSD: 0,
@@ -488,9 +488,9 @@ contract PayloadIGP93 is PayloadIGPMain {
             address PAXG_XAUT__GHO_VAULT = getVaultAddress(124);
 
             {
-                Vault memory VAULT_PAXG_XAUT__GHO = Vault({
+                VaultConfig memory VAULT_PAXG_XAUT__GHO = VaultConfig({
                     vault: PAXG_XAUT__GHO_VAULT,
-                    vaultType: TYPE.TYPE_2,
+                    vaultType: VAULT_TYPE.TYPE_2,
                     supplyToken: address(0),
                     borrowToken: GHO_ADDRESS,
                     baseWithdrawalLimitInUSD: 0,
