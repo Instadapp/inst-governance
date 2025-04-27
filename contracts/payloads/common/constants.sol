@@ -143,9 +143,9 @@ contract PayloadIGPConstants {
         0x1202F5C7b4B9E47a1A484E8B270be34dbbC75055;
 
     address internal constant XAUT_ADDRESS = 
-        0x45804880De22913dAFE09f4980848ECE6EcbAf78;
-    address internal constant PAXG_ADDRESS = 
         0x68749665FF8D2d112Fa859AA293F07A622782F38;
+    address internal constant PAXG_ADDRESS = 
+        0x45804880De22913dAFE09f4980848ECE6EcbAf78;
 
     // fTokens
     address internal constant F_USDT_ADDRESS = 0x5C20B550819128074FD538Edf79791733ccEdd18;

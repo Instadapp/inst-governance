@@ -95,7 +95,7 @@ contract PayloadIGP93 is PayloadIGPMain {
 
         uint256[] memory amounts = new uint256[](1);
 
-        amounts[0] = 128 ether; // 129 ETH in reserves - 1
+        amounts[0] = address(FLUID_RESERVE).balance - 1;
 
         FLUID_RESERVE.withdrawFunds(tokens, amounts, TEAM_MULTISIG);
     }
