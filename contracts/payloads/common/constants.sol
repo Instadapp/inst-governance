@@ -14,6 +14,7 @@ import { IFluidReserveContract } from "./interfaces/IFluidReserveContract.sol";
 import { IFluidVaultFactory } from "./interfaces/IFluidVaultFactory.sol";
 import { IFluidDexFactory } from "./interfaces/IFluidDexFactory.sol";
 import { IFluidSmartLendingFactory } from "./interfaces/IFluidSmartLendingFactory.sol";
+import { IFluidLendingFactory } from "./interfaces/IFluidLendingFactory.sol";
 
 import { IFluidDex } from "./interfaces/IFluidDex.sol";
 import { IFluidDexResolver } from "./interfaces/IFluidDex.sol";
@@ -71,6 +72,8 @@ contract PayloadIGPConstants {
         IFluidDexFactory(0x91716C4EDA1Fb55e84Bf8b4c7085f84285c19085);
     IFluidSmartLendingFactory public constant SMART_LENDING_FACTORY =
         IFluidSmartLendingFactory(0xe57227C7d5900165344b190fc7aa580bceb53B9B);
+    IFluidLendingFactory public constant LENDING_FACTORY =
+        IFluidLendingFactory(0x54B91A0D94cb471F37f949c60F7Fa7935b551D03);
 
     
     ILite public constant IETHV2 =
@@ -80,6 +83,8 @@ contract PayloadIGPConstants {
     // Tokens
     address internal constant ETH_ADDRESS =
         0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
+    address internal constant WETH_ADDRESS =
+        0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;  
     address internal constant wstETH_ADDRESS =
         0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0;
     address internal constant weETH_ADDRESS =
@@ -136,6 +141,11 @@ contract PayloadIGPConstants {
         0x4956b52aE2fF65D74CA2d61207523288e4528f96;
     address internal constant wstUSR_ADDRESS =
         0x1202F5C7b4B9E47a1A484E8B270be34dbbC75055;
+
+    address internal constant XAUT_ADDRESS = 
+        0x68749665FF8D2d112Fa859AA293F07A622782F38;
+    address internal constant PAXG_ADDRESS = 
+        0x45804880De22913dAFE09f4980848ECE6EcbAf78;
 
     // fTokens
     address internal constant F_USDT_ADDRESS = 0x5C20B550819128074FD538Edf79791733ccEdd18;

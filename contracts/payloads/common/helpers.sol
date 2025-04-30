@@ -15,6 +15,8 @@ import {IFluidReserveContract} from "./interfaces/IFluidReserveContract.sol";
 
 import {IFluidVaultFactory} from "./interfaces/IFluidVaultFactory.sol";
 import {IFluidDexFactory} from "./interfaces/IFluidDexFactory.sol";
+import { IFluidLendingFactory } from "./interfaces/IFluidLendingFactory.sol";
+
 
 import {IFluidDex, IFluidAdminDex} from "./interfaces/IFluidDex.sol";
 import {IFluidDexResolver} from "./interfaces/IFluidDex.sol";
@@ -43,6 +45,47 @@ contract PayloadIGPHelpers is PayloadIGPConstants {
 
     function getDexAddress(uint256 dexId_) public view returns (address) {
         return DEX_FACTORY.getDexAddress(dexId_);
+    }
+
+    function getFTokenAddress(address token) public view returns (address) {
+        if (token == WETH_ADDRESS) {
+            return LENDING_FACTORY.computeToken(token, "NativeUnderlying");
+        }
+        return LENDING_FACTORY.computeToken(token, "fToken");
+    }
+
+    function getCurrentBaseWithdrawalLimit(address token_, address user_) internal view returns (uint256) {
+        bytes32 _LIQUDITY_PROTOCOL_SUPPLY_SLOT = LiquiditySlotsLink.calculateDoubleMappingStorageSlot(
+            LiquiditySlotsLink.LIQUIDITY_USER_SUPPLY_DOUBLE_MAPPING_SLOT,
+            user_,
+            token_
+        );
+
+        uint256 userSupplyData_ = LIQUIDITY.readFromStorage(_LIQUDITY_PROTOCOL_SUPPLY_SLOT);
+        
+        return BigMathMinified.fromBigNumber(
+            (userSupplyData_ >> LiquiditySlotsLink.BITS_USER_SUPPLY_BASE_WITHDRAWAL_LIMIT) & X18,
+            DEFAULT_EXPONENT_SIZE,
+            DEFAULT_EXPONENT_MASK
+        );
+    }
+
+    function setProtocolSupplyExpansion(
+        address protocol,
+        address token,
+        uint256 expandPercent,
+        uint256 expandDuration
+    ) internal {
+        FluidLiquidityAdminStructs.UserSupplyConfig[] memory configs_ = new FluidLiquidityAdminStructs.UserSupplyConfig[](1);
+        configs_[0] = FluidLiquidityAdminStructs.UserSupplyConfig({
+            user: protocol,
+            token: token, 
+            mode: 1,
+            expandPercent: expandPercent,
+            expandDuration: expandDuration,
+            baseWithdrawalLimit: getCurrentBaseWithdrawalLimit(token, protocol) // Keep existing limit
+        });
+        LIQUIDITY.updateUserSupplyConfigs(configs_);
     }
 
     /// @dev gets a smart lending address based on the underlying dexId
