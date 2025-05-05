@@ -459,7 +459,7 @@ contract PayloadIGP95 is PayloadIGPMain {
         }
         {
             IFluidDex(RLP_USDC_DEX).updateMaxSupplyShares(
-                5_000_000 * 1e18 // $5M
+                5_000_000 * 1e18 // $10M
             );
         }
     }
@@ -476,17 +476,17 @@ contract PayloadIGP95 is PayloadIGPMain {
                     tokenB: XAUT_ADDRESS,
                     smartCollateral: true,
                     smartDebt: false,
-                    baseWithdrawalLimitInUSD: 1_000_000, // $1M
+                    baseWithdrawalLimitInUSD: 1_200_000, // $1.2M
                     baseBorrowLimitInUSD: 0, // $0
                     maxBorrowLimitInUSD: 0 // $0
                 });
                 setDexLimits(DEX_PAXG_XAUT); // Smart Collateral
 
-                DEX_FACTORY.setDexAuth(PAXG_XAUT_DEX, TEAM_MULTISIG, false);
+                DEX_FACTORY.setDexAuth(PAXG_XAUT_DEX, TEAM_MULTISIG, true);
             }
             {
                 IFluidDex(PAXG_XAUT_DEX).updateMaxSupplyShares(
-                    1_800_000 * 1e18 // $1.8M
+                    280 * 1e18 // $1.8M
                 );
             }
         }
@@ -500,9 +500,9 @@ contract PayloadIGP95 is PayloadIGPMain {
                     vaultType: VAULT_TYPE.TYPE_1,
                     supplyToken: XAUT_ADDRESS,
                     borrowToken: USDC_ADDRESS,
-                    baseWithdrawalLimitInUSD: 750_000, // $750k
-                    baseBorrowLimitInUSD: 750_000, // $750k
-                    maxBorrowLimitInUSD: 1_400_000 // $1.4M
+                    baseWithdrawalLimitInUSD: 1_000_000, // $1M
+                    baseBorrowLimitInUSD: 1_000_000, // $1M
+                    maxBorrowLimitInUSD: 1_500_000 // $1.5M
                 });
 
                 setVaultLimits(VAULT_XAUT_USDC); // TYPE_1 => 116
@@ -524,9 +524,9 @@ contract PayloadIGP95 is PayloadIGPMain {
                     vaultType: VAULT_TYPE.TYPE_1,
                     supplyToken: XAUT_ADDRESS,
                     borrowToken: USDT_ADDRESS,
-                    baseWithdrawalLimitInUSD: 750_000, // $750k
-                    baseBorrowLimitInUSD: 750_000, // $750k
-                    maxBorrowLimitInUSD: 1_400_000 // $1.4M
+                    baseWithdrawalLimitInUSD: 1_000_000, // $1M
+                    baseBorrowLimitInUSD: 1_000_000, // $1M
+                    maxBorrowLimitInUSD: 1_500_000 // $1.5M
                 });
 
                 setVaultLimits(VAULT_XAUT_USDT); // TYPE_1 => 117
@@ -548,9 +548,9 @@ contract PayloadIGP95 is PayloadIGPMain {
                     vaultType: VAULT_TYPE.TYPE_1,
                     supplyToken: XAUT_ADDRESS,
                     borrowToken: GHO_ADDRESS,
-                    baseWithdrawalLimitInUSD: 750_000, // $750k
-                    baseBorrowLimitInUSD: 750_000, // $750k
-                    maxBorrowLimitInUSD: 1_400_000 // $1.4M
+                    baseWithdrawalLimitInUSD: 1_000_000, // $1M
+                    baseBorrowLimitInUSD: 1_000_000, // $1M
+                    maxBorrowLimitInUSD: 1_500_000 // $1.5M
                 });
 
                 setVaultLimits(VAULT_XAUT_GHO); // TYPE_1 => 118
@@ -715,16 +715,6 @@ contract PayloadIGP95 is PayloadIGPMain {
     function action10() internal isActionSkippable(10) {
         address sUSDe_USDC_VAULT = getVaultAddress(7);
         {
-            // Set supply protocol limits
-            SupplyProtocolConfig memory supplyConfig_ = SupplyProtocolConfig({
-                protocol: sUSDe_USDC_VAULT,
-                supplyToken: sUSDe_ADDRESS,
-                expandPercent: 1 * 1e2, // 1%
-                expandDuration: 720 hours, // 720 hours
-                baseWithdrawalLimitInUSD: 0 // $0
-            });
-            setSupplyProtocolLimits(supplyConfig_);
-
             // Set borrow protocol limits
             BorrowProtocolConfig memory borrowConfig_ = BorrowProtocolConfig({
                 protocol: sUSDe_USDC_VAULT,
@@ -736,6 +726,17 @@ contract PayloadIGP95 is PayloadIGPMain {
             });
             setBorrowProtocolLimits(borrowConfig_);
         }
+    }
+
+    // @notice Action 11: Update Borrow Limits for sUSDe/USDC
+    function action11() internal isActionSkippable(11) {
+        address USD0_USDC_DEX = getDexAddress(4);
+
+        IFluidDex(USD0_USDC_DEX).updateRangePercents(
+            0.05 * 1e4, // upper range: 0.05%
+            0.5 * 1e4, // lower range: 0.5%
+            2 days
+        );
     }
 
     /**
