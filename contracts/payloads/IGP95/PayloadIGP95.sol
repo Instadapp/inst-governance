@@ -68,6 +68,12 @@ contract PayloadIGP95 is PayloadIGPMain {
 
         // Action 10: Update Borrow Limits for sUSDe/USDC
         action10();
+
+        // Action 11: Update Range Percentages for USD0-USDC DEX
+        action11();
+
+        // Action 12: Deposit ETH from Treasury to Lite
+        action12();
     }
 
     function verifyProposal() public view override {}
@@ -500,8 +506,8 @@ contract PayloadIGP95 is PayloadIGPMain {
                     vaultType: VAULT_TYPE.TYPE_1,
                     supplyToken: XAUT_ADDRESS,
                     borrowToken: USDC_ADDRESS,
-                    baseWithdrawalLimitInUSD: 1_000_000, // $1M
-                    baseBorrowLimitInUSD: 1_000_000, // $1M
+                    baseWithdrawalLimitInUSD: 5_000_000, // $5M
+                    baseBorrowLimitInUSD: 1_500_000, // $1.5M
                     maxBorrowLimitInUSD: 1_500_000 // $1.5M
                 });
 
@@ -524,8 +530,8 @@ contract PayloadIGP95 is PayloadIGPMain {
                     vaultType: VAULT_TYPE.TYPE_1,
                     supplyToken: XAUT_ADDRESS,
                     borrowToken: USDT_ADDRESS,
-                    baseWithdrawalLimitInUSD: 1_000_000, // $1M
-                    baseBorrowLimitInUSD: 1_000_000, // $1M
+                    baseWithdrawalLimitInUSD: 5_000_000, // $5M
+                    baseBorrowLimitInUSD: 1_500_000, // $1.5M
                     maxBorrowLimitInUSD: 1_500_000 // $1.5M
                 });
 
@@ -548,8 +554,8 @@ contract PayloadIGP95 is PayloadIGPMain {
                     vaultType: VAULT_TYPE.TYPE_1,
                     supplyToken: XAUT_ADDRESS,
                     borrowToken: GHO_ADDRESS,
-                    baseWithdrawalLimitInUSD: 1_000_000, // $1M
-                    baseBorrowLimitInUSD: 1_000_000, // $1M
+                    baseWithdrawalLimitInUSD: 5_000_000, // $5M
+                    baseBorrowLimitInUSD: 1_500_000, // $1.5M
                     maxBorrowLimitInUSD: 1_500_000 // $1.5M
                 });
 
@@ -572,9 +578,9 @@ contract PayloadIGP95 is PayloadIGPMain {
                     vaultType: VAULT_TYPE.TYPE_1,
                     supplyToken: PAXG_ADDRESS,
                     borrowToken: USDC_ADDRESS,
-                    baseWithdrawalLimitInUSD: 1_000_000, // $1M
-                    baseBorrowLimitInUSD: 1_000_000, // $1M
-                    maxBorrowLimitInUSD: 2_500_000 // $2.5M
+                    baseWithdrawalLimitInUSD: 5_000_000, // $5M
+                    baseBorrowLimitInUSD: 1_500_000, // $1.5M
+                    maxBorrowLimitInUSD: 1_500_000 // $1.5M
                 });
 
                 setVaultLimits(VAULT_PAXG_USDC); // TYPE_1 => 119
@@ -596,9 +602,9 @@ contract PayloadIGP95 is PayloadIGPMain {
                     vaultType: VAULT_TYPE.TYPE_1,
                     supplyToken: PAXG_ADDRESS,
                     borrowToken: USDT_ADDRESS,
-                    baseWithdrawalLimitInUSD: 1_000_000, // $1M
-                    baseBorrowLimitInUSD: 1_000_000, // $1M
-                    maxBorrowLimitInUSD: 2_500_000 // $2.5M
+                    baseWithdrawalLimitInUSD: 5_000_000, // $5M
+                    baseBorrowLimitInUSD: 1_500_000, // $1.5M
+                    maxBorrowLimitInUSD: 1_500_000 // $1.5M
                 });
 
                 setVaultLimits(VAULT_PAXG_USDT); // TYPE_1 => 120
@@ -728,15 +734,39 @@ contract PayloadIGP95 is PayloadIGPMain {
         }
     }
 
-    // @notice Action 11: Update Borrow Limits for sUSDe/USDC
+    // @notice Action 11: Update Range Percentages for USD0-USDC DEX
     function action11() internal isActionSkippable(11) {
-        address USD0_USDC_DEX = getDexAddress(4);
+        address USD0_USDC_DEX = getDexAddress(23);
 
         IFluidDex(USD0_USDC_DEX).updateRangePercents(
             0.05 * 1e4, // upper range: 0.05%
             0.5 * 1e4, // lower range: 0.5%
             2 days
         );
+    }
+
+    // @notice Action 12: Deposit ETH from Treasury to Lite
+    function action12() internal isActionSkippable(12) {
+        string[] memory targets = new string[](1);
+        bytes[] memory encodedSpells = new bytes[](1);
+
+        string
+            memory depositSignature = "deposit(address,uint256,uint256,uint256)";
+
+        // Spell 1: Deposit ETH into Lite
+        {
+            uint256 ETH_AMOUNT = 1_000_000 * 1e18; //
+            targets[0] = "BASIC-D-V2";
+            encodedSpells[0] = abi.encodeWithSignature(
+                depositSignature,
+                IETHV2,
+                ETH_AMOUNT,
+                0,
+                0
+            );
+        }
+
+        IDSAV2(TREASURY).cast(targets, encodedSpells, address(this));
     }
 
     /**
