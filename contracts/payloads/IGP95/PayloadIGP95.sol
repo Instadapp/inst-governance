@@ -82,7 +82,7 @@ contract PayloadIGP95 is PayloadIGPMain {
      * |__________________________________
      */
 
-    // @notice Action 1: Set dust limits for sUSDe-GHO and USDC-GHO DEXes
+    // @notice Action 1: Set dust limits for sUSDe-GHO DEXes
     function action1() internal isActionSkippable(1) {
         {
             address sUSDe_GHO_DEX = getDexAddress(33);
@@ -106,29 +106,6 @@ contract PayloadIGP95 is PayloadIGPMain {
                 }
             }
         }
-
-        {
-            address USDC_GHO_DEX = getDexAddress(34);
-            {
-                // USDC-GHO DEX
-                {
-                    // USDC-GHO Dex
-                    Dex memory DEX_USDC_GHO = Dex({
-                        dex: USDC_GHO_DEX,
-                        tokenA: USDC_ADDRESS,
-                        tokenB: GHO_ADDRESS,
-                        smartCollateral: false,
-                        smartDebt: true,
-                        baseWithdrawalLimitInUSD: 0, // $0
-                        baseBorrowLimitInUSD: 10_000, // $10k
-                        maxBorrowLimitInUSD: 10_000 // $10k
-                    });
-                    setDexLimits(DEX_USDC_GHO); // Smart Debt
-
-                    DEX_FACTORY.setDexAuth(USDC_GHO_DEX, TEAM_MULTISIG, true);
-                }
-            }
-        }
     }
 
     // @notice Action 2: Set dust limits for sUSDe-GHO/USDC-GHO T4 vault
@@ -136,24 +113,8 @@ contract PayloadIGP95 is PayloadIGPMain {
         {
             //sUSDe/GHO : USDC/GHO
             address sUSDe_GHO_DEX_ADDRESS = getDexAddress(33);
-            address USDC_GHO_DEX_ADDRESS = getDexAddress(34);
+            address USDC_GHO_DEX_ADDRESS = getDexAddress(4);
             address sUSDe_GHO__USDC_GHO_VAULT_ADDRESS = getVaultAddress(125);
-
-            {
-                // Update sUSDe-GHO<>USDC-GHO vault supply shares limit
-                IFluidAdminDex.UserSupplyConfig[]
-                    memory config_ = new IFluidAdminDex.UserSupplyConfig[](1);
-                config_[0] = IFluidAdminDex.UserSupplyConfig({
-                    user: sUSDe_GHO__USDC_GHO_VAULT_ADDRESS,
-                    expandPercent: 35 * 1e2, // 35%
-                    expandDuration: 6 hours, // 6 hours
-                    baseWithdrawalLimit: 5_000 * 1e18 // 5k shares ($10k)
-                });
-
-                IFluidDex(sUSDe_GHO_DEX_ADDRESS).updateUserSupplyConfigs(
-                    config_
-                );
-            }
 
             {
                 // Update sUSDe-GHO<>USDC-GHO vault borrow shares limit
@@ -188,11 +149,6 @@ contract PayloadIGP95 is PayloadIGPMain {
 
         {
             /// fUSDC
-            uint256 allowance = IERC20(USDC_ADDRESS).allowance(
-                address(FLUID_RESERVE),
-                F_USDC_ADDRESS
-            );
-
             protocols[0] = F_USDC_ADDRESS;
             tokens[0] = USDC_ADDRESS;
             amounts[0] = 1_200_000 * 1e6; // 1.2M
@@ -200,18 +156,15 @@ contract PayloadIGP95 is PayloadIGPMain {
 
         {
             /// fUSDT
-            uint256 allowance = IERC20(USDT_ADDRESS).allowance(
-                address(FLUID_RESERVE),
-                F_USDT_ADDRESS
-            );
-
             protocols[1] = F_USDT_ADDRESS;
             tokens[1] = USDT_ADDRESS;
             amounts[1] = 1_200_000 * 1e6; // 1.2M
         }
+
+        FLUID_RESERVE.approve(protocols, tokens, amounts);
     }
 
-    // @notice Action 4: Reduce allowance of fUSDC and fUSDT
+    // @notice Action 4: Remove Borrow Rewards handlers as Vault Auth
     function action4() internal isActionSkippable(4) {
         {
             address cbBTC_USDC = getVaultAddress(29);
@@ -287,7 +240,7 @@ contract PayloadIGP95 is PayloadIGPMain {
             address USDe_USDC__USDe_USDC = getVaultAddress(65);
 
             VAULT_FACTORY.setVaultAuth(
-                cbBTC_ETH__cbBTC_ETH,
+                USDe_USDC__USDe_USDC,
                 TEAM_MULTISIG,
                 false
             );
@@ -296,6 +249,11 @@ contract PayloadIGP95 is PayloadIGPMain {
             address FLUID_ETH__ETH = getVaultAddress(75);
 
             VAULT_FACTORY.setVaultAuth(FLUID_ETH__ETH, TEAM_MULTISIG, false);
+        }
+        {
+            address eBTC_cbBTC = getVaultAddress(95);
+
+            VAULT_FACTORY.setVaultAuth(eBTC_cbBTC, TEAM_MULTISIG, false);
         }
     }
 
@@ -323,7 +281,7 @@ contract PayloadIGP95 is PayloadIGPMain {
         }
     }
 
-    // @notice Action 7: Pause Limits for Unlaunched USDe Collateral Vaults
+    // @notice Action 7: Pause Limits for Bugged DEXes
     function action7() internal isActionSkippable(7) {
         {
             address USDC_ETH_DEX = getDexAddress(5);
@@ -364,6 +322,11 @@ contract PayloadIGP95 is PayloadIGPMain {
 
                     setSupplyProtocolLimitsPaused(WBTC_ETH_DEX, ETH_ADDRESS);
                 }
+                {
+                    setBorrowProtocolLimitsPaused(WBTC_ETH_DEX, WBTC_ADDRESS);
+
+                    setBorrowProtocolLimitsPaused(WBTC_ETH_DEX, ETH_ADDRESS);
+                }
             }
 
             {
@@ -372,7 +335,9 @@ contract PayloadIGP95 is PayloadIGPMain {
                 supplyTokens[0] = WBTC_ADDRESS;
                 supplyTokens[1] = ETH_ADDRESS;
 
-                address[] memory borrowTokens = new address[](0);
+                address[] memory borrowTokens = new address[](2);
+                borrowTokens[0] = WBTC_ADDRESS;
+                borrowTokens[1] = ETH_ADDRESS;
 
                 // Pause the user operations
                 LIQUIDITY.pauseUser(WBTC_ETH_DEX, supplyTokens, borrowTokens);
@@ -387,6 +352,11 @@ contract PayloadIGP95 is PayloadIGPMain {
 
                     setSupplyProtocolLimitsPaused(cbBTC_ETH_DEX, ETH_ADDRESS);
                 }
+                {
+                    setBorrowProtocolLimitsPaused(cbBTC_ETH_DEX, cbBTC_ADDRESS);
+
+                    setBorrowProtocolLimitsPaused(cbBTC_ETH_DEX, ETH_ADDRESS);
+                }
             }
 
             {
@@ -395,7 +365,9 @@ contract PayloadIGP95 is PayloadIGPMain {
                 supplyTokens[0] = cbBTC_ADDRESS;
                 supplyTokens[1] = ETH_ADDRESS;
 
-                address[] memory borrowTokens = new address[](0);
+                address[] memory borrowTokens = new address[](2);
+                borrowTokens[0] = cbBTC_ADDRESS;
+                borrowTokens[1] = ETH_ADDRESS;
 
                 // Pause the user operations
                 LIQUIDITY.pauseUser(cbBTC_ETH_DEX, supplyTokens, borrowTokens);
@@ -410,6 +382,11 @@ contract PayloadIGP95 is PayloadIGPMain {
 
                     setSupplyProtocolLimitsPaused(USDe_USDC_DEX, USDC_ADDRESS);
                 }
+                {
+                    setBorrowProtocolLimitsPaused(USDe_USDC_DEX, USDe_ADDRESS);
+
+                    setBorrowProtocolLimitsPaused(USDe_USDC_DEX, USDC_ADDRESS);
+                }
             }
 
             {
@@ -418,7 +395,9 @@ contract PayloadIGP95 is PayloadIGPMain {
                 supplyTokens[0] = USDe_ADDRESS;
                 supplyTokens[1] = USDC_ADDRESS;
 
-                address[] memory borrowTokens = new address[](0);
+                address[] memory borrowTokens = new address[](2);
+                borrowTokens[0] = USDe_ADDRESS;
+                borrowTokens[1] = USDC_ADDRESS;
 
                 // Pause the user operations
                 LIQUIDITY.pauseUser(USDe_USDC_DEX, supplyTokens, borrowTokens);
@@ -426,7 +405,7 @@ contract PayloadIGP95 is PayloadIGPMain {
         }
 
         {
-            address FLUID_ETH_DEX = getDexAddress(8);
+            address FLUID_ETH_DEX = getDexAddress(10);
             {
                 // cbBTC-ETH DEX
                 {
@@ -461,7 +440,7 @@ contract PayloadIGP95 is PayloadIGPMain {
                 tokenB: USDC_ADDRESS,
                 smartCollateral: true,
                 smartDebt: false,
-                baseWithdrawalLimitInUSD: 10_000_000, // $10M
+                baseWithdrawalLimitInUSD: 6_500_000, // $6.5M
                 baseBorrowLimitInUSD: 0, // $0
                 maxBorrowLimitInUSD: 0 // $0
             });
@@ -480,7 +459,7 @@ contract PayloadIGP95 is PayloadIGPMain {
         }
         {
             IFluidDex(RLP_USDC_DEX).updateMaxSupplyShares(
-                7_500_000 * 1e18 // $7.5M
+                5_000_000 * 1e18 // $5M
             );
         }
     }
@@ -507,7 +486,7 @@ contract PayloadIGP95 is PayloadIGPMain {
             }
             {
                 IFluidDex(PAXG_XAUT_DEX).updateMaxSupplyShares(
-                    2_500_000 * 1e18 // $2.5M
+                    1_800_000 * 1e18 // $1.8M
                 );
             }
         }
@@ -736,17 +715,26 @@ contract PayloadIGP95 is PayloadIGPMain {
     function action10() internal isActionSkippable(10) {
         address sUSDe_USDC_VAULT = getVaultAddress(7);
         {
-            VaultConfig memory VAULT_sUSDe_USDC = VaultConfig({
-                vault: sUSDe_USDC_VAULT,
-                vaultType: VAULT_TYPE.TYPE_1,
+            // Set supply protocol limits
+            SupplyProtocolConfig memory supplyConfig_ = SupplyProtocolConfig({
+                protocol: sUSDe_USDC_VAULT,
                 supplyToken: sUSDe_ADDRESS,
-                borrowToken: USDC_ADDRESS,
-                baseWithdrawalLimitInUSD: 0, // $0
-                baseBorrowLimitInUSD: 2_500, // $2.5k
-                maxBorrowLimitInUSD: 5_000 // $5k
+                expandPercent: 1 * 1e2, // 1%
+                expandDuration: 720 hours, // 720 hours
+                baseWithdrawalLimitInUSD: 0 // $0
             });
+            setSupplyProtocolLimits(supplyConfig_);
 
-            setVaultLimits(VAULT_sUSDe_USDC);
+            // Set borrow protocol limits
+            BorrowProtocolConfig memory borrowConfig_ = BorrowProtocolConfig({
+                protocol: sUSDe_USDC_VAULT,
+                borrowToken: USDC_ADDRESS,
+                expandPercent: 1 * 1e2, // 1%
+                expandDuration: 720 hours, // 720 hours
+                baseBorrowLimitInUSD: 2_500, // $2.5k
+                maxBorrowLimitInUSD: 2_500 // $2.5k
+            });
+            setBorrowProtocolLimits(borrowConfig_);
         }
     }
 
