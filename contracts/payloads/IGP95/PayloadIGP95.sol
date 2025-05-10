@@ -783,7 +783,7 @@ contract PayloadIGP95 is PayloadIGPMain {
                     tokenA: wstETH_ADDRESS,
                     tokenB: ETH_ADDRESS,
                     smartCollateral: true,
-                    smartDebt: false,
+                    smartDebt: true,
                     baseWithdrawalLimitInUSD: 20_000_000, // $20M
                     baseBorrowLimitInUSD: 26_000_000, // $26M
                     maxBorrowLimitInUSD: 51_000_000 // $51M
