@@ -99,7 +99,7 @@ contract PayloadIGP95 is PayloadIGPMain {
                 // sUSDe-GHO DEX
                 {
                     // sUSDe-GHO Dex
-                    Dex memory DEX_sUSDe_GHO = Dex({
+                    DexConfig memory DEX_sUSDe_GHO = DexConfig({
                         dex: sUSDe_GHO_DEX,
                         tokenA: sUSDe_ADDRESS,
                         tokenB: GHO_ADDRESS,
@@ -758,7 +758,7 @@ contract PayloadIGP95 is PayloadIGPMain {
 
         // Spell 1: Deposit stETH into Lite
         {
-            uint256 STETH_AMOUNT = IERC20(STETH_ADDRESS).balanceOf(TREASURY);
+            uint256 STETH_AMOUNT = IERC20(stETH_ADDRESS).balanceOf(address(TREASURY));
             targets[0] = "BASIC-D-V2";
             encodedSpells[0] = abi.encodeWithSignature(
                 depositSignature,
@@ -817,7 +817,7 @@ contract PayloadIGP95 is PayloadIGPMain {
 
         {
             // weETH-ETH DEX
-            address WEETH_ETH_DEX = getDexAddress(14);
+            address WEETH_ETH_DEX = getDexAddress(9);
             {
                 // Update max supply shares
                 IFluidDex(WEETH_ETH_DEX).updateMaxSupplyShares(
