@@ -495,7 +495,7 @@ contract PayloadIGP95 is PayloadIGPMain {
             }
             {
                 IFluidDex(PAXG_XAUT_DEX).updateMaxSupplyShares(
-                    280 * 1e18 // $1.8M
+                    310 * 1e18 // $2M
                 );
             }
         }
@@ -758,7 +758,9 @@ contract PayloadIGP95 is PayloadIGPMain {
 
         // Spell 1: Deposit stETH into Lite
         {
-            uint256 STETH_AMOUNT = IERC20(stETH_ADDRESS).balanceOf(address(TREASURY));
+            uint256 STETH_AMOUNT = IERC20(stETH_ADDRESS).balanceOf(
+                address(TREASURY)
+            );
             targets[0] = "BASIC-D-V2";
             encodedSpells[0] = abi.encodeWithSignature(
                 depositSignature,
@@ -842,15 +844,15 @@ contract PayloadIGP95 is PayloadIGPMain {
      */
 
     // Token Prices Constants
-    uint256 public constant ETH_USD_PRICE = 1_750 * 1e2;
-    uint256 public constant wstETH_USD_PRICE = 2_300 * 1e2;
-    uint256 public constant weETH_USD_PRICE = 2_000 * 1e2;
-    uint256 public constant rsETH_USD_PRICE = 1_975 * 1e2;
-    uint256 public constant weETHs_USD_PRICE = 1_930 * 1e2;
-    uint256 public constant mETH_USD_PRICE = 2_000 * 1e2;
-    uint256 public constant ezETH_USD_PRICE = 1_975 * 1e2;
+    uint256 public constant ETH_USD_PRICE = 2_400 * 1e2;
+    uint256 public constant wstETH_USD_PRICE = 2_950 * 1e2;
+    uint256 public constant weETH_USD_PRICE = 2_600 * 1e2;
+    uint256 public constant rsETH_USD_PRICE = 2_550 * 1e2;
+    uint256 public constant weETHs_USD_PRICE = 2_500 * 1e2;
+    uint256 public constant mETH_USD_PRICE = 2_590 * 1e2;
+    uint256 public constant ezETH_USD_PRICE = 2_550 * 1e2;
 
-    uint256 public constant BTC_USD_PRICE = 94_500 * 1e2;
+    uint256 public constant BTC_USD_PRICE = 103_500 * 1e2;
 
     uint256 public constant STABLE_USD_PRICE = 1 * 1e2;
     uint256 public constant sUSDe_USD_PRICE = 1.15 * 1e2;
@@ -860,9 +862,8 @@ contract PayloadIGP95 is PayloadIGPMain {
 
     uint256 public constant RLP_USD_PRICE = 1.16 * 1e2;
     uint256 public constant wstUSR_USD_PRICE = 1.07 * 1e2;
-
-    uint256 public constant XAUT_USD_PRICE = 3_400 * 1e2;
-    uint256 public constant PAXG_USD_PRICE = 3_400 * 1e2;
+    uint256 public constant XAUT_USD_PRICE = 3_350 * 1e2;
+    uint256 public constant PAXG_USD_PRICE = 3_350 * 1e2;
 
     function getRawAmount(
         address token,
