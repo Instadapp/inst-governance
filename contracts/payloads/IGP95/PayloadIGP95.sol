@@ -811,7 +811,7 @@ contract PayloadIGP95 is PayloadIGPMain {
                     memory config_ = new IFluidDex.UserBorrowConfig[](1);
                 config_[0] = IFluidAdminDex.UserBorrowConfig({
                     user: WSTETH_ETH__WSTETH_ETH_VAULT,
-                    expandPercent: 35 * 1e2, // 35%
+                    expandPercent: 30 * 1e2, // 30%
                     expandDuration: 6 hours, // 6 hours
                     baseDebtCeiling: 3_000 * 1e18, // 3k shares
                     maxDebtCeiling: 12_000 * 1e18 // 12k shares
