@@ -87,6 +87,8 @@ contract PayloadIGPConstants {
         0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;  
     address internal constant wstETH_ADDRESS =
         0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0;
+    address internal constant stETH_ADDRESS =
+        0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84;
     address internal constant weETH_ADDRESS =
         0xCd5fE23C85820F7B72D0926FC9b05b43E359b7ee;
     address internal constant rsETH_ADDRESS =
