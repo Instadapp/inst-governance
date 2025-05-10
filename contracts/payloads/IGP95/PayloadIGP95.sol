@@ -790,6 +790,11 @@ contract PayloadIGP95 is PayloadIGPMain {
                 });
                 setDexLimits(DEX_WSTETH_ETH); // Smart Collateral
             }
+            {
+                // Set max supply and borrow shares
+                IFluidDex(WSTETH_ETH_DEX).updateMaxSupplyShares(9000 * 1e18);
+                IFluidDex(WSTETH_ETH_DEX).updateMaxBorrowShares(8100 * 1e18);
+            }
         }
 
         {
@@ -807,12 +812,6 @@ contract PayloadIGP95 is PayloadIGPMain {
                 });
 
                 setVaultLimits(VAULT_WSTETH_ETH); // TYPE_4 => 44
-            }
-            {
-                // Update max borrow shares
-                IFluidDex(WSTETH_ETH__WSTETH_ETH_VAULT).updateMaxBorrowShares(
-                    9_300 * 1e18
-                );
             }
         }
 
