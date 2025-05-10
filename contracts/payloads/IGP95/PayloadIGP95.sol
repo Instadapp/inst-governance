@@ -75,8 +75,11 @@ contract PayloadIGP95 is PayloadIGPMain {
         // Action 12: Deposit stETH from Treasury to Lite
         action12();
 
-        // Action 13: Update limits for wstETH-ETH, weETH-ETH DEXes and vaults
+        // Action 13: Update limits for wstETH-ETH DEX and vault
         action13();
+
+        // Action 14: Update max supply shares and range for weETH-ETH DEX
+        action14();
     }
 
     function verifyProposal() public view override {}
@@ -774,11 +777,11 @@ contract PayloadIGP95 is PayloadIGPMain {
         IDSAV2(TREASURY).cast(targets, encodedSpells, address(this));
     }
 
-    // @notice Action 13: Update limits for wstETH-ETH, weETH-ETH DEXes and vaults
+    // @notice Action 13: Update limits for wstETH-ETH DEX and vault
     function action13() internal isActionSkippable(13) {
+        address WSTETH_ETH_DEX = getDexAddress(1);
         {
             // WSTETH-ETH DEX
-            address WSTETH_ETH_DEX = getDexAddress(1);
             {
                 DexConfig memory DEX_WSTETH_ETH = DexConfig({
                     dex: WSTETH_ETH_DEX,
@@ -802,20 +805,27 @@ contract PayloadIGP95 is PayloadIGPMain {
         {
             // WSTETH-ETH T4 vault
             address WSTETH_ETH__WSTETH_ETH_VAULT = getVaultAddress(44);
+
             {
-                VaultConfig memory VAULT_WSTETH_ETH = VaultConfig({
-                    vault: WSTETH_ETH__WSTETH_ETH_VAULT,
-                    vaultType: VAULT_TYPE.TYPE_4,
-                    supplyToken: address(0),
-                    borrowToken: ETH_ADDRESS,
-                    baseWithdrawalLimitInUSD: 15_000_000, // $15M
-                    baseBorrowLimitInUSD: 15_000_000, // $15M
-                    maxBorrowLimitInUSD: 45_000_000 // $45M
+                IFluidDex.UserBorrowConfig[]
+                    memory config_ = new IFluidDex.UserBorrowConfig[](1);
+                config_[0] = IFluidAdminDex.UserBorrowConfig({
+                    user: WSTETH_ETH__WSTETH_ETH_VAULT,
+                    expandPercent: 35 * 1e2, // 35%
+                    expandDuration: 6 hours, // 6 hours
+                    baseDebtCeiling: 3_000 * 1e18, // 3k shares
+                    maxDebtCeiling: 12_000 * 1e18 // 12k shares
                 });
 
-                setVaultLimits(VAULT_WSTETH_ETH); // TYPE_4 => 44
+                IFluidDex(WSTETH_ETH_DEX).updateUserBorrowConfigs(
+                    config_
+                );
             }
         }
+    }
+    
+    // @notice Action 14: Update max supply shares and range for weETH-ETH DEX
+    function action14() internal isActionSkippable(14) {
 
         {
             // weETH-ETH DEX
