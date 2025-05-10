@@ -72,8 +72,11 @@ contract PayloadIGP95 is PayloadIGPMain {
         // Action 11: Update Range Percentages for USD0-USDC DEX
         action11();
 
-        // Action 12: Deposit ETH from Treasury to Lite
+        // Action 12: Deposit stETH from Treasury to Lite
         action12();
+
+        // Action 13: Update limits for wstETH-ETH, weETH-ETH DEXes and vaults
+        action13();
     }
 
     function verifyProposal() public view override {}
@@ -745,7 +748,7 @@ contract PayloadIGP95 is PayloadIGPMain {
         );
     }
 
-    // @notice Action 12: Deposit ETH from Treasury to Lite
+    // @notice Action 12: Deposit stETH from Treasury to Lite
     function action12() internal isActionSkippable(12) {
         string[] memory targets = new string[](1);
         bytes[] memory encodedSpells = new bytes[](1);
@@ -753,20 +756,90 @@ contract PayloadIGP95 is PayloadIGPMain {
         string
             memory depositSignature = "deposit(address,uint256,uint256,uint256)";
 
-        // Spell 1: Deposit ETH into Lite
+        // Spell 1: Deposit stETH into Lite
         {
-            uint256 ETH_AMOUNT = 1_000_000 * 1e18; //
+            uint256 STETH_AMOUNT = IERC20(STETH_ADDRESS).balanceOf(TREASURY);
             targets[0] = "BASIC-D-V2";
             encodedSpells[0] = abi.encodeWithSignature(
                 depositSignature,
                 IETHV2,
-                ETH_AMOUNT,
+                STETH_AMOUNT,
                 0,
                 0
             );
         }
 
         IDSAV2(TREASURY).cast(targets, encodedSpells, address(this));
+    }
+
+    // @notice Action 13: Update limits for wstETH-ETH, weETH-ETH DEXes and vaults
+    function action13() internal isActionSkippable(13) {
+        {
+            // WSTETH-ETH DEX
+            address WSTETH_ETH_DEX = getDexAddress(1);
+            {
+                DexConfig memory DEX_WSTETH_ETH = DexConfig({
+                    dex: WSTETH_ETH_DEX,
+                    tokenA: wstETH_ADDRESS,
+                    tokenB: ETH_ADDRESS,
+                    smartCollateral: true,
+                    smartDebt: false,
+                    baseWithdrawalLimitInUSD: 20_000_000, // $20M
+                    baseBorrowLimitInUSD: 26_000_000, // $26M
+                    maxBorrowLimitInUSD: 51_000_000 // $51M
+                });
+                setDexLimits(DEX_WSTETH_ETH); // Smart Collateral
+            }
+        }
+
+        {
+            // WSTETH-ETH T4 vault
+            address WSTETH_ETH__WSTETH_ETH_VAULT = getVaultAddress(44);
+            {
+                VaultConfig memory VAULT_WSTETH_ETH = VaultConfig({
+                    vault: WSTETH_ETH__WSTETH_ETH_VAULT,
+                    vaultType: VAULT_TYPE.TYPE_4,
+                    supplyToken: address(0),
+                    borrowToken: ETH_ADDRESS,
+                    baseWithdrawalLimitInUSD: 15_000_000, // $15M
+                    baseBorrowLimitInUSD: 15_000_000, // $15M
+                    maxBorrowLimitInUSD: 45_000_000 // $45M
+                });
+
+                setVaultLimits(VAULT_WSTETH_ETH); // TYPE_4 => 44
+            }
+            {
+                // Update max borrow shares
+                IFluidDex(WSTETH_ETH__WSTETH_ETH_VAULT).updateMaxBorrowShares(
+                    9_300 * 1e18
+                );
+            }
+        }
+
+        {
+            // weETH-ETH T2 vault
+            address weETH_ETH__wstETH_VAULT = getVaultAddress(74);
+            {
+                // Update max borrow to 45.5M$
+                VaultConfig memory VAULT_weETH_ETH = VaultConfig({
+                    vault: weETH_ETH__wstETH_VAULT,
+                    vaultType: VAULT_TYPE.TYPE_2,
+                    supplyToken: address(0),
+                    borrowToken: ETH_ADDRESS,
+                    baseWithdrawalLimitInUSD: 0,
+                    baseBorrowLimitInUSD: 0,
+                    maxBorrowLimitInUSD: 45_500_000 // 45.5M$
+                });
+
+                setVaultLimits(VAULT_weETH_ETH); // TYPE_2 => 74
+            }
+            {
+                // Update max supply shares
+                IFluidDex(weETH_ETH__wstETH_VAULT).updateMaxSupplyShares(
+                    10_000 * 1e18 // ~48M
+                );
+            }
+        }
     }
 
     /**
