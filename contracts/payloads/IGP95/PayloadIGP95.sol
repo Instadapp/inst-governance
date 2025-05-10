@@ -816,26 +816,20 @@ contract PayloadIGP95 is PayloadIGPMain {
         }
 
         {
-            // weETH-ETH T2 vault
-            address weETH_ETH__wstETH_VAULT = getVaultAddress(74);
-            {
-                // Update max borrow to 45.5M$
-                VaultConfig memory VAULT_weETH_ETH = VaultConfig({
-                    vault: weETH_ETH__wstETH_VAULT,
-                    vaultType: VAULT_TYPE.TYPE_2,
-                    supplyToken: address(0),
-                    borrowToken: ETH_ADDRESS,
-                    baseWithdrawalLimitInUSD: 0,
-                    baseBorrowLimitInUSD: 0,
-                    maxBorrowLimitInUSD: 45_500_000 // 45.5M$
-                });
-
-                setVaultLimits(VAULT_weETH_ETH); // TYPE_2 => 74
-            }
+            // weETH-ETH DEX
+            address WEETH_ETH_DEX = getDexAddress(14);
             {
                 // Update max supply shares
-                IFluidDex(weETH_ETH__wstETH_VAULT).updateMaxSupplyShares(
+                IFluidDex(WEETH_ETH_DEX).updateMaxSupplyShares(
                     10_000 * 1e18 // ~48M
+                );
+            }
+            {
+                // Update Range
+                IFluidDex(WEETH_ETH_DEX).updateRangePercents(
+                    0.0001 * 1e4, // +0.0001%
+                    0.07 * 1e4, // -0.07%
+                    0
                 );
             }
         }
