@@ -89,31 +89,35 @@ contract PayloadIGP96 is PayloadIGPMain {
                 DEX_FACTORY.setDexAuth(sUSDe_GHO_DEX, TEAM_MULTISIG, false);
             }
         }
-        //sUSDe-GHO / USDC-GHO
-        address sUSDe_GHO_DEX_ADDRESS = getDexAddress(33);
-        address USDC_GHO_DEX_ADDRESS = getDexAddress(4);
-        address sUSDe_GHO__USDC_GHO_VAULT_ADDRESS = getVaultAddress(125);
 
+        // sUSDe-GHO / USDC-GHO
         {
-            // Update sUSDe-GHO<>USDC-GHO vault borrow shares limit
-            IFluidAdminDex.UserBorrowConfig[]
-                memory config_ = new IFluidAdminDex.UserBorrowConfig[](1);
-            config_[0] = IFluidAdminDex.UserBorrowConfig({
-                user: sUSDe_GHO__USDC_GHO_VAULT_ADDRESS,
-                expandPercent: 30 * 1e2, // 30%
-                expandDuration: 6 hours, // 6 hours
-                baseDebtCeiling: 4_000_000 * 1e18, // 4M shares ($8M)
-                maxDebtCeiling: 5_000_000 * 1e18 // 5M shares ($10M)
-            });
+            address USDC_GHO_DEX_ADDRESS = getDexAddress(4);
+            address sUSDe_GHO__USDC_GHO_VAULT_ADDRESS = getVaultAddress(125);
 
-            IFluidDex(USDC_GHO_DEX_ADDRESS).updateUserBorrowConfigs(config_);
+            {
+                // Update sUSDe-GHO<>USDC-GHO vault borrow shares limit
+                IFluidAdminDex.UserBorrowConfig[]
+                    memory config_ = new IFluidAdminDex.UserBorrowConfig[](1);
+                config_[0] = IFluidAdminDex.UserBorrowConfig({
+                    user: sUSDe_GHO__USDC_GHO_VAULT_ADDRESS,
+                    expandPercent: 30 * 1e2, // 30%
+                    expandDuration: 6 hours, // 6 hours
+                    baseDebtCeiling: 4_000_000 * 1e18, // 4M shares ($8M)
+                    maxDebtCeiling: 5_000_000 * 1e18 // 5M shares ($10M)
+                });
+
+                IFluidDex(USDC_GHO_DEX_ADDRESS).updateUserBorrowConfigs(
+                    config_
+                );
+            }
+
+            VAULT_FACTORY.setVaultAuth(
+                sUSDe_GHO__USDC_GHO_VAULT_ADDRESS,
+                TEAM_MULTISIG,
+                false
+            );
         }
-
-        VAULT_FACTORY.setVaultAuth(
-            sUSDe_GHO__USDC_GHO_VAULT_ADDRESS,
-            TEAM_MULTISIG,
-            false
-        );
     }
 
     // @notice Action 2: Update Range Percent for sUSDS<>USDT DEX
@@ -166,8 +170,8 @@ contract PayloadIGP96 is PayloadIGPMain {
                         mode: 1,
                         expandPercent: 1,
                         expandDuration: 16777215,
-                        baseDebtCeiling: (1 * 1e18) / (ETH_USD_PRICE / 1e2), // $1 in ETH
-                        maxDebtCeiling: (1000 * 1e18) / (ETH_USD_PRICE / 1e2) // $1000 in ETH
+                        baseDebtCeiling: 0.001 ether, // $1 in ETH
+                        maxDebtCeiling: 0.4 ether // $1000 in ETH
                     });
 
                     LIQUIDITY.updateUserBorrowConfigs(configsETH);
@@ -187,28 +191,20 @@ contract PayloadIGP96 is PayloadIGPMain {
     function action5() internal isActionSkippable(5) {
         address wBTC_USDC_VAULT = getVaultAddress(21);
         address wBTC_USDT_VAULT = getVaultAddress(22);
+        address wBTC_GHO_VAULT = getVaultAddress(59);
+        address wBTC_USDe_VAULT = getVaultAddress(72);
         address cbBTC_USDC_VAULT = getVaultAddress(29);
         address cbBTC_USDT_VAULT = getVaultAddress(30);
+        address cbBTC_GHO_VAULT = getVaultAddress(60);
+        address cbBTC_USDe_VAULT = getVaultAddress(73);
+        address cbBTC_SUSDS_VAULT = getVaultAddress(86);
 
-        uint256 CF = 85 * 1e2;
         uint256 LT = 90 * 1e2;
-        uint256 LML = 92.5 * 1e2;
 
-        IFluidVaultT1(wBTC_USDC_VAULT).updateLiquidationMaxLimit(LML);
         IFluidVaultT1(wBTC_USDC_VAULT).updateLiquidationThreshold(LT);
-        IFluidVaultT1(wBTC_USDC_VAULT).updateCollateralFactor(CF);
-
-        IFluidVaultT1(wBTC_USDT_VAULT).updateLiquidationMaxLimit(LML);
         IFluidVaultT1(wBTC_USDT_VAULT).updateLiquidationThreshold(LT);
-        IFluidVaultT1(wBTC_USDT_VAULT).updateCollateralFactor(CF);
-
-        IFluidVaultT1(cbBTC_USDC_VAULT).updateLiquidationMaxLimit(LML);
         IFluidVaultT1(cbBTC_USDC_VAULT).updateLiquidationThreshold(LT);
-        IFluidVaultT1(cbBTC_USDC_VAULT).updateCollateralFactor(CF);
-
-        IFluidVaultT1(cbBTC_USDT_VAULT).updateLiquidationMaxLimit(LML);
         IFluidVaultT1(cbBTC_USDT_VAULT).updateLiquidationThreshold(LT);
-        IFluidVaultT1(cbBTC_USDT_VAULT).updateCollateralFactor(CF);
     }
 
     /**
