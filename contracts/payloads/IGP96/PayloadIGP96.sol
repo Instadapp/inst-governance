@@ -39,20 +39,17 @@ contract PayloadIGP96 is PayloadIGPMain {
     function execute() public virtual override {
         super.execute();
 
-        // Action 1: Set launch limits for sUSDe-GHO/USDC-GHO T4 vault
+        // Action 1: Update Range Percent for sUSDS<>USDT DEX
         action1();
 
-        // Action 2: Update Range Percent for sUSDS<>USDT DEX
+        // Action 2: Update Max Borrow Limits for Deprecated DEXes
         action2();
 
-        // Action 3: Update Max Borrow Limits for Deprecated DEXes
+        // Action 3: Remove Team MS as Auth on XAUT<>PAXG DEX
         action3();
 
-        // Action 4: Remove Team MS as Auth on XAUT<>PAXG DEX
+        // Action 4: Update LT for cbBTC/stable, WBTC/stable Vaults
         action4();
-
-        // Action 5: Update LT for cbBTC/stable, WBTC/stable Vaults
-        action5();
     }
 
     function verifyProposal() public view override {}
@@ -67,61 +64,8 @@ contract PayloadIGP96 is PayloadIGPMain {
      * |__________________________________
      */
 
-    // @notice Action 1: Set launch limits for sUSDe-GHO/USDC-GHO T4 vault
+    // @notice Action 1: Update Range Percent for sUSDS<>USDT DEX
     function action1() internal isActionSkippable(1) {
-        address sUSDe_GHO_DEX = getDexAddress(33);
-        {
-            // sUSDe-GHO DEX
-            {
-                // sUSDe-GHO Dex
-                DexConfig memory DEX_sUSDe_GHO = DexConfig({
-                    dex: sUSDe_GHO_DEX,
-                    tokenA: sUSDe_ADDRESS,
-                    tokenB: GHO_ADDRESS,
-                    smartCollateral: true,
-                    smartDebt: false,
-                    baseWithdrawalLimitInUSD: 10_000_000, // $10M
-                    baseBorrowLimitInUSD: 0, // $0
-                    maxBorrowLimitInUSD: 0 // $0
-                });
-                setDexLimits(DEX_sUSDe_GHO); // Smart Collateral
-
-                DEX_FACTORY.setDexAuth(sUSDe_GHO_DEX, TEAM_MULTISIG, false);
-            }
-        }
-
-        // sUSDe-GHO / USDC-GHO
-        {
-            address USDC_GHO_DEX_ADDRESS = getDexAddress(4);
-            address sUSDe_GHO__USDC_GHO_VAULT_ADDRESS = getVaultAddress(125);
-
-            {
-                // Update sUSDe-GHO<>USDC-GHO vault borrow shares limit
-                IFluidAdminDex.UserBorrowConfig[]
-                    memory config_ = new IFluidAdminDex.UserBorrowConfig[](1);
-                config_[0] = IFluidAdminDex.UserBorrowConfig({
-                    user: sUSDe_GHO__USDC_GHO_VAULT_ADDRESS,
-                    expandPercent: 30 * 1e2, // 30%
-                    expandDuration: 6 hours, // 6 hours
-                    baseDebtCeiling: 4_000_000 * 1e18, // 4M shares ($8M)
-                    maxDebtCeiling: 5_000_000 * 1e18 // 5M shares ($10M)
-                });
-
-                IFluidDex(USDC_GHO_DEX_ADDRESS).updateUserBorrowConfigs(
-                    config_
-                );
-            }
-
-            VAULT_FACTORY.setVaultAuth(
-                sUSDe_GHO__USDC_GHO_VAULT_ADDRESS,
-                TEAM_MULTISIG,
-                false
-            );
-        }
-    }
-
-    // @notice Action 2: Update Range Percent for sUSDS<>USDT DEX
-    function action2() internal isActionSkippable(2) {
         address SUSDS_USDT_DEX_ADDRESS = getDexAddress(31);
 
         IFluidDex(SUSDS_USDT_DEX_ADDRESS).updateRangePercents(
@@ -131,8 +75,8 @@ contract PayloadIGP96 is PayloadIGPMain {
         );
     }
 
-    // @notice Action 3: Update Max Borrow Limits for Deprecated DEXes
-    function action3() internal isActionSkippable(3) {
+    // @notice Action 2: Update Max Borrow Limits for Deprecated DEXes
+    function action2() internal isActionSkippable(2) {
         address USDC_ETH_DEX = getDexAddress(5);
         {
             // USDC-ETH DEX
@@ -180,15 +124,15 @@ contract PayloadIGP96 is PayloadIGPMain {
         }
     }
 
-    // @notice Action 4: Remove Team MS as Auth on XAUT<>PAXG DEX
-    function action4() internal isActionSkippable(4) {
+    // @notice Action 3: Remove Team MS as Auth on XAUT<>PAXG DEX
+    function action3() internal isActionSkippable(3) {
         address XAUT_PAXG_DEX = getDexAddress(32);
 
         DEX_FACTORY.setDexAuth(XAUT_PAXG_DEX, TEAM_MULTISIG, false);
     }
 
-    // @notice Action 5: Update LT for cbBTC/stable, WBTC/stable Vaults
-    function action5() internal isActionSkippable(5) {
+    // @notice Action 4: Update LT for cbBTC/stable, WBTC/stable Vaults
+    function action4() internal isActionSkippable(4) {
         address wBTC_USDC_VAULT = getVaultAddress(21);
         address wBTC_USDT_VAULT = getVaultAddress(22);
         address wBTC_GHO_VAULT = getVaultAddress(59);
@@ -203,8 +147,13 @@ contract PayloadIGP96 is PayloadIGPMain {
 
         IFluidVaultT1(wBTC_USDC_VAULT).updateLiquidationThreshold(LT);
         IFluidVaultT1(wBTC_USDT_VAULT).updateLiquidationThreshold(LT);
+        IFluidVaultT1(wBTC_GHO_VAULT).updateLiquidationThreshold(LT);
+        IFluidVaultT1(wBTC_USDe_VAULT).updateLiquidationThreshold(LT);
         IFluidVaultT1(cbBTC_USDC_VAULT).updateLiquidationThreshold(LT);
         IFluidVaultT1(cbBTC_USDT_VAULT).updateLiquidationThreshold(LT);
+        IFluidVaultT1(cbBTC_GHO_VAULT).updateLiquidationThreshold(LT);
+        IFluidVaultT1(cbBTC_USDe_VAULT).updateLiquidationThreshold(LT);
+        IFluidVaultT1(cbBTC_SUSDS_VAULT).updateLiquidationThreshold(LT);
     }
 
     /**
