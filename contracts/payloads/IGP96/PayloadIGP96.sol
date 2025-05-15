@@ -114,7 +114,7 @@ contract PayloadIGP96 is PayloadIGPMain {
                         mode: 1,
                         expandPercent: 1,
                         expandDuration: 16777215,
-                        baseDebtCeiling: 0.001 ether, // $1 in ETH
+                        baseDebtCeiling: 0.001 ether, // $2.5 in ETH
                         maxDebtCeiling: 0.4 ether // $1000 in ETH
                     });
 
