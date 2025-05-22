@@ -145,7 +145,6 @@ contract PayloadIGP97 is PayloadIGPMain {
         {
             //sUSDe-USDT / USDT-USDC-CONCENTRATED
             address sUSDe_USDT_DEX_ADDRESS = getDexAddress(15);
-            address USDT_USDC_CONCENTRATED_DEX_ADDRESS = getDexAddress(34);
             address sUSDe_USDT__USDT_USDC_CONCENTRATED_VAULT_ADDRESS = getVaultAddress(
                     126
                 );
@@ -176,7 +175,6 @@ contract PayloadIGP97 is PayloadIGPMain {
         {
             //USDe-USDT / USDT-USDC-CONCENTRATED
             address USDe_USDT_DEX_ADDRESS = getDexAddress(18);
-            address USDT_USDC_CONCENTRATED_DEX_ADDRESS = getDexAddress(34);
             address USDe_USDT__USDT_USDC_CONCENTRATED_VAULT_ADDRESS = getVaultAddress(
                     127
                 );
@@ -230,8 +228,8 @@ contract PayloadIGP97 is PayloadIGPMain {
 
         {
             // Update Min Max center price
-            uint256 minCenterPrice_ = (9965 * 1e27) / 10000;
-            uint256 maxCenterPrice_ = uint256(1e27 * 10005) / 10000;
+            uint256 minCenterPrice_ = (9985 * 9980 * 1e27) / 1e8;
+            uint256 maxCenterPrice_ = uint256(9985 * 1e27) / 9980;
             IFluidDex(cbBTC_wBTC_DEX_ADDRESS).updateCenterPriceLimits(
                 maxCenterPrice_,
                 minCenterPrice_
@@ -240,9 +238,9 @@ contract PayloadIGP97 is PayloadIGPMain {
 
         {
             IFluidDex(cbBTC_wBTC_DEX_ADDRESS).updateCenterPriceAddress(
-                address(0), //TODO: Add address
-                100e4,
-                0
+                142,
+                0.3e4,
+                2 days
             );
         }
     }
