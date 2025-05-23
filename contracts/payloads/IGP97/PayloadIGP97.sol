@@ -47,6 +47,9 @@ contract PayloadIGP97 is PayloadIGPMain {
 
         // Action 3: Update Range and Center Price for WBTC-cbBTC
         action3();
+
+        // Action 4: Update Rate Curve for sUSDS
+        action4();
     }
 
     function verifyProposal() public view override {}
@@ -234,6 +237,24 @@ contract PayloadIGP97 is PayloadIGPMain {
                 2 days
             );
         }
+    }
+
+    // @notice Action 4: Update Rate Curve for sUSDS
+    function action4() internal isActionSkippable(4) {
+        FluidLiquidityAdminStructs.RateDataV1Params[]
+            memory params_ = new FluidLiquidityAdminStructs.RateDataV1Params[](
+                1
+            );
+
+        params_[0] = FluidLiquidityAdminStructs.RateDataV1Params({
+            token: sUSDs_ADDRESS, // sUSDs
+            kink: 90 * 1e2, // 90%
+            rateAtUtilizationZero: 0, // 0%
+            rateAtUtilizationKink: 0.75 * 1e2, // 0.75%
+            rateAtUtilizationMax: 10 * 1e2 // 10%
+        });
+
+        LIQUIDITY.updateRateDataV1s(params_);
     }
 
     /**
