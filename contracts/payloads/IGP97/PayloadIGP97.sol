@@ -218,18 +218,9 @@ contract PayloadIGP97 is PayloadIGPMain {
         }
 
         {
-            // update the upper and lower range +-0.2%
-            IFluidDex(cbBTC_wBTC_DEX_ADDRESS).updateRangePercents(
-                0.2 * 1e4,
-                0.2 * 1e4,
-                2 days
-            );
-        }
-
-        {
             // Update Min Max center price
-            uint256 minCenterPrice_ = (9985 * 9980 * 1e27) / 1e8;
-            uint256 maxCenterPrice_ = uint256(9985 * 1e27) / 9980;
+            uint256 minCenterPrice_ = (9985 * 9975 * 1e27) / 1e8;
+            uint256 maxCenterPrice_ = uint256(9985 * 1e27) / 9975;
             IFluidDex(cbBTC_wBTC_DEX_ADDRESS).updateCenterPriceLimits(
                 maxCenterPrice_,
                 minCenterPrice_
