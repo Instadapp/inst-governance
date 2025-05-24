@@ -50,6 +50,9 @@ contract PayloadIGP97 is PayloadIGPMain {
 
         // Action 4: Update Rate Curve for sUSDS
         action4();
+
+        // Action 5: Set Launch Limits for iUSD-USDe DEX
+        action5();
     }
 
     function verifyProposal() public view override {}
@@ -257,6 +260,36 @@ contract PayloadIGP97 is PayloadIGPMain {
         LIQUIDITY.updateRateDataV1s(params_);
     }
 
+    // @notice Action 5: Set Launch Limits for  iUSD-USDe DEX
+    function action5() internal isActionSkippable(5) {
+        address iUSD_USDe_DEX_ADDRESS = getDexAddress(35);
+
+        {
+            // iUSD-USDe DEX
+            {
+                // iUSD-USDe Dex
+                DexConfig memory DEX_iUSD_USDe = DexConfig({
+                    dex: iUSD_USDe_DEX_ADDRESS,
+                    tokenA: iUSD_ADDRESS,
+                    tokenB: USDe_ADDRESS,
+                    smartCollateral: true,
+                    smartDebt: false,
+                    baseWithdrawalLimitInUSD: 5_000_000, // $5M
+                    baseBorrowLimitInUSD: 0, // $0
+                    maxBorrowLimitInUSD: 0 // $0
+                });
+                setDexLimits(DEX_iUSD_USDe); // Smart Collateral
+
+                DEX_FACTORY.setDexAuth(iUSD_USDe_DEX_ADDRESS, TEAM_MULTISIG, true);
+            }
+            {
+                IFluidDex(iUSD_USDe_DEX_ADDRESS).updateMaxSupplyShares(
+                    5_000_000 * 1e18 // $10M
+                );
+            }
+        }
+    }
+
     /**
      * |
      * |     Payload Actions End Here      |
@@ -356,7 +389,8 @@ contract PayloadIGP97 is PayloadIGPMain {
             token == USR_ADDRESS ||
             token == USD0_ADDRESS ||
             token == fxUSD_ADDRESS ||
-            token == BOLD_ADDRESS
+            token == BOLD_ADDRESS ||
+            token == iUSD_ADDRESS
         ) {
             usdPrice = STABLE_USD_PRICE;
             decimals = 18;
