@@ -282,11 +282,6 @@ contract PayloadIGP97 is PayloadIGPMain {
 
                 DEX_FACTORY.setDexAuth(iUSD_USDe_DEX_ADDRESS, TEAM_MULTISIG, true);
             }
-            {
-                IFluidDex(iUSD_USDe_DEX_ADDRESS).updateMaxSupplyShares(
-                    5_000_000 * 1e18 // $10M
-                );
-            }
         }
     }
 
