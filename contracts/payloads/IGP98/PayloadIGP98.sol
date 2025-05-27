@@ -39,7 +39,7 @@ contract PayloadIGP98 is PayloadIGPMain {
     function execute() public virtual override {
         super.execute();
 
-        // Action 1: Update Range and center Price for USDC-USDT-CONCENTRATED DEX
+        // Action 1: Update Range and center Price for USDC-USDT DEX
         action1();
 
         // Action 2: Update Range and Center Price for WBTC-cbBTC DEX
@@ -50,6 +50,9 @@ contract PayloadIGP98 is PayloadIGPMain {
 
         // Action 4: Update Vault & DEX Auth for FLUID-ETH / ETH Vault and FLUID-ETH DEX
         action4();
+
+        // Action 5: Update Borrow Shares for GHO-USDC DEX
+        action5();
     }
 
     function verifyProposal() public view override {}
@@ -64,31 +67,31 @@ contract PayloadIGP98 is PayloadIGPMain {
      * |__________________________________
      */
 
-    // @notice Action 1: Update Range and center Price for USDC-USDT-CONCENTRATED DEX
+    // @notice Action 1: Update Range and center Price for USDC-USDT DEX
     function action1() internal isActionSkippable(1) {
         {
-            address USDC_USDT_CONCENTRATED_DEX = getDexAddress(34);
+            address USDC_USDT_DEX = getDexAddress(2);
             {
-                // USDC-USDT-CONCENTRATED DEX
+                // USDC-USDT DEX
                 {
-                    IFluidDex(USDC_USDT_CONCENTRATED_DEX).updateRangePercents(
+                    IFluidDex(USDC_USDT_DEX).updateRangePercents(
                         0.15 * 1e4, // +0.15%
                         0.15 * 1e4, // -0.15%
                         0
                     );
 
                     // Non Rebalancing
-                    IFluidDex(USDC_USDT_CONCENTRATED_DEX)
+                    IFluidDex(USDC_USDT_DEX)
                         .updateThresholdPercent(0, 0, 16777215, 0);
 
                     // Update center price address to 0.15%
-                    IFluidDex(USDC_USDT_CONCENTRATED_DEX)
+                    IFluidDex(USDC_USDT_DEX)
                         .updateCenterPriceAddress(147, 0.1e4, 2 days);
 
                     // Update Min Max center prices from 0.15% to 0.15% with center = 1
                     uint256 minCenterPrice_ = (9985 * 1e27) / 10000;
                     uint256 maxCenterPrice_ = uint256(1e27 * 10000) / 9985;
-                    IFluidDex(USDC_USDT_CONCENTRATED_DEX)
+                    IFluidDex(USDC_USDT_DEX)
                         .updateCenterPriceLimits(
                             maxCenterPrice_,
                             minCenterPrice_
@@ -155,6 +158,13 @@ contract PayloadIGP98 is PayloadIGPMain {
         }
     }
 
+    // @notice Action 5: Update Borrow Shares for GHO-USDC DEX
+    function action5() internal isActionSkippable(5) {
+        address GHO_USDC_DEX = getDexAddress(4);
+        {
+            IFluidDex(GHO_USDC_DEX).updateMaxBorrowShares(9_000_000 * 1e18); // from 6M shares
+        }
+    }
     /**
      * |
      * |     Payload Actions End Here      |
