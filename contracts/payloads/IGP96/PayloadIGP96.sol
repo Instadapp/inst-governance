@@ -83,12 +83,12 @@ contract PayloadIGP96 is PayloadIGPMain {
             {
                 {
                     // Set debt ceiling for USDC token
-                    AdminModuleStructs.UserBorrowConfig[]
-                        memory configsUSDC = new AdminModuleStructs.UserBorrowConfig[](
+                    FluidLiquidityAdminStructs.UserBorrowConfig[]
+                        memory configsUSDC = new FluidLiquidityAdminStructs.UserBorrowConfig[](
                             1
                         );
 
-                    configsUSDC[0] = AdminModuleStructs.UserBorrowConfig({
+                    configsUSDC[0] = FluidLiquidityAdminStructs.UserBorrowConfig({
                         user: USDC_ETH_DEX,
                         token: USDC_ADDRESS,
                         mode: 1,
@@ -103,12 +103,12 @@ contract PayloadIGP96 is PayloadIGPMain {
 
                 {
                     // Set debt ceiling for ETH token
-                    AdminModuleStructs.UserBorrowConfig[]
-                        memory configsETH = new AdminModuleStructs.UserBorrowConfig[](
+                    FluidLiquidityAdminStructs.UserBorrowConfig[]
+                        memory configsETH = new FluidLiquidityAdminStructs.UserBorrowConfig[](
                             1
                         );
 
-                    configsETH[0] = AdminModuleStructs.UserBorrowConfig({
+                    configsETH[0] = FluidLiquidityAdminStructs.UserBorrowConfig({
                         user: USDC_ETH_DEX,
                         token: ETH_ADDRESS,
                         mode: 1,
