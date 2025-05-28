@@ -149,7 +149,7 @@ contract PayloadIGP98 is PayloadIGPMain {
             {
                 // Set max borrow shares
                 IFluidDex(USDC_USDT_CONCENTRATED_DEX).updateMaxBorrowShares(
-                    20_000_000 * 1e18
+                    10_000_000 * 1e18
                 );
             }
         }
