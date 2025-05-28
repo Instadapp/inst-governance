@@ -131,7 +131,7 @@ contract PayloadIGP98 is PayloadIGPMain {
 
         {
             // Update Min Max center price
-            uint256 minCenterPrice_ = (9985 * 1e27) / 10000;
+            uint256 minCenterPrice_ = (9984 * 1e27) / 10000;
             uint256 maxCenterPrice_ = (9990 * 1e27) / 10000;
             IFluidDex(cbBTC_wBTC_DEX_ADDRESS).updateCenterPriceLimits(
                 maxCenterPrice_,
@@ -232,6 +232,7 @@ contract PayloadIGP98 is PayloadIGPMain {
             setDexLimits(DEX_USDC_USDT_CONCENTRATED); // Smart Debt
         }
     }
+
     /**
      * |
      * |     Payload Actions End Here      |
