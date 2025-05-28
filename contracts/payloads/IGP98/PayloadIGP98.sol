@@ -77,7 +77,7 @@ contract PayloadIGP98 is PayloadIGPMain {
                     IFluidDex(USDC_USDT_DEX).updateRangePercents(
                         0.15 * 1e4, // +0.15%
                         0.15 * 1e4, // -0.15%
-                        0
+                        5 days
                     );
 
                     // Non Rebalancing
@@ -92,15 +92,7 @@ contract PayloadIGP98 is PayloadIGPMain {
                     IFluidDex(USDC_USDT_DEX).updateCenterPriceAddress(
                         147,
                         0.1e4,
-                        2 days
-                    );
-
-                    // Update Min Max center prices from 0.15% to 0.15% with center = 1
-                    uint256 minCenterPrice_ = (9985 * 1e27) / 10000;
-                    uint256 maxCenterPrice_ = uint256(1e27 * 10000) / 9985;
-                    IFluidDex(USDC_USDT_DEX).updateCenterPriceLimits(
-                        maxCenterPrice_,
-                        minCenterPrice_
+                        5 days
                     );
 
                     address FeeHandler = 0x65454D16A39c7b5b52A67116FC1cf0a5e5942EFd;
@@ -181,6 +173,7 @@ contract PayloadIGP98 is PayloadIGPMain {
             IFluidDex(GHO_USDC_DEX).updateMaxBorrowShares(11_000_000 * 1e18); // from 6M shares
         }
     }
+
     /**
      * |
      * |     Payload Actions End Here      |
