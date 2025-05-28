@@ -120,6 +120,16 @@ contract PayloadIGP98 is PayloadIGPMain {
         address cbBTC_wBTC_DEX_ADDRESS = getDexAddress(3);
 
         {
+            // Non Rebalancing
+            IFluidDex(cbBTC_wBTC_DEX_ADDRESS).updateThresholdPercent(
+                0,
+                0,
+                16777215,
+                0
+            );
+        }
+
+        {
             // Update Min Max center price
             uint256 minCenterPrice_ = (9985 * 1e27) / 10000;
             uint256 maxCenterPrice_ = (9990 * 1e27) / 10000;
