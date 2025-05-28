@@ -178,7 +178,7 @@ contract PayloadIGP98 is PayloadIGPMain {
     function action5() internal isActionSkippable(5) {
         address GHO_USDC_DEX = getDexAddress(4);
         {
-            IFluidDex(GHO_USDC_DEX).updateMaxBorrowShares(11_000_000 * 1e18); // from 11M shares
+            IFluidDex(GHO_USDC_DEX).updateMaxBorrowShares(11_000_000 * 1e18); // from 6M shares
         }
     }
 
@@ -187,9 +187,9 @@ contract PayloadIGP98 is PayloadIGPMain {
         address sUSDe_USDT__USDT_VAULT = getVaultAddress(92);
         {
             // [TYPE 2] sUSDe-USDT<>USDT | smart collateral & debt
-            Vault memory VAULT_sUSDe_USDT_USDT = Vault({
+            VaultConfig memory VAULT_sUSDe_USDT_USDT = VaultConfig({
                 vault: sUSDe_USDT__USDT_VAULT,
-                vaultType: TYPE.TYPE_2,
+                vaultType: VAULT_TYPE.TYPE_2,
                 supplyToken: address(0),
                 borrowToken: USDT_ADDRESS,
                 baseWithdrawalLimitInUSD: 0,
