@@ -56,6 +56,9 @@ contract PayloadIGP98 is PayloadIGPMain {
 
         // Action 6: Update borrow limits for sUSDe-USDT<>USDT vault
         action6();
+
+        // Action 7: Update limits for USDC-USDT-CONCENTRATED DEX
+        action7();
     }
 
     function verifyProposal() public view override {}
@@ -125,7 +128,7 @@ contract PayloadIGP98 is PayloadIGPMain {
         );
     }
 
-    // @notice Action 3: Update Limits for sUSDe-USDT, USDe-USDT and new USDC-USDT DEXes
+    // @notice Action 3: Update Limits for sUSDe-USDT, USDe-USDT DEXes
     function action3() internal isActionSkippable(3) {
         {
             address sUSDe_USDT_DEX = getDexAddress(15);
@@ -145,24 +148,6 @@ contract PayloadIGP98 is PayloadIGPMain {
                     17_500_000 * 1e18 // from 12.5M shares
                 );
             }
-        }
-
-        {
-            // USDC-USDT-CONCENTRATED DEX
-                {
-                    // USDC-USDT-CONCENTRATED Dex
-                    DexConfig memory DEX_USDC_USDT_CONCENTRATED = DexConfig({
-                        dex: USDC_USDT_CONCENTRATED_DEX,
-                        tokenA: USDC_ADDRESS,
-                        tokenB: USDT_ADDRESS,
-                        smartCollateral: false,
-                        smartDebt: true,
-                        baseWithdrawalLimitInUSD: 0, // $0
-                        baseBorrowLimitInUSD: 12_500_000 // $12.5M
-                        maxBorrowLimitInUSD: 20_500_000, // $20.5M
-                    });
-                    setDexLimits(DEX_USDC_USDT_CONCENTRATED); // Smart Debt
-                }
         }
     }
 
@@ -206,6 +191,27 @@ contract PayloadIGP98 is PayloadIGPMain {
             });
 
             setVaultLimits(VAULT_sUSDe_USDT_USDT); // TYPE_2 => 92
+        }
+    }
+
+    // @notice Action 7: Update limits for USDC-USDT-CONCENTRATED DEX
+    function action7() internal isActionSkippable(7) {
+        {
+            address USDC_USDT_CONCENTRATED_DEX = getDexAddress(34);
+                {
+                    // USDC-USDT-CONCENTRATED Dex
+                    DexConfig memory DEX_USDC_USDT_CONCENTRATED = DexConfig({
+                        dex: USDC_USDT_CONCENTRATED_DEX,
+                        tokenA: USDC_ADDRESS,
+                        tokenB: USDT_ADDRESS,
+                        smartCollateral: false,
+                        smartDebt: true,
+                        baseWithdrawalLimitInUSD: 0, // $0
+                        baseBorrowLimitInUSD: 12_500_000, // $12.5M
+                        maxBorrowLimitInUSD: 20_500_000 // $20.5M
+                    });
+                    setDexLimits(DEX_USDC_USDT_CONCENTRATED); // Smart Debt
+                }
         }
     }
     /**
