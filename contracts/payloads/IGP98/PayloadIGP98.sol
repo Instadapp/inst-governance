@@ -178,7 +178,7 @@ contract PayloadIGP98 is PayloadIGPMain {
     function action5() internal isActionSkippable(5) {
         address GHO_USDC_DEX = getDexAddress(4);
         {
-            IFluidDex(GHO_USDC_DEX).updateMaxBorrowShares(9_000_000 * 1e18); // from 6M shares
+            IFluidDex(GHO_USDC_DEX).updateMaxBorrowShares(11_000_000 * 1e18); // from 6M shares
         }
     }
     /**
