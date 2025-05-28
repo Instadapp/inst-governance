@@ -122,7 +122,7 @@ contract PayloadIGP98 is PayloadIGPMain {
         );
     }
 
-    // @notice Action 3: Update Limits for sUSDe-USDT and USDe-USDT DEXes
+    // @notice Action 3: Update Limits for sUSDe-USDT, USDe-USDT and new USDC-USDT DEXes
     function action3() internal isActionSkippable(3) {
         {
             address sUSDe_USDT_DEX = getDexAddress(15);
