@@ -148,13 +148,21 @@ contract PayloadIGP98 is PayloadIGPMain {
         }
 
         {
-            address USDC_USDT_CONCENTRATED_DEX = getDexAddress(34);
-            {
-                // Set max borrow shares
-                IFluidDex(USDC_USDT_CONCENTRATED_DEX).updateMaxBorrowShares(
-                    10_000_000 * 1e18
-                );
-            }
+            // USDC-USDT-CONCENTRATED DEX
+                {
+                    // USDC-USDT-CONCENTRATED Dex
+                    DexConfig memory DEX_USDC_USDT_CONCENTRATED = DexConfig({
+                        dex: USDC_USDT_CONCENTRATED_DEX,
+                        tokenA: USDC_ADDRESS,
+                        tokenB: USDT_ADDRESS,
+                        smartCollateral: false,
+                        smartDebt: true,
+                        baseWithdrawalLimitInUSD: 0, // $0
+                        baseBorrowLimitInUSD: 12_500_000 // $12.5M
+                        maxBorrowLimitInUSD: 20_500_000, // $20.5M
+                    });
+                    setDexLimits(DEX_USDC_USDT_CONCENTRATED); // Smart Debt
+                }
         }
     }
 
