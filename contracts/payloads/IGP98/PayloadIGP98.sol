@@ -145,11 +145,11 @@ contract PayloadIGP98 is PayloadIGPMain {
         }
 
         {
-            address USDC_USDT_DEX = getDexAddress(2);
+            address USDC_USDT_CONCENTRATED_DEX = getDexAddress(34);
             {
                 // Set max borrow shares
-                IFluidDex(USDC_USDT_DEX).updateMaxBorrowShares(
-                    38_000_000 * 1e18 // from 35M shares
+                IFluidDex(USDC_USDT_CONCENTRATED_DEX).updateMaxBorrowShares(
+                    20_000_000 * 1e18
                 );
             }
         }
@@ -179,6 +179,24 @@ contract PayloadIGP98 is PayloadIGPMain {
         }
     }
 
+    // @notice Action 6: Update borrow limits for sUSDe-USDT<>USDT vault
+    function action6() internal isActionSkippable(6) {
+        address sUSDe_USDT__USDT_VAULT = getVaultAddress(92);
+        {
+            // [TYPE 2] sUSDe-USDT<>USDT | smart collateral & debt
+            Vault memory VAULT_sUSDe_USDT_USDT = Vault({
+                vault: sUSDe_USDT__USDT_VAULT,
+                vaultType: TYPE.TYPE_2,
+                supplyToken: address(0),
+                borrowToken: USDT_ADDRESS,
+                baseWithdrawalLimitInUSD: 0,
+                baseBorrowLimitInUSD: 12_000_000, // $12M
+                maxBorrowLimitInUSD: 25_000_000 // $25M
+            });
+
+            setVaultLimits(VAULT_sUSDe_USDT_USDT); // TYPE_2 => 92
+        }
+    }
     /**
      * |
      * |     Payload Actions End Here      |
