@@ -142,7 +142,7 @@ contract PayloadIGP98 is PayloadIGPMain {
         {
             IFluidDex(cbBTC_wBTC_DEX_ADDRESS).updateCenterPriceAddress(
                 142,
-                0.5e4,
+                0.05e4,
                 5 days
             );
         }
