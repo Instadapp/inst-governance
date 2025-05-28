@@ -102,7 +102,7 @@ contract PayloadIGP98 is PayloadIGPMain {
                     );
 
                     address FeeHandler = 0x65454D16A39c7b5b52A67116FC1cf0a5e5942EFd;
-                    // Add new handler as auth
+                    // Remove old handler as auth
                     DEX_FACTORY.setDexAuth(USDC_USDT_DEX, FeeHandler, false);
 
                     //Update Trading Fee
