@@ -181,9 +181,7 @@ contract PayloadIGP97 is PayloadIGPMain {
         {
             //USDe-USDT / USDT-USDC-CONCENTRATED
             address USDe_USDT_DEX_ADDRESS = getDexAddress(18);
-            address USDe_USDT__USDT_USDC_CONCENTRATED_VAULT_ADDRESS = getVaultAddress(
-                    127
-                );
+            address USDe_USDT__USDT_USDC_CONCENTRATED_VAULT_ADDRESS = getVaultAddress(127);
 
             {
                 // Update USDe-USDT<>USDT-USDC-CONCENTRATED vault supply shares limit
