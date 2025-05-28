@@ -112,9 +112,14 @@ contract PayloadIGP98 is PayloadIGPMain {
     // @notice Action 2: Update Range and Center Price for WBTC-cbBTC DEX
     function action2() internal isActionSkippable(2) {
         address cbBTC_wBTC_DEX_ADDRESS = getDexAddress(3);
-        {
-            IFluidDex(cbBTC_wBTC_DEX_ADDRESS).updateCenterPriceAddress(0, 1, 1);
-        }
+
+        // Update Min & Max center prices from -0.15% to -0.1%
+        uint256 minCenterPrice_ = (9985 * 1e27) / 10000;
+        uint256 maxCenterPrice_ = (9990 * 1e27) / 10000;
+        IFluidDex(cbBTC_wBTC_DEX_ADDRESS).updateCenterPriceLimits(
+            maxCenterPrice_,
+            minCenterPrice_
+        );
     }
 
     // @notice Action 3: Update Limits for sUSDe-USDT and USDe-USDT DEXes
