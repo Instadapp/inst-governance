@@ -216,8 +216,8 @@ contract PayloadIGP98 is PayloadIGPMain {
                 smartCollateral: false,
                 smartDebt: true,
                 baseWithdrawalLimitInUSD: 0, // $0
-                baseBorrowLimitInUSD: 12_500_000, // $12.5M
-                maxBorrowLimitInUSD: 20_500_000 // $20.5M
+                baseBorrowLimitInUSD: 11_000_000, // $11M
+                maxBorrowLimitInUSD: 22_000_000 // $22M
             });
             setDexLimits(DEX_USDC_USDT_CONCENTRATED); // Smart Debt
         }
