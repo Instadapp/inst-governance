@@ -39,7 +39,7 @@ contract PayloadIGP98 is PayloadIGPMain {
     function execute() public virtual override {
         super.execute();
 
-        // Action 1: Update Range and center Price for USDC-USDT DEX
+        // Action 1: Update Range, center Price and Fee for USDC-USDT DEX
         action1();
 
         // Action 2: Update Range and Center Price for WBTC-cbBTC DEX
@@ -67,7 +67,7 @@ contract PayloadIGP98 is PayloadIGPMain {
      * |__________________________________
      */
 
-    // @notice Action 1: Update Range and center Price for USDC-USDT DEX
+    // @notice Action 1: Update Range, center Price and Fee for USDC-USDT DEX
     function action1() internal isActionSkippable(1) {
         {
             address USDC_USDT_DEX = getDexAddress(2);
@@ -81,21 +81,37 @@ contract PayloadIGP98 is PayloadIGPMain {
                     );
 
                     // Non Rebalancing
-                    IFluidDex(USDC_USDT_DEX)
-                        .updateThresholdPercent(0, 0, 16777215, 0);
+                    IFluidDex(USDC_USDT_DEX).updateThresholdPercent(
+                        0,
+                        0,
+                        16777215,
+                        0
+                    );
 
                     // Update center price address to 0.15%
-                    IFluidDex(USDC_USDT_DEX)
-                        .updateCenterPriceAddress(147, 0.1e4, 2 days);
+                    IFluidDex(USDC_USDT_DEX).updateCenterPriceAddress(
+                        147,
+                        0.1e4,
+                        2 days
+                    );
 
                     // Update Min Max center prices from 0.15% to 0.15% with center = 1
                     uint256 minCenterPrice_ = (9985 * 1e27) / 10000;
                     uint256 maxCenterPrice_ = uint256(1e27 * 10000) / 9985;
-                    IFluidDex(USDC_USDT_DEX)
-                        .updateCenterPriceLimits(
-                            maxCenterPrice_,
-                            minCenterPrice_
-                        );
+                    IFluidDex(USDC_USDT_DEX).updateCenterPriceLimits(
+                        maxCenterPrice_,
+                        minCenterPrice_
+                    );
+
+                    address FeeHandler = 0x65454D16A39c7b5b52A67116FC1cf0a5e5942EFd;
+                    // Add new handler as auth
+                    DEX_FACTORY.setDexAuth(USDC_USDT_DEX, FeeHandler, false);
+
+                    //Update Trading Fee
+                    IFluidDex(USDC_USDT_DEX).updateFeeAndRevenueCut(
+                        0.001 * 1e4, // 0.001%
+                        25 * 1e4 // 25%
+                    );
                 }
             }
         }
