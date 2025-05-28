@@ -77,7 +77,7 @@ contract PayloadIGP98 is PayloadIGPMain {
                     IFluidDex(USDC_USDT_DEX).updateRangePercents(
                         0.15 * 1e4, // +0.15%
                         0.15 * 1e4, // -0.15%
-                        0
+                        5 days
                     );
 
                     // Non Rebalancing
@@ -92,15 +92,7 @@ contract PayloadIGP98 is PayloadIGPMain {
                     IFluidDex(USDC_USDT_DEX).updateCenterPriceAddress(
                         147,
                         0.1e4,
-                        2 days
-                    );
-
-                    // Update Min Max center prices from 0.15% to 0.15% with center = 1
-                    uint256 minCenterPrice_ = (9985 * 1e27) / 10000;
-                    uint256 maxCenterPrice_ = uint256(1e27 * 10000) / 9985;
-                    IFluidDex(USDC_USDT_DEX).updateCenterPriceLimits(
-                        maxCenterPrice_,
-                        minCenterPrice_
+                        5 days
                     );
 
                     address FeeHandler = 0x65454D16A39c7b5b52A67116FC1cf0a5e5942EFd;
@@ -120,9 +112,14 @@ contract PayloadIGP98 is PayloadIGPMain {
     // @notice Action 2: Update Range and Center Price for WBTC-cbBTC DEX
     function action2() internal isActionSkippable(2) {
         address cbBTC_wBTC_DEX_ADDRESS = getDexAddress(3);
-        {
-            IFluidDex(cbBTC_wBTC_DEX_ADDRESS).updateCenterPriceAddress(0, 1, 1);
-        }
+
+        // Update Min & Max center prices from -0.15% to -0.1%
+        uint256 minCenterPrice_ = (9985 * 1e27) / 10000;
+        uint256 maxCenterPrice_ = (9990 * 1e27) / 10000;
+        IFluidDex(cbBTC_wBTC_DEX_ADDRESS).updateCenterPriceLimits(
+            maxCenterPrice_,
+            minCenterPrice_
+        );
     }
 
     // @notice Action 3: Update Limits for sUSDe-USDT and USDe-USDT DEXes
@@ -181,6 +178,7 @@ contract PayloadIGP98 is PayloadIGPMain {
             IFluidDex(GHO_USDC_DEX).updateMaxBorrowShares(11_000_000 * 1e18); // from 11M shares
         }
     }
+
     /**
      * |
      * |     Payload Actions End Here      |
