@@ -112,6 +112,8 @@ contract PayloadIGPConstants {
         0x4c9EDD5852cd905f086C759E8383e09bff1E68B3;
     address internal constant GHO_ADDRESS =
         0x40D16FC0246aD3160Ccc09B8D0D3A2cD28aE6C2f;
+    address internal constant iUSD_ADDRESS =
+        0x48f9e38f3070AD8945DFEae3FA70987722E3D89c;
     address internal constant deUSD_ADDRESS = 
         0x15700B564Ca08D9439C58cA5053166E8317aa138;
     address internal constant USR_ADDRESS =
