@@ -53,6 +53,9 @@ contract PayloadIGP98 is PayloadIGPMain {
 
         // Action 5: Update Borrow Shares for GHO-USDC DEX
         action5();
+
+        // Action 6: Update borrow limits for sUSDe-USDT<>USDT vault
+        action6();
     }
 
     function verifyProposal() public view override {}
