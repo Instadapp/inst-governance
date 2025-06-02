@@ -66,13 +66,19 @@ contract PayloadIGP99 is PayloadIGPMain {
 
     // @notice Action 1: Remove MS as auth and Set rebalancer for iUSD-USDC DEX
     function action1() internal isActionSkippable(1) {
-        address iUSD_USDe_DEX_ADDRESS = getDexAddress(35);
-        DEX_FACTORY.setDexAuth(iUSD_USDe_DEX_ADDRESS, TEAM_MULTISIG, false);
 
-        // set rebalancer for iUSD-USDe DEX to reserve contract proxy
-        ISmartLendingAdmin(iUSD_USDe_DEX_ADDRESS).setRebalancer(
-            address(FLUID_RESERVE)
-        );
+        {
+            address fSL35_iUSD_USDe = getSmartLendingAddress(35);
+
+            // set rebalancer at fSL31 to reserve contract proxy
+            ISmartLendingAdmin(fSL35_iUSD_USDe).setRebalancer(
+                address(FLUID_RESERVE)
+            );
+        }
+        {
+            address iUSD_USDe_DEX_ADDRESS = getDexAddress(35);
+            DEX_FACTORY.setDexAuth(iUSD_USDe_DEX_ADDRESS, TEAM_MULTISIG, false);
+        }
     }
     // @notice Action 2: Update Range for cbBTC-wBTC DEX
     function action2() internal isActionSkippable(2) {
@@ -104,8 +110,66 @@ contract PayloadIGP99 is PayloadIGPMain {
         setBorrowProtocolLimits(protocolConfig_);
     }
 
-    // @notice Action 4:
-    function action4() internal isActionSkippable(4) {}
+    // @notice Action 4: Set Launch Limits for USDC-USDT-CONCENTRATED DEX Vaults
+    function action4() internal isActionSkippable(4) {
+        {
+            //sUSDe-USDT / USDT-USDC-CONCENTRATED
+            address sUSDe_USDT_DEX_ADDRESS = getDexAddress(15);
+            address sUSDe_USDT__USDT_USDC_CONCENTRATED_VAULT_ADDRESS = getVaultAddress(
+                    126
+                );
+
+            {
+                // Update sUSDe-USDT<>USDT-USDC-CONCENTRATED vault supply shares limit
+                IFluidAdminDex.UserSupplyConfig[]
+                    memory config_ = new IFluidAdminDex.UserSupplyConfig[](1);
+                config_[0] = IFluidAdminDex.UserSupplyConfig({
+                    user: sUSDe_USDT__USDT_USDC_CONCENTRATED_VAULT_ADDRESS,
+                    expandPercent: 35 * 1e2, // 35%
+                    expandDuration: 6 hours, // 6 hours
+                    baseWithdrawalLimit: 5_000_000 * 1e18 // 5M shares
+                });
+
+                IFluidDex(sUSDe_USDT_DEX_ADDRESS).updateUserSupplyConfigs(
+                    config_
+                );
+            }
+
+            VAULT_FACTORY.setVaultAuth(
+                sUSDe_USDT__USDT_USDC_CONCENTRATED_VAULT_ADDRESS,
+                TEAM_MULTISIG,
+                false
+            );
+        }
+
+        {
+            //USDe-USDT / USDT-USDC-CONCENTRATED
+            address USDe_USDT_DEX_ADDRESS = getDexAddress(18);
+            address USDe_USDT__USDT_USDC_CONCENTRATED_VAULT_ADDRESS = getVaultAddress(127);
+
+            {
+                // Update USDe-USDT<>USDT-USDC-CONCENTRATED vault supply shares limit
+                IFluidAdminDex.UserSupplyConfig[]
+                    memory config_ = new IFluidAdminDex.UserSupplyConfig[](1);
+                config_[0] = IFluidAdminDex.UserSupplyConfig({
+                    user: USDe_USDT__USDT_USDC_CONCENTRATED_VAULT_ADDRESS,
+                    expandPercent: 35 * 1e2, // 35%
+                    expandDuration: 6 hours, // 6 hours
+                    baseWithdrawalLimit: 5_000_000 * 1e18 // 5M shares
+                });
+
+                IFluidDex(USDe_USDT_DEX_ADDRESS).updateUserSupplyConfigs(
+                    config_
+                );
+            }
+
+            VAULT_FACTORY.setVaultAuth(
+                USDe_USDT__USDT_USDC_CONCENTRATED_VAULT_ADDRESS,
+                TEAM_MULTISIG,
+                false
+            );
+        }
+    }
 
     /**
      * |
