@@ -120,7 +120,6 @@ contract PayloadIGP99 is PayloadIGPMain {
                 );
 
             {
-                // Update sUSDe-USDT<>USDT-USDC-CONCENTRATED vault supply shares limit
                 IFluidAdminDex.UserSupplyConfig[]
                     memory config_ = new IFluidAdminDex.UserSupplyConfig[](1);
                 config_[0] = IFluidAdminDex.UserSupplyConfig({
@@ -148,7 +147,6 @@ contract PayloadIGP99 is PayloadIGPMain {
             address USDe_USDT__USDT_USDC_CONCENTRATED_VAULT_ADDRESS = getVaultAddress(127);
 
             {
-                // Update USDe-USDT<>USDT-USDC-CONCENTRATED vault supply shares limit
                 IFluidAdminDex.UserSupplyConfig[]
                     memory config_ = new IFluidAdminDex.UserSupplyConfig[](1);
                 config_[0] = IFluidAdminDex.UserSupplyConfig({
