@@ -48,8 +48,11 @@ contract PayloadIGP99 is PayloadIGPMain {
         // Action 3: Update Borrow Limits for sUSDe-GHO T1 vault
         action3();
 
-        // Action 4:
+        // Action 4: Set Launch Limits for USDC-USDT-CONCENTRATED DEX Vaultsq
         action4();
+
+        // Action 5: Set limits for fUSDTb and update rate curve for USDTb
+        action5();
     }
 
     function verifyProposal() public view override {}
@@ -66,7 +69,6 @@ contract PayloadIGP99 is PayloadIGPMain {
 
     // @notice Action 1: Remove MS as auth and Set rebalancer for iUSD-USDC DEX
     function action1() internal isActionSkippable(1) {
-
         {
             address fSL35_iUSD_USDe = getSmartLendingAddress(35);
 
@@ -96,7 +98,7 @@ contract PayloadIGP99 is PayloadIGPMain {
     // @notice Action 3: Update Borrow Limits for sUSDe-GHO T1 vault
     function action3() internal isActionSkippable(3) {
         address sUSDe_GHO = getVaultAddress(56);
-        
+
         // sUSDe-GHO T1 vault
         BorrowProtocolConfig memory protocolConfig_ = BorrowProtocolConfig({
             protocol: sUSDe_GHO,
@@ -144,7 +146,9 @@ contract PayloadIGP99 is PayloadIGPMain {
         {
             //USDe-USDT / USDT-USDC-CONCENTRATED
             address USDe_USDT_DEX_ADDRESS = getDexAddress(18);
-            address USDe_USDT__USDT_USDC_CONCENTRATED_VAULT_ADDRESS = getVaultAddress(127);
+            address USDe_USDT__USDT_USDC_CONCENTRATED_VAULT_ADDRESS = getVaultAddress(
+                    127
+                );
 
             {
                 IFluidAdminDex.UserSupplyConfig[]
@@ -166,6 +170,47 @@ contract PayloadIGP99 is PayloadIGPMain {
                 TEAM_MULTISIG,
                 false
             );
+        }
+    }
+
+    // @notice Action 5: Set limits for fUSDTb and update rate curve for USDTb
+    function action5() internal isActionSkippable(5) {
+        {
+            IFTokenAdmin fUSDTb_ADDRESS = IFTokenAdmin(
+                address(F_USDTb_ADDRESS)
+            );
+
+            SupplyProtocolConfig
+                memory protocolConfigTokenB_ = SupplyProtocolConfig({
+                    protocol: address(fUSDTb_ADDRESS),
+                    supplyToken: USDTb_ADDRESS,
+                    expandPercent: 35 * 1e2, // 35%
+                    expandDuration: 6 hours, // 6 hours
+                    baseWithdrawalLimitInUSD: 8_000_000 // $8M
+                });
+
+            setSupplyProtocolLimits(protocolConfigTokenB_);
+
+            // set rebalancer at fToken to reserve contract proxy
+            IFTokenAdmin(F_USDTb_ADDRESS).updateRebalancer();
+            // TODO: Add rebalancer address
+        }
+
+        {
+            AdminModuleStructs.RateDataV2Params[]
+                memory params_ = new AdminModuleStructs.RateDataV2Params[](1);
+
+            params_[0] = AdminModuleStructs.RateDataV2Params({
+                token: USDTb_ADDRESS, // USDTb
+                kink1: 85 * 1e2, // 85%
+                kink2: 90 * 1e2, // 90%
+                rateAtUtilizationZero: 0, // 0%
+                rateAtUtilizationKink1: 6 * 1e2, // 6%
+                rateAtUtilizationKink2: 10 * 1e2, // 10%
+                rateAtUtilizationMax: 40 * 1e2 // 40%
+            });
+
+            LIQUIDITY.updateRateDataV2s(params_);
         }
     }
 
@@ -269,7 +314,8 @@ contract PayloadIGP99 is PayloadIGPMain {
             token == USD0_ADDRESS ||
             token == fxUSD_ADDRESS ||
             token == BOLD_ADDRESS ||
-            token == iUSD_ADDRESS
+            token == iUSD_ADDRESS ||
+            token == USDTb_ADDRESS
         ) {
             usdPrice = STABLE_USD_PRICE;
             decimals = 18;
