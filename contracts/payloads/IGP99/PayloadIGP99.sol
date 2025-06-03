@@ -53,6 +53,15 @@ contract PayloadIGP99 is PayloadIGPMain {
 
         // Action 5: Set limits for fUSDTb and update rate curve for USDTb
         action5();
+
+        // Action 6: Update Limits for sUSDe-USDT and USDe-USDT DEXes
+        action6();
+
+        // Action 7: Remove center price for USDC-USDT and WBTC-cbBTC DEXes
+        action7();
+
+        // Action 8: Collect Revenue
+        action8();
     }
 
     function verifyProposal() public view override {}
@@ -211,6 +220,90 @@ contract PayloadIGP99 is PayloadIGPMain {
             });
 
             LIQUIDITY.updateRateDataV2s(params_);
+        }
+    }
+
+    // @notice Action 6: Update Limits for sUSDe-USDT and USDe-USDT DEXes
+    function action6() internal isActionSkippable(6) {
+        {
+            address sUSDe_USDT_DEX = getDexAddress(15);
+            {
+                // Set max sypply shares
+                IFluidDex(sUSDe_USDT_DEX).updateMaxSupplyShares(
+                    45_000_000 * 1e18 // from 37.5M shares
+                );
+            }
+        }
+
+        {
+            address USDe_USDT_DEX = getDexAddress(18);
+            {
+                // Set max supply shares
+                IFluidDex(USDe_USDT_DEX).updateMaxSupplyShares(
+                    25_000_000 * 1e18 // from 17.5M shares
+                );
+            }
+        }
+    }
+
+    // @notice Action 7: Remove center price for USDC-USDT and WBTC-cbBTC DEXes
+    function action7() internal isActionSkippable(7) {
+        address USDC_USDT_DEX = getDexAddress(2);
+        address cbBTC_WBTC_DEX = getDexAddress(3);
+
+        {
+            // Remove center price by setting to address(0)
+            IFluidDex(USDC_USDT_DEX).updateCenterPriceAddress(address(0), 0, 0);
+        }
+
+        {
+            // Remove center price by setting to address(0)
+            IFluidDex(cbBTC_WBTC_DEX).updateCenterPriceAddress(
+                address(0),
+                0,
+                0
+            );
+        }
+    }
+
+    // @notice Action 8: Collect Revenue
+    function action8() internal isActionSkippable(8) {
+        {
+            address[] memory tokens = new address[](5);
+
+            tokens[0] = USDC_ADDRESS;
+            tokens[1] = USDT_ADDRESS;
+            tokens[2] = USDe_ADDRESS;
+            tokens[3] = sUSDe_ADDRESS;
+            tokens[4] = GHO_ADDRESS;
+
+            LIQUIDITY.collectRevenue(tokens);
+        }
+        {
+            address[] memory tokens = new address[](4);
+            uint256[] memory amounts = new uint256[](4);
+
+            tokens[0] = USDC_ADDRESS;
+            amounts[0] =
+                IERC20(USDC_ADDRESS).balanceOf(address(FLUID_RESERVE)) -
+                10;
+
+            tokens[1] = USDT_ADDRESS;
+            amounts[1] =
+                IERC20(USDT_ADDRESS).balanceOf(address(FLUID_RESERVE)) -
+                10;
+
+            tokens[2] = USDe_ADDRESS;
+            amounts[2] =
+                IERC20(USDe_ADDRESS).balanceOf(address(FLUID_RESERVE)) -
+                10;
+
+            tokens[3] = sUSDe_ADDRESS;
+            amounts[3] =
+                IERC20(sUSDe_ADDRESS).balanceOf(address(FLUID_RESERVE)) -
+                10;
+
+            FLUID_RESERVE.withdrawFunds(tokens, amounts, TEAM_MULTISIG);
         }
     }
 
