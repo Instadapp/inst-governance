@@ -65,6 +65,9 @@ contract PayloadIGP99 is PayloadIGPMain {
 
         // Action 9: Update Range Percentages for sUSDe-USDT DEX
         action9();
+
+        // Action 10: Set Dust Limits for USDTb vaults
+        action10();
     }
 
     function verifyProposal() public view override {}
@@ -316,6 +319,11 @@ contract PayloadIGP99 is PayloadIGPMain {
                 2 days
             );
         }
+    }
+
+    // @notice Action 10: Set Dust Limits for USDTb vaults
+    function action10() internal isActionSkippable(10) {
+        // TODO: Set dust limits for USDTb vaults
     }
 
     /**
