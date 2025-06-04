@@ -62,6 +62,9 @@ contract PayloadIGP99 is PayloadIGPMain {
 
         // Action 8: Collect Revenue
         action8();
+
+        // Action 9: Update Range Percentages for sUSDe-USDT DEX
+        action9();
     }
 
     function verifyProposal() public view override {}
@@ -253,16 +256,12 @@ contract PayloadIGP99 is PayloadIGPMain {
 
         {
             // Remove center price by setting to address(0)
-            IFluidDex(USDC_USDT_DEX).updateCenterPriceAddress(address(0), 0, 0);
+            IFluidDex(USDC_USDT_DEX).updateCenterPriceAddress(0, 1, 1);
         }
 
         {
             // Remove center price by setting to address(0)
-            IFluidDex(cbBTC_WBTC_DEX).updateCenterPriceAddress(
-                address(0),
-                0,
-                0
-            );
+            IFluidDex(cbBTC_WBTC_DEX).updateCenterPriceAddress(0, 1, 1);
         }
     }
 
@@ -304,6 +303,18 @@ contract PayloadIGP99 is PayloadIGPMain {
                 10;
 
             FLUID_RESERVE.withdrawFunds(tokens, amounts, TEAM_MULTISIG);
+        }
+    }
+
+    // @notice Action 9: Update Range Percentages for sUSDe-USDT DEX
+    function action9() internal isActionSkippable(9) {
+        address sUSDe_USDT_DEX = getDexAddress(15);
+        {
+            IFluidDex(sUSDe_USDT_DEX).updateRangePercents(
+                0.4 * 1e4, // +0.4%
+                0.8 * 1e4, // -0.8%
+                2 days
+            );
         }
     }
 
