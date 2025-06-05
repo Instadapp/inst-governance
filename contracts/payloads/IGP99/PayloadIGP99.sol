@@ -48,7 +48,7 @@ contract PayloadIGP99 is PayloadIGPMain {
         // Action 3: Update Borrow Limits for sUSDe-GHO T1 vault
         action3();
 
-        // Action 4: Set Launch Limits for USDC-USDT-CONCENTRATED DEX Vaultsq
+        // Action 4: Increase Limits for USDC-USDT-CONCENTRATED DEX Vaults
         action4();
 
         // Action 5: Set limits for fUSDTb and update rate curve for USDTb
@@ -131,7 +131,7 @@ contract PayloadIGP99 is PayloadIGPMain {
         setBorrowProtocolLimits(protocolConfig_);
     }
 
-    // @notice Action 4: Set Launch Limits for USDC-USDT-CONCENTRATED DEX Vaults
+    // @notice Action 4: Increase Limits for USDC-USDT-CONCENTRATED DEX Vaults
     function action4() internal isActionSkippable(4) {
         {
             //sUSDe-USDT / USDT-USDC-CONCENTRATED
@@ -446,9 +446,9 @@ contract PayloadIGP99 is PayloadIGPMain {
                 vaultType: VAULT_TYPE.TYPE_1,
                 supplyToken: ETH_ADDRESS,
                 borrowToken: USDTb_ADDRESS,
-                baseWithdrawalLimitInUSD: 10_000, // $10k
-                baseBorrowLimitInUSD: 10_000, // $10k
-                maxBorrowLimitInUSD: 15_000 // $15k
+                baseWithdrawalLimitInUSD: 7_000, // $7k
+                baseBorrowLimitInUSD: 7_000, // $7k
+                maxBorrowLimitInUSD: 10_000 // $10k
             });
 
             setVaultLimits(VAULT_ETH_USDTb); // TYPE_1 => 128
@@ -464,9 +464,9 @@ contract PayloadIGP99 is PayloadIGPMain {
                 vaultType: VAULT_TYPE.TYPE_1,
                 supplyToken: wstETH_ADDRESS,
                 borrowToken: USDTb_ADDRESS,
-                baseWithdrawalLimitInUSD: 10_000, // $10k
-                baseBorrowLimitInUSD: 10_000, // $10k
-                maxBorrowLimitInUSD: 15_000 // $15k
+                baseWithdrawalLimitInUSD: 7_000, // $7k
+                baseBorrowLimitInUSD: 7_000, // $7k
+                maxBorrowLimitInUSD: 10_000 // $10k
             });
 
             setVaultLimits(VAULT_WSTETH_USDTb); // TYPE_1 => 129
@@ -482,9 +482,9 @@ contract PayloadIGP99 is PayloadIGPMain {
                 vaultType: VAULT_TYPE.TYPE_1,
                 supplyToken: weETH_ADDRESS,
                 borrowToken: USDTb_ADDRESS,
-                baseWithdrawalLimitInUSD: 10_000, // $10k
-                baseBorrowLimitInUSD: 10_000, // $10k
-                maxBorrowLimitInUSD: 15_000 // $15k
+                baseWithdrawalLimitInUSD: 7_000, // $7k
+                baseBorrowLimitInUSD: 7_000, // $7k
+                maxBorrowLimitInUSD: 10_000 // $10k
             });
 
             setVaultLimits(VAULT_WEETH_USDTb); // TYPE_1 => 130
@@ -500,9 +500,9 @@ contract PayloadIGP99 is PayloadIGPMain {
                 vaultType: VAULT_TYPE.TYPE_1,
                 supplyToken: wBTC_ADDRESS,
                 borrowToken: USDTb_ADDRESS,
-                baseWithdrawalLimitInUSD: 10_000, // $10k
-                baseBorrowLimitInUSD: 10_000, // $10k
-                maxBorrowLimitInUSD: 15_000 // $15k
+                baseWithdrawalLimitInUSD: 7_000, // $7k
+                baseBorrowLimitInUSD: 7_000, // $7k
+                maxBorrowLimitInUSD: 10_000 // $10k
             });
 
             setVaultLimits(VAULT_WBTC_USDTb); // TYPE_1 => 131
@@ -518,9 +518,9 @@ contract PayloadIGP99 is PayloadIGPMain {
                 vaultType: VAULT_TYPE.TYPE_1,
                 supplyToken: cbBTC_ADDRESS,
                 borrowToken: USDTb_ADDRESS,
-                baseWithdrawalLimitInUSD: 10_000, // $10k
-                baseBorrowLimitInUSD: 10_000, // $10k
-                maxBorrowLimitInUSD: 15_000 // $15k
+                baseWithdrawalLimitInUSD: 7_000, // $7k
+                baseBorrowLimitInUSD: 7_000, // $7k
+                maxBorrowLimitInUSD: 10_000 // $10k
             });
 
             setVaultLimits(VAULT_CBBTC_USDTb); // TYPE_1 => 132
