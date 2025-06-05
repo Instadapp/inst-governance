@@ -85,7 +85,7 @@ contract PayloadIGP99 is PayloadIGPMain {
      * |__________________________________
      */
 
-    // @notice Action 1: Remove MS as auth and Set rebalancer for iUSD-USDe DEX
+    // @notice Action 1: Remove MS as auth for iUSD-USDe dex and set rebalancer for iUSD-USDe smart lending
     function action1() internal isActionSkippable(1) {
         {
             address fSL35_iUSD_USDe = getSmartLendingAddress(35);
