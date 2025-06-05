@@ -54,22 +54,22 @@ contract PayloadIGP99 is PayloadIGPMain {
         // Action 5: Set limits for fUSDTb and update rate curve for USDTb
         action5();
 
-        // Action 6: Update Limits for sUSDe-USDT, USDe-USDT and USDC-USDT DEXes
+        // Action 6: Remove center price for USDC-USDT and WBTC-cbBTC DEXes
         action6();
 
-        // Action 7: Remove center price for USDC-USDT and WBTC-cbBTC DEXes
+        // Action 7: Collect Revenue
         action7();
 
-        // Action 8: Collect Revenue
+        // Action 8: Update Limits and Parameters for sUSDe-USDT, USDe-USDT, USDC-USDT DEXes
         action8();
 
-        // Action 9: Update Range Percentages for sUSDe-USDT DEX
+        // Action 9: Update Limits for sUSDe-USDT, USDe-USDT based T2 and T4 vaults
         action9();
 
         // Action 10: Set Dust Limits for USDTb vaults
         action10();
 
-        // Action 11: Update Limits for sUSDe-USDT, USDe-USDT based vaults
+        // Action 11: Set Dust Limits for USDE-USDTb DEX
         action11();
     }
 
@@ -100,6 +100,7 @@ contract PayloadIGP99 is PayloadIGPMain {
             DEX_FACTORY.setDexAuth(iUSD_USDe_DEX_ADDRESS, TEAM_MULTISIG, false);
         }
     }
+
     // @notice Action 2: Update Range for cbBTC-wBTC DEX
     function action2() internal isActionSkippable(2) {
         address cbBTC_wBTC_DEX_ADDRESS = getDexAddress(3);
@@ -232,47 +233,8 @@ contract PayloadIGP99 is PayloadIGPMain {
         }
     }
 
-    // @notice Action 6: Update Limits for USDe-USDT, USDC-USDT, sUSDe-USDT DEXes
+    // @notice Action 6: Remove center price for USDC-USDT and WBTC-cbBTC DEXes
     function action6() internal isActionSkippable(6) {
-        {
-            address sUSDe_USDT_DEX = getDexAddress(15);
-            {
-                // Set max sypply shares
-                IFluidDex(sUSDe_USDT_DEX).updateMaxSupplyShares(
-                    50_000_000 * 1e18 // from 37.5M shares
-                );
-            }
-            {
-                // Update Trading Fee
-                IFluidDex(sUSDe_USDT_DEX).updateFeeAndRevenueCut(
-                    0.01 * 1e4, // 0.01%
-                    25 * 1e4 // 25%
-                );
-            }
-        }
-
-        {
-            address USDe_USDT_DEX = getDexAddress(18);
-            {
-                // Set max supply shares
-                IFluidDex(USDe_USDT_DEX).updateMaxSupplyShares(
-                    25_000_000 * 1e18 // from 17.5M shares
-                );
-            }
-        }
-        {
-            address USDC_USDT_DEX = getDexAddress(2);
-            {
-                // Set max supply shares
-                IFluidDex(USDC_USDT_DEX).updateMaxSupplyShares(
-                    50_000_000 * 1e18 // from 35M shares
-                );
-            }
-        }
-    }
-
-    // @notice Action 7: Remove center price for USDC-USDT and WBTC-cbBTC DEXes
-    function action7() internal isActionSkippable(7) {
         address USDC_USDT_DEX = getDexAddress(2);
         address cbBTC_WBTC_DEX = getDexAddress(3);
 
@@ -287,8 +249,8 @@ contract PayloadIGP99 is PayloadIGPMain {
         }
     }
 
-    // @notice Action 8: Collect Revenue
-    function action8() internal isActionSkippable(8) {
+    // @notice Action 7: Collect Revenue
+    function action7() internal isActionSkippable(7) {
         {
             address[] memory tokens = new address[](5);
 
@@ -328,15 +290,148 @@ contract PayloadIGP99 is PayloadIGPMain {
         }
     }
 
-    // @notice Action 9: Update Range Percentages for sUSDe-USDT DEX
-    function action9() internal isActionSkippable(9) {
-        address sUSDe_USDT_DEX = getDexAddress(15);
+    // @notice Action 8: Update Limits and Parameters for sUSDe-USDT, USDe-USDT, USDC-USDT DEXes
+    function action8() internal isActionSkippable(8) {
         {
-            IFluidDex(sUSDe_USDT_DEX).updateRangePercents(
-                0.4 * 1e4, // +0.4%
-                0.8 * 1e4, // -0.8%
-                2 days
-            );
+            // sUSDe-USDT DEX updates
+            address sUSDe_USDT_DEX = getDexAddress(15);
+            {
+                // Set max sypply shares
+                IFluidDex(sUSDe_USDT_DEX).updateMaxSupplyShares(
+                    50_000_000 * 1e18 // from 37.5M shares
+                );
+            }
+            {
+                // Update Trading Fee
+                IFluidDex(sUSDe_USDT_DEX).updateFeeAndRevenueCut(
+                    0.01 * 1e4, // 0.01%
+                    25 * 1e4 // 25%
+                );
+            }
+            {
+                // Update Range Percentages
+                IFluidDex(sUSDe_USDT_DEX).updateRangePercents(
+                    0.4 * 1e4, // +0.4%
+                    0.8 * 1e4, // -0.8%
+                    2 days
+                );
+            }
+        }
+
+        {
+            // USDe-USDT DEX updates
+            address USDe_USDT_DEX = getDexAddress(18);
+            {
+                // Set max supply shares
+                IFluidDex(USDe_USDT_DEX).updateMaxSupplyShares(
+                    25_000_000 * 1e18 // from 17.5M shares
+                );
+            }
+        }
+
+        {
+            // USDC-USDT DEX updates
+            address USDC_USDT_DEX = getDexAddress(2);
+            {
+                // Set max supply shares
+                IFluidDex(USDC_USDT_DEX).updateMaxBorrowShares(
+                    50_000_000 * 1e18 // from 35M shares
+                );
+            }
+            {
+                Dex memory DEX_USDC_USDT = Dex({
+                    dex: USDC_USDT_DEX,
+                    tokenA: USDC_ADDRESS,
+                    tokenB: USDT_ADDRESS,
+                    smartCollateral: false,
+                    smartDebt: true,
+                    baseWithdrawalLimitInUSD: 0, // $0
+                    baseBorrowLimitInUSD: 40_000_000, // $40M
+                    maxBorrowLimitInUSD: 110_000_000 // $110M
+                });
+                setDexLimits(DEX_USDC_USDT); // Smart Debt
+            }
+        }
+    }
+
+    // @notice Action 9: Update Limits for sUSDe-USDT, USDe-USDT based T2 and T4 vaults
+    function action9() internal isActionSkippable(9) {
+        {
+            address sUSDe_USDT__USDT_VAULT = getVaultAddress(92);
+            // [TYPE 2] sUSDe-USDT<>USDT | smart collateral & debt
+            VaultConfig memory VAULT_sUSDe_USDT__USDT = VaultConfig({
+                vault: sUSDe_USDT__USDT_VAULT,
+                vaultType: VAULT_TYPE.TYPE_2,
+                supplyToken: address(0),
+                borrowToken: USDT_ADDRESS,
+                baseWithdrawalLimitInUSD: 0,
+                baseBorrowLimitInUSD: 17_500_000, // $17.5M
+                maxBorrowLimitInUSD: 35_000_000 // $35M
+            });
+
+            setVaultLimits(VAULT_sUSDe_USDT__USDT);
+        }
+
+        {
+            address USDe_USDT__USDT_VAULT = getVaultAddress(93);
+            // [TYPE 2] USDe-USDT<>USDT | smart collateral & debt
+            VaultConfig memory VAULT_USDe_USDT__USDT = VaultConfig({
+                vault: USDe_USDT__USDT_VAULT,
+                vaultType: VAULT_TYPE.TYPE_2,
+                supplyToken: address(0),
+                borrowToken: USDT_ADDRESS,
+                baseWithdrawalLimitInUSD: 0,
+                baseBorrowLimitInUSD: 12_500_000, // $12.5M
+                maxBorrowLimitInUSD: 25_000_000 // $25M
+            });
+
+            setVaultLimits(VAULT_USDe_USDT__USDT);
+        }
+
+        {
+            // T4 sUSDe-USDT | USDC-USDT vault
+            address USDC_USDT_DEX_ADDRESS = getDexAddress(2);
+            address sUSDe_USDT__USDC_USDT_VAULT_ADDRESS = getVaultAddress(98);
+
+            {
+                // Increase sUSDe-USDT<>USDC-USDT vault borrow shares limit
+                IFluidAdminDex.UserBorrowConfig[]
+                    memory config_ = new IFluidAdminDex.UserBorrowConfig[](1);
+                config_[0] = IFluidAdminDex.UserBorrowConfig({
+                    user: sUSDe_USDT__USDC_USDT_VAULT_ADDRESS,
+                    expandPercent: 30 * 1e2, // 30%
+                    expandDuration: 6 hours, // 6 hours
+                    baseDebtCeiling: 20_000_000 * 1e18, // 20M shares
+                    maxDebtCeiling: 40_000_000 * 1e18 // 40M shares
+                });
+
+                IFluidDex(USDC_USDT_DEX_ADDRESS).updateUserBorrowConfigs(
+                    config_
+                );
+            }
+        }
+
+        {
+            // T4 USDe-USDT | USDC-USDT vault
+            address USDC_USDT_DEX_ADDRESS = getDexAddress(2);
+            address USDe_USDT__USDC_USDT_VAULT_ADDRESS = getVaultAddress(99);
+
+            {
+                // Increase USDe-USDT<>USDC-USDT vault borrow shares limit
+                IFluidAdminDex.UserBorrowConfig[]
+                    memory config_ = new IFluidAdminDex.UserBorrowConfig[](1);
+                config_[0] = IFluidAdminDex.UserBorrowConfig({
+                    user: USDe_USDT__USDC_USDT_VAULT_ADDRESS,
+                    expandPercent: 30 * 1e2, // 30%
+                    expandDuration: 6 hours, // 6 hours
+                    baseDebtCeiling: 20_000_000 * 1e18, // 20M shares
+                    maxDebtCeiling: 40_000_000 * 1e18 // 40M shares
+                });
+
+                IFluidDex(USDC_USDT_DEX_ADDRESS).updateUserBorrowConfigs(
+                    config_
+                );
+            }
         }
     }
 
@@ -433,80 +528,24 @@ contract PayloadIGP99 is PayloadIGPMain {
         }
     }
 
-    // @notice Action 11: Update Limits for sUSDe-USDT, USDe-USDT based T2 and T4vaults
+    // @notice Action 11: Set Dust Limits for USDE-USDTb DEX
     function action11() internal isActionSkippable(11) {
+        address USDE_USDTb_DEX = getDexAddress(36);
         {
-            address sUSDe_USDT__USDT_VAULT = getVaultAddress(92);
-            // [TYPE 2] sUSDe-USDT<>USDT | smart collateral & debt
-            VaultConfig memory VAULT_sUSDe_USDT__USDT = VaultConfig({
-                vault: sUSDe_USDT__USDT_VAULT,
-                vaultType: VAULT_TYPE.TYPE_2,
-                supplyToken: address(0),
-                borrowToken: USDT_ADDRESS,
-                baseWithdrawalLimitInUSD: 0,
-                baseBorrowLimitInUSD: 17_500_000, // $17.5M
-                maxBorrowLimitInUSD: 35_000_000 // $35M
+            // USDE-USDTb DEX
+            DexConfig memory DEX_USDE_USDTb = DexConfig({
+                dex: USDE_USDTb_DEX,
+                tokenA: USDe_ADDRESS,
+                tokenB: USDTb_ADDRESS,
+                smartCollateral: true,
+                smartDebt: false,
+                baseWithdrawalLimitInUSD: 10_000, // $10k
+                baseBorrowLimitInUSD: 0, // $0
+                maxBorrowLimitInUSD: 0 // $0
             });
+            setDexLimits(DEX_USDE_USDTb); // Smart Collateral
 
-            setVaultLimits(VAULT_sUSDe_USDT__USDT);
-        }
-
-        {
-            address USDe_USDT__USDT_VAULT = getVaultAddress(93);
-            // [TYPE 2] USDe-USDT<>USDT | smart collateral & debt
-            VaultConfig memory VAULT_USDe_USDT__USDT = VaultConfig({
-                vault: USDe_USDT__USDT_VAULT,
-                vaultType: VAULT_TYPE.TYPE_2,
-                supplyToken: address(0),
-                borrowToken: USDT_ADDRESS,
-                baseWithdrawalLimitInUSD: 0,
-                baseBorrowLimitInUSD: 12_500_000, // $12.5M
-                maxBorrowLimitInUSD: 25_000_000 // $25M
-            });
-
-            setVaultLimits(VAULT_USDe_USDT__USDT);
-        }
-
-        {
-            // T4 sUSDe-USDT | USDC-USDT vault
-            address USDC_USDT_DEX_ADDRESS = getDexAddress(2);
-            address sUSDe_USDT__USDC_USDT_VAULT_ADDRESS = getVaultAddress(98);
-
-            {
-                // Increase sUSDe-USDT<>USDC-USDT vault borrow shares limit
-                IFluidAdminDex.UserBorrowConfig[]
-                    memory config_ = new IFluidAdminDex.UserBorrowConfig[](1);
-                config_[0] = IFluidAdminDex.UserBorrowConfig({
-                    user: sUSDe_USDT__USDC_USDT_VAULT_ADDRESS,
-                    expandPercent: 30 * 1e2, // 30%
-                    expandDuration: 6 hours, // 6 hours
-                    baseDebtCeiling: 20_000_000 * 1e18, // 20M shares
-                    maxDebtCeiling: 40_000_000 * 1e18 // 40M shares
-                });
-
-                IFluidDex(USDC_USDT_DEX_ADDRESS).updateUserBorrowConfigs(config_);
-            }
-        }
-
-        {
-            // T4 USDe-USDT | USDC-USDT vault
-            address USDC_USDT_DEX_ADDRESS = getDexAddress(2);
-            address USDe_USDT__USDC_USDT_VAULT_ADDRESS = getVaultAddress(99);
-
-            {
-                // Increase USDe-USDT<>USDC-USDT vault borrow shares limit
-                IFluidAdminDex.UserBorrowConfig[]
-                    memory config_ = new IFluidAdminDex.UserBorrowConfig[](1);
-                config_[0] = IFluidAdminDex.UserBorrowConfig({
-                    user: USDe_USDT__USDC_USDT_VAULT_ADDRESS,
-                    expandPercent: 30 * 1e2, // 30%
-                    expandDuration: 6 hours, // 6 hours
-                    baseDebtCeiling: 20_000_000 * 1e18, // 20M shares
-                    maxDebtCeiling: 40_000_000 * 1e18 // 40M shares
-                });
-
-                IFluidDex(USDC_USDT_DEX_ADDRESS).updateUserBorrowConfigs(config_);
-            }
+            DEX_FACTORY.setDexAuth(USDE_USDTb_DEX, TEAM_MULTISIG, true);
         }
     }
 
