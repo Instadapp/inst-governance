@@ -217,10 +217,10 @@ contract PayloadIGP99 is PayloadIGPMain {
         }
 
         {
-            AdminModuleStructs.RateDataV2Params[]
-                memory params_ = new AdminModuleStructs.RateDataV2Params[](1);
+            FluidLiquidityAdminStructs.RateDataV2Params[]
+                memory params_ = new FluidLiquidityAdminStructs.RateDataV2Params[](1);
 
-            params_[0] = AdminModuleStructs.RateDataV2Params({
+            params_[0] = FluidLiquidityAdminStructs.RateDataV2Params({
                 token: USDTb_ADDRESS, // USDTb
                 kink1: 85 * 1e2, // 85%
                 kink2: 90 * 1e2, // 90%
@@ -340,7 +340,7 @@ contract PayloadIGP99 is PayloadIGPMain {
                 );
             }
             {
-                Dex memory DEX_USDC_USDT = Dex({
+                DexConfig memory DEX_USDC_USDT = DexConfig({
                     dex: USDC_USDT_DEX,
                     tokenA: USDC_ADDRESS,
                     tokenB: USDT_ADDRESS,
@@ -499,7 +499,7 @@ contract PayloadIGP99 is PayloadIGPMain {
             VaultConfig memory VAULT_WBTC_USDTb = VaultConfig({
                 vault: WBTC_USDTb_VAULT,
                 vaultType: VAULT_TYPE.TYPE_1,
-                supplyToken: wBTC_ADDRESS,
+                supplyToken: WBTC_ADDRESS,
                 borrowToken: USDTb_ADDRESS,
                 baseWithdrawalLimitInUSD: 7_000, // $7k
                 baseBorrowLimitInUSD: 7_000, // $7k
