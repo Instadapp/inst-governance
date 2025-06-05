@@ -39,7 +39,7 @@ contract PayloadIGP99 is PayloadIGPMain {
     function execute() public virtual override {
         super.execute();
 
-        // Action 1: Remove MS as auth and Set rebalancer for iUSD-USDe DEX
+        // Action 1: Remove MS as auth for iUSD-USDe dex and set rebalancer for iUSD-USDe smart lending
         action1();
 
         // Action 2: Update Range for cbBTC-wBTC DEX
@@ -90,7 +90,7 @@ contract PayloadIGP99 is PayloadIGPMain {
         {
             address fSL35_iUSD_USDe = getSmartLendingAddress(35);
 
-            // set rebalancer at fSL31 to reserve contract proxy
+            // set rebalancer at fSL35 to reserve contract proxy
             ISmartLendingAdmin(fSL35_iUSD_USDe).setRebalancer(
                 address(FLUID_RESERVE)
             );
@@ -211,7 +211,7 @@ contract PayloadIGP99 is PayloadIGPMain {
 
             // set rebalancer at fToken to reserve contract proxy
             IFTokenAdmin(F_USDTb_ADDRESS).updateRebalancer(
-                0x264786EF916af64a1DB19F513F24a3681734ce92
+                address(FLUID_RESERVE)
             );
         }
 
