@@ -202,7 +202,7 @@ contract PayloadIGP99 is PayloadIGPMain {
             SupplyProtocolConfig memory protocolConfigTokenB_ = SupplyProtocolConfig({
                 protocol: address(fUSDTb_ADDRESS),
                 supplyToken: USDTb_ADDRESS,
-                expandPercent: 50% * 1e2, // 50%
+                expandPercent: 50 * 1e2, // 50%
                 expandDuration: 6 hours, // 6 hours
                 baseWithdrawalLimitInUSD: 10_000_000 // $10M
             });
