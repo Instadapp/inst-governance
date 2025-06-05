@@ -109,7 +109,7 @@ contract PayloadIGP99 is PayloadIGPMain {
             IFluidDex(cbBTC_wBTC_DEX_ADDRESS).updateRangePercents(
                 0.2 * 1e4,
                 0.2 * 1e4,
-                2 days
+                5 days
             );
         }
     }
@@ -122,10 +122,10 @@ contract PayloadIGP99 is PayloadIGPMain {
         BorrowProtocolConfig memory protocolConfig_ = BorrowProtocolConfig({
             protocol: sUSDe_GHO,
             borrowToken: GHO_ADDRESS,
-            expandPercent: 30 * 1e2, // 30%
+            expandPercent: 50 * 1e2, // 50%
             expandDuration: 6 hours, // 6 hours
-            baseBorrowLimitInUSD: 25_000_000, // $25M base limit
-            maxBorrowLimitInUSD: 50_000_000 // $50M max limit
+            baseBorrowLimitInUSD: 20_000_000, // $20M base limit
+            maxBorrowLimitInUSD: 100_000_000 // $100M max limit
         });
 
         setBorrowProtocolLimits(protocolConfig_);
@@ -199,14 +199,13 @@ contract PayloadIGP99 is PayloadIGPMain {
                 address(F_USDTb_ADDRESS)
             );
 
-            SupplyProtocolConfig
-                memory protocolConfigTokenB_ = SupplyProtocolConfig({
-                    protocol: address(fUSDTb_ADDRESS),
-                    supplyToken: USDTb_ADDRESS,
-                    expandPercent: 35 * 1e2, // 35%
-                    expandDuration: 6 hours, // 6 hours
-                    baseWithdrawalLimitInUSD: 8_000_000 // $8M
-                });
+            SupplyProtocolConfig memory protocolConfigTokenB_ = SupplyProtocolConfig({
+                protocol: address(fUSDTb_ADDRESS),
+                supplyToken: USDTb_ADDRESS,
+                expandPercent: 50% * 1e2, // 50%
+                expandDuration: 6 hours, // 6 hours
+                baseWithdrawalLimitInUSD: 10_000_000 // $10M
+            });
 
             setSupplyProtocolLimits(protocolConfigTokenB_);
 
@@ -223,10 +222,10 @@ contract PayloadIGP99 is PayloadIGPMain {
             params_[0] = FluidLiquidityAdminStructs.RateDataV2Params({
                 token: USDTb_ADDRESS, // USDTb
                 kink1: 85 * 1e2, // 85%
-                kink2: 90 * 1e2, // 90%
+                kink2: 93 * 1e2, // 93%
                 rateAtUtilizationZero: 0, // 0%
-                rateAtUtilizationKink1: 6 * 1e2, // 6%
-                rateAtUtilizationKink2: 10 * 1e2, // 10%
+                rateAtUtilizationKink1: 1 * 1e2, // 1%
+                rateAtUtilizationKink2: 5 * 1e2, // 5%
                 rateAtUtilizationMax: 40 * 1e2 // 40%
             });
 
@@ -314,7 +313,7 @@ contract PayloadIGP99 is PayloadIGPMain {
                 IFluidDex(sUSDe_USDT_DEX).updateRangePercents(
                     0.4 * 1e4, // +0.4%
                     0.8 * 1e4, // -0.8%
-                    2 days
+                    5 days
                 );
             }
         }
@@ -348,7 +347,7 @@ contract PayloadIGP99 is PayloadIGPMain {
                     smartDebt: true,
                     baseWithdrawalLimitInUSD: 0, // $0
                     baseBorrowLimitInUSD: 40_000_000, // $40M
-                    maxBorrowLimitInUSD: 110_000_000 // $110M
+                    maxBorrowLimitInUSD: 120_000_000 // $120M
                 });
                 setDexLimits(DEX_USDC_USDT); // Smart Debt
             }
@@ -400,7 +399,7 @@ contract PayloadIGP99 is PayloadIGPMain {
                     memory config_ = new IFluidAdminDex.UserBorrowConfig[](1);
                 config_[0] = IFluidAdminDex.UserBorrowConfig({
                     user: sUSDe_USDT__USDC_USDT_VAULT_ADDRESS,
-                    expandPercent: 30 * 1e2, // 30%
+                    expandPercent: 50 * 1e2, // 50%
                     expandDuration: 6 hours, // 6 hours
                     baseDebtCeiling: 20_000_000 * 1e18, // 20M shares
                     maxDebtCeiling: 40_000_000 * 1e18 // 40M shares
@@ -423,7 +422,7 @@ contract PayloadIGP99 is PayloadIGPMain {
                     memory config_ = new IFluidAdminDex.UserBorrowConfig[](1);
                 config_[0] = IFluidAdminDex.UserBorrowConfig({
                     user: USDe_USDT__USDC_USDT_VAULT_ADDRESS,
-                    expandPercent: 30 * 1e2, // 30%
+                    expandPercent: 50 * 1e2, // 50%
                     expandDuration: 6 hours, // 6 hours
                     baseDebtCeiling: 20_000_000 * 1e18, // 20M shares
                     maxDebtCeiling: 40_000_000 * 1e18 // 40M shares
