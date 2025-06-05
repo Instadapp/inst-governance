@@ -54,7 +54,7 @@ contract PayloadIGP99 is PayloadIGPMain {
         // Action 5: Set limits for fUSDTb and update rate curve for USDTb
         action5();
 
-        // Action 6: Update Limits for sUSDe-USDT and USDe-USDT DEXes
+        // Action 6: Update Limits for sUSDe-USDT, USDe-USDT and USDC-USDT DEXes
         action6();
 
         // Action 7: Remove center price for USDC-USDT and WBTC-cbBTC DEXes
@@ -68,6 +68,9 @@ contract PayloadIGP99 is PayloadIGPMain {
 
         // Action 10: Set Dust Limits for USDTb vaults
         action10();
+
+        // Action 11: Update Limits for sUSDe-USDT, USDe-USDT based vaults
+        action11();
     }
 
     function verifyProposal() public view override {}
@@ -229,14 +232,21 @@ contract PayloadIGP99 is PayloadIGPMain {
         }
     }
 
-    // @notice Action 6: Update Limits for sUSDe-USDT and USDe-USDT DEXes
+    // @notice Action 6: Update Limits for USDe-USDT, USDC-USDT, sUSDe-USDT DEXes
     function action6() internal isActionSkippable(6) {
         {
             address sUSDe_USDT_DEX = getDexAddress(15);
             {
                 // Set max sypply shares
                 IFluidDex(sUSDe_USDT_DEX).updateMaxSupplyShares(
-                    45_000_000 * 1e18 // from 37.5M shares
+                    50_000_000 * 1e18 // from 37.5M shares
+                );
+            }
+            {
+                // Update Trading Fee
+                IFluidDex(sUSDe_USDT_DEX).updateFeeAndRevenueCut(
+                    0.01 * 1e4, // 0.01%
+                    25 * 1e4 // 25%
                 );
             }
         }
@@ -247,6 +257,15 @@ contract PayloadIGP99 is PayloadIGPMain {
                 // Set max supply shares
                 IFluidDex(USDe_USDT_DEX).updateMaxSupplyShares(
                     25_000_000 * 1e18 // from 17.5M shares
+                );
+            }
+        }
+        {
+            address USDC_USDT_DEX = getDexAddress(2);
+            {
+                // Set max supply shares
+                IFluidDex(USDC_USDT_DEX).updateMaxSupplyShares(
+                    50_000_000 * 1e18 // from 35M shares
                 );
             }
         }
@@ -323,7 +342,172 @@ contract PayloadIGP99 is PayloadIGPMain {
 
     // @notice Action 10: Set Dust Limits for USDTb vaults
     function action10() internal isActionSkippable(10) {
-        // TODO: Set dust limits for USDTb vaults
+        {
+            address ETH_USDTb_VAULT = getVaultAddress(128);
+
+            // [TYPE 1] ETH/USDTb vault
+            VaultConfig memory VAULT_ETH_USDTb = VaultConfig({
+                vault: ETH_USDTb_VAULT,
+                vaultType: VAULT_TYPE.TYPE_1,
+                supplyToken: ETH_ADDRESS,
+                borrowToken: USDTb_ADDRESS,
+                baseWithdrawalLimitInUSD: 10_000, // $10k
+                baseBorrowLimitInUSD: 10_000, // $10k
+                maxBorrowLimitInUSD: 15_000 // $15k
+            });
+
+            setVaultLimits(VAULT_ETH_USDTb); // TYPE_1 => 128
+            VAULT_FACTORY.setVaultAuth(ETH_USDTb_VAULT, TEAM_MULTISIG, true);
+        }
+
+        {
+            address WSTETH_USDTb_VAULT = getVaultAddress(129);
+
+            // [TYPE 1] WSTETH/USDTb vault
+            VaultConfig memory VAULT_WSTETH_USDTb = VaultConfig({
+                vault: WSTETH_USDTb_VAULT,
+                vaultType: VAULT_TYPE.TYPE_1,
+                supplyToken: wstETH_ADDRESS,
+                borrowToken: USDTb_ADDRESS,
+                baseWithdrawalLimitInUSD: 10_000, // $10k
+                baseBorrowLimitInUSD: 10_000, // $10k
+                maxBorrowLimitInUSD: 15_000 // $15k
+            });
+
+            setVaultLimits(VAULT_WSTETH_USDTb); // TYPE_1 => 129
+            VAULT_FACTORY.setVaultAuth(WSTETH_USDTb_VAULT, TEAM_MULTISIG, true);
+        }
+
+        {
+            address WEETH_USDTb_VAULT = getVaultAddress(130);
+
+            // [TYPE 1] WEETH/USDTb vault
+            VaultConfig memory VAULT_WEETH_USDTb = VaultConfig({
+                vault: WEETH_USDTb_VAULT,
+                vaultType: VAULT_TYPE.TYPE_1,
+                supplyToken: weETH_ADDRESS,
+                borrowToken: USDTb_ADDRESS,
+                baseWithdrawalLimitInUSD: 10_000, // $10k
+                baseBorrowLimitInUSD: 10_000, // $10k
+                maxBorrowLimitInUSD: 15_000 // $15k
+            });
+
+            setVaultLimits(VAULT_WEETH_USDTb); // TYPE_1 => 130
+            VAULT_FACTORY.setVaultAuth(WEETH_USDTb_VAULT, TEAM_MULTISIG, true);
+        }
+
+        {
+            address WBTC_USDTb_VAULT = getVaultAddress(131);
+
+            // [TYPE 1] WBTC/USDTb vault
+            VaultConfig memory VAULT_WBTC_USDTb = VaultConfig({
+                vault: WBTC_USDTb_VAULT,
+                vaultType: VAULT_TYPE.TYPE_1,
+                supplyToken: wBTC_ADDRESS,
+                borrowToken: USDTb_ADDRESS,
+                baseWithdrawalLimitInUSD: 10_000, // $10k
+                baseBorrowLimitInUSD: 10_000, // $10k
+                maxBorrowLimitInUSD: 15_000 // $15k
+            });
+
+            setVaultLimits(VAULT_WBTC_USDTb); // TYPE_1 => 131
+            VAULT_FACTORY.setVaultAuth(WBTC_USDTb_VAULT, TEAM_MULTISIG, true);
+        }
+
+        {
+            address CBBTC_USDTb_VAULT = getVaultAddress(132);
+
+            // [TYPE 1] CBBTC/USDTb vault
+            VaultConfig memory VAULT_CBBTC_USDTb = VaultConfig({
+                vault: CBBTC_USDTb_VAULT,
+                vaultType: VAULT_TYPE.TYPE_1,
+                supplyToken: cbBTC_ADDRESS,
+                borrowToken: USDTb_ADDRESS,
+                baseWithdrawalLimitInUSD: 10_000, // $10k
+                baseBorrowLimitInUSD: 10_000, // $10k
+                maxBorrowLimitInUSD: 15_000 // $15k
+            });
+
+            setVaultLimits(VAULT_CBBTC_USDTb); // TYPE_1 => 132
+            VAULT_FACTORY.setVaultAuth(CBBTC_USDTb_VAULT, TEAM_MULTISIG, true);
+        }
+    }
+
+    // @notice Action 11: Update Limits for sUSDe-USDT, USDe-USDT based T2 and T4vaults
+    function action11() internal isActionSkippable(11) {
+        {
+            address sUSDe_USDT__USDT_VAULT = getVaultAddress(92);
+            // [TYPE 2] sUSDe-USDT<>USDT | smart collateral & debt
+            VaultConfig memory VAULT_sUSDe_USDT__USDT = VaultConfig({
+                vault: sUSDe_USDT__USDT_VAULT,
+                vaultType: VAULT_TYPE.TYPE_2,
+                supplyToken: address(0),
+                borrowToken: USDT_ADDRESS,
+                baseWithdrawalLimitInUSD: 0,
+                baseBorrowLimitInUSD: 17_500_000, // $17.5M
+                maxBorrowLimitInUSD: 35_000_000 // $35M
+            });
+
+            setVaultLimits(VAULT_sUSDe_USDT__USDT);
+        }
+
+        {
+            address USDe_USDT__USDT_VAULT = getVaultAddress(93);
+            // [TYPE 2] USDe-USDT<>USDT | smart collateral & debt
+            VaultConfig memory VAULT_USDe_USDT__USDT = VaultConfig({
+                vault: USDe_USDT__USDT_VAULT,
+                vaultType: VAULT_TYPE.TYPE_2,
+                supplyToken: address(0),
+                borrowToken: USDT_ADDRESS,
+                baseWithdrawalLimitInUSD: 0,
+                baseBorrowLimitInUSD: 12_500_000, // $12.5M
+                maxBorrowLimitInUSD: 25_000_000 // $25M
+            });
+
+            setVaultLimits(VAULT_USDe_USDT__USDT);
+        }
+
+        {
+            // T4 sUSDe-USDT | USDC-USDT vault
+            address USDC_USDT_DEX_ADDRESS = getDexAddress(2);
+            address sUSDe_USDT__USDC_USDT_VAULT_ADDRESS = getVaultAddress(98);
+
+            {
+                // Increase sUSDe-USDT<>USDC-USDT vault borrow shares limit
+                IFluidAdminDex.UserBorrowConfig[]
+                    memory config_ = new IFluidAdminDex.UserBorrowConfig[](1);
+                config_[0] = IFluidAdminDex.UserBorrowConfig({
+                    user: sUSDe_USDT__USDC_USDT_VAULT_ADDRESS,
+                    expandPercent: 30 * 1e2, // 30%
+                    expandDuration: 6 hours, // 6 hours
+                    baseDebtCeiling: 20_000_000 * 1e18, // 20M shares
+                    maxDebtCeiling: 40_000_000 * 1e18 // 40M shares
+                });
+
+                IFluidDex(USDC_USDT_DEX_ADDRESS).updateUserBorrowConfigs(config_);
+            }
+        }
+
+        {
+            // T4 USDe-USDT | USDC-USDT vault
+            address USDC_USDT_DEX_ADDRESS = getDexAddress(2);
+            address USDe_USDT__USDC_USDT_VAULT_ADDRESS = getVaultAddress(99);
+
+            {
+                // Increase USDe-USDT<>USDC-USDT vault borrow shares limit
+                IFluidAdminDex.UserBorrowConfig[]
+                    memory config_ = new IFluidAdminDex.UserBorrowConfig[](1);
+                config_[0] = IFluidAdminDex.UserBorrowConfig({
+                    user: USDe_USDT__USDC_USDT_VAULT_ADDRESS,
+                    expandPercent: 30 * 1e2, // 30%
+                    expandDuration: 6 hours, // 6 hours
+                    baseDebtCeiling: 20_000_000 * 1e18, // 20M shares
+                    maxDebtCeiling: 40_000_000 * 1e18 // 40M shares
+                });
+
+                IFluidDex(USDC_USDT_DEX_ADDRESS).updateUserBorrowConfigs(config_);
+            }
+        }
     }
 
     /**
