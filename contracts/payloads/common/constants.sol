@@ -5,30 +5,29 @@ import {BigMathMinified} from "../libraries/bigMathMinified.sol";
 import {LiquidityCalcs} from "../libraries/liquidityCalcs.sol";
 import {LiquiditySlotsLink} from "../libraries/liquiditySlotsLink.sol";
 
-import { IGovernorBravo } from "./interfaces/IGovernorBravo.sol";
-import { ITimelock } from "./interfaces/ITimelock.sol";
+import {IGovernorBravo} from "./interfaces/IGovernorBravo.sol";
+import {ITimelock} from "./interfaces/ITimelock.sol";
 
-import { IFluidLiquidityAdmin } from "./interfaces/IFluidLiquidity.sol";
-import { IFluidReserveContract } from "./interfaces/IFluidReserveContract.sol";
+import {IFluidLiquidityAdmin} from "./interfaces/IFluidLiquidity.sol";
+import {IFluidReserveContract} from "./interfaces/IFluidReserveContract.sol";
 
-import { IFluidVaultFactory } from "./interfaces/IFluidVaultFactory.sol";
-import { IFluidDexFactory } from "./interfaces/IFluidDexFactory.sol";
-import { IFluidSmartLendingFactory } from "./interfaces/IFluidSmartLendingFactory.sol";
-import { IFluidLendingFactory } from "./interfaces/IFluidLendingFactory.sol";
+import {IFluidVaultFactory} from "./interfaces/IFluidVaultFactory.sol";
+import {IFluidDexFactory} from "./interfaces/IFluidDexFactory.sol";
+import {IFluidSmartLendingFactory} from "./interfaces/IFluidSmartLendingFactory.sol";
+import {IFluidLendingFactory} from "./interfaces/IFluidLendingFactory.sol";
 
-import { IFluidDex } from "./interfaces/IFluidDex.sol";
-import { IFluidDexResolver } from "./interfaces/IFluidDex.sol";
+import {IFluidDex} from "./interfaces/IFluidDex.sol";
+import {IFluidDexResolver} from "./interfaces/IFluidDex.sol";
 
-import { IFluidVault } from "./interfaces/IFluidVault.sol";
-import { IFluidVaultT1 } from "./interfaces/IFluidVault.sol";
+import {IFluidVault} from "./interfaces/IFluidVault.sol";
+import {IFluidVaultT1} from "./interfaces/IFluidVault.sol";
 
-import { IFTokenAdmin } from "./interfaces/IFToken.sol";
-import { ILendingRewards } from "./interfaces/IFToken.sol";
+import {IFTokenAdmin} from "./interfaces/IFToken.sol";
+import {ILendingRewards} from "./interfaces/IFToken.sol";
 
-import { IDSAV2 } from "./interfaces/IDSA.sol";
+import {IDSAV2} from "./interfaces/IDSA.sol";
 
-import { ILite } from "./interfaces/ILite.sol";
-
+import {ILite} from "./interfaces/ILite.sol";
 
 contract PayloadIGPConstants {
     address public immutable ADDRESS_THIS;
@@ -52,7 +51,8 @@ contract PayloadIGPConstants {
         IGovernorBravo(0x0204Cd037B2ec03605CFdFe482D8e257C765fA1B);
     ITimelock public constant TIMELOCK =
         ITimelock(0x2386DC45AdDed673317eF068992F19421B481F4c);
-    IDSAV2 public constant TREASURY = IDSAV2(0x28849D2b63fA8D361e5fc15cB8aBB13019884d09);
+    IDSAV2 public constant TREASURY =
+        IDSAV2(0x28849D2b63fA8D361e5fc15cB8aBB13019884d09);
 
     // Team Multisig
     address public constant TEAM_MULTISIG =
@@ -64,7 +64,6 @@ contract PayloadIGPConstants {
     IFluidReserveContract public constant FLUID_RESERVE =
         IFluidReserveContract(0x264786EF916af64a1DB19F513F24a3681734ce92);
 
-
     // Fluid Factory Addresses
     IFluidVaultFactory public constant VAULT_FACTORY =
         IFluidVaultFactory(0x324c5Dc1fC42c7a4D43d92df1eBA58a54d13Bf2d);
@@ -75,16 +74,14 @@ contract PayloadIGPConstants {
     IFluidLendingFactory public constant LENDING_FACTORY =
         IFluidLendingFactory(0x54B91A0D94cb471F37f949c60F7Fa7935b551D03);
 
-    
     ILite public constant IETHV2 =
         ILite(0xA0D3707c569ff8C87FA923d3823eC5D81c98Be78);
-
 
     // Tokens
     address internal constant ETH_ADDRESS =
         0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
     address internal constant WETH_ADDRESS =
-        0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;  
+        0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
     address internal constant wstETH_ADDRESS =
         0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0;
     address internal constant stETH_ADDRESS =
@@ -114,7 +111,7 @@ contract PayloadIGPConstants {
         0x40D16FC0246aD3160Ccc09B8D0D3A2cD28aE6C2f;
     address internal constant iUSD_ADDRESS =
         0x48f9e38f3070AD8945DFEae3FA70987722E3D89c;
-    address internal constant deUSD_ADDRESS = 
+    address internal constant deUSD_ADDRESS =
         0x15700B564Ca08D9439C58cA5053166E8317aa138;
     address internal constant USR_ADDRESS =
         0x66a1E37c9b0eAddca17d3662D6c05F4DECf3e110;
@@ -124,6 +121,8 @@ contract PayloadIGPConstants {
         0x085780639CC2cACd35E474e71f4d000e2405d8f6;
     address internal constant BOLD_ADDRESS =
         0xb01dd87B29d187F3E3a4Bf6cdAebfb97F3D9aB98;
+    address internal constant USDTb_ADDRESS =
+        0xC139190F447e929f090Edeb554D95AbB8b18aC1C;
 
     address internal constant WBTC_ADDRESS =
         0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599;
@@ -131,12 +130,12 @@ contract PayloadIGPConstants {
         0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf;
     address internal constant tBTC_ADDRESS =
         0x18084fbA666a33d37592fA2633fD49a74DD93a88;
-    address internal constant eBTC_ADDRESS = 
+    address internal constant eBTC_ADDRESS =
         0x657e8C867D8B37dCC18fA4Caead9C45EB088C642;
-    address internal constant lBTC_ADDRESS = 
+    address internal constant lBTC_ADDRESS =
         0x8236a87084f8B84306f72007F36F2618A5634494;
 
-    address internal constant INST_ADDRESS = 
+    address internal constant INST_ADDRESS =
         0x6f40d4A6237C257fff2dB00FA0510DeEECd303eb;
     address internal constant FLUID_ADDRESS =
         0x6f40d4A6237C257fff2dB00FA0510DeEECd303eb;
@@ -146,17 +145,24 @@ contract PayloadIGPConstants {
     address internal constant wstUSR_ADDRESS =
         0x1202F5C7b4B9E47a1A484E8B270be34dbbC75055;
 
-    address internal constant XAUT_ADDRESS = 
+    address internal constant XAUT_ADDRESS =
         0x68749665FF8D2d112Fa859AA293F07A622782F38;
-    address internal constant PAXG_ADDRESS = 
+    address internal constant PAXG_ADDRESS =
         0x45804880De22913dAFE09f4980848ECE6EcbAf78;
 
     // fTokens
-    address internal constant F_USDT_ADDRESS = 0x5C20B550819128074FD538Edf79791733ccEdd18;
-    address internal constant F_USDC_ADDRESS = 0x9Fb7b4477576Fe5B32be4C1843aFB1e55F251B33;
-    address internal constant F_WETH_ADDRESS = 0x90551c1795392094FE6D29B758EcCD233cFAa260;
-    address internal constant F_GHO_ADDRESS = 0x6A29A46E21C730DcA1d8b23d637c101cec605C5B;
-    address internal constant F_SUSDs_ADDRESS = 0x2BBE31d63E6813E3AC858C04dae43FB2a72B0D11;
+    address internal constant F_USDT_ADDRESS =
+        0x5C20B550819128074FD538Edf79791733ccEdd18;
+    address internal constant F_USDC_ADDRESS =
+        0x9Fb7b4477576Fe5B32be4C1843aFB1e55F251B33;
+    address internal constant F_WETH_ADDRESS =
+        0x90551c1795392094FE6D29B758EcCD233cFAa260;
+    address internal constant F_GHO_ADDRESS =
+        0x6A29A46E21C730DcA1d8b23d637c101cec605C5B;
+    address internal constant F_SUSDs_ADDRESS =
+        0x2BBE31d63E6813E3AC858C04dae43FB2a72B0D11;
+    address internal constant F_USDTb_ADDRESS =
+        0x15e8c742614b5D8Db4083A41Df1A14F5D2bFB400;
 
     // Constants
     uint256 internal constant X8 = 0xff;
