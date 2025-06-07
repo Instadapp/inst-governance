@@ -199,7 +199,7 @@ contract PayloadIGP100 is PayloadIGPMain {
     // @notice Action 4: Set Dust Limits for USDTb smart vaults
     function action4() internal isActionSkippable(4) {
         {
-            address USDE_USDTb__USDTb_VAULT = getVaultAddress(133);
+            address USDE_USDTb__USDTb_VAULT = getVaultAddress(136);
 
             // [TYPE 2] USDE-USDTb<>USDTb | smart collateral & debt
             VaultConfig memory VAULT_USDE_USDTb_USDTb = VaultConfig({
@@ -222,7 +222,7 @@ contract PayloadIGP100 is PayloadIGPMain {
         }
 
         {
-            address USDE_USDTb__USDT_VAULT = getVaultAddress(134);
+            address USDE_USDTb__USDT_VAULT = getVaultAddress(137);
 
             // USDE-USDTb / USDT T2 vault
             Vault memory VAULT_USDE_USDTb_USDT = Vault({
@@ -245,7 +245,7 @@ contract PayloadIGP100 is PayloadIGPMain {
         }
 
         {
-            address USDE_USDTb__USDC_VAULT = getVaultAddress(135);
+            address USDE_USDTb__USDC_VAULT = getVaultAddress(138);
 
             // USDE-USDTb / USDC T2 vault
             Vault memory VAULT_USDE_USDTb_USDC = Vault({
@@ -351,7 +351,7 @@ contract PayloadIGP100 is PayloadIGPMain {
                 DEX_FACTORY.setDexAuth(wstUSR_USDC_DEX, TEAM_MULTISIG, true);
             }
             {
-                address wstUSR_USDC__USDC_VAULT = getVaultAddress(136);
+                address wstUSR_USDC__USDC_VAULT = getVaultAddress(133);
                 // [TYPE 2] wstUSR-USDC<>USDC | smart collateral & debt
                 VaultConfig memory VAULT_wstUSR_USDC_USDC = VaultConfig({
                     vault: wstUSR_USDC__USDC_VAULT,
@@ -371,7 +371,7 @@ contract PayloadIGP100 is PayloadIGPMain {
                 );
             }
             {
-                address wstUSR_USDC__USDC_USDT_VAULT = getVaultAddress(137);
+                address wstUSR_USDC__USDC_USDT_VAULT = getVaultAddress(134);
                 address USDC_USDT_DEX = getDexAddress(2);
 
                 {
@@ -400,7 +400,7 @@ contract PayloadIGP100 is PayloadIGPMain {
 
             {
                 address wstUSR_USDC__USDC_USDT_CONCENTRATED_VAULT = getVaultAddress(
-                        138
+                        135
                     );
                 address USDC_USDT_CONCENTRATED_DEX = getDexAddress(34);
 
@@ -451,7 +451,7 @@ contract PayloadIGP100 is PayloadIGPMain {
         }
 
         {
-            address GHO_USDe__GHO_USDC_VAULT = getVaultAddress(139);
+            address GHO_USDe__GHO_USDC_VAULT = getVaultAddress(136);
             address GHO_USDC_DEX = getDexAddress(4);
 
             {
