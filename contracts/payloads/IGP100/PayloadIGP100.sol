@@ -208,8 +208,8 @@ contract PayloadIGP100 is PayloadIGPMain {
                 supplyToken: address(0),
                 borrowToken: USDTb_ADDRESS,
                 baseWithdrawalLimitInUSD: 0,
-                baseBorrowLimitInUSD: 20_000, // $20k
-                maxBorrowLimitInUSD: 25_000 // $25k
+                baseBorrowLimitInUSD: 7_000, // $7k
+                maxBorrowLimitInUSD: 10_000 // $10k
             });
 
             setVaultLimits(VAULT_USDE_USDTb_USDTb);
@@ -231,8 +231,8 @@ contract PayloadIGP100 is PayloadIGPMain {
                 supplyToken: address(0), // supply token (DEX LP)
                 borrowToken: USDT_ADDRESS,
                 baseWithdrawalLimitInUSD: 0,
-                baseBorrowLimitInUSD: 20_000, // $20k
-                maxBorrowLimitInUSD: 25_000 // $25k
+                baseBorrowLimitInUSD: 7_000, // $7k
+                maxBorrowLimitInUSD: 10_000 // $10k
             });
 
             setVaultLimits(VAULT_USDE_USDTb_USDT);
@@ -254,8 +254,8 @@ contract PayloadIGP100 is PayloadIGPMain {
                 supplyToken: address(0), // supply token (DEX LP)
                 borrowToken: USDC_ADDRESS,
                 baseWithdrawalLimitInUSD: 0,
-                baseBorrowLimitInUSD: 20_000, // $20k
-                maxBorrowLimitInUSD: 25_000 // $25k
+                baseBorrowLimitInUSD: 7_000, // $7k
+                maxBorrowLimitInUSD: 10_000 // $10k
             });
 
             setVaultLimits(VAULT_USDE_USDTb_USDC);
@@ -359,8 +359,8 @@ contract PayloadIGP100 is PayloadIGPMain {
                     supplyToken: address(0),
                     borrowToken: USDC_ADDRESS,
                     baseWithdrawalLimitInUSD: 0,
-                    baseBorrowLimitInUSD: 20_000, // $20k
-                    maxBorrowLimitInUSD: 25_000 // $25k
+                    baseBorrowLimitInUSD: 7_000, // $7k
+                    maxBorrowLimitInUSD: 10_000 // $10k
                 });
 
                 setVaultLimits(VAULT_wstUSR_USDC_USDC); // TYPE_2 => 136
