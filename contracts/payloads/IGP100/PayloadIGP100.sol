@@ -199,11 +199,69 @@ contract PayloadIGP100 is PayloadIGPMain {
     // @notice Action 4: Set Dust Limits for USDTb smart vaults
     function action4() internal isActionSkippable(4) {
         {
-            //
+            address USDE_USDTb_USDTb_VAULT = getVaultAddress(133);
+
+            // [TYPE 2] USDE-USDTb<>USDTb | smart collateral & debt
+            VaultConfig memory VAULT_USDE_USDTb_USDTb = VaultConfig({
+                vault: USDE_USDTb_USDTb_VAULT,
+                vaultType: VAULT_TYPE.TYPE_2,
+                supplyToken: address(0),
+                borrowToken: USDTb_ADDRESS,
+                baseWithdrawalLimitInUSD: 0,
+                baseBorrowLimitInUSD: 20_000, // $20k
+                maxBorrowLimitInUSD: 25_000 // $25k
+            });
+
+            setVaultLimits(VAULT_USDE_USDTb_USDTb); // TYPE_2 => 133
+            VAULT_FACTORY.setVaultAuth(
+                USDE_USDTb_USDTb_VAULT,
+                TEAM_MULTISIG,
+                true
+            );
         }
 
         {
-            //
+            address USDE_USDTb_USDT_VAULT = getVaultAddress(134);
+
+            // USDE-USDTb / USDT T2 vault
+            Vault memory VAULT_USDE_USDTb_USDT = Vault({
+                vault: USDE_USDTb_USDT_VAULT,
+                vaultType: TYPE.TYPE_2,
+                supplyToken: address(0), // supply token (DEX LP)
+                borrowToken: USDT_ADDRESS,
+                baseWithdrawalLimitInUSD: 0,
+                baseBorrowLimitInUSD: 20_000, // $20k
+                maxBorrowLimitInUSD: 25_000 // $25k
+            });
+
+            setVaultLimits(VAULT_USDE_USDTb_USDT);
+            VAULT_FACTORY.setVaultAuth(
+                USDE_USDTb_USDT_VAULT,
+                TEAM_MULTISIG,
+                true
+            );
+        }
+
+        {
+            address USDE_USDTb_USDC_VAULT = getVaultAddress(135);
+
+            // USDE-USDTb / USDC T2 vault
+            Vault memory VAULT_USDE_USDTb_USDC = Vault({
+                vault: USDE_USDTb_USDC_VAULT,
+                vaultType: TYPE.TYPE_2,
+                supplyToken: address(0), // supply token (DEX LP)
+                borrowToken: USDC_ADDRESS,
+                baseWithdrawalLimitInUSD: 0,
+                baseBorrowLimitInUSD: 20_000, // $20k
+                maxBorrowLimitInUSD: 25_000 // $25k
+            });
+
+            setVaultLimits(VAULT_USDE_USDTb_USDC);
+            VAULT_FACTORY.setVaultAuth(
+                USDE_USDTb_USDC_VAULT,
+                TEAM_MULTISIG,
+                true
+            );
         }
     }
 
