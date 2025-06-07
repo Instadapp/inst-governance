@@ -373,23 +373,6 @@ contract PayloadIGP100 is PayloadIGPMain {
             {
                 address wstUSR_USDC__USDC_USDT_VAULT = getVaultAddress(137);
                 address USDC_USDT_DEX = getDexAddress(2);
-                address wstUSR_USDC_DEX = getDexAddress(27);
-
-                {
-                    // Update wstUSR-USDC<>USDC-USDT vault supply shares limit
-                    IFluidAdminDex.UserSupplyConfig[]
-                        memory config_ = new IFluidAdminDex.UserSupplyConfig[](
-                            1
-                        );
-                    config_[0] = IFluidAdminDex.UserSupplyConfig({
-                        user: wstUSR_USDC__USDC_USDT_VAULT,
-                        expandPercent: 35 * 1e2, // 25%
-                        expandDuration: 6 hours, // 12 hours
-                        baseWithdrawalLimit: 5_000 * 1e18 // 5k shares (10k)
-                    });
-
-                    IFluidDex(wstUSR_USDC_DEX).updateUserSupplyConfigs(config_);
-                }
 
                 {
                     // Update wstUSR-USDC<>USDC-USDT vault borrow shares limit
@@ -420,23 +403,6 @@ contract PayloadIGP100 is PayloadIGPMain {
                         138
                     );
                 address USDC_USDT_CONCENTRATED_DEX = getDexAddress(34);
-                address wstUSR_USDC_DEX = getDexAddress(27);
-
-                {
-                    // Update wstUSR-USDC<>USDC-USDT concentrated vault supply shares limit
-                    IFluidAdminDex.UserSupplyConfig[]
-                        memory config_ = new IFluidAdminDex.UserSupplyConfig[](
-                            1
-                        );
-                    config_[0] = IFluidAdminDex.UserSupplyConfig({
-                        user: wstUSR_USDC__USDC_USDT_VAULT,
-                        expandPercent: 35 * 1e2, // 25%
-                        expandDuration: 6 hours, // 12 hours
-                        baseWithdrawalLimit: 5_000 * 1e18 // 5k shares (10k)
-                    });
-
-                    IFluidDex(wstUSR_USDC_DEX).updateUserSupplyConfigs(config_);
-                }
 
                 {
                     // Update wstUSR-USDC<>USDC-USDT concentrated vault borrow shares limit
@@ -482,6 +448,32 @@ contract PayloadIGP100 is PayloadIGPMain {
             setDexLimits(DEX_GHO_USDe); // Smart Collateral
 
             DEX_FACTORY.setDexAuth(GHO_USDe_DEX, TEAM_MULTISIG, true);
+        }
+
+        {
+            address GHO_USDe__GHO_USDC_VAULT = getVaultAddress(139);
+            address GHO_USDC_DEX = getDexAddress(4);
+
+            {
+                // Update GHO-USDe<>GHO-USDC vault borrow shares limit
+                IFluidAdminDex.UserBorrowConfig[]
+                    memory config_ = new IFluidAdminDex.UserBorrowConfig[](1);
+                config_[0] = IFluidAdminDex.UserBorrowConfig({
+                    user: GHO_USDe__GHO_USDC_VAULT,
+                    expandPercent: 30 * 1e2, // 20%
+                    expandDuration: 6 hours, // 12 hours
+                    baseDebtCeiling: 4_000 * 1e18, // 4k shares ($8k)
+                    maxDebtCeiling: 5_000 * 1e18 // 5k shares ($10k)
+                });
+
+                IFluidDex(GHO_USDC_DEX).updateUserBorrowConfigs(config_);
+            }
+
+            VAULT_FACTORY.setVaultAuth(
+                GHO_USDe__GHO_USDC_VAULT,
+                TEAM_MULTISIG,
+                true
+            );
         }
     }
 
