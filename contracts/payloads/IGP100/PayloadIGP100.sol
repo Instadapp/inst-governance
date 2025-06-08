@@ -54,7 +54,7 @@ contract PayloadIGP100 is PayloadIGPMain {
         // Action 5: Reduce Borrow Expand Percentage on (s)USDe-USDT T4 vaults back to 30%
         action5();
 
-        // Action 6: Increase Caps on GHO-sUSDe
+        // Action 6: Increase Caps on GHO-sUSDe and its vault
         action6();
 
         // Action 7: Set dust limits for wstUSR-USDC DEX and its vaults
@@ -329,15 +329,38 @@ contract PayloadIGP100 is PayloadIGPMain {
         }
     }
 
-    // @notice Action 6: Increase Caps on GHO-sUSDe
+    // @notice Action 6: Increase Caps on GHO-sUSDe and its vault
     function action6() internal isActionSkippable(6) {
         address GHO_sUSDe_DEX = getDexAddress(33);
 
         {
-            // Set max sypply shares
+            // Set max supply shares
             IFluidDex(GHO_sUSDe_DEX).updateMaxSupplyShares(
                 15_000_000 * 1e18 // from 5M shares
             );
+        }
+        {
+            //sUSDe-GHO/GHO-USDC
+            address USDC_GHO_DEX_ADDRESS = getDexAddress(4);
+            address sUSDe_GHO__USDC_GHO_VAULT_ADDRESS = getVaultAddress(125);
+
+            {
+                // Update sUSDe-GHO<>USDC-GHO vault borrow shares limit
+                IFluidAdminDex.UserBorrowConfig[]
+                    memory config_ = new IFluidAdminDex.UserBorrowConfig[](1);
+                config_[0] = IFluidAdminDex.UserBorrowConfig({
+                    user: sUSDe_GHO__USDC_GHO_VAULT_ADDRESS,
+                    expandPercent: 30 * 1e2, // 30%
+                    expandDuration: 6 hours, // 6 hours
+                    baseDebtCeiling: 5_000_000 * 1e18, // 5M shares ($10M)
+                    maxDebtCeiling: 15_000_000 * 1e18 // 15M shares ($30M)
+                });
+
+                IFluidDex(USDC_GHO_DEX_ADDRESS).updateUserBorrowConfigs(
+                    config_
+                );
+            }
+
         }
     }
 
@@ -464,7 +487,7 @@ contract PayloadIGP100 is PayloadIGPMain {
         }
 
         {
-            address GHO_USDe__GHO_USDC_VAULT = getVaultAddress(136);
+            address GHO_USDe__GHO_USDC_VAULT = getVaultAddress(139);
             address GHO_USDC_DEX = getDexAddress(4);
 
             {
@@ -506,6 +529,11 @@ contract PayloadIGP100 is PayloadIGPMain {
                 maxBorrowLimitInUSD: 30_000_000 // $30M
             });
             setDexLimits(DEX_GHO_USDC); // Smart Collateral & Smart Debt
+        }
+        {
+            IFluidDex(GHO_USDC_DEX).updateMaxBorrowShares(
+                16_000_000 * 1e18 // from 11M shares
+            );
         }
     }
 
