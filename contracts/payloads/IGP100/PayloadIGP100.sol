@@ -110,9 +110,9 @@ contract PayloadIGP100 is PayloadIGPMain {
                 vaultType: VAULT_TYPE.TYPE_1,
                 supplyToken: ETH_ADDRESS,
                 borrowToken: USDTb_ADDRESS,
-                baseWithdrawalLimitInUSD: 7_000_000, // $7M
-                baseBorrowLimitInUSD: 7_000_000, // $7M
-                maxBorrowLimitInUSD: 10_000_000 // $10M
+                baseWithdrawalLimitInUSD: 5_000_000, // $5M
+                baseBorrowLimitInUSD: 5_000_000, // $5M
+                maxBorrowLimitInUSD: 20_000_000 // $20M
             });
 
             setVaultLimits(VAULT_ETH_USDTb); // TYPE_1 => 128
@@ -128,9 +128,9 @@ contract PayloadIGP100 is PayloadIGPMain {
                 vaultType: VAULT_TYPE.TYPE_1,
                 supplyToken: wstETH_ADDRESS,
                 borrowToken: USDTb_ADDRESS,
-                baseWithdrawalLimitInUSD: 7_000_000, // $7M
-                baseBorrowLimitInUSD: 7_000_000, // $7M
-                maxBorrowLimitInUSD: 10_000_000 // $10M
+                baseWithdrawalLimitInUSD: 5_000_000, // $5M
+                baseBorrowLimitInUSD: 5_000_000, // $5M
+                maxBorrowLimitInUSD: 20_000_000 // $20M
             });
 
             setVaultLimits(VAULT_WSTETH_USDTb); // TYPE_1 => 129
@@ -150,9 +150,9 @@ contract PayloadIGP100 is PayloadIGPMain {
                 vaultType: VAULT_TYPE.TYPE_1,
                 supplyToken: weETH_ADDRESS,
                 borrowToken: USDTb_ADDRESS,
-                baseWithdrawalLimitInUSD: 7_000_000, // $7M
-                baseBorrowLimitInUSD: 7_000_000, // $7M
-                maxBorrowLimitInUSD: 10_000_000 // $10M
+                baseWithdrawalLimitInUSD: 5_000_000, // $5M
+                baseBorrowLimitInUSD: 5_000_000, // $5M
+                maxBorrowLimitInUSD: 20_000_000 // $20M
             });
 
             setVaultLimits(VAULT_WEETH_USDTb); // TYPE_1 => 130
@@ -168,9 +168,9 @@ contract PayloadIGP100 is PayloadIGPMain {
                 vaultType: VAULT_TYPE.TYPE_1,
                 supplyToken: WBTC_ADDRESS,
                 borrowToken: USDTb_ADDRESS,
-                baseWithdrawalLimitInUSD: 7_000_000, // $7M
-                baseBorrowLimitInUSD: 7_000_000, // $7M
-                maxBorrowLimitInUSD: 10_000_000 // $10M
+                baseWithdrawalLimitInUSD: 5_000_000, // $5M
+                baseBorrowLimitInUSD: 5_000_000, // $5M
+                maxBorrowLimitInUSD: 20_000_000 // $20M
             });
 
             setVaultLimits(VAULT_WBTC_USDTb); // TYPE_1 => 131
@@ -186,9 +186,9 @@ contract PayloadIGP100 is PayloadIGPMain {
                 vaultType: VAULT_TYPE.TYPE_1,
                 supplyToken: cbBTC_ADDRESS,
                 borrowToken: USDTb_ADDRESS,
-                baseWithdrawalLimitInUSD: 7_000_000, // $7M
-                baseBorrowLimitInUSD: 7_000_000, // $7M
-                maxBorrowLimitInUSD: 10_000_000 // $10M
+                baseWithdrawalLimitInUSD: 5_000_000, // $5M
+                baseBorrowLimitInUSD: 5_000_000, // $5M
+                maxBorrowLimitInUSD: 20_000_000 // $20M
             });
 
             setVaultLimits(VAULT_CBBTC_USDTb); // TYPE_1 => 132
