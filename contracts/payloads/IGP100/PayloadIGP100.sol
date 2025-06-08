@@ -336,7 +336,7 @@ contract PayloadIGP100 is PayloadIGPMain {
         {
             // Set max supply shares
             IFluidDex(GHO_sUSDe_DEX).updateMaxSupplyShares(
-                15_000_000 * 1e18 // from 5M shares
+                10_000_000 * 1e18 // from 5M shares
             );
         }
         {
