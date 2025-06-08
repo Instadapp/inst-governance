@@ -102,8 +102,8 @@ contract PayloadIGP100 is PayloadIGPMain {
                 kink1: 85 * 1e2, // 85%
                 kink2: 93 * 1e2, // 93%
                 rateAtUtilizationZero: 0, // 0%
-                rateAtUtilizationKink1: 6 * 1e2, // 6%
-                rateAtUtilizationKink2: 8 * 1e2, // 8%
+                rateAtUtilizationKink1: 4 * 1e2, // 4%
+                rateAtUtilizationKink2: 6 * 1e2, // 6%
                 rateAtUtilizationMax: 40 * 1e2 // 40%
             });
 
