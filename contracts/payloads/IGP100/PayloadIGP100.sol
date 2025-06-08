@@ -336,7 +336,7 @@ contract PayloadIGP100 is PayloadIGPMain {
         {
             // Set max sypply shares
             IFluidDex(GHO_sUSDe_DEX).updateMaxSupplyShares(
-                15_000_000 * 1e18 // from 10M shares
+                15_000_000 * 1e18 // from 5M shares
             );
         }
     }
@@ -375,7 +375,7 @@ contract PayloadIGP100 is PayloadIGPMain {
                     maxBorrowLimitInUSD: 10_000 // $10k
                 });
 
-                setVaultLimits(VAULT_wstUSR_USDC_USDC); // TYPE_2 => 136
+                setVaultLimits(VAULT_wstUSR_USDC_USDC); // TYPE_2 => 133
                 VAULT_FACTORY.setVaultAuth(
                     wstUSR_USDC__USDC_VAULT,
                     TEAM_MULTISIG,
