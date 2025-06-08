@@ -240,9 +240,9 @@ contract PayloadIGP100 is PayloadIGPMain {
             address USDE_USDTb__USDT_VAULT = getVaultAddress(137);
 
             // USDE-USDTb / USDT T2 vault
-            Vault memory VAULT_USDE_USDTb_USDT = Vault({
+            VaultConfig memory VAULT_USDE_USDTb_USDT = VaultConfig({
                 vault: USDE_USDTb__USDT_VAULT,
-                vaultType: TYPE.TYPE_2,
+                vaultType: VAULT_TYPE.TYPE_2,
                 supplyToken: address(0), // supply token (DEX LP)
                 borrowToken: USDT_ADDRESS,
                 baseWithdrawalLimitInUSD: 0,
@@ -263,9 +263,9 @@ contract PayloadIGP100 is PayloadIGPMain {
             address USDE_USDTb__USDC_VAULT = getVaultAddress(138);
 
             // USDE-USDTb / USDC T2 vault
-            Vault memory VAULT_USDE_USDTb_USDC = Vault({
+            VaultConfig memory VAULT_USDE_USDTb_USDC = VaultConfig({
                 vault: USDE_USDTb__USDC_VAULT,
-                vaultType: TYPE.TYPE_2,
+                vaultType: VAULT_TYPE.TYPE_2,
                 supplyToken: address(0), // supply token (DEX LP)
                 borrowToken: USDC_ADDRESS,
                 baseWithdrawalLimitInUSD: 0,
@@ -448,7 +448,7 @@ contract PayloadIGP100 is PayloadIGPMain {
                             1
                         );
                     config_[0] = IFluidAdminDex.UserBorrowConfig({
-                        user: wstUSR_USDC__USDC_USDT_VAULT,
+                        user: wstUSR_USDC__USDC_USDT_CONCENTRATED_VAULT,
                         expandPercent: 30 * 1e2, // 20%
                         expandDuration: 6 hours, // 12 hours
                         baseDebtCeiling: 4_000 * 1e18, // 4k shares ($8k)
