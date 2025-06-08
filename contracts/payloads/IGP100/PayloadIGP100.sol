@@ -336,7 +336,7 @@ contract PayloadIGP100 is PayloadIGPMain {
         {
             // Set max sypply shares
             IFluidDex(GHO_sUSDe_DEX).updateMaxSupplyShares(
-                10_000_000 * 1e18 // from 10M shares
+                15_000_000 * 1e18 // from 10M shares
             );
         }
     }
@@ -446,6 +446,7 @@ contract PayloadIGP100 is PayloadIGPMain {
     // @notice Action 8: Set dust limits for GHO-USDe DEX and its vault
     function action8() internal isActionSkippable(8) {
         {
+            address GHO_USDe_DEX = getDexAddress(37);
             // GHO-USDe DEX
             DexConfig memory DEX_GHO_USDe = DexConfig({
                 dex: GHO_USDe_DEX,
@@ -493,9 +494,18 @@ contract PayloadIGP100 is PayloadIGPMain {
     function action9() internal isActionSkippable(9) {
         address GHO_USDC_DEX = getDexAddress(4);
         {
-            IFluidDex(GHO_USDC_DEX).updateMaxBorrowShares(
-                15_000_000 * 1e18
-            ); // from 11M shares
+            // Increase GHO-USDC Dex Pool Limits
+            DexConfig memory DEX_GHO_USDC = DexConfig({
+                dex: GHO_USDC_DEX,
+                tokenA: GHO_ADDRESS,
+                tokenB: USDC_ADDRESS,
+                smartCollateral: true,
+                smartDebt: true,
+                baseWithdrawalLimitInUSD: 18_000_000, // $18M
+                baseBorrowLimitInUSD: 18_000_000, // $18M
+                maxBorrowLimitInUSD: 30_000_000 // $30M
+            });
+            setDexLimits(DEX_GHO_USDC); // Smart Collateral & Smart Debt
         }
     }
 
