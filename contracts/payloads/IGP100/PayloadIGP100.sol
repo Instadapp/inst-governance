@@ -501,7 +501,7 @@ contract PayloadIGP100 is PayloadIGPMain {
                 tokenB: USDC_ADDRESS,
                 smartCollateral: true,
                 smartDebt: true,
-                baseWithdrawalLimitInUSD: 18_000_000, // $18M
+                baseWithdrawalLimitInUSD: 11_000_000, // $11M
                 baseBorrowLimitInUSD: 18_000_000, // $18M
                 maxBorrowLimitInUSD: 30_000_000 // $30M
             });
