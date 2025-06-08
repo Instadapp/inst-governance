@@ -53,6 +53,18 @@ contract PayloadIGP100 is PayloadIGPMain {
 
         // Action 5: Reduce Borrow Expand Percentage on (s)USDe-USDT T4 vaults back to 30%
         action5();
+
+        // Action 6: Increase Caps on GHO-sUSDe
+        action6();
+
+        // Action 7: Set dust limits for wstUSR-USDC DEX and its vaults
+        action7();
+
+        // Action 8: Set dust limits for GHO-USDe DEX and its vault
+        action8();
+
+        // Action 9: Increase Borrow Limits on GHO-USDC DEX
+        action9();
     }
 
     function verifyProposal() public view override {}
@@ -431,7 +443,7 @@ contract PayloadIGP100 is PayloadIGPMain {
         }
     }
 
-    // @notice Action 8: Set dust limits for GHO-USDe DEX
+    // @notice Action 8: Set dust limits for GHO-USDe DEX and its vault
     function action8() internal isActionSkippable(8) {
         {
             // GHO-USDe DEX
@@ -474,6 +486,16 @@ contract PayloadIGP100 is PayloadIGPMain {
                 TEAM_MULTISIG,
                 true
             );
+        }
+    }
+
+    // @notice Action 9: Increase Borrow Limits on GHO-USDC DEX
+    function action9() internal isActionSkippable(9) {
+        address GHO_USDC_DEX = getDexAddress(4);
+        {
+            IFluidDex(GHO_USDC_DEX).updateMaxBorrowShares(
+                15_000_000 * 1e18
+            ); // from 11M shares
         }
     }
 
