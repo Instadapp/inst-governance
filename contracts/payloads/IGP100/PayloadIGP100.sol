@@ -86,7 +86,7 @@ contract PayloadIGP100 is PayloadIGPMain {
         setFTokenExpandPercentage(F_USDT_ADDRESS, USDT_ADDRESS);
         setFTokenExpandPercentage(F_USDC_ADDRESS, USDC_ADDRESS);
         setFTokenExpandPercentage(F_GHO_ADDRESS, GHO_ADDRESS);
-        setFTokenExpandPercentage(F_SUSDs_ADDRESS, sUSDe_ADDRESS);
+        setFTokenExpandPercentage(F_SUSDs_ADDRESS, sUSDs_ADDRESS);
     }
 
     // @notice Action 2: Adjust USDTb rate curve
@@ -526,14 +526,13 @@ contract PayloadIGP100 is PayloadIGPMain {
     ) internal {
         IFTokenAdmin fToken = IFTokenAdmin(address(fTokenAddress));
 
-        SupplyProtocolConfig
-            memory protocolConfigTokenB_ = SupplyProtocolConfig({
-                protocol: address(fToken),
-                supplyToken: underlyingToken,
-                expandPercent: 50 * 1e2, // 50%
-                expandDuration: 6 hours, // 6 hours
-                baseWithdrawalLimitInUSD: 10_000_000 // $10M
-            });
+        SupplyProtocolConfig memory protocolConfigTokenB_ = SupplyProtocolConfig({
+            protocol: address(fToken),
+            supplyToken: underlyingToken,
+            expandPercent: 50 * 1e2, // 50%
+            expandDuration: 6 hours, // 6 hours
+            baseWithdrawalLimitInUSD: 10_000_000 // $10M
+        });
 
         setSupplyProtocolLimits(protocolConfigTokenB_);
     }
