@@ -65,6 +65,9 @@ contract PayloadIGP100 is PayloadIGPMain {
 
         // Action 9: Increase Borrow Limits on GHO-USDC DEX
         action9();
+
+        // Action 10: Increase Borrow Cap on GHO-USDC DEX
+        action10();
     }
 
     function verifyProposal() public view override {}
@@ -360,7 +363,6 @@ contract PayloadIGP100 is PayloadIGPMain {
                     config_
                 );
             }
-
         }
     }
 
@@ -526,10 +528,16 @@ contract PayloadIGP100 is PayloadIGPMain {
                 smartDebt: true,
                 baseWithdrawalLimitInUSD: 11_000_000, // $11M
                 baseBorrowLimitInUSD: 18_000_000, // $18M
-                maxBorrowLimitInUSD: 30_000_000 // $30M
+                maxBorrowLimitInUSD: 40_000_000 // $40M
             });
             setDexLimits(DEX_GHO_USDC); // Smart Collateral & Smart Debt
         }
+    }
+
+    // @notice Action 10: Increase Borrow Cap on GHO-USDC DEX
+    function action10() internal isActionSkippable(10) {
+        address GHO_USDC_DEX = getDexAddress(4);
+
         {
             IFluidDex(GHO_USDC_DEX).updateMaxBorrowShares(
                 16_000_000 * 1e18 // from 11M shares
