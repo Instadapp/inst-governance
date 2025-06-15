@@ -45,7 +45,7 @@ contract PayloadIGP101 is PayloadIGPMain {
         // Action 2: Set Launch Limits for USDTb DEX and its Smart Vaults
         action2();
 
-        // Action 3: Set Launch Limits for USDe-USDT / USDT Vault
+        // Action 3: Set Launch Limits for USDe-USDT / USDTb Vault
         action3();
 
         // Action 4: Set Launch Limits for wstUSR-USDC DEX and its vaults and its vaults
@@ -54,17 +54,20 @@ contract PayloadIGP101 is PayloadIGPMain {
         // Action 5: Update CF, LT, LML and Borrow Cap for Gold Smart Vaults
         action5();
 
-        // Action 6: Set global authorization for DEX Factory
+        // Action 6: Update Borrow Cap for Gold DEX
         action6();
 
-        // Action 7: Set Launch Limits for GHO-USDe T4 Vault
+        // Action 7: Set global authorization for DEX Factory
         action7();
 
-        // Action 8: Increase Borrow Cap on GHO-USDC DEX
+        // Action 8: Set Launch Limits for GHO-USDe T4 Vault
         action8();
 
-        // Action 9: Increase Borrow Cap on USDC-USDT DEX
+        // Action 9: Increase Borrow Cap on GHO-USDC DEX
         action9();
+
+        // Action 10: Increase Borrow Cap on USDC-USDT DEX
+        action10();
     }
 
     function verifyProposal() public view override {}
@@ -123,28 +126,25 @@ contract PayloadIGP101 is PayloadIGPMain {
             setDexLimits(DEX_USDE_USDTb); // Smart Collateral
 
             DEX_FACTORY.setDexAuth(USDE_USDTb_DEX, TEAM_MULTISIG, false);
-
-            // Set max supply shares
-            IFluidDex(USDE_USDTb_DEX).updateMaxSupplyShares(12_000_000 * 1e18);
         }
         {
-            address USDE_USDTb__USDTb_VAULT = getVaultAddress(136);
+            address USDE_USDTb__USDT_VAULT = getVaultAddress(137);
 
-            // [TYPE 2] USDE-USDTb<>USDTb | smart collateral & debt
-            VaultConfig memory VAULT_USDE_USDTb_USDTb = VaultConfig({
-                vault: USDE_USDTb__USDTb_VAULT,
+            // USDE-USDTb / USDT T2 vault
+            VaultConfig memory VAULT_USDE_USDTb_USDT = VaultConfig({
+                vault: USDE_USDTb__USDT_VAULT,
                 vaultType: VAULT_TYPE.TYPE_2,
                 supplyToken: address(0),
-                borrowToken: USDTb_ADDRESS,
+                borrowToken: USDT_ADDRESS,
                 baseWithdrawalLimitInUSD: 0,
                 baseBorrowLimitInUSD: 5_000_000, // $5M
                 maxBorrowLimitInUSD: 20_000_000 // $20M
             });
 
-            setVaultLimits(VAULT_USDE_USDTb_USDTb);
+            setVaultLimits(VAULT_USDE_USDTb_USDT);
 
             VAULT_FACTORY.setVaultAuth(
-                USDE_USDTb__USDTb_VAULT,
+                USDE_USDTb__USDT_VAULT,
                 TEAM_MULTISIG,
                 false
             );
@@ -173,26 +173,26 @@ contract PayloadIGP101 is PayloadIGPMain {
         }
     }
 
-    // @notice Action 3: Set Launch Limits for USDe-USDT / USDT Vault
+    // @notice Action 3: Set Launch Limits for USDe-USDT / USDTb Vault
     function action3() internal isActionSkippable(3) {
         {
-            address USDE_USDTb__USDT_VAULT = getVaultAddress(137);
+            address USDE_USDTb__USDTb_VAULT = getVaultAddress(136);
 
-            // USDE-USDTb / USDT T2 vault
-            VaultConfig memory VAULT_USDE_USDTb_USDT = VaultConfig({
-                vault: USDE_USDTb__USDT_VAULT,
+            // [TYPE 2] USDE-USDTb<>USDTb | smart collateral & debt
+            VaultConfig memory VAULT_USDE_USDTb_USDTb = VaultConfig({
+                vault: USDE_USDTb__USDTb_VAULT,
                 vaultType: VAULT_TYPE.TYPE_2,
                 supplyToken: address(0),
-                borrowToken: USDT_ADDRESS,
+                borrowToken: USDTb_ADDRESS,
                 baseWithdrawalLimitInUSD: 0,
                 baseBorrowLimitInUSD: 5_000_000, // $5M
                 maxBorrowLimitInUSD: 20_000_000 // $20M
             });
 
-            setVaultLimits(VAULT_USDE_USDTb_USDT);
+            setVaultLimits(VAULT_USDE_USDTb_USDTb);
 
             VAULT_FACTORY.setVaultAuth(
-                USDE_USDTb__USDT_VAULT,
+                USDE_USDTb__USDTb_VAULT,
                 TEAM_MULTISIG,
                 false
             );
@@ -219,11 +219,6 @@ contract PayloadIGP101 is PayloadIGPMain {
                 setDexLimits(DEX_wstUSR_USDC); // Smart Collateral
 
                 DEX_FACTORY.setDexAuth(wstUSR_USDC_DEX, TEAM_MULTISIG, false);
-
-                // Set max supply shares
-                IFluidDex(wstUSR_USDC_DEX).updateMaxSupplyShares(
-                    10_000_000 * 1e18
-                );
             }
             {
                 address wstUSR_USDC__USDC_VAULT = getVaultAddress(133);
@@ -306,48 +301,65 @@ contract PayloadIGP101 is PayloadIGPMain {
         }
     }
 
-    // @notice Action 5: Update CF, LT, LML and Borrow Cap for Gold Smart Vaults
+    // @notice Action 5: Update CF, LT, LML for Gold Smart Vaults
     function action5() internal isActionSkippable(5) {
         {
             address PAXG_XAUT__USDC_VAULT = getVaultAddress(122);
             address PAXG_XAUT__USDT_VAULT = getVaultAddress(123);
             address PAXG_XAUT__GHO_VAULT = getVaultAddress(124);
 
-            uint256 CF = 75 * 1e2;
-            uint256 LT = 80 * 1e2;
             uint256 LML = 83 * 1e2;
+            uint256 LT = 80 * 1e2;
+            uint256 CF = 75 * 1e2;
 
-            IFluidVaultT1(PAXG_XAUT__USDC_VAULT).updateCollateralFactor(CF);
-            IFluidVaultT1(PAXG_XAUT__USDC_VAULT).updateLiquidationThreshold(LT);
             IFluidVaultT1(PAXG_XAUT__USDC_VAULT).updateLiquidationMaxLimit(LML);
+            IFluidVaultT1(PAXG_XAUT__USDC_VAULT).updateLiquidationThreshold(LT);
+            IFluidVaultT1(PAXG_XAUT__USDC_VAULT).updateCollateralFactor(CF);
 
-            IFluidVaultT1(PAXG_XAUT__USDT_VAULT).updateCollateralFactor(CF);
-            IFluidVaultT1(PAXG_XAUT__USDT_VAULT).updateLiquidationThreshold(LT);
             IFluidVaultT1(PAXG_XAUT__USDT_VAULT).updateLiquidationMaxLimit(LML);
+            IFluidVaultT1(PAXG_XAUT__USDT_VAULT).updateLiquidationThreshold(LT);
+            IFluidVaultT1(PAXG_XAUT__USDT_VAULT).updateCollateralFactor(CF);
 
-            IFluidVaultT1(PAXG_XAUT__GHO_VAULT).updateCollateralFactor(CF);
-            IFluidVaultT1(PAXG_XAUT__GHO_VAULT).updateLiquidationThreshold(LT);
             IFluidVaultT1(PAXG_XAUT__GHO_VAULT).updateLiquidationMaxLimit(LML);
+            IFluidVaultT1(PAXG_XAUT__GHO_VAULT).updateLiquidationThreshold(LT);
+            IFluidVaultT1(PAXG_XAUT__GHO_VAULT).updateCollateralFactor(CF);
         }
+    }
 
-        {
+    // @notice Action 6: Update Borrow Cap for Gold DEX
+    function action6() internal isActionSkippable(6) {
+        // PAXG-XAUT DEX
             address PAXG_XAUT_DEX = getDexAddress(32);
+            {
+                DexConfig memory DEX_PAXG_XAUT = DexConfig({
+                    dex: PAXG_XAUT_DEX,
+                    tokenA: PAXG_ADDRESS,
+                    tokenB: XAUT_ADDRESS,
+                    smartCollateral: true,
+                    smartDebt: false,
+                    baseWithdrawalLimitInUSD: 5_000_000, // $5M
+                    baseBorrowLimitInUSD: 0, // $0
+                    maxBorrowLimitInUSD: 0 // $0
+                });
+                setDexLimits(DEX_PAXG_XAUT); // Smart Collateral
+
+                DEX_FACTORY.setDexAuth(PAXG_XAUT_DEX, TEAM_MULTISIG, true);
+            }
             {
                 IFluidDex(PAXG_XAUT_DEX).updateMaxSupplyShares(
                     725 * 1e18 // $5M
                 );
             }
-        }
     }
 
-    // @notice Action 6: Set global authorization for DEX Factory
-    function action6() internal isActionSkippable(6) {
+    // @notice Action 7: Set global authorization for DEX Factory
+    function action7() internal isActionSkippable(7) {
         address global_auth_address = 0xE3e18c563d11ced9B0c9cb8dD0284CF4442bC06a;
         DEX_FACTORY.setGlobalAuth(global_auth_address, true);
     }
 
-    // @notice Action 7: Set Launch Limits for GHO-USDe T4 Vault
-    function action7() internal isActionSkippable(7) {
+    // @notice Action 8: Set Launch Limits for GHO-USDe T4 Vault
+    function action8() internal isActionSkippable(8) {
         {
             address GHO_USDe_DEX = getDexAddress(37);
             // GHO-USDe DEX
@@ -357,13 +369,13 @@ contract PayloadIGP101 is PayloadIGPMain {
                 tokenB: USDe_ADDRESS,
                 smartCollateral: true,
                 smartDebt: false,
-                baseWithdrawalLimitInUSD: 10_000, // $10k
+                baseWithdrawalLimitInUSD: 8_100_000, // $8.1M
                 baseBorrowLimitInUSD: 0, // $0
                 maxBorrowLimitInUSD: 0 // $0
             });
             setDexLimits(DEX_GHO_USDe); // Smart Collateral
 
-            DEX_FACTORY.setDexAuth(GHO_USDe_DEX, TEAM_MULTISIG, true);
+            DEX_FACTORY.setDexAuth(GHO_USDe_DEX, TEAM_MULTISIG, false);
         }
         {
             address GHO_USDe__GHO_USDC_VAULT = getVaultAddress(139);
@@ -377,8 +389,8 @@ contract PayloadIGP101 is PayloadIGPMain {
                     user: GHO_USDe__GHO_USDC_VAULT,
                     expandPercent: 30 * 1e2, // 20%
                     expandDuration: 6 hours, // 12 hours
-                    baseDebtCeiling: 4_000 * 1e18, // 4k shares ($8k)
-                    maxDebtCeiling: 5_000 * 1e18 // 5k shares ($10k)
+                    baseDebtCeiling: 5_000_000 * 1e18, // 5M shares ($10M)
+                    maxDebtCeiling: 10_000_000 * 1e18 // 10M shares ($20M)
                 });
 
                 IFluidDex(GHO_USDC_DEX).updateUserBorrowConfigs(config_);
@@ -387,24 +399,29 @@ contract PayloadIGP101 is PayloadIGPMain {
             VAULT_FACTORY.setVaultAuth(
                 GHO_USDe__GHO_USDC_VAULT,
                 TEAM_MULTISIG,
-                true
+                false
             );
         }
     }
 
-    // @notice Action 8: Increase Borrow Cap on GHO-USDC DEX
-    function action8() internal isActionSkippable(8) {
+    // @notice Action 9: Increase Borrow Cap on GHO-USDC DEX
+    function action9() internal isActionSkippable(9) {
         address GHO_USDC_DEX = getDexAddress(4);
         {
             IFluidDex(GHO_USDC_DEX).updateMaxBorrowShares(15_000_000 * 1e18); // from 11M shares
         }
     }
 
-    // @notice Action 9: Increase Borrow Cap on USDC-USDT DEX
-    function action9() internal isActionSkippable(9) {
+    // @notice Action 10: Increase Borrow Cap on USDC-USDT normal and concentrated DEXes
+    function action10() internal isActionSkippable(10) {
         address USDC_USDT_DEX = getDexAddress(2);
         {
             IFluidDex(USDC_USDT_DEX).updateMaxBorrowShares(40_000_000 * 1e18); // from 35M shares
+        }
+
+        address USDC_USDT_CONCENTRATED_DEX = getDexAddress(34);
+        {
+            IFluidDex(USDC_USDT_CONCENTRATED_DEX).updateMaxBorrowShares(20_000_000 * 1e18); // from 10M shares
         }
     }
 
