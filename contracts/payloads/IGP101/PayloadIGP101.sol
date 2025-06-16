@@ -45,7 +45,7 @@ contract PayloadIGP101 is PayloadIGPMain {
         // Action 2: Set Launch Limits for USDTb DEX and its Smart Vaults
         action2();
 
-        // Action 3: Set Launch Limits and remove auth for USDe-USDT / USDTb Vault
+        // Action 3: Pause USDe-USDT / USDTb Vault and remove auth
         action3();
 
         // Action 4: Set Launch Limits for wstUSR-USDC DEX and its vaults and its vaults
@@ -173,7 +173,7 @@ contract PayloadIGP101 is PayloadIGPMain {
         }
     }
 
-    // @notice Action 3: Set Launch Limits and remove auth for USDe-USDT / USDTb Vault
+    // @notice Action 3: Pause USDe-USDT / USDTb Vault and remove auth
     function action3() internal isActionSkippable(3) {
         {
             address USDE_USDTb__USDTb_VAULT = getVaultAddress(136);
