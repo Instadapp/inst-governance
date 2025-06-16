@@ -342,8 +342,6 @@ contract PayloadIGP101 is PayloadIGPMain {
                     maxBorrowLimitInUSD: 0 // $0
                 });
                 setDexLimits(DEX_PAXG_XAUT); // Smart Collateral
-
-                DEX_FACTORY.setDexAuth(PAXG_XAUT_DEX, TEAM_MULTISIG, true);
             }
             {
                 IFluidDex(PAXG_XAUT_DEX).updateMaxSupplyShares(
@@ -408,7 +406,21 @@ contract PayloadIGP101 is PayloadIGPMain {
     function action9() internal isActionSkippable(9) {
         address GHO_USDC_DEX = getDexAddress(4);
         {
-            IFluidDex(GHO_USDC_DEX).updateMaxBorrowShares(15_000_000 * 1e18); // from 11M shares
+            // Increase GHO-USDC Dex Pool Limits
+            DexConfig memory DEX_GHO_USDC = DexConfig({
+                dex: GHO_USDC_DEX,
+                tokenA: GHO_ADDRESS,
+                tokenB: USDC_ADDRESS,
+                smartCollateral: true,
+                smartDebt: true,
+                baseWithdrawalLimitInUSD: 11_000_000, // $11M
+                baseBorrowLimitInUSD: 30_000_000, // $30M
+                maxBorrowLimitInUSD: 50_000_000 // $50M
+            });
+            setDexLimits(DEX_GHO_USDC); // Smart Collateral & Smart Debt
+        }
+        {
+            IFluidDex(GHO_USDC_DEX).updateMaxBorrowShares(20_000_000 * 1e18); // from 16M shares
         }
     }
 
@@ -416,12 +428,40 @@ contract PayloadIGP101 is PayloadIGPMain {
     function action10() internal isActionSkippable(10) {
         address USDC_USDT_DEX = getDexAddress(2);
         {
-            IFluidDex(USDC_USDT_DEX).updateMaxBorrowShares(40_000_000 * 1e18); // from 35M shares
+            // Increase USDC-USDT Dex Pool Limits
+            DexConfig memory DEX_USDC_USDT = DexConfig({
+                dex: USDC_USDT_DEX,
+                tokenA: USDC_ADDRESS,
+                tokenB: USDT_ADDRESS,
+                smartCollateral: false,
+                smartDebt: true,
+                baseWithdrawalLimitInUSD: 0, // $0
+                baseBorrowLimitInUSD: 75_000_000, // $75M
+                maxBorrowLimitInUSD: 125_000_000 // $125M
+            });
+            setDexLimits(DEX_USDC_USDT); // Smart Collateral & Smart Debt
+        }
+        {
+            IFluidDex(USDC_USDT_DEX).updateMaxBorrowShares(55_000_000 * 1e18); // from 50M shares
         }
 
         address USDC_USDT_CONCENTRATED_DEX = getDexAddress(34);
         {
-            IFluidDex(USDC_USDT_CONCENTRATED_DEX).updateMaxBorrowShares(20_000_000 * 1e18); // from 10M shares
+            // Increase USDC-USDT-CONCENTRATED Dex Pool Limits
+            DexConfig memory DEX_USDC_USDT_CONCENTRATED = DexConfig({
+                dex: USDC_USDT_CONCENTRATED_DEX,
+                tokenA: USDC_ADDRESS,
+                tokenB: USDT_ADDRESS,
+                smartCollateral: false,
+                smartDebt: true,
+                baseWithdrawalLimitInUSD: 0, // $0
+                baseBorrowLimitInUSD: 22_000_000, // $22M
+                maxBorrowLimitInUSD: 37_000_000 // $37M
+            });
+            setDexLimits(DEX_USDC_USDT_CONCENTRATED); // Smart Debt
+        }
+        {
+            IFluidDex(USDC_USDT_CONCENTRATED_DEX).updateMaxBorrowShares(15_000_000 * 1e18); // from 10M shares
         }
     }
 
