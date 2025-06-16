@@ -177,25 +177,8 @@ contract PayloadIGP101 is PayloadIGPMain {
     function action3() internal isActionSkippable(3) {
         {
             address USDE_USDTb__USDTb_VAULT = getVaultAddress(136);
-
-            // [TYPE 2] USDE-USDTb<>USDTb | smart collateral & debt
-            VaultConfig memory VAULT_USDE_USDTb_USDTb = VaultConfig({
-                vault: USDE_USDTb__USDTb_VAULT,
-                vaultType: VAULT_TYPE.TYPE_2,
-                supplyToken: address(0),
-                borrowToken: USDTb_ADDRESS,
-                baseWithdrawalLimitInUSD: 0,
-                baseBorrowLimitInUSD: 5_000_000, // $5M
-                maxBorrowLimitInUSD: 20_000_000 // $20M
-            });
-
-            setVaultLimits(VAULT_USDE_USDTb_USDTb);
-
-            VAULT_FACTORY.setVaultAuth(
-                USDE_USDTb__USDTb_VAULT,
-                TEAM_MULTISIG,
-                false
-            );
+            // Pause borrow limits
+            setBorrowProtocolLimitsPaused(USDE_USDTb__USDTb_VAULT, USDTb_ADDRESS);
         }
     }
 
