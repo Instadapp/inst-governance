@@ -69,7 +69,7 @@ contract PayloadIGP101 is PayloadIGPMain {
         // Action 10: Increase Borrow Cap on USDC-USDT DEX
         action10();
 
-        // Action 11: Set Launch Limits for csUSDL/USDC DEX 
+        // Action 11: Set Launch Limits for csUSDL/USDC DEX
         action11();
     }
 
@@ -181,7 +181,10 @@ contract PayloadIGP101 is PayloadIGPMain {
         {
             address USDE_USDTb__USDTb_VAULT = getVaultAddress(136);
             // Pause borrow limits
-            setBorrowProtocolLimitsPaused(USDE_USDTb__USDTb_VAULT, USDTb_ADDRESS);
+            setBorrowProtocolLimitsPaused(
+                USDE_USDTb__USDTb_VAULT,
+                USDTb_ADDRESS
+            );
 
             VAULT_FACTORY.setVaultAuth(
                 USDE_USDTb__USDTb_VAULT,
@@ -222,7 +225,7 @@ contract PayloadIGP101 is PayloadIGPMain {
                     borrowToken: USDC_ADDRESS,
                     baseWithdrawalLimitInUSD: 0,
                     baseBorrowLimitInUSD: 5_000_000, // $5M
-                    maxBorrowLimitInUSD: 10_000_000 // $10M
+                    maxBorrowLimitInUSD: 20_000_000 // $20M
                 });
 
                 setVaultLimits(VAULT_wstUSR_USDC_USDC); // TYPE_2 => 133
@@ -244,10 +247,10 @@ contract PayloadIGP101 is PayloadIGPMain {
                         );
                     config_[0] = IFluidAdminDex.UserBorrowConfig({
                         user: wstUSR_USDC__USDC_USDT_VAULT,
-                        expandPercent: 30 * 1e2, // 20%
-                        expandDuration: 6 hours, // 12 hours
+                        expandPercent: 30 * 1e2, // 30%
+                        expandDuration: 6 hours, // 6 hours
                         baseDebtCeiling: 2_500_000 * 1e18, // 2.5M shares ($5M)
-                        maxDebtCeiling: 5_000_000 * 1e18 // 5M shares ($10M)
+                        maxDebtCeiling: 10_000_000 * 1e18 // 10M shares ($10M)
                     });
 
                     IFluidDex(USDC_USDT_DEX).updateUserBorrowConfigs(config_);
@@ -274,10 +277,10 @@ contract PayloadIGP101 is PayloadIGPMain {
                         );
                     config_[0] = IFluidAdminDex.UserBorrowConfig({
                         user: wstUSR_USDC__USDC_USDT_CONCENTRATED_VAULT,
-                        expandPercent: 30 * 1e2, // 20%
-                        expandDuration: 6 hours, // 12 hours
+                        expandPercent: 30 * 1e2, // 30%
+                        expandDuration: 6 hours, // 6 hours
                         baseDebtCeiling: 2_500_000 * 1e18, // 2.5M shares ($5M)
-                        maxDebtCeiling: 5_000_000 * 1e18 // 5M shares ($10M)
+                        maxDebtCeiling: 10_000_000 * 1e18 // 10M shares ($10M)
                     });
 
                     IFluidDex(USDC_USDT_CONCENTRATED_DEX)
@@ -300,7 +303,7 @@ contract PayloadIGP101 is PayloadIGPMain {
             address PAXG_XAUT__USDT_VAULT = getVaultAddress(123);
             address PAXG_XAUT__GHO_VAULT = getVaultAddress(124);
 
-            uint256 LML = 83 * 1e2;
+            uint256 LML = 90 * 1e2;
             uint256 LT = 80 * 1e2;
             uint256 CF = 75 * 1e2;
 
@@ -321,25 +324,25 @@ contract PayloadIGP101 is PayloadIGPMain {
     // @notice Action 6: Update Borrow Cap for Gold DEX
     function action6() internal isActionSkippable(6) {
         // PAXG-XAUT DEX
-            address PAXG_XAUT_DEX = getDexAddress(32);
-            {
-                DexConfig memory DEX_PAXG_XAUT = DexConfig({
-                    dex: PAXG_XAUT_DEX,
-                    tokenA: PAXG_ADDRESS,
-                    tokenB: XAUT_ADDRESS,
-                    smartCollateral: true,
-                    smartDebt: false,
-                    baseWithdrawalLimitInUSD: 5_000_000, // $5M
-                    baseBorrowLimitInUSD: 0, // $0
-                    maxBorrowLimitInUSD: 0 // $0
-                });
-                setDexLimits(DEX_PAXG_XAUT); // Smart Collateral
-            }
-            {
-                IFluidDex(PAXG_XAUT_DEX).updateMaxSupplyShares(
-                    725 * 1e18 // $5M
-                );
-            }
+        address PAXG_XAUT_DEX = getDexAddress(32);
+        {
+            DexConfig memory DEX_PAXG_XAUT = DexConfig({
+                dex: PAXG_XAUT_DEX,
+                tokenA: PAXG_ADDRESS,
+                tokenB: XAUT_ADDRESS,
+                smartCollateral: true,
+                smartDebt: false,
+                baseWithdrawalLimitInUSD: 5_000_000, // $5M
+                baseBorrowLimitInUSD: 0, // $0
+                maxBorrowLimitInUSD: 0 // $0
+            });
+            setDexLimits(DEX_PAXG_XAUT); // Smart Collateral
+        }
+        {
+            IFluidDex(PAXG_XAUT_DEX).updateMaxSupplyShares(
+                725 * 1e18 // $5M
+            );
+        }
     }
 
     // @notice Action 7: Set global authorization for DEX Factory
@@ -453,11 +456,13 @@ contract PayloadIGP101 is PayloadIGPMain {
             setDexLimits(DEX_USDC_USDT_CONCENTRATED); // Smart Debt
         }
         {
-            IFluidDex(USDC_USDT_CONCENTRATED_DEX).updateMaxBorrowShares(15_000_000 * 1e18); // from 10M shares
+            IFluidDex(USDC_USDT_CONCENTRATED_DEX).updateMaxBorrowShares(
+                15_000_000 * 1e18
+            ); // from 10M shares
         }
     }
 
-    // @notice Action 11: Set Launch Limits for csUSDL/USDC DEX 
+    // @notice Action 11: Set Launch Limits for csUSDL/USDC DEX
     function action11() internal isActionSkippable(11) {
         address csUSDL_USDC_DEX = getDexAddress(38);
         {
