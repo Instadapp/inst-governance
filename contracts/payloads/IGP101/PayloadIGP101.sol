@@ -127,12 +127,6 @@ contract PayloadIGP101 is PayloadIGPMain {
                 maxBorrowLimitInUSD: 0 // $0
             });
             setDexLimits(DEX_USDE_USDTb); // Smart Collateral
-
-            {
-                IFluidDex(USDE_USDTb_DEX).updateMaxSupplyShares(
-                    10_000_000 * 1e18 // $20M
-                );
-            }
         }
         {
             address USDE_USDTb__USDT_VAULT = getVaultAddress(137);
@@ -180,7 +174,7 @@ contract PayloadIGP101 is PayloadIGPMain {
         }
         {
             // dust limits
-            address USDE_USDTb__GHO_VAULT = getVaultAddress(139);
+            address USDE_USDTb__GHO_VAULT = getVaultAddress(140);
 
             // USDE-USDTb / GHO T2 vault
             VaultConfig memory VAULT_USDE_USDTb_GHO = VaultConfig({
@@ -398,6 +392,7 @@ contract PayloadIGP101 is PayloadIGPMain {
                 });
 
                 setVaultLimits(VAULT_XAUT_USDT); // TYPE_1 => 117
+
             }
         }
 
