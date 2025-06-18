@@ -573,6 +573,9 @@ contract PayloadIGP101 is PayloadIGPMain {
         } else if (token == sUSDs_ADDRESS) {
             usdPrice = sUSDs_USD_PRICE;
             decimals = 18;
+        } else if (token == csUSDL_ADDRESS) {
+            usdPrice = csUSDL_USD_PRICE;
+            decimals = 18;
         } else if (
             token == GHO_ADDRESS ||
             token == USDe_ADDRESS ||
