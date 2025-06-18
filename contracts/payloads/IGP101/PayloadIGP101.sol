@@ -68,6 +68,9 @@ contract PayloadIGP101 is PayloadIGPMain {
 
         // Action 10: Increase Borrow Cap on USDC-USDT DEX
         action10();
+
+        // Action 11: Set Launch Limits for csUSDL/USDC DEX 
+        action11();
     }
 
     function verifyProposal() public view override {}
@@ -451,6 +454,30 @@ contract PayloadIGP101 is PayloadIGPMain {
         }
         {
             IFluidDex(USDC_USDT_CONCENTRATED_DEX).updateMaxBorrowShares(15_000_000 * 1e18); // from 10M shares
+        }
+    }
+
+    // @notice Action 11: Set Launch Limits for csUSDL/USDC DEX 
+    function action11() internal isActionSkippable(11) {
+        address csUSDL_USDC_DEX = getDexAddress(38);
+        {
+            // csUSDL-USDC DEX
+            {
+                // csUSDL-USDC Dex
+                DexConfig memory DEX_csUSDL_USDC = DexConfig({
+                    dex: csUSDL_USDC_DEX,
+                    tokenA: csUSDL_ADDRESS,
+                    tokenB: USDC_ADDRESS,
+                    smartCollateral: true,
+                    smartDebt: false,
+                    baseWithdrawalLimitInUSD: 9_000_000, // $9M
+                    baseBorrowLimitInUSD: 0, // $0
+                    maxBorrowLimitInUSD: 0 // $0
+                });
+                setDexLimits(DEX_csUSDL_USDC); // Smart Collateral
+
+                DEX_FACTORY.setDexAuth(csUSDL_USDC_DEX, TEAM_MULTISIG, true);
+            }
         }
     }
 
