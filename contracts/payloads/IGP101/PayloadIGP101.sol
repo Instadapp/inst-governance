@@ -324,28 +324,16 @@ contract PayloadIGP101 is PayloadIGPMain {
             IFluidVaultT1(PAXG_XAUT__GHO_VAULT).updateCollateralFactor(CF);
 
             IFluidVaultT1(XAUT_USDC_VAULT).updateLiquidationMaxLimit(LML);
-            IFluidVaultT1(XAUT_USDC_VAULT).updateLiquidationThreshold(LT);
-            IFluidVaultT1(XAUT_USDC_VAULT).updateCollateralFactor(CF);
 
             IFluidVaultT1(XAUT_USDT_VAULT).updateLiquidationMaxLimit(LML);
-            IFluidVaultT1(XAUT_USDT_VAULT).updateLiquidationThreshold(LT);
-            IFluidVaultT1(XAUT_USDT_VAULT).updateCollateralFactor(CF);
 
             IFluidVaultT1(XAUT_GHO_VAULT).updateLiquidationMaxLimit(LML);
-            IFluidVaultT1(XAUT_GHO_VAULT).updateLiquidationThreshold(LT);
-            IFluidVaultT1(XAUT_GHO_VAULT).updateCollateralFactor(CF);
 
             IFluidVaultT1(PAXG_USDC_VAULT).updateLiquidationMaxLimit(LML);
-            IFluidVaultT1(PAXG_USDC_VAULT).updateLiquidationThreshold(LT);
-            IFluidVaultT1(PAXG_USDC_VAULT).updateCollateralFactor(CF);
 
             IFluidVaultT1(PAXG_USDT_VAULT).updateLiquidationMaxLimit(LML);
-            IFluidVaultT1(PAXG_USDT_VAULT).updateLiquidationThreshold(LT);
-            IFluidVaultT1(PAXG_USDT_VAULT).updateCollateralFactor(CF);
 
             IFluidVaultT1(PAXG_GHO_VAULT).updateLiquidationMaxLimit(LML);
-            IFluidVaultT1(PAXG_GHO_VAULT).updateLiquidationThreshold(LT);
-            IFluidVaultT1(PAXG_GHO_VAULT).updateCollateralFactor(CF);
         }
     }
 
