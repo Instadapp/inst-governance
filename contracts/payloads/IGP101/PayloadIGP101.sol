@@ -294,7 +294,7 @@ contract PayloadIGP101 is PayloadIGPMain {
         }
     }
 
-    // @notice Action 5: Update CF, LT, LML for Gold Vaults
+    // @notice Action 5: Update CF, LT, LML and LP for Gold Vaults
     function action5() internal isActionSkippable(5) {
         {
             address PAXG_XAUT__USDC_VAULT = getVaultAddress(122);
@@ -310,30 +310,40 @@ contract PayloadIGP101 is PayloadIGPMain {
             uint256 LML = 90 * 1e2;
             uint256 LT = 80 * 1e2;
             uint256 CF = 75 * 1e2;
+            uint256 LP = 3 * 1e2;
 
             IFluidVaultT1(PAXG_XAUT__USDC_VAULT).updateLiquidationMaxLimit(LML);
             IFluidVaultT1(PAXG_XAUT__USDC_VAULT).updateLiquidationThreshold(LT);
             IFluidVaultT1(PAXG_XAUT__USDC_VAULT).updateCollateralFactor(CF);
+            IFluidVaultT1(PAXG_XAUT__USDC_VAULT).updateLiquidationPenalty(LP);
 
             IFluidVaultT1(PAXG_XAUT__USDT_VAULT).updateLiquidationMaxLimit(LML);
             IFluidVaultT1(PAXG_XAUT__USDT_VAULT).updateLiquidationThreshold(LT);
             IFluidVaultT1(PAXG_XAUT__USDT_VAULT).updateCollateralFactor(CF);
+            IFluidVaultT1(PAXG_XAUT__USDT_VAULT).updateLiquidationPenalty(LP);
 
             IFluidVaultT1(PAXG_XAUT__GHO_VAULT).updateLiquidationMaxLimit(LML);
             IFluidVaultT1(PAXG_XAUT__GHO_VAULT).updateLiquidationThreshold(LT);
             IFluidVaultT1(PAXG_XAUT__GHO_VAULT).updateCollateralFactor(CF);
+            IFluidVaultT1(PAXG_XAUT__GHO_VAULT).updateLiquidationPenalty(LP);
 
             IFluidVaultT1(XAUT_USDC_VAULT).updateLiquidationMaxLimit(LML);
+            IFluidVaultT1(XAUT_USDC_VAULT).updateLiquidationPenalty(LP);
 
             IFluidVaultT1(XAUT_USDT_VAULT).updateLiquidationMaxLimit(LML);
+            IFluidVaultT1(XAUT_USDT_VAULT).updateLiquidationPenalty(LP);
 
             IFluidVaultT1(XAUT_GHO_VAULT).updateLiquidationMaxLimit(LML);
+            IFluidVaultT1(XAUT_GHO_VAULT).updateLiquidationPenalty(LP);
 
             IFluidVaultT1(PAXG_USDC_VAULT).updateLiquidationMaxLimit(LML);
+            IFluidVaultT1(PAXG_USDC_VAULT).updateLiquidationPenalty(LP);
 
             IFluidVaultT1(PAXG_USDT_VAULT).updateLiquidationMaxLimit(LML);
+            IFluidVaultT1(PAXG_USDT_VAULT).updateLiquidationPenalty(LP);
 
             IFluidVaultT1(PAXG_GHO_VAULT).updateLiquidationMaxLimit(LML);
+            IFluidVaultT1(PAXG_GHO_VAULT).updateLiquidationPenalty(LP);
         }
     }
 
