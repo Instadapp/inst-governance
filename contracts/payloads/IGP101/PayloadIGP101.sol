@@ -509,6 +509,8 @@ contract PayloadIGP101 is PayloadIGPMain {
     uint256 public constant XAUT_USD_PRICE = 3_240 * 1e2;
     uint256 public constant PAXG_USD_PRICE = 3_240 * 1e2;
 
+    uint256 public constant csUSDL_USD_PRICE = 1.03 * 1e2;
+
     function getRawAmount(
         address token,
         uint256 amount,
