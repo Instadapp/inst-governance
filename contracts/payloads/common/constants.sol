@@ -123,6 +123,8 @@ contract PayloadIGPConstants {
         0xb01dd87B29d187F3E3a4Bf6cdAebfb97F3D9aB98;
     address internal constant USDTb_ADDRESS =
         0xC139190F447e929f090Edeb554D95AbB8b18aC1C;
+    address internal constant csUSDL_ADDRESS =
+        0xbEeFc011e94f43b8B7b455eBaB290C7Ab4E216f1;
 
     address internal constant WBTC_ADDRESS =
         0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599;
