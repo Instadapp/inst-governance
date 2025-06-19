@@ -248,7 +248,7 @@ contract PayloadIGP101 is PayloadIGPMain {
                         expandPercent: 30 * 1e2, // 30%
                         expandDuration: 6 hours, // 6 hours
                         baseDebtCeiling: 2_500_000 * 1e18, // 2.5M shares ($5M)
-                        maxDebtCeiling: 10_000_000 * 1e18 // 10M shares ($10M)
+                        maxDebtCeiling: 10_000_000 * 1e18 // 10M shares ($20M)
                     });
 
                     IFluidDex(USDC_USDT_DEX).updateUserBorrowConfigs(config_);
@@ -278,7 +278,7 @@ contract PayloadIGP101 is PayloadIGPMain {
                         expandPercent: 30 * 1e2, // 30%
                         expandDuration: 6 hours, // 6 hours
                         baseDebtCeiling: 2_500_000 * 1e18, // 2.5M shares ($5M)
-                        maxDebtCeiling: 10_000_000 * 1e18 // 10M shares ($10M)
+                        maxDebtCeiling: 10_000_000 * 1e18 // 10M shares ($20M)
                     });
 
                     IFluidDex(USDC_USDT_CONCENTRATED_DEX)
