@@ -364,7 +364,7 @@ contract PayloadIGP101 is PayloadIGPMain {
                     supplyToken: XAUT_ADDRESS,
                     borrowToken: USDC_ADDRESS,
                     baseWithdrawalLimitInUSD: 5_000_000, // $5M
-                    baseBorrowLimitInUSD: 1_500_000, // $1.5M
+                    baseBorrowLimitInUSD: 5_000_000, // $5M
                     maxBorrowLimitInUSD: 10_000_000 // $10M
                 });
 
@@ -382,12 +382,11 @@ contract PayloadIGP101 is PayloadIGPMain {
                     supplyToken: XAUT_ADDRESS,
                     borrowToken: USDT_ADDRESS,
                     baseWithdrawalLimitInUSD: 5_000_000, // $5M
-                    baseBorrowLimitInUSD: 1_500_000, // $1.5M
+                    baseBorrowLimitInUSD: 5_000_000, // $5M
                     maxBorrowLimitInUSD: 10_000_000 // $10M
                 });
 
                 setVaultLimits(VAULT_XAUT_USDT); // TYPE_1 => 117
-
             }
         }
 
@@ -401,7 +400,7 @@ contract PayloadIGP101 is PayloadIGPMain {
                     supplyToken: XAUT_ADDRESS,
                     borrowToken: GHO_ADDRESS,
                     baseWithdrawalLimitInUSD: 5_000_000, // $5M
-                    baseBorrowLimitInUSD: 1_500_000, // $1.5M
+                    baseBorrowLimitInUSD: 5_000_000, // $5M
                     maxBorrowLimitInUSD: 10_000_000 // $10M
                 });
 
@@ -419,7 +418,7 @@ contract PayloadIGP101 is PayloadIGPMain {
                     supplyToken: PAXG_ADDRESS,
                     borrowToken: USDC_ADDRESS,
                     baseWithdrawalLimitInUSD: 5_000_000, // $5M
-                    baseBorrowLimitInUSD: 2_500_000, // $2.5M
+                    baseBorrowLimitInUSD: 5_000_000, // $5M
                     maxBorrowLimitInUSD: 10_000_000 // $10M
                 });
 
@@ -437,7 +436,7 @@ contract PayloadIGP101 is PayloadIGPMain {
                     supplyToken: PAXG_ADDRESS,
                     borrowToken: USDT_ADDRESS,
                     baseWithdrawalLimitInUSD: 5_000_000, // $5M
-                    baseBorrowLimitInUSD: 2_500_000, // $2.5M
+                    baseBorrowLimitInUSD: 5_000_000, // $5M
                     maxBorrowLimitInUSD: 10_000_000 // $10M
                 });
 
@@ -455,7 +454,7 @@ contract PayloadIGP101 is PayloadIGPMain {
                     supplyToken: PAXG_ADDRESS,
                     borrowToken: GHO_ADDRESS,
                     baseWithdrawalLimitInUSD: 5_000_000, // $5M
-                    baseBorrowLimitInUSD: 2_500_000, // $2.5M
+                    baseBorrowLimitInUSD: 5_000_000, // $5M
                     maxBorrowLimitInUSD: 10_000_000 // $10M
                 });
 
