@@ -48,7 +48,7 @@ contract PayloadIGP102 is PayloadIGPMain {
         // Action 3: Remove MS as auth for csUSDL-USDC dex and set rebalancer for csUSDL-USDC smart lending
         action3();
 
-        // Action 4:
+        // Action 4: Collect stETH, wstETH revenue and deposit from reserve contract to Lite Vault
         action4();
 
         // Action 5:
