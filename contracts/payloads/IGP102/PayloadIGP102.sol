@@ -33,6 +33,9 @@ import {PayloadIGPConstants} from "../common/constants.sol";
 import {PayloadIGPHelpers} from "../common/helpers.sol";
 import {PayloadIGPMain} from "../common/main.sol";
 
+import {IStETH} from "../common/interfaces/IStETH.sol";
+import {IWstETH} from "../common/interfaces/IWstETH.sol";
+
 contract PayloadIGP102 is PayloadIGPMain {
     uint256 public constant PROPOSAL_ID = 102;
 
@@ -51,7 +54,7 @@ contract PayloadIGP102 is PayloadIGPMain {
         // Action 4: Collect stETH, wstETH revenue and deposit from reserve contract to Lite Vault
         action4();
 
-        // Action 5:
+        // Action 5: Update wstUSR-USDC Supply Caps
         action5();
     }
 
@@ -81,7 +84,7 @@ contract PayloadIGP102 is PayloadIGPMain {
                 borrowToken: GHO_ADDRESS,
                 baseWithdrawalLimitInUSD: 0,
                 baseBorrowLimitInUSD: 5_000_000, // $5M
-                maxBorrowLimitInUSD: 10_000_000 // $10M
+                maxBorrowLimitInUSD: 20_000_000 // $20M
             });
 
             setVaultLimits(VAULT_USDE_USDTb_GHO);
@@ -113,7 +116,7 @@ contract PayloadIGP102 is PayloadIGPMain {
                 borrowToken: GHO_ADDRESS,
                 baseWithdrawalLimitInUSD: 0,
                 baseBorrowLimitInUSD: 5_000_000, // $5M
-                maxBorrowLimitInUSD: 20_000_000 // $20M
+                maxBorrowLimitInUSD: 10_000_000 // $10M
             });
 
             setVaultLimits(VAULT_GHO_USDe_GHO);
@@ -150,51 +153,84 @@ contract PayloadIGP102 is PayloadIGPMain {
 
     // @notice Action 4: Collect stETH, wstETH revenue and deposit from reserve contract to Lite Vault
     function action4() internal isActionSkippable(4) {
-        address[] memory tokens = new address[](2);
-
-        tokens[0] = stETH_ADDRESS;
-        tokens[1] = wstETH_ADDRESS;
-
-        LIQUIDITY.collectRevenue(tokens);
-
-        // Deposit stETH, wstETH into Lite Vault
-        string[] memory targets = new string[](2);
-        bytes[] memory encodedSpells = new bytes[](2);
-
-        string
-            memory depositSignature = "deposit(address,uint256,uint256,uint256)";
-
-        // Spell 1: Deposit stETH into Lite
         {
-            uint256 STETH_AMOUNT = IERC20(stETH_ADDRESS).balanceOf(
+            address[] memory tokens = new address[](2);
+
+            tokens[0] = ETH_ADDRESS;
+            tokens[1] = wstETH_ADDRESS;
+
+            LIQUIDITY.collectRevenue(tokens);
+
+            uint256[] memory amounts = new uint256[](2);
+
+            amounts[0] = address(FLUID_RESERVE).balance - 0.1;
+            amounts[1] =
+                IERC20(wstETH_ADDRESS).balanceOf(address(FLUID_RESERVE)) -
+                0.1;
+
+            FLUID_RESERVE.withdrawFunds(tokens, amounts, TREASURY); // Withdraw to Treasury
+        }
+        {
+            address[] memory tokens = new address[](1);
+            uint256[] memory amounts = new uint256[](1);
+
+            tokens[0] = stETH_ADDRESS;
+            amounts[0] = IERC20(stETH_ADDRESS).balanceOf(
                 address(FLUID_RESERVE)
             );
-            targets[0] = "BASIC-D-V2";
-            encodedSpells[0] = abi.encodeWithSignature(
-                depositSignature,
-                IETHV2,
-                STETH_AMOUNT,
-                0,
-                0
-            );
-        }
 
-        // Spell 2: Deposit wstETH into Lite
+            FLUID_RESERVE.withdrawFunds(tokens, amounts, TREASURY); // Withdraw to Treasury
+        }
         {
+            // stake ETH and unwrap wstETH
+            uint256 ETH_AMOUNT = address(TREASURY).balance;
             uint256 WSTETH_AMOUNT = IERC20(wstETH_ADDRESS).balanceOf(
-                address(FLUID_RESERVE)
+                address(TREASURY)
             );
-            targets[1] = "BASIC-D-V2";
-            encodedSpells[1] = abi.encodeWithSignature(
-                depositSignature,
-                IETHV2,
-                WSTETH_AMOUNT,
-                0,
-                0
-            );
-        }
 
-        IDSAV2(FLUID_RESERVE).cast(targets, encodedSpells, address(this));
+            // stake ETH
+            IStETH(stETH_ADDRESS).submit{value: ETH_AMOUNT}(address(0));
+
+            // unwrap wstETH
+            IWstETH(wstETH_ADDRESS).unwrap(WSTETH_AMOUNT);
+        }
+        {
+            // Deposit stETH into Lite Vault
+            string[] memory targets = new string[](1);
+            bytes[] memory encodedSpells = new bytes[](1);
+
+            string
+                memory depositSignature = "deposit(address,uint256,uint256,uint256)";
+
+            // Spell 1: Deposit stETH into Lite
+            {
+                uint256 STETH_AMOUNT = IERC20(stETH_ADDRESS).balanceOf(
+                    address(TREASURY)
+                );
+                targets[0] = "BASIC-D-V2";
+                encodedSpells[0] = abi.encodeWithSignature(
+                    depositSignature,
+                    IETHV2,
+                    STETH_AMOUNT,
+                    0,
+                    0
+                );
+            }
+
+            IDSAV2(TREASURY).cast(targets, encodedSpells, address(this));
+        }
+    }
+
+    // @notice Action 5: Update wstUSR-USDC Supply Caps
+    function action5() internal isActionSkippable(5) {
+        {
+            // update wstUSR-USDC max supply shares
+            {
+                address wstUSR_USDC_DEX = getDexAddress(27);
+
+                IFluidDex(wstUSR_USDC_DEX).updateMaxSupplyShares(7_500_000 * 1e18); // $15M
+            }
+        }
     }
 
     /**
