@@ -185,11 +185,14 @@ contract PayloadIGP102 is PayloadIGPMain {
             // stake ETH and unwrap wstETH
             {
                 // Stake ETH
-                string[] memory targets = new string[](1);
-                bytes[] memory encodedSpells = new bytes[](1);
+                string[] memory targets = new string[](2);
+                bytes[] memory encodedSpells = new bytes[](2);
 
                 string
                     memory depositSignature = "deposit(uint256,uint256,uint256)";
+                string
+                    memory withdrawSignature = "withdraw(uint256,uint256,uint256)";
+
 
                 // Spell 1: Stake ETH
                 {
@@ -203,23 +206,13 @@ contract PayloadIGP102 is PayloadIGPMain {
                     );
                 }
 
-                IDSAV2(TREASURY).cast(targets, encodedSpells, address(this));
-            }
-            {
-                // Unwrap WSTETH
-                string[] memory targets = new string[](1);
-                bytes[] memory encodedSpells = new bytes[](1);
-
-                string
-                    memory withdrawSignature = "withdraw(uint256,uint256,uint256)";
-
-                // Spell 1: Unwrap WSTETH
+                // Spell 2: Unwrap WSTETH
                 {
                     uint256 WSTETH_AMOUNT = IERC20(wstETH_ADDRESS).balanceOf(
                         address(TREASURY)
                     );
-                    targets[0] = "WSTETH-A";
-                    encodedSpells[0] = abi.encodeWithSignature(
+                    targets[1] = "WSTETH-A";
+                    encodedSpells[1] = abi.encodeWithSignature(
                         withdrawSignature,
                         WSTETH_AMOUNT,
                         0,
