@@ -183,16 +183,52 @@ contract PayloadIGP102 is PayloadIGPMain {
         }
         {
             // stake ETH and unwrap wstETH
-            uint256 ETH_AMOUNT = address(TREASURY).balance;
-            uint256 WSTETH_AMOUNT = IERC20(wstETH_ADDRESS).balanceOf(
-                address(TREASURY)
-            );
+            {
+                // Stake ETH
+                string[] memory targets = new string[](1);
+                bytes[] memory encodedSpells = new bytes[](1);
 
-            // stake ETH
-            IStETH(stETH_ADDRESS).submit{value: ETH_AMOUNT}(address(0));
+                string
+                    memory depositSignature = "deposit(uint256,uint256,uint256)";
 
-            // unwrap wstETH
-            IWstETH(wstETH_ADDRESS).unwrap(WSTETH_AMOUNT);
+                // Spell 1: Stake ETH
+                {
+                    uint256 ETH_AMOUNT = address(TREASURY).balance;
+                    targets[0] = "LIDO-STETH-A";
+                    encodedSpells[0] = abi.encodeWithSignature(
+                        depositSignature,
+                        ETH_AMOUNT,
+                        0,
+                        0
+                    );
+                }
+
+                IDSAV2(TREASURY).cast(targets, encodedSpells, address(this));
+            }
+            {
+                // Unwrap WSTETH
+                string[] memory targets = new string[](1);
+                bytes[] memory encodedSpells = new bytes[](1);
+
+                string
+                    memory withdrawSignature = "withdraw(uint256,uint256,uint256)";
+
+                // Spell 1: Unwrap WSTETH
+                {
+                    uint256 WSTETH_AMOUNT = IERC20(wstETH_ADDRESS).balanceOf(
+                        address(TREASURY)
+                    );
+                    targets[0] = "WSTETH-A";
+                    encodedSpells[0] = abi.encodeWithSignature(
+                        withdrawSignature,
+                        WSTETH_AMOUNT,
+                        0,
+                        0
+                    );
+                }
+
+                IDSAV2(TREASURY).cast(targets, encodedSpells, address(this));
+            }
         }
         {
             // Deposit stETH into Lite Vault
@@ -228,7 +264,9 @@ contract PayloadIGP102 is PayloadIGPMain {
             {
                 address wstUSR_USDC_DEX = getDexAddress(27);
 
-                IFluidDex(wstUSR_USDC_DEX).updateMaxSupplyShares(7_500_000 * 1e18); // $15M
+                IFluidDex(wstUSR_USDC_DEX).updateMaxSupplyShares(
+                    10_000_000 * 1e18
+                ); // $20M
             }
         }
     }
