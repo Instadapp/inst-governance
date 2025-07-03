@@ -56,6 +56,9 @@ contract PayloadIGP102 is PayloadIGPMain {
 
         // Action 5: Update wstUSR-USDC Supply Caps
         action5();
+
+        // Action 6: Update all the Maintenance Auths with Team Multisig
+        action6();
     }
 
     function verifyProposal() public view override {}
@@ -193,7 +196,6 @@ contract PayloadIGP102 is PayloadIGPMain {
                 string
                     memory withdrawSignature = "withdraw(uint256,uint256,uint256)";
 
-
                 // Spell 1: Stake ETH
                 {
                     uint256 ETH_AMOUNT = address(TREASURY).balance;
@@ -261,6 +263,54 @@ contract PayloadIGP102 is PayloadIGPMain {
                     10_000_000 * 1e18
                 ); // $20M
             }
+        }
+    }
+
+    // @notice Action 6: Update all the Maintenance Auths with Team Multisig
+    function action6() internal isActionSkippable(6) {
+        // update all the maintenance auths with Team Multisig
+        {
+            // Dex Fee Auths
+            address oldDexFeeAuth = 0xE3e18c563d11ced9B0c9cb8dD0284CF4442bC06a;
+            address newDexFeeAuth = 0x7BD48D505A195d2d3B90263b7E4DB78909b817D3;
+
+            // Remove old dex fee auth
+            DEX_FACTORY.setGlobalAuth(oldDexFeeAuth, false);
+
+            // Add new dex fee auth
+            DEX_FACTORY.setGlobalAuth(newDexFeeAuth, true);
+        }
+        {
+            // Rates Auths
+            address oldRatesAuth = 0x3eca30f7dB5AeAbD8757cE5Baf850dA8acA086Db;
+            address newRatesAuth = 0x1e6B029284dc2779F8FfBD83a3a5aA00EdCE6ba4;
+
+            // Remove old rates auth
+            LIQUIDITY.setGlobalAuth(oldRatesAuth, false);
+
+            // Add new rates auth
+            LIQUIDITY.setGlobalAuth(newRatesAuth, true);
+        }
+        {
+            // Range Auth
+            address newRangeAuth = 0x827089c01E9f761ff1A6D7041a9388bDdae74cc4;
+
+            // Add new range auth
+            LIQUIDITY.setGlobalAuth(newRangeAuth, true);
+        }
+        {
+            // Limits Auth
+            address newLimitsAuth = 0x38f099E69F76978E195712727A1858C6c63335aa;
+
+            // Add new limits auth
+            LIQUIDITY.setGlobalAuth(newLimitsAuth, true);
+        }
+        {
+            // Limits Auth Dex
+            address newLimitsAuthDex = 0x5A09B07DFCc0852ADA327Dc81A9cb676B6c676f2;
+
+            // Add new limits auth dex
+            DEX_FACTORY.setGlobalAuth(newLimitsAuthDex, true);
         }
     }
 
