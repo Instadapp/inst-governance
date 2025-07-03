@@ -285,25 +285,43 @@ contract PayloadIGP102 is PayloadIGPMain {
             address oldRatesAuth = 0x3eca30f7dB5AeAbD8757cE5Baf850dA8acA086Db;
             address newRatesAuth = 0x1e6B029284dc2779F8FfBD83a3a5aA00EdCE6ba4;
 
-            // Remove old rates auth
-            LIQUIDITY.setGlobalAuth(oldRatesAuth, false);
+            AdminModuleStructs.AddressBool[]
+                memory addrBools_ = new AdminModuleStructs.AddressBool[](2);
 
-            // Add new rates auth
-            LIQUIDITY.setGlobalAuth(newRatesAuth, true);
+            // update rates auth
+            addrBools_[0] = AdminModuleStructs.AddressBool({
+                addr: oldRatesAuth,
+                value: false
+            });
+
+            addrBools_[1] = AdminModuleStructs.AddressBool({
+                addr: newRatesAuth,
+                value: true
+            });
+
+            LIQUIDITY.updateAuths(addrBools_);
         }
         {
-            // Range Auth
-            address newRangeAuth = 0x827089c01E9f761ff1A6D7041a9388bDdae74cc4;
+            // Range Auth Dex
+            address newRangeAuthDex = 0x827089c01E9f761ff1A6D7041a9388bDdae74cc4;
 
-            // Add new range auth
-            LIQUIDITY.setGlobalAuth(newRangeAuth, true);
+            // Add new range auth dex
+            DEX_FACTORY.setGlobalAuth(newRangeAuthDex, true);
         }
         {
             // Limits Auth
             address newLimitsAuth = 0x38f099E69F76978E195712727A1858C6c63335aa;
 
-            // Add new limits auth
-            LIQUIDITY.setGlobalAuth(newLimitsAuth, true);
+            AdminModuleStructs.AddressBool[]
+                memory addrBools_ = new AdminModuleStructs.AddressBool[](1);
+
+            // set limits auth
+            addrBools_[0] = AdminModuleStructs.AddressBool({
+                addr: newLimitsAuth,
+                value: true
+            });
+
+            LIQUIDITY.updateAuths(addrBools_);
         }
         {
             // Limits Auth Dex
