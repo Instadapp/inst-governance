@@ -126,7 +126,7 @@ contract PayloadIGP102 is PayloadIGPMain {
             // launch limits
             address GHO_USDe__GHO_VAULT = getVaultAddress(141);
 
-            // USDE-USDTb / GHO T2 vault
+            // GHO-USDe / GHO T2 vault
             VaultConfig memory VAULT_GHO_USDe_GHO = VaultConfig({
                 vault: GHO_USDe__GHO_VAULT,
                 vaultType: VAULT_TYPE.TYPE_2,
@@ -181,23 +181,12 @@ contract PayloadIGP102 is PayloadIGPMain {
 
             uint256[] memory amounts = new uint256[](2);
 
-            amounts[0] = address(FLUID_RESERVE).balance - 0.1;
+            amounts[0] = address(FLUID_RESERVE).balance - 0.1 ether;
             amounts[1] =
                 IERC20(wstETH_ADDRESS).balanceOf(address(FLUID_RESERVE)) -
-                0.1;
+                0.1 ether;
 
-            FLUID_RESERVE.withdrawFunds(tokens, amounts, TREASURY); // Withdraw to Treasury
-        }
-        {
-            address[] memory tokens = new address[](1);
-            uint256[] memory amounts = new uint256[](1);
-
-            tokens[0] = stETH_ADDRESS;
-            amounts[0] = IERC20(stETH_ADDRESS).balanceOf(
-                address(FLUID_RESERVE)
-            );
-
-            FLUID_RESERVE.withdrawFunds(tokens, amounts, TREASURY); // Withdraw to Treasury
+            FLUID_RESERVE.withdrawFunds(tokens, amounts, address(TREASURY)); // Withdraw to Treasury
         }
         {
             // stake ETH and unwrap wstETH
@@ -303,16 +292,16 @@ contract PayloadIGP102 is PayloadIGPMain {
             address oldRatesAuth = 0x3eca30f7dB5AeAbD8757cE5Baf850dA8acA086Db;
             address newRatesAuth = 0x1e6B029284dc2779F8FfBD83a3a5aA00EdCE6ba4;
 
-            AdminModuleStructs.AddressBool[]
-                memory addrBools_ = new AdminModuleStructs.AddressBool[](2);
+            FluidLiquidityAdminStructs.AddressBool[]
+                memory addrBools_ = new FluidLiquidityAdminStructs.AddressBool[](2);
 
             // update rates auth
-            addrBools_[0] = AdminModuleStructs.AddressBool({
+            addrBools_[0] = FluidLiquidityAdminStructs.AddressBool({
                 addr: oldRatesAuth,
                 value: false
             });
 
-            addrBools_[1] = AdminModuleStructs.AddressBool({
+            addrBools_[1] = FluidLiquidityAdminStructs.AddressBool({
                 addr: newRatesAuth,
                 value: true
             });
@@ -338,11 +327,11 @@ contract PayloadIGP102 is PayloadIGPMain {
             // Limits Auth
             address newLimitsAuth = 0x38f099E69F76978E195712727A1858C6c63335aa;
 
-            AdminModuleStructs.AddressBool[]
-                memory addrBools_ = new AdminModuleStructs.AddressBool[](1);
+            FluidLiquidityAdminStructs.AddressBool[]
+                memory addrBools_ = new FluidLiquidityAdminStructs.AddressBool[](1);
 
             // set limits auth
-            addrBools_[0] = AdminModuleStructs.AddressBool({
+            addrBools_[0] = FluidLiquidityAdminStructs.AddressBool({
                 addr: newLimitsAuth,
                 value: true
             });
