@@ -178,13 +178,24 @@ contract PayloadIGP102 is PayloadIGPMain {
             tokens[1] = wstETH_ADDRESS;
 
             LIQUIDITY.collectRevenue(tokens);
-
+        
             uint256[] memory amounts = new uint256[](2);
 
             amounts[0] = address(FLUID_RESERVE).balance - 0.1 ether;
             amounts[1] =
                 IERC20(wstETH_ADDRESS).balanceOf(address(FLUID_RESERVE)) -
                 0.1 ether;
+
+            FLUID_RESERVE.withdrawFunds(tokens, amounts, address(TREASURY)); // Withdraw to Treasury
+        }
+        {
+            address[] memory tokens = new address[](1);
+            uint256[] memory amounts = new uint256[](1);
+
+            tokens[0] = stETH_ADDRESS;
+            amounts[0] = IERC20(stETH_ADDRESS).balanceOf(
+                address(FLUID_RESERVE)
+            );
 
             FLUID_RESERVE.withdrawFunds(tokens, amounts, address(TREASURY)); // Withdraw to Treasury
         }
