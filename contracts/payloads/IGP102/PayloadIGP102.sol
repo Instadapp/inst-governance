@@ -63,7 +63,7 @@ contract PayloadIGP102 is PayloadIGPMain {
         // Action 7: Update Rates Auths
         action7();
 
-        // Action 8: Update Range Auths
+        // Action 8: Update Dex Range Auths
         action8();
 
         // Action 9: Update Limits Auths
@@ -321,7 +321,7 @@ contract PayloadIGP102 is PayloadIGPMain {
         }
     }
 
-    // @notice Action 8: Update Range Auths
+    // @notice Action 8: Update Dex Range Auths
     function action8() internal isActionSkippable(8) {
         {
             // Range Auth Dex
