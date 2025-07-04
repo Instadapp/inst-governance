@@ -57,11 +57,23 @@ contract PayloadIGP102 is PayloadIGPMain {
         // Action 5: Update wstUSR-USDC Supply Caps
         action5();
 
-        // Action 6: Update all the Maintenance Auths with Team Multisig
+        // Action 6: Update Dex Fee Auths
         action6();
 
-        // Action 7: Add USDe-USDT Dex Fee auth
+        // Action 7: Update Rates Auths
         action7();
+
+        // Action 8: Update Range Auths
+        action8();
+
+        // Action 9: Update Limits Auths
+        action9();
+
+        // Action 10: Update Dex Limits Auths
+        action10();
+
+        // Action 11: Add USDe-USDT Dex Fee auth
+        action11();
     }
 
     function verifyProposal() public view override {}
@@ -269,9 +281,8 @@ contract PayloadIGP102 is PayloadIGPMain {
         }
     }
 
-    // @notice Action 6: Update all the Maintenance Auths with Team Multisig
+    // @notice Action 6: Update Dex Fee Auths
     function action6() internal isActionSkippable(6) {
-        // update all the maintenance auths with Team Multisig
         {
             // Dex Fee Auths
             address oldDexFeeAuth = 0xE3e18c563d11ced9B0c9cb8dD0284CF4442bC06a;
@@ -283,6 +294,10 @@ contract PayloadIGP102 is PayloadIGPMain {
             // Add new dex fee auth
             DEX_FACTORY.setGlobalAuth(newDexFeeAuth, true);
         }
+    }
+
+    // @notice Action 7: Update Rates Auths
+    function action7() internal isActionSkippable(7) {
         {
             // Rates Auths
             address oldRatesAuth = 0x3eca30f7dB5AeAbD8757cE5Baf850dA8acA086Db;
@@ -304,6 +319,10 @@ contract PayloadIGP102 is PayloadIGPMain {
 
             LIQUIDITY.updateAuths(addrBools_);
         }
+    }
+
+    // @notice Action 8: Update Range Auths
+    function action8() internal isActionSkippable(8) {
         {
             // Range Auth Dex
             address newRangeAuthDex = 0x827089c01E9f761ff1A6D7041a9388bDdae74cc4;
@@ -311,6 +330,10 @@ contract PayloadIGP102 is PayloadIGPMain {
             // Add new range auth dex
             DEX_FACTORY.setGlobalAuth(newRangeAuthDex, true);
         }
+    }
+
+    // @notice Action 9: Update Limits Auths
+    function action9() internal isActionSkippable(9) {
         {
             // Limits Auth
             address newLimitsAuth = 0x38f099E69F76978E195712727A1858C6c63335aa;
@@ -326,6 +349,10 @@ contract PayloadIGP102 is PayloadIGPMain {
 
             LIQUIDITY.updateAuths(addrBools_);
         }
+    }
+
+    // @notice Action 10: Update Dex Limits Auths
+    function action10() internal isActionSkippable(10) {
         {
             // Limits Auth Dex
             address newLimitsAuthDex = 0x5A09B07DFCc0852ADA327Dc81A9cb676B6c676f2;
@@ -335,8 +362,8 @@ contract PayloadIGP102 is PayloadIGPMain {
         }
     }
 
-    // @notice Action 7: Add USDe-USDT Dex Fee auth
-    function action7() internal isActionSkippable(7) {
+    // @notice Action 11: Add USDe-USDT Dex Fee auth
+    function action11() internal isActionSkippable(11) {
         address USDe_USDT_DEX = getDexAddress(18);
 
         // Fee Handler Addresses
