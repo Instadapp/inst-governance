@@ -59,6 +59,9 @@ contract PayloadIGP102 is PayloadIGPMain {
 
         // Action 6: Update all the Maintenance Auths with Team Multisig
         action6();
+
+        // Action 7: Add USDe-USDT Dex Fee auth
+        action7();
     }
 
     function verifyProposal() public view override {}
@@ -330,6 +333,17 @@ contract PayloadIGP102 is PayloadIGPMain {
             // Add new limits auth dex
             DEX_FACTORY.setGlobalAuth(newLimitsAuthDex, true);
         }
+    }
+
+    // @notice Action 7: Add USDe-USDT Dex Fee auth
+    function action7() internal isActionSkippable(7) {
+        address USDe_USDT_DEX = getDexAddress(18);
+
+        // Fee Handler Addresses
+        address FeeHandler = 0x855BaEf2EEBf4238e6e509c85a5277a3c5A38f9D;
+
+        // Add new handler as auth
+        DEX_FACTORY.setDexAuth(USDe_USDT_DEX, FeeHandler, true);
     }
 
     /**
