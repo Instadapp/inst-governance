@@ -2,7 +2,7 @@
 
 ## Summary
 
-This proposal sets **$50k** Liquidity Layer withdrawal and borrow limits for **ETH**, **USDC**, **USDT** and **WBTC** on the new **DexV2** proxy and **Money Market** proxy on Ethereum, ahead of the DexV2 private beta. It also collects the Liquidity Layer's uncollected **USDC**, **USDT** and **ETH** revenue into the Fluid Reserve and sends the Fluid Foundation's **$350k/month** October grant tranche (**90,000 USDC + 80,000 USDT + 60 ETH + 13 stETH**, ~$352k).
+This proposal sets **$50k** Liquidity Layer withdrawal and borrow limits for **ETH**, **USDC**, **USDT** and **WBTC** on the new **DexV2** proxy and **Money Market** proxy on Ethereum, ahead of the DexV2 private beta. It also collects the Liquidity Layer's uncollected **USDC**, **USDT**, **GHO**, **USDe**, **USDtb**, **sUSDe** and **ETH** revenue into the Fluid Reserve and sends the Fluid Foundation's **$350k/month** October grant tranche (**90,000 USDC + 80,000 USDT + 37,000 GHO + 5,000 USDe + 4,000 USDtb + 1,500 sUSDe + 41 ETH + 13 stETH**, ~$352k), paid stablecoins-first.
 
 ## Code Changes
 
@@ -26,18 +26,22 @@ Token amounts are set at ETH $2,490 and WBTC $84,000.
 
 ### Action 2: Collect Revenue and Send the Foundation's October Grant
 
-1. `collectRevenue` on the Liquidity Layer for USDC, USDT and ETH into the Fluid Reserve.
+1. `collectRevenue` on the Liquidity Layer for USDC, USDT, GHO, USDe, USDtb, sUSDe and ETH into the Fluid Reserve.
 2. `withdrawFunds` from the Fluid Reserve to the Fluid Foundation (`0xde0377eF25aD02dBcFbc87D632E46bf1972A0Dc3`), memo "FOUNDATION GRANT":
 
 | Token | Amount | ~USD |
 | --- | --- | --- |
 | USDC | 90,000 | $90,000 |
 | USDT | 80,000 | $80,000 |
-| ETH | 60 | $149,400 |
+| GHO | 37,000 | $37,000 |
+| USDe | 5,000 | $5,000 |
+| USDtb | 4,000 | $4,000 |
+| sUSDe | 1,500 | $1,881 |
+| ETH | 41 | $102,090 |
 | stETH | 13 | $32,370 |
-| **Total** | | **~$351,770** |
+| **Total** | | **~$352,341** |
 
-Amounts are fixed in token terms; any excess revenue stays in the Reserve.
+Stablecoins are used first (about $218k of the total); ETH and stETH cover the rest. Priced at ETH $2,490 and sUSDe ~$1.254. Amounts are fixed in token terms; any excess revenue stays in the Reserve.
 
 ## Description
 
