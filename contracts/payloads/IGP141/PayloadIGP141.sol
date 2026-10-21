@@ -29,6 +29,9 @@ contract PayloadIGP141 is PayloadIGPPriceHelpers {
     ///      be deployed before this proposal executes.
     address public constant DEXV2_LAUNCH_PROXY = 0xaBE4D5AA1Bb188f4B5d3a1aE3B8ec5e300A78261;
     address public constant MONEY_MARKET_LAUNCH_PROXY = 0x92fC6445a6d57fCA94c3B847E80504B95e2D9e2F;
+    /// @dev Token amounts for the limits use the same prices as the grant:
+    ///      7-day average (CoinGecko hourly, 14-21 Oct 2026), ETH ~$2,420,
+    ///      WBTC ~$81,800, stables $1.
     uint256 public constant DEXV2_MM_LIMIT_USD = 50_000; // $50k
     uint256 public constant DEXV2_MM_EXPAND_PERCENT = 20 * 1e2; // 20%
     uint256 public constant DEXV2_MM_EXPAND_DURATION = 12 hours;
@@ -163,8 +166,8 @@ contract PayloadIGP141 is PayloadIGPPriceHelpers {
 
     // --- BEGIN AUTO-GENERATED PRICES (scripts/verify/prepare-prices.ts) ---
     // fetched: 2026-10-21T20:06:51.248Z, source: coingecko
-    function ETH_USD_PRICE()    public pure override returns (uint256) { return 2_490 * 1e2; }
+    function ETH_USD_PRICE()    public pure override returns (uint256) { return 2_420 * 1e2; }
     function STABLE_USD_PRICE() public pure override returns (uint256) { return 1 * 1e2; }
-    function BTC_USD_PRICE()    public pure override returns (uint256) { return 84_000 * 1e2; }
+    function BTC_USD_PRICE()    public pure override returns (uint256) { return 81_800 * 1e2; }
     // --- END AUTO-GENERATED PRICES ---
 }

@@ -22,7 +22,7 @@ For each proxy and each of ETH, USDC, USDT and WBTC:
 | Supply (withdrawal limit) | with interest | 20% | 12h | $50k | - |
 | Borrow (debt ceiling) | with interest | 20% | 12h | $50k | $50k |
 
-Token amounts are set at ETH $2,490 and WBTC $84,000 (CoinGecko, 21 Oct 2026).
+Token amounts use the same prices as the grant below: 7-day average (CoinGecko hourly, 14-21 Oct 2026), ETH ~$2,420 and WBTC ~$81,800, stablecoins $1.
 
 ### Action 2: Collect Revenue and Send the Foundation's October Grant
 
