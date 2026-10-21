@@ -20,19 +20,14 @@ contract PayloadIGP141 is PayloadIGPPriceHelpers {
     uint256 public constant PROPOSAL_ID = 141;
 
     // --- Action 1 ---
-    /// @dev DexV2 / Money Market proxies. Deployed with the Arachnid CREATE2
-    ///      factory (salt 0x0003) on EmptyImplementationUUPS
-    ///      0xDbd2791d64266eA070A3fEf681fb4E5b547A37C0, so the address is the
-    ///      same on every chain (live on Polygon, fluid-contracts #949).
+    /// @dev DexV2 / Money Market proxies on Ethereum.
+    ///      TODO: set both to the deployed Ethereum proxy addresses before
+    ///      this proposal is submitted.
     ///      The Liquidity AdminModule requires `user.code.length > 0`
     ///      (AdminModule__AddressNotAContract, 10026), so both proxies must
-    ///      be deployed on mainnet before this proposal executes.
-    ///      Not the older test proxies DEX_V2_PROXY / MONEY_MARKET_PROXY in
-    ///      common/constants.sol (0x4E42 / 0xe3B7), which are left untouched.
-    address public constant DEXV2_LAUNCH_PROXY =
-        0x17Eb78c5F7667C30ca241F56eCfE1e3b233b1E4F;
-    address public constant MONEY_MARKET_LAUNCH_PROXY =
-        0x2536CbF2F657F153A86aCF8435293c60A23D32bf;
+    ///      be deployed before this proposal executes.
+    address public constant DEXV2_LAUNCH_PROXY = address(0);
+    address public constant MONEY_MARKET_LAUNCH_PROXY = address(0);
     uint256 public constant DEXV2_MM_LIMIT_USD = 50_000; // $50k
     uint256 public constant DEXV2_MM_EXPAND_PERCENT = 20 * 1e2; // 20%
     uint256 public constant DEXV2_MM_EXPAND_DURATION = 12 hours;
@@ -77,9 +72,8 @@ contract PayloadIGP141 is PayloadIGPPriceHelpers {
     ///           expand 20% / 12h
     ///         - borrow: base and max debt ceiling $50k, mode 1, expand
     ///           20% / 12h
-    ///         Same shape as the Polygon Team MS limits for these proxies.
     ///         Supply and borrow configs are both needed for every listed
-    ///         token (deployment checklist, fluid-contracts #943).
+    ///         token.
     function action1() internal isActionSkippable(1) {
         address[2] memory protocols_ = [
             DEXV2_LAUNCH_PROXY,

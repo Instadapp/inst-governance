@@ -10,10 +10,10 @@ This proposal sets **$50k** Liquidity Layer withdrawal and borrow limits for **E
 
 | Protocol | Address |
 | --- | --- |
-| DexV2 proxy | `0x17Eb78c5F7667C30ca241F56eCfE1e3b233b1E4F` |
-| Money Market proxy | `0x2536CbF2F657F153A86aCF8435293c60A23D32bf` |
+| DexV2 proxy | TBD (set to the Ethereum deployment) |
+| Money Market proxy | TBD (set to the Ethereum deployment) |
 
-Both proxies are deployed through the CREATE2 factory (salt `0x0003`) on an empty UUPS implementation, so they have the same address on every chain. The Liquidity Layer only accepts configs for addresses with code, so both proxies must be deployed on Ethereum before this proposal executes.
+The Liquidity Layer only accepts configs for addresses with code, so both proxies must be deployed on Ethereum before this proposal executes.
 
 For each proxy and each of ETH, USDC, USDT and WBTC:
 
