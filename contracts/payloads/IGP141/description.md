@@ -1,4 +1,4 @@
-# Set Liquidity Layer Limits for the DexV2 and Money Market Proxies, and Send the Foundation's $350k October Grant
+# Set Initial Limits for the DexV2 and Money Market, and Send the Foundation's $350k October Grant
 
 ## Summary
 
