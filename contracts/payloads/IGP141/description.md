@@ -2,7 +2,7 @@
 
 ## Summary
 
-This proposal sets **$50k** Liquidity Layer withdrawal and borrow limits for **ETH**, **USDC**, **USDT** and **WBTC** on the new **DexV2** proxy and **Money Market** proxy on Ethereum, ahead of the DexV2 private beta. It also collects the Liquidity Layer's uncollected **USDC**, **USDT** and **ETH** revenue into the Fluid Reserve and sends the Fluid Foundation's **$350k/month** October grant tranche (**90,000 USDC + 80,000 USDT + 61 ETH + 13 stETH**, ~$349k).
+This proposal sets **$50k** Liquidity Layer withdrawal and borrow limits for **ETH**, **USDC**, **USDT** and **WBTC** on the new **DexV2** proxy and **Money Market** proxy on Ethereum, ahead of the DexV2 private beta. It also collects the Liquidity Layer's uncollected **USDC**, **USDT** and **ETH** revenue into the Fluid Reserve and sends the Fluid Foundation's **$350k/month** October grant tranche (**90,000 USDC + 80,000 USDT + 62 ETH + 13 stETH**, ~$350k).
 
 ## Code Changes
 
@@ -31,13 +31,13 @@ Token amounts are set at ETH $2,490 and WBTC $84,000.
 
 | Token | Amount | ~USD |
 | --- | --- | --- |
-| USDC | 90,000 | $90,000 |
-| USDT | 80,000 | $80,000 |
-| ETH | 61 | $147,641 |
-| stETH | 13 | $31,466 |
-| **Total** | | **~$349,107** |
+| USDC | 90,000 | ~$90k |
+| USDT | 80,000 | ~$80k |
+| ETH | 62 | ~$150k |
+| stETH | 13 | ~$31k |
+| **Total** | | **~$350k** |
 
-ETH and stETH are valued at their 7-day average price (CoinGecko hourly, 14-21 Oct 2026): ETH $2,420.35, stETH $2,420.44. Amounts are fixed in token terms; any excess revenue stays in the Reserve.
+ETH and stETH are valued at their 7-day average price (CoinGecko hourly, 14-21 Oct 2026): ETH and stETH ~$2,420. Amounts are fixed in token terms; any excess revenue stays in the Reserve.
 
 ## Description
 

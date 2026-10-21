@@ -15,7 +15,7 @@ import {IFluidReserveContractV2} from "../common/interfaces/IFluidReserveContrac
 ///         Action 2 collects the Liquidity Layer's USDC, USDT and ETH revenue
 ///         into the Fluid Reserve and sends the October tranche of the
 ///         $350,000/month Foundation grant (IGP-139): 90,000 USDC + 80,000
-///         USDT + 61 ETH + 13 stETH, ~$349k at the 7-day average ETH price
+///         USDT + 62 ETH + 13 stETH, ~$350k at the 7-day average ETH price
 ///         ($2,420).
 contract PayloadIGP141 is PayloadIGPPriceHelpers {
     uint256 public constant PROPOSAL_ID = 141;
@@ -37,12 +37,12 @@ contract PayloadIGP141 is PayloadIGPPriceHelpers {
     /// @notice October 2026 tranche of the $350,000/month Foundation grant.
     ///         Sized to what the Reserve plus uncollected Liquidity revenue
     ///         holds at authoring (~93.0k USDC, ~83.7k USDT, ~65.3 ETH,
-    ///         ~53.6 stETH). ~$349k at the 7-day average ETH / stETH price of
+    ///         ~53.6 stETH). ~$350k at the 7-day average ETH / stETH price of
     ///         ~$2,420 (14-21 Oct 2026); fixed token amounts, so the
     ///         USD value of the ETH / stETH legs moves with the ETH price.
     uint256 public constant FOUNDATION_GRANT_USDC = 90_000 * 1e6;
     uint256 public constant FOUNDATION_GRANT_USDT = 80_000 * 1e6;
-    uint256 public constant FOUNDATION_GRANT_ETH = 61 ether;
+    uint256 public constant FOUNDATION_GRANT_ETH = 62 ether;
     uint256 public constant FOUNDATION_GRANT_STETH = 13 ether;
 
     function execute() public virtual override {
@@ -118,7 +118,7 @@ contract PayloadIGP141 is PayloadIGPPriceHelpers {
         amounts_[1] = FOUNDATION_GRANT_USDT; // 80,000 USDT
 
         tokens_[2] = ETH_ADDRESS;
-        amounts_[2] = FOUNDATION_GRANT_ETH; // 61 ETH
+        amounts_[2] = FOUNDATION_GRANT_ETH; // 62 ETH
 
         tokens_[3] = stETH_ADDRESS;
         amounts_[3] = FOUNDATION_GRANT_STETH; // 13 stETH
