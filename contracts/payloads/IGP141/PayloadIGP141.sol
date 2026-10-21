@@ -12,11 +12,10 @@ import {IFluidReserveContractV2} from "../common/interfaces/IFluidReserveContrac
 ///         for ETH, USDC, USDT and WBTC on the DexV2 proxy and the Money
 ///         Market proxy (mainnet private beta).
 ///
-///         Action 2 collects the Liquidity Layer's USDC, USDT, GHO, USDe,
-///         USDtb, sUSDe and ETH revenue into the Fluid Reserve and sends the
-///         October tranche of the $350,000/month Foundation grant (IGP-139):
-///         90,000 USDC + 80,000 USDT + 37,000 GHO + 5,000 USDe + 4,000 USDtb
-///         + 1,500 sUSDe + 41 ETH + 13 stETH, ~$352k at ETH $2,490.
+///         Action 2 collects the Liquidity Layer's USDC, USDT and ETH revenue
+///         into the Fluid Reserve and sends the October tranche of the
+///         $350,000/month Foundation grant (IGP-139): 90,000 USDC + 80,000
+///         USDT + 60 ETH + 13 stETH, ~$352k at ETH $2,490.
 contract PayloadIGP141 is PayloadIGPPriceHelpers {
     uint256 public constant PROPOSAL_ID = 141;
 
@@ -40,19 +39,13 @@ contract PayloadIGP141 is PayloadIGPPriceHelpers {
 
     // --- Action 2 ---
     /// @notice October 2026 tranche of the $350,000/month Foundation grant.
-    ///         Stables-first: sized to what the Reserve plus uncollected
-    ///         Liquidity revenue holds at authoring (block 26243414: ~93.0k
-    ///         USDC, ~83.8k USDT, ~37.1k GHO, ~5.09k USDe, ~4.09k USDtb,
-    ///         ~1.52k sUSDe, ~65.3 ETH, ~53.6 stETH); ETH covers the rest.
-    ///         ~$352k at ETH $2,490 and sUSDe ~$1.254; fixed token amounts, so
-    ///         the USD value of the ETH / stETH legs moves with the ETH price.
+    ///         Sized to what the Reserve plus uncollected Liquidity revenue
+    ///         holds at authoring (~93.0k USDC, ~83.7k USDT, ~65.3 ETH,
+    ///         ~53.6 stETH). ~$352k at ETH $2,490; fixed token amounts, so the
+    ///         USD value of the ETH / stETH legs moves with the ETH price.
     uint256 public constant FOUNDATION_GRANT_USDC = 90_000 * 1e6;
     uint256 public constant FOUNDATION_GRANT_USDT = 80_000 * 1e6;
-    uint256 public constant FOUNDATION_GRANT_GHO = 37_000 * 1e18;
-    uint256 public constant FOUNDATION_GRANT_USDE = 5_000 * 1e18;
-    uint256 public constant FOUNDATION_GRANT_USDTB = 4_000 * 1e18;
-    uint256 public constant FOUNDATION_GRANT_SUSDE = 1_500 * 1e18;
-    uint256 public constant FOUNDATION_GRANT_ETH = 41 ether;
+    uint256 public constant FOUNDATION_GRANT_ETH = 60 ether;
     uint256 public constant FOUNDATION_GRANT_STETH = 13 ether;
 
     function execute() public virtual override {
@@ -101,7 +94,7 @@ contract PayloadIGP141 is PayloadIGPPriceHelpers {
         }
     }
 
-    /// @notice Action 2: Collect the Liquidity Layer's stablecoin and ETH
+    /// @notice Action 2: Collect the Liquidity Layer's USDC, USDT and ETH
     ///         revenue into the Fluid Reserve and transfer the October
     ///         tranche of the Foundation's $350,000/month grant.
     /// @dev IGP-140 Action 8 pattern (`collectRevenue`, then
@@ -111,20 +104,16 @@ contract PayloadIGP141 is PayloadIGPPriceHelpers {
     ///      Reserve.
     function action2() internal isActionSkippable(2) {
         // Step 1: Collect Liquidity Layer revenue into the Reserve.
-        address[] memory liquidityTokens_ = new address[](7);
-        liquidityTokens_[0] = USDC_ADDRESS; // ~71.9k uncollected
-        liquidityTokens_[1] = USDT_ADDRESS; // ~61.1k uncollected
-        liquidityTokens_[2] = GHO_ADDRESS; // ~37.1k uncollected
-        liquidityTokens_[3] = USDe_ADDRESS; // ~5.09k uncollected
-        liquidityTokens_[4] = USDTb_ADDRESS; // ~4.09k uncollected
-        liquidityTokens_[5] = sUSDe_ADDRESS; // ~1.52k uncollected
-        liquidityTokens_[6] = ETH_ADDRESS; // ~13.1 ETH uncollected
+        address[] memory liquidityTokens_ = new address[](3);
+        liquidityTokens_[0] = USDC_ADDRESS; // ~$71.8k uncollected
+        liquidityTokens_[1] = USDT_ADDRESS; // ~$61.0k uncollected
+        liquidityTokens_[2] = ETH_ADDRESS; // ~13.1 ETH uncollected
 
         LIQUIDITY.collectRevenue(liquidityTokens_);
 
         // Step 2: Transfer the tranche to the Fluid Foundation.
-        address[] memory tokens_ = new address[](8);
-        uint256[] memory amounts_ = new uint256[](8);
+        address[] memory tokens_ = new address[](4);
+        uint256[] memory amounts_ = new uint256[](4);
 
         tokens_[0] = USDC_ADDRESS;
         amounts_[0] = FOUNDATION_GRANT_USDC; // 90,000 USDC
@@ -132,23 +121,11 @@ contract PayloadIGP141 is PayloadIGPPriceHelpers {
         tokens_[1] = USDT_ADDRESS;
         amounts_[1] = FOUNDATION_GRANT_USDT; // 80,000 USDT
 
-        tokens_[2] = GHO_ADDRESS;
-        amounts_[2] = FOUNDATION_GRANT_GHO; // 37,000 GHO
+        tokens_[2] = ETH_ADDRESS;
+        amounts_[2] = FOUNDATION_GRANT_ETH; // 60 ETH
 
-        tokens_[3] = USDe_ADDRESS;
-        amounts_[3] = FOUNDATION_GRANT_USDE; // 5,000 USDe
-
-        tokens_[4] = USDTb_ADDRESS;
-        amounts_[4] = FOUNDATION_GRANT_USDTB; // 4,000 USDtb
-
-        tokens_[5] = sUSDe_ADDRESS;
-        amounts_[5] = FOUNDATION_GRANT_SUSDE; // 1,500 sUSDe (~$1.9k)
-
-        tokens_[6] = ETH_ADDRESS;
-        amounts_[6] = FOUNDATION_GRANT_ETH; // 41 ETH
-
-        tokens_[7] = stETH_ADDRESS;
-        amounts_[7] = FOUNDATION_GRANT_STETH; // 13 stETH
+        tokens_[3] = stETH_ADDRESS;
+        amounts_[3] = FOUNDATION_GRANT_STETH; // 13 stETH
 
         IFluidReserveContractV2(address(FLUID_RESERVE)).withdrawFunds(
             tokens_,
