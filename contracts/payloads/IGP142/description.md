@@ -191,4 +191,4 @@ Dex 45 itself is left unchanged.
 
 ## Conclusion
 
-IGP-141 closes the dexV1 test DEX at the Liquidity Layer, rebalances vault 3 without leaving any borrow capacity open, launches the weETH/ETH vault, closes the Team Multisig's remaining wstETH/cbBTC credit lines, returns iETHv2's residual test positions, closes the IGP-45 test DEXes id1/id2/id3 at the Liquidity Layer, restricts and pauses the remaining pre-launch vaults, old DEXes, and vaults 35-40, and closes the hidden USDe vaults 66-73, the dex 5 test market, dex 27 deposits, and the dust-launch vaults 95 / 167.
+IGP-142 closes the dexV1 test DEX at the Liquidity Layer, rebalances vault 3 without leaving any borrow capacity open, launches the weETH/ETH vault, closes the Team Multisig's remaining wstETH/cbBTC credit lines, returns iETHv2's residual test positions, closes the IGP-45 test DEXes id1/id2/id3 at the Liquidity Layer, restricts and pauses the remaining pre-launch vaults, old DEXes, and vaults 35-40, and closes the hidden USDe vaults 66-73, the dex 5 test market, dex 27 deposits, and the dust-launch vaults 95 / 167.

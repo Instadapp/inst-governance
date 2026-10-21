@@ -20,7 +20,7 @@ interface IFluidLiquidityWithdrawalLimit {
     ) external;
 }
 
-/// @notice IGP141 (DRAFT): Close down the dexV1 test DEX at the Liquidity
+/// @notice IGP142 (DRAFT): Close down the dexV1 test DEX at the Liquidity
 ///         Layer, rebalance vault 3 (wstETH/ETH), and raise the weETH/ETH
 ///         vault (182) from dust to launch limits. More actions are added as
 ///         they are agreed in #gov-proposals-lineup.
@@ -76,8 +76,8 @@ interface IFluidLiquidityWithdrawalLimit {
 ///
 ///         Action 12 restricts and pauses the dust-launch vaults 95
 ///         (eBTC/cbBTC) and 167 (PST-USDC / USDC).
-contract PayloadIGP141 is PayloadIGPPriceHelpers {
-    uint256 public constant PROPOSAL_ID = 141;
+contract PayloadIGP142 is PayloadIGPPriceHelpers {
+    uint256 public constant PROPOSAL_ID = 142;
 
     // --- Action 1 ---
     /// @dev dexV1 test DEX (wstETH/ETH). Not deployed by the DexFactory, so
