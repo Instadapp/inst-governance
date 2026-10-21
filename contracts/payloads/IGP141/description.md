@@ -22,7 +22,7 @@ For each proxy and each of ETH, USDC, USDT and WBTC:
 | Supply (withdrawal limit) | with interest | 20% | 12h | $50k | - |
 | Borrow (debt ceiling) | with interest | 20% | 12h | $50k | $50k |
 
-Token amounts are set at ETH $2,490 and WBTC $84,000.
+Token amounts are set at ETH $2,490 and WBTC $84,000 (CoinGecko, 21 Oct 2026).
 
 ### Action 2: Collect Revenue and Send the Foundation's October Grant
 
@@ -46,4 +46,4 @@ ETH and stETH are valued at their 7-day average price (CoinGecko hourly, 14-21 O
 
 ## Conclusion
 
-IGP-141 sets $50k Liquidity Layer withdrawal and borrow limits for ETH, USDC, USDT and WBTC on the DexV2 and Money Market proxies, and sends the Fluid Foundation's ~$350k October grant tranche from collected Liquidity Layer revenue.
+IGP-141 sets $50k Liquidity Layer withdrawal and borrow limits for ETH, USDC, USDT and WBTC on the DexV2 and Money Market proxies, and sends the Fluid Foundation's ~$350k October grant tranche from the Fluid Reserve, funded by its existing holdings plus the Liquidity Layer revenue collected in the same transaction.
