@@ -10,10 +10,10 @@ This proposal sets **$50k** Liquidity Layer withdrawal and borrow limits for **E
 
 | Protocol | Address |
 | --- | --- |
-| DexV2 proxy | TBD (set to the Ethereum deployment) |
-| Money Market proxy | TBD (set to the Ethereum deployment) |
+| DexV2 proxy | [0xaBE4D5AA1Bb188f4B5d3a1aE3B8ec5e300A78261](https://etherscan.io/address/0xaBE4D5AA1Bb188f4B5d3a1aE3B8ec5e300A78261) |
+| Money Market proxy | [0x92fC6445a6d57fCA94c3B847E80504B95e2D9e2F](https://etherscan.io/address/0x92fC6445a6d57fCA94c3B847E80504B95e2D9e2F) |
 
-The Liquidity Layer only accepts configs for addresses with code, so both proxies must be deployed on Ethereum before this proposal executes.
+The Liquidity Layer only accepts configs for addresses with code; both proxies are deployed on Ethereum.
 
 For each proxy and each of ETH, USDC, USDT and WBTC:
 

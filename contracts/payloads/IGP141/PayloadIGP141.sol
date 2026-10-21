@@ -21,14 +21,14 @@ contract PayloadIGP141 is PayloadIGPPriceHelpers {
     uint256 public constant PROPOSAL_ID = 141;
 
     // --- Action 1 ---
-    /// @dev DexV2 / Money Market proxies on Ethereum.
-    ///      TODO: set both to the deployed Ethereum proxy addresses before
-    ///      this proposal is submitted.
+    /// @dev DexV2 / Money Market proxies on Ethereum (deployed via CREATE2,
+    ///      initial logic = EmptyImplementationUUPS 0x9aA2B2aba70EEF169a8ad6949C0B2F68e3C6e63F,
+    ///      owner Team Multisig).
     ///      The Liquidity AdminModule requires `user.code.length > 0`
     ///      (AdminModule__AddressNotAContract, 10026), so both proxies must
     ///      be deployed before this proposal executes.
-    address public constant DEXV2_LAUNCH_PROXY = address(0);
-    address public constant MONEY_MARKET_LAUNCH_PROXY = address(0);
+    address public constant DEXV2_LAUNCH_PROXY = 0xaBE4D5AA1Bb188f4B5d3a1aE3B8ec5e300A78261;
+    address public constant MONEY_MARKET_LAUNCH_PROXY = 0x92fC6445a6d57fCA94c3B847E80504B95e2D9e2F;
     uint256 public constant DEXV2_MM_LIMIT_USD = 50_000; // $50k
     uint256 public constant DEXV2_MM_EXPAND_PERCENT = 20 * 1e2; // 20%
     uint256 public constant DEXV2_MM_EXPAND_DURATION = 12 hours;
